@@ -64,15 +64,23 @@
   };
 
   virtualisation.docker.enable = true;
-  systemd.services.run-portainer = {
-    path = [ pkgs.docker ];
-    script = ''
-      docker run -d -p 8000:8000 -p 9443:9443 --name portainer --restart=always --pull=always  -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer-ee:latest
-    '';
-    wantedBy = ["multi-user.target"];
-    after = ["docker.service" "docker.socket"];
+  virtualisation.oci-containers.backend = "docker";
+  virtualisation.oci-containers.containers.portainer = {
+    image = "portainer/portainer-ee:latest";
+    ports = [
+      "8000:8000",
+      "9443:9443"
+    ];
+    volumes = [
+      "/var/run/docker.sock:/var/run/docker.sock",
+      "portainer_data:/data"
+    ];
+    autoStart = true;
+    extraOptions = [
+      "--network=host"
+    ];
   };
-  
+
   users = {
     mutableUsers = false;
     users.mu = {
