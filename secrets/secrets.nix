@@ -6,7 +6,9 @@ let
   petrichor = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICqvZ7US1q9NDUo15xyyzXCiAGXoes0tmETy/76+nG7A";
   rhizome = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICt1ZqGf+/PV2hiuGVxbJvytEcKT0xvd4+iJZlFKtAQr";
   systems = [ zeta petrichor rhizome ];
+  all = users ++ systems;
 in
 {
-  "userpassword.age".publicKeys = users ++ systems;
+  "userpassword.age".publicKeys = all;
+  "wireless.age".publicKeys = all;
 }

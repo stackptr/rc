@@ -1,5 +1,6 @@
 { config, pkgs, ... }: {
   age.secrets.userpassword.file = ./secrets/userpassword.age;
+  age.secrets.wireless.file = ./secrets/wireless.age;
   boot = {
     kernelPackages = pkgs.linuxKernel.packages.linux_rpi4;
     initrd.availableKernelModules = [ "xhci_pci" "usbhid" "usb_storage" ];
@@ -21,7 +22,7 @@
     hostName = "zeta";
     wireless = {
       enable = true;
-      environmentFile = "/home/mu/wireless.env";
+      environmentFile = config.age.secrets.wireless.path;
       networks.Ansible.psk = "@PSK_ANSIBLE@";
       interfaces = [ "wlan0" ];
     };
