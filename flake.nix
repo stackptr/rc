@@ -20,7 +20,7 @@
       inherit system;
       modules = [
         { environment.systemPackages = [ agenix.packages.${system}.default ]; }
-        ./configuration.nix
+        ./nixos
         agenix.nixosModules.default
       ];
     };
