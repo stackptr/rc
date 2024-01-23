@@ -1,4 +1,5 @@
 { config, pkgs, ... }: {
+  age.secrets.userpassword.file = ./secrets/userpassword.age;
   boot = {
     kernelPackages = pkgs.linuxKernel.packages.linux_rpi4;
     initrd.availableKernelModules = [ "xhci_pci" "usbhid" "usb_storage" ];
@@ -85,7 +86,7 @@
     mutableUsers = false;
     users.mu = {
       isNormalUser = true;
-      password = "password";
+      hashedPasswordFile = config.age.secrets.userpassword.path;
       extraGroups = [ "wheel" "docker" ];
     };
     users.root.initialPassword = "password";
