@@ -9,7 +9,6 @@
   outputs = { nixpkgs, agenix, ... }:
   let
     system = "aarch64-linux";
-    # overlays = [ agenix.overlay ];
 
     pkgs = import nixpkgs {
       inherit system;
@@ -22,6 +21,7 @@
     nixosConfigurations.zeta = lib.nixosSystem {
       inherit system;
       modules = [
+        { environment.systemPackages = [ agenix.packages.${system}.default ]; }
         ./configuration.nix
         agenix.nixosModules.default
       ];
