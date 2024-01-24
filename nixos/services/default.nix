@@ -30,6 +30,7 @@
       };
     };
   };
+  programs.vim.defaultEditor = true;
   programs.zsh.enable = true;
 
   virtualisation.docker.enable = true;

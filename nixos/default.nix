@@ -6,7 +6,6 @@
   ];
 
   environment.systemPackages = with pkgs; [
-    vim
     tailscale
   ];
   environment.pathsToLink = [ "/share/zsh" ];
