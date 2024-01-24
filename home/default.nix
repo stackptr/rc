@@ -1,9 +1,11 @@
 { pkgs, ... }: {
   programs.home-manager.enable = true;
-  home.packages = [
-    pkgs.htop
-    pkgs.ripgrep
-    pkgs.nix-your-shell
+  home.packages = with pkgs; [
+    gh
+    htop
+    hub
+    nix-your-shell
+    ripgrep
   ];
 
   programs.zsh = {
@@ -34,7 +36,13 @@
       }
     ];
 
-    sessionVariables = {
+    sessionVariables = if pkgs.stdenv.isDarwin then {
+      FR_DOCKERHOST = "docker.for.mac.localhost";
+    } else {};
+
+    shellAliases = {
+      git = "hub";
+      ssh = "mosh";
     };
 
     syntaxHighlighting = {
@@ -42,16 +50,49 @@
     };
     
     initExtra = ''
+      incog () {
+        unset HISTFILE
+      }
+
       if command -v nix-your-shell > /dev/null; then
         nix-your-shell zsh | source /dev/stdin
       fi
+
+      setopt hist_verify
+      setopt inc_append_history
 
       # Pure prompt is not supported by Warp
       if [[ -n "$IN_NIX_SHELL" || -z "$WARP_IS_LOCAL_SHELL_SESSION" ]]; then
         autoload -U promptinit; promptinit
         prompt pure
       fi
+      
+      ## Wrappers for `stack`
+
+      # Build project and specs without running tests:
+      #   sbuild fancy-api
+      #
+      # Omit argument to build everything
+      sbuild () {
+        AWS_PROFILE=freckle-dev stack build "''${STACK_ARGS[@]}" "$1" --test --no-run-tests --file-watch
+      }
+
+      # Test specific matcher pattern with stack:
+      #   stest project "matcher pattern"
+      stest () {
+        AWS_PROFILE=freckle-dev stack build "''${STACK_ARGS[@]}" --test "$1" --test-arguments="--match \"$2\"" --file-watch
+      }
+
+      # Purge package from stack to force rebuild
+      spurge () {
+        stack exec -- ghc-pkg unregister --force "$1"
+      }
     '';
+  
+    envExtra = if pkgs.stdenv.isDarwin then ''
+      # If zsh is launched as a login shell, reset PATH to sensible default:
+      [[ -o login ]] && export PATH='/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin'
+    '' else "";
   };
 
   home.stateVersion = "23.11";
