@@ -24,6 +24,7 @@
       isNormalUser = true;
       hashedPasswordFile = config.age.secrets.userpassword.path;
       extraGroups = [ "wheel" "docker" ];
+      shell = pkgs.zsh;
     };
     users.root.initialPassword = "password";
   };

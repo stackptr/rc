@@ -2,9 +2,11 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     agenix.url = "github:ryantm/agenix";
+    home-manager.url = "github:nix-community/home-manager";
+    home-manager.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = { nixpkgs, agenix, ... }:
+  outputs = { nixpkgs, agenix, home-manager, ... }:
   let
     system = "aarch64-linux";
 
@@ -22,6 +24,12 @@
         { environment.systemPackages = [ agenix.packages.${system}.default ]; }
         ./nixos
         agenix.nixosModules.default
+        home-manager.nixosModules.home-manager
+        {
+          home-manager.useGlobalPkgs = true;
+          home-manager.useUserPackages = true;
+          home-manager.users.mu = import ./home;
+        }
       ];
     };
   };

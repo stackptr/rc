@@ -9,4 +9,5 @@
     vim
     tailscale
   ];
+  environment.pathsToLink = [ "/share/zsh" ];
 }
