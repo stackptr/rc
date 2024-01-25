@@ -18,6 +18,8 @@
     };
   };
 
+  security.sudo.wheelNeedsPassword = false;
+
   users = {
     mutableUsers = false;
     users.mu = {
