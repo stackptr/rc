@@ -24,15 +24,8 @@
   };
 
   programs.mosh.enable = true;
-  programs.git = {
-    enable = true;
-    config = {
-      user = {
-        name = "✿ corey";
-        email = "corey@x64.co";
-      };
-    };
-  };
+  programs.git.enable = true;
+  programs.gnupg.agent.enable = true;
   programs.vim.defaultEditor = true;
   programs.zsh.enable = true;
 

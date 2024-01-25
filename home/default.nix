@@ -8,6 +8,20 @@
     ripgrep
   ];
 
+  programs.git = {
+    enable = true;
+    userName = "✿ corey";
+    userEmail = "corey@x64.co";
+    signing = {
+      key = "F88C08579051AB48";
+      signByDefault = true;
+    };
+  };
+
+  programs.gpg = {
+    enable = true;
+  };
+
   programs.zsh = {
     enable = true;
 
@@ -38,7 +52,10 @@
 
     sessionVariables = if pkgs.stdenv.isDarwin then {
       FR_DOCKERHOST = "docker.for.mac.localhost";
-    } else {};
+    } else {
+      # See: https://www.gnupg.org/documentation/manuals/gnupg/Invoking-GPG_002dAGENT.html
+      GPG_TTY = "$(tty)";
+    };
 
     shellAliases = {
       git = "hub";
@@ -93,6 +110,15 @@
       # If zsh is launched as a login shell, reset PATH to sensible default:
       [[ -o login ]] && export PATH='/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin'
     '' else "";
+  };
+
+  services.gpg-agent = {
+    enable = true;
+    enableZshIntegration = true;
+    pinentryFlavor = "tty";
+    extraConfig = ''
+      allow-loopback-pinentry
+    '';
   };
 
   home.stateVersion = "23.11";
