@@ -1,6 +1,9 @@
 { config, pkgs, ... }: {
   services.openssh.enable = true;
-  services.tailscale.enable = true;
+  services.tailscale = {
+    enable = true;
+    extraUpFlags = [ "--ssh" ];
+  };
   services.samba = {
     enable = true;
     securityType = "user";
