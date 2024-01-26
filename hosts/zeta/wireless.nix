@@ -1,5 +1,5 @@
 { config, pkgs, ... }: {
-  age.secrets.wireless.file = ./../secrets/wireless.age;
+  age.secrets.wireless.file = ./secrets/wireless.age;
 
   networking = {
     hostName = "zeta";

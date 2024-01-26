@@ -1,5 +1,5 @@
 { config, pkgs, ... }: {
-  age.secrets.userpassword.file = ./../secrets/userpassword.age;
+  age.secrets.userpassword.file = ./secrets/userpassword.age;
 
   boot = {
     kernelPackages = pkgs.linuxKernel.packages.linux_rpi4;

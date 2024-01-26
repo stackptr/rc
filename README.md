@@ -1,3 +1,3 @@
-# zeta
+# rc
 
-NixOS configuration for my Raspberry Pi 4.
+This repo houses declarative configurations for systems using NixOS.

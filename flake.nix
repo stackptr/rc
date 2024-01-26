@@ -22,7 +22,7 @@
       inherit system;
       modules = [
         { environment.systemPackages = [ agenix.packages.${system}.default ]; }
-        ./nixos
+        ./hosts/zeta
         agenix.nixosModules.default
         home-manager.nixosModules.home-manager
         {
