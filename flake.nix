@@ -4,9 +4,11 @@
     agenix.url = "github:ryantm/agenix";
     home-manager.url = "github:nix-community/home-manager";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
+    nix-darwin.url = "github:LnL7/nix-darwin";
+    nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = { nixpkgs, agenix, home-manager, ... }:
+  outputs = { self, nixpkgs, agenix, home-manager, nix-darwin, ... }:
   let
     system = "aarch64-linux";
 
@@ -32,5 +34,12 @@
         }
       ];
     };
+
+    darwinConfigurations."Rhizome" = nix-darwin.lib.darwinSystem {
+      modules = [ ./hosts/Rhizome ];
+    };
+
+    # Expose the package set, including overlays, for convenience.
+    darwinPackages = self.darwinConfigurations."Rhizome".pkgs;
   };
 }
