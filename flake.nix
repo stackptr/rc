@@ -36,7 +36,15 @@
     };
 
     darwinConfigurations."Rhizome" = nix-darwin.lib.darwinSystem {
-      modules = [ ./hosts/Rhizome ];
+      modules = [
+        ./hosts/Rhizome
+        home-manager.darwinModules.home-manager
+        {
+          home-manager.useGlobalPkgs = true;
+          home-manager.useUserPackages = true;
+          home-manager.users.corey = import ./home;
+        }
+      ];
     };
 
     # Expose the package set, including overlays, for convenience.

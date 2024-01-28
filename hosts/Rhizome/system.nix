@@ -1,4 +1,8 @@
 { config, pkgs, ... }: {
+  users.users.corey = {
+    home = "/Users/corey";
+  };
+
   # Auto upgrade nix package and the daemon service.
   services.nix-daemon.enable = true;
 

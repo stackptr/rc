@@ -105,15 +105,11 @@
         stack exec -- ghc-pkg unregister --force "$1"
       }
     '';
-  
-    envExtra = if pkgs.stdenv.isDarwin then ''
-      # If zsh is launched as a login shell, reset PATH to sensible default:
-      [[ -o login ]] && export PATH='/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin'
-    '' else "";
   };
 
   services.gpg-agent = {
-    enable = true;
+    # TODO: nix-community/home-manager#2964
+    enable = if pkgs.stdenv.isDarwin then false else true;
     enableZshIntegration = true;
     pinentryFlavor = "tty";
     extraConfig = ''
