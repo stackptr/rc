@@ -1,11 +1,30 @@
 { pkgs, ... }: {
   programs.home-manager.enable = true;
   home.packages = with pkgs; [
+    awscli2
+    btop
+    coreutils-full
+    fd
+    ffmpeg_6
     gh
     htop
     hub
+    jo
+    jq
+    mediainfo
+    mosh
+    neofetch
+    neovim
+    nodejs_20
+    nushell
     nix-your-shell
     ripgrep
+    shellcheck
+    sox
+    tree
+    yarn
+    yt-dlp
+    yq
   ];
 
   programs.git = {
