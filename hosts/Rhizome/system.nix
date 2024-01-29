@@ -2,6 +2,7 @@
   users.users.corey = {
     home = "/Users/corey";
   };
+  security.pam.enableSudoTouchIdAuth = true;
 
   # Auto upgrade nix package and the daemon service.
   services.nix-daemon.enable = true;
