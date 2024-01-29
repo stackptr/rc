@@ -1,6 +1,10 @@
 { pkgs, ... }: {
   programs.home-manager.enable = true;
-  home.packages = with pkgs; [
+  home.packages = let
+    nodejs = pkgs.nodejs_20;
+    yarn = pkgs.yarn.override { inherit nodejs; };
+  in
+  with pkgs; [
     awscli2
     btop
     coreutils-full
@@ -16,7 +20,7 @@
     mosh
     neofetch
     neovim
-    nodejs_20
+    nodejs
     nushell
     nix-your-shell
     ripgrep
