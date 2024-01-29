@@ -5,7 +5,6 @@
     yarn = pkgs.yarn.override { inherit nodejs; };
   in
   with pkgs; [
-    awscli2
     btop
     coreutils-full
     fd
@@ -30,6 +29,11 @@
     yt-dlp
     yq
   ];
+
+  programs.awscli = {
+    enable = true;
+    settings = import ./aws.nix;
+  };
 
   programs.git = {
     enable = true;
