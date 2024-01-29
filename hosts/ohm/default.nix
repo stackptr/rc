@@ -9,6 +9,7 @@
   zramSwap.enable = true;
   networking.hostName = "ohm";
   networking.domain = "";
+  security.pam.sshAgentAuth.enable = true;
 
   programs.zsh.enable = true;
   services.openssh.enable = true;
