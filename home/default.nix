@@ -7,6 +7,7 @@
     fd
     ffmpeg_6
     gh
+    git-interactive-rebase-tool
     htop
     hub
     jo
@@ -34,6 +35,9 @@
     signing = {
       key = "F88C08579051AB48";
       signByDefault = true;
+    };
+    extraConfig = {
+      sequence.editor = "interactive-rebase-tool";
     };
   };
 
