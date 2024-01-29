@@ -9,5 +9,7 @@
   zramSwap.enable = true;
   networking.hostName = "ohm";
   networking.domain = "";
+
+  programs.zsh.enable = true;
   services.openssh.enable = true;
 }
