@@ -35,6 +35,13 @@
       ];
     };
 
+    nixosConfigurations.ohm = lib.nixosSystem {
+      system = "x86_64-linux";
+      modules = [
+        ./hosts/ohm
+      ];
+    };
+
     darwinConfigurations."Rhizome" = nix-darwin.lib.darwinSystem {
       modules = [
         ./hosts/Rhizome
