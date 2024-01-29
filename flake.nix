@@ -47,6 +47,18 @@
       ];
     };
 
+    darwinConfigurations."Petrichor" = nix-darwin.lib.darwinSystem {
+      modules = [
+        ./hosts/Petrichor
+        home-manager.darwinModules.home-manager
+        {
+          home-manager.useGlobalPkgs = true;
+          home-manager.useUserPackages = true;
+          home-manager.users.corey = import ./home;
+        }
+      ];
+    };
+
     # Expose the package set, including overlays, for convenience.
     darwinPackages = self.darwinConfigurations."Rhizome".pkgs;
   };
