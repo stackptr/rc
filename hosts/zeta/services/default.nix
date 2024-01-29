@@ -1,8 +1,12 @@
-{ config, pkgs, ... }: {
+{
+  config,
+  pkgs,
+  ...
+}: {
   services.openssh.enable = true;
   services.tailscale = {
     enable = true;
-    extraUpFlags = [ "--ssh" ];
+    extraUpFlags = ["--ssh"];
   };
   services.samba = {
     enable = true;

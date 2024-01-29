@@ -1,4 +1,8 @@
-{ config, pkgs, ... }: {
+{
+  config,
+  pkgs,
+  ...
+}: {
   age.secrets.wireless.file = ./secrets/wireless.age;
 
   networking = {
@@ -7,7 +11,7 @@
       enable = true;
       environmentFile = config.age.secrets.wireless.path;
       networks.Ansible.psk = "@PSK_ANSIBLE@";
-      interfaces = [ "wlan0" ];
+      interfaces = ["wlan0"];
     };
   };
 }

@@ -1,34 +1,36 @@
-{ pkgs, ... }: {
+{pkgs, ...}: {
   programs.home-manager.enable = true;
   home.packages = let
     nodejs = pkgs.nodejs_20;
-    yarn = pkgs.yarn.override { inherit nodejs; };
+    yarn = pkgs.yarn.override {inherit nodejs;};
   in
-  with pkgs; [
-    btop
-    coreutils-full
-    fd
-    ffmpeg_6
-    gh
-    git-interactive-rebase-tool
-    htop
-    hub
-    jo
-    jq
-    mediainfo
-    mosh
-    neofetch
-    neovim
-    nodejs
-    nix-your-shell
-    ripgrep
-    shellcheck
-    sox
-    tree
-    yarn
-    yt-dlp
-    yq
-  ];
+    with pkgs; [
+      alejandra
+      btop
+      coreutils-full
+      fd
+      ffmpeg_6
+      gh
+      git-interactive-rebase-tool
+      htop
+      hub
+      jo
+      jq
+      mediainfo
+      mosh
+      neofetch
+      neovim
+      nodejs
+      nix-your-shell
+      ripgrep
+      shellcheck
+      sox
+      statix
+      tree
+      yarn
+      yt-dlp
+      yq
+    ];
 
   programs.awscli = {
     enable = true;
@@ -80,12 +82,15 @@
       }
     ];
 
-    sessionVariables = if pkgs.stdenv.isDarwin then {
-      FR_DOCKERHOST = "docker.for.mac.localhost";
-    } else {
-      # See: https://www.gnupg.org/documentation/manuals/gnupg/Invoking-GPG_002dAGENT.html
-      GPG_TTY = "$(tty)";
-    };
+    sessionVariables =
+      if pkgs.stdenv.isDarwin
+      then {
+        FR_DOCKERHOST = "docker.for.mac.localhost";
+      }
+      else {
+        # See: https://www.gnupg.org/documentation/manuals/gnupg/Invoking-GPG_002dAGENT.html
+        GPG_TTY = "$(tty)";
+      };
 
     shellAliases = {
       git = "hub";
@@ -95,7 +100,7 @@
     syntaxHighlighting = {
       enable = true;
     };
-    
+
     initExtra = ''
       incog () {
         unset HISTFILE
@@ -113,7 +118,7 @@
         autoload -U promptinit; promptinit
         prompt pure
       fi
-      
+
       ## Wrappers for `stack`
 
       # Build project and specs without running tests:
@@ -139,7 +144,10 @@
 
   services.gpg-agent = {
     # TODO: nix-community/home-manager#2964
-    enable = if pkgs.stdenv.isDarwin then false else true;
+    enable =
+      if pkgs.stdenv.isDarwin
+      then false
+      else true;
     enableZshIntegration = true;
     pinentryFlavor = "tty";
     extraConfig = ''

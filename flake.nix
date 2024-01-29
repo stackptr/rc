@@ -8,13 +8,19 @@
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = { self, nixpkgs, agenix, home-manager, nix-darwin, ... }:
-  let
+  outputs = {
+    self,
+    nixpkgs,
+    agenix,
+    home-manager,
+    nix-darwin,
+    ...
+  }: let
     system = "aarch64-linux";
 
     pkgs = import nixpkgs {
       inherit system;
-      config = { 
+      config = {
         # allowUnfree = true;
       };
     };
@@ -23,7 +29,7 @@
     nixosConfigurations.zeta = lib.nixosSystem {
       inherit system;
       modules = [
-        { environment.systemPackages = [ agenix.packages.${system}.default ]; }
+        {environment.systemPackages = [agenix.packages.${system}.default];}
         ./hosts/zeta
         agenix.nixosModules.default
         home-manager.nixosModules.home-manager

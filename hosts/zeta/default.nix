@@ -1,4 +1,8 @@
-{ config, pkgs, ... }: {
+{
+  config,
+  pkgs,
+  ...
+}: {
   imports = [
     ./system.nix
     ./wireless.nix
@@ -8,5 +12,5 @@
   environment.systemPackages = with pkgs; [
     tailscale
   ];
-  environment.pathsToLink = [ "/share/zsh" ];
+  environment.pathsToLink = ["/share/zsh"];
 }

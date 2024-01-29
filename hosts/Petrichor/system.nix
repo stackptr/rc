@@ -1,4 +1,8 @@
-{ config, pkgs, ... }: {
+{
+  config,
+  pkgs,
+  ...
+}: {
   users.users.corey = {
     home = "/Users/corey";
   };
@@ -8,7 +12,7 @@
   services.nix-daemon.enable = true;
 
   nix.settings.experimental-features = "nix-command flakes";
-  
+
   # TODO: Set Git commit hash for darwin-version.
   #system.configurationRevision = self.rev or self.dirtyRev or null;
 
