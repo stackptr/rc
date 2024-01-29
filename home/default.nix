@@ -21,7 +21,6 @@
     neofetch
     neovim
     nodejs
-    nushell
     nix-your-shell
     ripgrep
     shellcheck
@@ -143,6 +142,8 @@
       allow-loopback-pinentry
     '';
   };
+
+  programs.nushell.enable = true;
 
   home.stateVersion = "23.11";
 }
