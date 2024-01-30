@@ -6,29 +6,23 @@
   in
     with pkgs; [
       alejandra
-      btop
       coreutils-full
       fd
       ffmpeg_6
-      gh
       git-interactive-rebase-tool
-      htop
       hub
       jo
-      jq
       mediainfo
       mosh
       neofetch
       neovim
       nodejs
       nix-your-shell
-      ripgrep
       shellcheck
       sox
       statix
       tree
       yarn
-      yt-dlp
       yq
     ] ++ lib.optionals stdenv.isDarwin [
       m-cli
@@ -37,6 +31,13 @@
   programs.awscli = {
     enable = true;
     settings = import ./aws.nix;
+  };
+
+  programs.btop.enable = true;
+
+  programs.gh = {
+    enable = true;
+    gitCredentialHelper.enable = true;
   };
 
   programs.git = {
@@ -55,6 +56,10 @@
   programs.gpg = {
     enable = true;
   };
+  
+  programs.htop.enable = true;
+
+  programs.jq.enable = true;
 
   programs.zsh = {
     enable = true;
@@ -158,6 +163,10 @@
   };
 
   programs.nushell.enable = true;
+
+  programs.ripgrep.enable = true;
+
+  programs.yt-dlp.enable = true;
 
   home.stateVersion = "23.11";
 }
