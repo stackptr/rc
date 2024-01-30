@@ -3,8 +3,11 @@
   # details gathered from the active system.
   networking = {
     nameservers = [
+      "100.100.100.100" # Tailscale
       "8.8.8.8"
+      "1.1.1.1"
     ];
+    search = ["rove-duck.ts.net"];
     defaultGateway = "146.190.112.1";
     defaultGateway6 = {
       address = "";
