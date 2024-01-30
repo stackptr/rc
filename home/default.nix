@@ -30,6 +30,8 @@
       yarn
       yt-dlp
       yq
+    ] ++ lib.optionals stdenv.isDarwin [
+      m-cli
     ];
 
   programs.awscli = {
