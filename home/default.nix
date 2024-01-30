@@ -2,7 +2,7 @@
   imports = [
     ./zsh.nix
   ];
-  programs.home-manager.enable = true;
+
   home.packages = let
     nodejs = pkgs.nodejs_20;
     yarn = pkgs.yarn.override {inherit nodejs;};
