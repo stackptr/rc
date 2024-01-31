@@ -10,8 +10,5 @@
     ./services
   ];
 
-  environment.systemPackages = with pkgs; [
-    tailscale
-  ];
   environment.pathsToLink = ["/share/zsh"];
 }
