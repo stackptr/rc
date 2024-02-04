@@ -10,4 +10,5 @@ let
 in {
   "userpassword.age".publicKeys = all;
   "wireless.age".publicKeys = all;
+  "dd-agent.age".publicKeys = all;
 }
