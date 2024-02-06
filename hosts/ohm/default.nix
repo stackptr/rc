@@ -7,6 +7,7 @@
     ./system.nix
     ./hardware-configuration.nix
     ./networking.nix # generated at runtime by nixos-infect
+    ./containers.nix
   ];
 
   boot.cleanTmpDir = true;
