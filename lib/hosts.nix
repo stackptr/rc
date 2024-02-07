@@ -3,6 +3,7 @@
   agenix,
   home-manager,
   nix-darwin,
+  profile,
   ...
 }: let
   baseHomeManager = username: {
@@ -17,6 +18,7 @@
   }:
     nixpkgs.lib.nixosSystem {
       inherit system;
+      specialArgs = {inherit profile;};
       modules = [
         {environment.systemPackages = [agenix.packages.${system}.default];}
         ./../hosts/${hostname}
