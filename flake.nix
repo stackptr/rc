@@ -10,7 +10,7 @@
 
   outputs = inputs:
     with (import ./lib/hosts.nix inputs); {
-      nixosConfigurations = mkHosts nixosHost [
+      nixosConfigurations = mkNixosHosts [
         {
           hostname = "zeta";
           system = "aarch64-linux";
@@ -21,13 +21,9 @@
         }
       ];
 
-      darwinConfigurations = mkHosts darwinHost [
-        {
-          hostname = "Rhizome";
-        }
-        {
-          hostname = "Petrichor";
-        }
+      darwinConfigurations = mkDarwinHosts [
+        "Rhizome"
+        "Petrichor"
       ];
     };
 }

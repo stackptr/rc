@@ -4,7 +4,7 @@
   home-manager,
   nix-darwin,
   ...
-}: {
+}: let
   nixosHost = {
     system,
     hostname,
@@ -35,11 +35,15 @@
         }
       ];
     };
-  mkHosts = f: hosts:
+  mkHosts = f: hostEntries:
     builtins.listToAttrs (map
       (host: {
         name = host.hostname;
         value = f host;
       })
-      hosts);
+      hostEntries);
+  hostEntry = name: {hostname = name;};
+in {
+  mkNixosHosts = mkHosts nixosHost;
+  mkDarwinHosts = names: mkHosts darwinHost (map hostEntry names);
 }
