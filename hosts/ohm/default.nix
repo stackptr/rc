@@ -10,7 +10,7 @@
     ./containers.nix
   ];
 
-  boot.cleanTmpDir = true;
+  boot.tmp.cleanOnBoot = true;
   zramSwap.enable = true;
   networking.hostName = "ohm";
   networking.domain = "";
