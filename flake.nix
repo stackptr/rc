@@ -16,36 +16,42 @@
     nix-darwin,
     ...
   }: let
-    system = "aarch64-linux";
-    lib = nixpkgs.lib;
+    nixosHost = {
+      system,
+      hostname,
+    }:
+      nixpkgs.lib.nixosSystem {
+        inherit system;
+        modules = [
+          {environment.systemPackages = [agenix.packages.${system}.default];}
+          ./hosts/${hostname}
+          agenix.nixosModules.default
+          home-manager.nixosModules.home-manager
+          {
+            home-manager.useGlobalPkgs = true;
+            home-manager.useUserPackages = true;
+            home-manager.users.mu = import ./home;
+          }
+        ];
+      };
+    mkHosts = hosts:
+      builtins.listToAttrs (map
+        (host: {
+          name = host.hostname;
+          value = nixosHost host;
+        })
+        hosts);
   in {
-    nixosConfigurations.zeta = lib.nixosSystem {
-      inherit system;
-      modules = [
-        {environment.systemPackages = [agenix.packages.${system}.default];}
-        ./hosts/zeta
-        agenix.nixosModules.default
-        home-manager.nixosModules.home-manager
-        {
-          home-manager.useGlobalPkgs = true;
-          home-manager.useUserPackages = true;
-          home-manager.users.mu = import ./home;
-        }
-      ];
-    };
-
-    nixosConfigurations.ohm = lib.nixosSystem {
-      system = "x86_64-linux";
-      modules = [
-        ./hosts/ohm
-        home-manager.nixosModules.home-manager
-        {
-          home-manager.useGlobalPkgs = true;
-          home-manager.useUserPackages = true;
-          home-manager.users.mu = import ./home;
-        }
-      ];
-    };
+    nixosConfigurations = mkHosts [
+      {
+        hostname = "zeta";
+        system = "aarch64-linux";
+      }
+      {
+        hostname = "ohm";
+        system = "x86_64-linux";
+      }
+    ];
 
     darwinConfigurations."Rhizome" = nix-darwin.lib.darwinSystem {
       modules = [
@@ -70,8 +76,5 @@
         }
       ];
     };
-
-    # Expose the package set, including overlays, for convenience.
-    darwinPackages = self.darwinConfigurations."Rhizome".pkgs;
   };
 }
