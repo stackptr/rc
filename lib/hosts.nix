@@ -5,6 +5,12 @@
   nix-darwin,
   ...
 }: let
+  baseHomeManager = username: {
+    home-manager.useGlobalPkgs = true;
+    home-manager.useUserPackages = true;
+    home-manager.users.${username} = import ./../home;
+  };
+  nixosHomeManager = baseHomeManager "mu";
   nixosHost = {
     system,
     hostname,
@@ -16,23 +22,16 @@
         ./../hosts/${hostname}
         agenix.nixosModules.default
         home-manager.nixosModules.home-manager
-        {
-          home-manager.useGlobalPkgs = true;
-          home-manager.useUserPackages = true;
-          home-manager.users.mu = import ./../home;
-        }
+        nixosHomeManager
       ];
     };
+  darwinHomeManager = baseHomeManager "corey";
   darwinHost = {hostname, ...}:
     nix-darwin.lib.darwinSystem {
       modules = [
         ./../hosts/${hostname}
         home-manager.darwinModules.home-manager
-        {
-          home-manager.useGlobalPkgs = true;
-          home-manager.useUserPackages = true;
-          home-manager.users.corey = import ./../home;
-        }
+        darwinHomeManager
       ];
     };
   mkHosts = f: hostEntries:
