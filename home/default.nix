@@ -1,5 +1,6 @@
 {pkgs, ...}: {
   imports = [
+    ./aws.nix
     ./zsh.nix
   ];
 
@@ -32,11 +33,6 @@
       ++ lib.optionals stdenv.isDarwin [
         m-cli
       ];
-
-  programs.awscli = {
-    enable = true;
-    settings = import ./aws.nix;
-  };
 
   programs.btop.enable = true;
 
