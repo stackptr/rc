@@ -1,7 +1,22 @@
-{pkgs, ...}: {
+{
+  pkgs,
+  lib,
+  ...
+}: let
+  # TODO: Upstream to home-manager modules/programs/awscli.nix
+  patchSettings = lib.mapAttrs' (
+    name: value: {
+      name =
+        if name == "default"
+        then name
+        else "profile ${name}";
+      inherit value;
+    }
+  );
+in {
   programs.awscli = {
     enable = true;
-    settings = {
+    settings = patchSettings {
       freckle-dev = {
         sso_start_url = "https://d-90675613ab.awsapps.com/start";
         sso_region = "us-east-1";
