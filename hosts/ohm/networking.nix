@@ -3,12 +3,9 @@
   # details gathered from the active system.
   networking = {
     nameservers = [
-      "100.100.100.100" # Tailscale
       "8.8.8.8"
-      "1.1.1.1"
     ];
-    search = ["rove-duck.ts.net"];
-    defaultGateway = "146.190.112.1";
+    defaultGateway = "143.198.144.1";
     defaultGateway6 = {
       address = "";
       interface = "eth0";
@@ -19,23 +16,23 @@
       eth0 = {
         ipv4.addresses = [
           {
-            address = "146.190.126.122";
+            address = "143.198.154.166";
             prefixLength = 20;
           }
           {
-            address = "10.48.0.5";
+            address = "10.48.0.6";
             prefixLength = 16;
           }
         ];
         ipv6.addresses = [
           {
-            address = "fe80::bc52:eff:fee9:ae66";
+            address = "fe80::ec9c:6fff:fee8:433e";
             prefixLength = 64;
           }
         ];
         ipv4.routes = [
           {
-            address = "146.190.112.1";
+            address = "143.198.144.1";
             prefixLength = 32;
           }
         ];
@@ -49,13 +46,13 @@
       eth1 = {
         ipv4.addresses = [
           {
-            address = "10.124.0.2";
+            address = "10.124.0.3";
             prefixLength = 20;
           }
         ];
         ipv6.addresses = [
           {
-            address = "fe80::4f8:bfff:fee0:5a0e";
+            address = "fe80::5493:8fff:fe1b:ce84";
             prefixLength = 64;
           }
         ];
@@ -63,7 +60,7 @@
     };
   };
   services.udev.extraRules = ''
-    ATTR{address}=="be:52:0e:e9:ae:66", NAME="eth0"
-    ATTR{address}=="06:f8:bf:e0:5a:0e", NAME="eth1"
+    ATTR{address}=="ee:9c:6f:e8:43:3e", NAME="eth0"
+    ATTR{address}=="56:93:8f:1b:ce:84", NAME="eth1"
   '';
 }
