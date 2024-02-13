@@ -14,8 +14,8 @@
         enable = true;
         recommendedProxySettings = true;
         recommendedTlsSettings = true;
-        virtualHosts."x64.co" = {
-          locations."/".proxyPass = "http://zeta.rove-duck.ts.net:3001";
+        virtualHosts."xor.ooo" = {
+          locations."/corey".proxyPass = "http://zeta.rove-duck.ts.net:3001";
           listen = [
             {
               addr = "0.0.0.0";

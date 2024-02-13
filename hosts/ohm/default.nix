@@ -20,4 +20,6 @@
   services.openssh.enable = true;
   services.tailscale.enable = true;
   services.do-agent.enable = true;
+
+  networking.firewall.allowedTCPPorts = [443];
 }
