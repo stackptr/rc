@@ -23,8 +23,16 @@
             }
           ];
         };
+        virtualHosts."portainer" = {
+          locations."/".proxyPass = "https://zeta.rove-duck.ts.net:9443";
+          listen = [
+            {
+              addr = "0.0.0.0";
+              port = 9443;
+            }
+          ];
+        };
       };
-      #networking.firewall.allowedTCPPorts = [80 3001];
     };
   };
 }
