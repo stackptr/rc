@@ -7,4 +7,10 @@
     device = "/dev/vda1";
     fsType = "ext4";
   };
+  swapDevices = [
+    {
+      device = "/swapfile";
+      size = 8 * 1024;
+    }
+  ];
 }
