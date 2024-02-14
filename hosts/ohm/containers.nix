@@ -19,6 +19,7 @@
           dnsProvider = "cloudflare";
           environmentFile = config.age.secrets.cloudflare-dns.path;
           dnsPropagationCheck = true;
+          webroot = null;
         };
       };
       services.nginx = {
