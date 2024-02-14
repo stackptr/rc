@@ -3,7 +3,6 @@
   pkgs,
   ...
 }: {
-  age.secrets.cloudflare-dns.file = ./secrets/cloudflare-dns.age;
   containers.web = {
     autoStart = true;
     config = {
@@ -11,6 +10,7 @@
       pkgs,
       ...
     }: {
+      age.secrets.cloudflare-dns.file = ./secrets/cloudflare-dns.age;
       security.acme = {
         acceptTerms = true;
         defaults.email = "admin@xor.ooo";
