@@ -3,14 +3,20 @@
   pkgs,
   ...
 }: {
+  age.secrets.cloudflare-dns.file = ./secrets/cloudflare-dns.age;
   containers.web = {
     autoStart = true;
+    bindMounts = {
+      cloudflareDns = {
+        mountPoint = config.age.secrets.cloudflare-dns.path;
+        hostPath = config.age.secrets.cloudflare-dns.path;
+      };
+    };
     config = {
       config,
       pkgs,
       ...
     }: {
-      age.secrets.cloudflare-dns.file = ./secrets/cloudflare-dns.age;
       security.acme = {
         acceptTerms = true;
         defaults.email = "admin@xor.ooo";
