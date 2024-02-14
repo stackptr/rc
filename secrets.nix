@@ -1,5 +1,7 @@
 let
-  readKey = host: builtins.readFile ./hosts/${host}/key.pub;
+  firstLine = str: builtins.head (builtins.split "\n" str); 
+  readKey = host:
+    firstLine (builtins.readFile ./hosts/${host}/key.pub);
   keys = map readKey [ "ohm" "Petrichor" "Rhizome" "zeta"];
 in {
   "hosts/zeta/secrets/userpassword.age".publicKeys = keys;
