@@ -19,7 +19,6 @@
           dnsProvider = "cloudflare";
           environmentFile = config.age.secrets.cloudflare-dns.path;
           dnsPropagationCheck = true;
-          webroot = null;
         };
       };
       services.nginx = {
@@ -28,7 +27,7 @@
         recommendedTlsSettings = true;
         virtualHosts."xor.ooo" = {
           forceSSL = true;
-          enableACME = true;
+          useACMEHost = "xor.ooo";
           locations."/corey".proxyPass = "http://zeta.rove-duck.ts.net:3001";
         };
         virtualHosts."portainer" = {
