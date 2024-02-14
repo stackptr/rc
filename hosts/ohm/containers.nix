@@ -8,7 +8,7 @@
     autoStart = true;
     bindMounts = {
       cloudflareDns = {
-        mountPoint = config.age.secrets.cloudflare-dns.path;
+        mountPoint = "/run/cloudflare-dns";
         hostPath = config.age.secrets.cloudflare-dns.path;
       };
     };
@@ -23,7 +23,7 @@
         certs."xor.ooo" = {
           domain = "*.xor.ooo";
           dnsProvider = "cloudflare";
-          environmentFile = config.age.secrets.cloudflare-dns.path;
+          environmentFile = "/run/cloudflare-dns";
           dnsPropagationCheck = true;
         };
       };
