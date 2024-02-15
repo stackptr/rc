@@ -55,6 +55,7 @@
           locations."/".proxyPass = "https://zeta.rove-duck.ts.net:9443";
         };
       };
+      system.stateVersion = "24.05";
     };
   };
 }
