@@ -35,7 +35,8 @@
         virtualHosts."xor.ooo" = {
           forceSSL = true;
           useACMEHost = "xor.ooo";
-          locations."/".proxyPass = "http://zeta.rove-duck.ts.net:3001";
+          locations."/".return = "302 /corey";
+          locations."/corey".proxyPass = "http://zeta.rove-duck.ts.net:3001";
         };
         virtualHosts."portainer.xor.ooo" = {
           forceSSL = true;
