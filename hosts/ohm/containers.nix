@@ -25,6 +25,7 @@
           dnsProvider = "cloudflare";
           environmentFile = "/run/cloudflare-dns";
           dnsPropagationCheck = true;
+          extraDomainNames = ["xor.ooo"];
         };
       };
       users.users.nginx.extraGroups = [ "acme" ];
