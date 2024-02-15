@@ -12,6 +12,7 @@
         hostPath = config.age.secrets.cloudflare-dns.path;
       };
     };
+    ephemeral = true;
     config = {
       config,
       pkgs,
