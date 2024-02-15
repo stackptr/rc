@@ -38,14 +38,10 @@
           useACMEHost = "xor.ooo";
           locations."/".proxyPass = "http://zeta.rove-duck.ts.net:3001";
         };
-        virtualHosts."portainer" = {
+        virtualHosts."portainer.xor.ooo" = {
+          forceSSL = true;
+          useACMEHost = "xor.ooo";
           locations."/".proxyPass = "https://zeta.rove-duck.ts.net:9443";
-          listen = [
-            {
-              addr = "0.0.0.0";
-              port = 9443;
-            }
-          ];
         };
       };
     };
