@@ -27,12 +27,22 @@
           environmentFile = "/run/cloudflare-dns";
           extraDomainNames = ["xor.ooo"];
         };
+        certs."rey.foo" = {
+          domain = "rey.foo";
+          dnsProvider = "cloudflare";
+          environmentFile = "/run/cloudflare-dns";
+        };
       };
       users.users.nginx.extraGroups = [ "acme" ];
       services.nginx = {
         enable = true;
         recommendedProxySettings = true;
         recommendedTlsSettings = true;
+        virtualHosts."rey.foo" = {
+          forceSSL = true;
+          useACMEHost = "rey.foo";
+          locations."/".return = "302 https://xor.ooo/corey";
+        };
         virtualHosts."xor.ooo" = {
           forceSSL = true;
           useACMEHost = "xor.ooo";
