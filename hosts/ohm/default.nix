@@ -21,5 +21,5 @@
   services.tailscale.enable = true;
   services.do-agent.enable = true;
 
-  networking.firewall.allowedTCPPorts = [443];
+  networking.firewall.allowedTCPPorts = [80 443];
 }
