@@ -24,7 +24,6 @@
           domain = "*.xor.ooo";
           dnsProvider = "cloudflare";
           environmentFile = "/run/cloudflare-dns";
-          dnsPropagationCheck = true;
           extraDomainNames = ["xor.ooo"];
         };
       };
