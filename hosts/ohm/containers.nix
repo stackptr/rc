@@ -33,10 +33,6 @@
         enable = true;
         recommendedProxySettings = true;
         recommendedTlsSettings = true;
-        tailscaleAuth = {
-          enable = true;
-          virtualHosts = ["portainer.xor.ooo"]; 
-        };
         virtualHosts."xor.ooo" = {
           forceSSL = true;
           useACMEHost = "xor.ooo";
