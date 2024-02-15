@@ -3,7 +3,12 @@
   pkgs,
   ...
 }: {
-  age.secrets.dd-agent.file = ./../secrets/dd-agent.age;
+  age.secrets.dd-agent = {
+    file = ./../secrets/dd-agent.age;
+    mode = "440";
+    owner = "datadog";
+    group = "datadog";
+  };
   services.openssh.enable = true;
   services.tailscale = {
     enable = true;
