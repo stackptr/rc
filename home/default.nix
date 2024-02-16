@@ -10,25 +10,32 @@
   in
     with pkgs;
       [
-        alejandra
-        coreutils-full
-        fd
-        ffmpeg_6
-        git-interactive-rebase-tool
-        hub
-        jo
-        mediainfo
+        # Apps
         mosh
         neofetch
         neovim
-        nodejs
-        nix-your-shell
-        shellcheck
+
+        # Audio/video
+        ffmpeg_6
+        mediainfo
         sox
-        statix
+
+        # Development
+        coreutils-full
+        fd
+        git-interactive-rebase-tool
+        hub
+        jo
+        nodejs
+        shellcheck
         tree
         yarn
         yq
+
+        # Nix
+        alejandra
+        nix-your-shell
+        statix
       ]
       ++ lib.optionals stdenv.isDarwin [
         m-cli
