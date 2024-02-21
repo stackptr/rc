@@ -148,7 +148,7 @@
             refresh_interval = "5m";
             ldap = {
               implementation = "custom";
-              url = "ldap://openldap:1389";
+              url = "ldap://localhost:389";
               timeout = "5s";
               start_tls = false;
               base_dn = "dc=xor,dc=ooo";
