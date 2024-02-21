@@ -4,36 +4,9 @@
   agenix,
   ...
 }: {
-  age.secrets.cloudflare-dns.file = ./secrets/cloudflare-dns.age;
-  age.secrets.jwt-secret.file = ./secrets/jwt-secret.age;
-  age.secrets.session-secret.file = ./secrets/session-secret.age;
-  age.secrets.storage-encryption-key.file = ./secrets/storage-encryption-key.age;
-  age.secrets.notifier-smtp-password.file = ./secrets/notifier-smtp-password.age;
   containers.web = {
     autoStart = true;
-    bindMounts = {
-      cloudflareDns = {
-        mountPoint = "/run/secrets/cloudflare-dns";
-        hostPath = config.age.secrets.cloudflare-dns.path;
-      };
-      jwtSecret = {
-        mountPoint = "/run/secrets/jwt-secret";
-        hostPath = config.age.secrets.jwt-secret.path;
-      };
-      session-secret = {
-        mountPoint = "/run/secrets/session-secret";
-        hostPath = config.age.secrets.session-secret.path;
-      };
-      storage-encryption-key = {
-        mountPoint = "/run/secrets/storage-encryption-key";
-        hostPath = config.age.secrets.storage-encryption-key.path;
-      };
-      notifier-smtp-password = {
-        mountPoint = "/run/secrets/notifier-smtp-password";
-        hostPath = config.age.secrets.notifier-smtp-password.path;
-      };
-      "/etc/ssh/ssh_host_ed25519_key".isReadOnly = true;
-    };
+    bindMounts."/etc/ssh/ssh_host_ed25519_key".isReadOnly = true;
     ephemeral = true;
     config = {
       config,
@@ -42,11 +15,36 @@
     }: {
       imports = [agenix.nixosModules.default];
       age.identityPaths = ["/etc/ssh/ssh_host_ed25519_key"];
+      age.secrets.cloudflare-dns.file = ./secrets/cloudflare-dns.age;
       age.secrets.ldap-admin-password = {
         file = ./secrets/ldap-admin-password.age;
         mode = "440";
         owner = "openldap";
         group = "openldap";
+      };
+      age.secrets.jwt-secret = {
+        file = ./secrets/jwt-secret.age;
+        mode = "440";
+        owner = "authelia-main";
+        group = "authelia-main";
+      };
+      age.secrets.session-secret = {
+        file = ./secrets/session-secret.age;
+        mode = "440";
+        owner = "authelia-main";
+        group = "authelia-main";
+      };
+      age.secrets.storage-encryption-key = {
+        file = ./secrets/storage-encryption-key.age;
+        mode = "440";
+        owner = "authelia-main";
+        group = "authelia-main";
+      };
+      age.secrets.notifier-smtp-password = {
+        file = ./secrets/notifier-smtp-password.age;
+        mode = "440";
+        owner = "authelia-main";
+        group = "authelia-main";
       };
       security.acme = {
         acceptTerms = true;
@@ -54,13 +52,13 @@
         certs."xor.ooo" = {
           domain = "*.xor.ooo";
           dnsProvider = "cloudflare";
-          environmentFile = "/run/secrets/cloudflare-dns";
+          environmentFile = config.age.secrets.cloudflare-dns.path;
           extraDomainNames = ["xor.ooo"];
         };
         certs."rey.foo" = {
           domain = "rey.foo";
           dnsProvider = "cloudflare";
-          environmentFile = "/run/secrets/cloudflare-dns";
+          environmentFile = config.age.secrets.cloudflare-dns.path;
         };
       };
       users.users.nginx.extraGroups = [ "acme" ];
@@ -113,12 +111,12 @@
       }; 
       services.authelia.instances.main = {
         enable = true;
-        secrets.jwtSecretFile = "/run/secrets/jwt-secret";
-        secrets.sessionSecretFile = "/run/secrets/session-secret";
-        secrets.storageEncryptionKeyFile = "/run/secrets/storage-encryption-key";
+        secrets.jwtSecretFile = config.age.secrets.jwt-secret.path;
+        secrets.sessionSecretFile = config.age.secrets.session-secret.path;
+        secrets.storageEncryptionKeyFile = config.age.secrets.storage-encryption-key.path;
         environmentVariables = {
           # N.B.: `secrets.notifierSmtpPasswordFile` is not yet defined
-          AUTHELIA_NOTIFIER_SMTP_PASSWORD_FILE = "/run/secrets/notifier-smtp-password";
+          AUTHELIA_NOTIFIER_SMTP_PASSWORD_FILE = config.age.secrets.notifier-smtp-password.path;
         };
         settings = {
           theme = "auto";
