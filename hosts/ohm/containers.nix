@@ -201,7 +201,7 @@
             find_time = "2m";
             ban_time = "5m";
           };
-          storage.local.path = "/config/db.sqlite3";
+          storage.local.path = "/var/lib/authelia-main/db.sqlite3";
           notifier = {
             disable_startup_check = false;
             smtp = {
