@@ -15,6 +15,8 @@
     }: {
       imports = [
         agenix.nixosModules.default
+        ./authelia-auth.nix
+        ./authelia-proxy.nix
       ];
       age.identityPaths = ["/etc/ssh/ssh_host_ed25519_key"];
       age.secrets.cloudflare-dns.file = ./secrets/cloudflare-dns.age;
@@ -84,10 +86,23 @@
           useACMEHost = "xor.ooo";
           locations."/".proxyPass = "http://zeta.rove-duck.ts.net:3001";
         };
+        virtualHosts."auth.xor.ooo" = {
+          forceSSL = true;
+          useACMEHost = "xor.ooo";
+          useAutheliaProxyConf = true;
+          locations."/".proxyPass = "http://127.0.0.1:9091";
+          locations."/api/verify".proxyPass = "http://127.0.0.1:9091";
+        };
         virtualHosts."portainer.xor.ooo" = {
           forceSSL = true;
           useACMEHost = "xor.ooo";
           locations."/".proxyPass = "https://zeta.rove-duck.ts.net:9443";
+        };
+        virtualHosts."test.xor.ooo" = {
+          forceSSL = true;
+          useACMEHost = "xor.ooo";
+          enableAutheliaAuth = true;
+          locations."/".proxyPass = "http://zeta.rove-duck.ts.net:3001";
         };
       };
       services.openldap = {
