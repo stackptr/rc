@@ -92,6 +92,17 @@
             olcSuffix = "dc=xor,dc=ooo";
             olcRootDN = "cn=admin,dc=xor,dc=ooo";
             olcRootPW.path = "/run/secrets/ldap-admin-password";
+            olcAccess = [
+              /* custom access rules for userPassword attributes */
+              ''{0}to attrs=userPassword
+                  by self write
+                  by anonymous auth
+                  by * none''
+            
+              /* allow read on anything else */
+              ''{1}to *
+                  by * read''
+            ];
           };
         };
       }; 
