@@ -34,6 +34,10 @@
 
         # Nix
         alejandra
+        comma
+        manix
+        nix-du
+        nix-tree
         nix-your-shell
         statix
       ]
