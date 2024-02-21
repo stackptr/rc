@@ -117,6 +117,7 @@
         environmentVariables = {
           # N.B.: `secrets.notifierSmtpPasswordFile` is not yet defined
           AUTHELIA_NOTIFIER_SMTP_PASSWORD_FILE = config.age.secrets.notifier-smtp-password.path;
+          AUTHELIA_AUTHENTICATION_BACKEND_LDAP_PASSWORD_FILE = config.age.secrets.ldap-admin-password.path;
         };
         settings = {
           theme = "auto";
@@ -161,7 +162,6 @@
               permit_referrals = false;
               permit_unauthenticated_bind = false;
               user = "cn=admin,dc=xor,dc=ooo";
-              password = "f738e96f7b81405470a66dba196f1cfa9e915a430c2ec2d2";
             };
           };
           password_policy = {
