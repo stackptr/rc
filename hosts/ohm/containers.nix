@@ -179,6 +179,15 @@
               min_score = 3;
             };
           };
+          access_control = {
+            default_policy = "deny";
+            rules = [
+              {
+                domain = "*.xor.ooo";
+                policy = "two_factor";
+              }
+            ];
+          };
           session = {
             name = "authelia_session";
             domain = "xor.ooo";
@@ -192,6 +201,7 @@
             find_time = "2m";
             ban_time = "5m";
           };
+          storage.local.path = "/config/db.sqlite3";
           notifier = {
             disable_startup_check = false;
             smtp = {
