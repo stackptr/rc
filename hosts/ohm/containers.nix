@@ -13,7 +13,9 @@
       pkgs,
       ...
     }: {
-      imports = [agenix.nixosModules.default];
+      imports = [
+        agenix.nixosModules.default
+      ];
       age.identityPaths = ["/etc/ssh/ssh_host_ed25519_key"];
       age.secrets.cloudflare-dns.file = ./secrets/cloudflare-dns.age;
       age.secrets.ldap-admin-password = {
@@ -67,7 +69,7 @@
           environmentFile = config.age.secrets.cloudflare-dns.path;
         };
       };
-      users.users.nginx.extraGroups = [ "acme" ];
+      users.users.nginx.extraGroups = ["acme"];
       services.nginx = {
         enable = true;
         recommendedProxySettings = true;
@@ -90,31 +92,35 @@
       };
       services.openldap = {
         enable = true;
-        urlList = [ "ldap:///" ];
+        urlList = ["ldap:///"];
         settings.children = {
           "olcDatabase={1}mdb".attrs = {
-            objectClass = [ "olcDatabaseConfig" "olcMdbConfig" ];
-            
+            objectClass = ["olcDatabaseConfig" "olcMdbConfig"];
+
             olcDatabase = "{1}mdb";
             olcDbDirectory = "/var/lib/openldap/data";
-            
+
             olcSuffix = "dc=xor,dc=ooo";
             olcRootDN = "cn=admin,dc=xor,dc=ooo";
             olcRootPW.path = config.age.secrets.ldap-admin-password.path;
             olcAccess = [
-              /* custom access rules for userPassword attributes */
-              ''{0}to attrs=userPassword
-                  by self write
-                  by anonymous auth
-                  by * none''
-            
-              /* allow read on anything else */
-              ''{1}to *
-                  by * read''
+              /*
+              custom access rules for userPassword attributes
+              */
+              ''                {0}to attrs=userPassword
+                                  by self write
+                                  by anonymous auth
+                                  by * none''
+
+              /*
+              allow read on anything else
+              */
+              ''                {1}to *
+                                  by * read''
             ];
           };
         };
-      }; 
+      };
       services.authelia.instances.main = {
         enable = true;
         secrets.jwtSecretFile = config.age.secrets.jwt-secret.path;
