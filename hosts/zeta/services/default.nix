@@ -44,7 +44,6 @@
   programs.git.enable = true;
   programs.gnupg.agent.enable = true;
   programs.vim.defaultEditor = true;
-  programs.zsh.enable = true;
 
   virtualisation.docker.enable = true;
   virtualisation.oci-containers.backend = "docker";

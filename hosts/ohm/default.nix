@@ -15,7 +15,6 @@
   networking.domain = "";
   security.pam.sshAgentAuth.enable = true;
 
-  programs.zsh.enable = true;
   services.openssh.enable = true;
   services.tailscale.enable = true;
   services.do-agent.enable = true;

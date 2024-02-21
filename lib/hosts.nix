@@ -21,6 +21,7 @@
       specialArgs = {inherit profile;};
       modules = [
         {environment.systemPackages = [agenix.packages.${system}.default];}
+        ./../modules/base.nix
         ./../hosts/${hostname}
         agenix.nixosModules.default
         home-manager.nixosModules.home-manager
@@ -31,6 +32,8 @@
   darwinHost = {hostname, ...}:
     nix-darwin.lib.darwinSystem {
       modules = [
+        ./../modules/base.nix
+        ./../modules/darwin.nix
         ./../hosts/${hostname}
         home-manager.darwinModules.home-manager
         darwinHomeManager

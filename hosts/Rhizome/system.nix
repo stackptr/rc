@@ -6,12 +6,6 @@
   users.users.corey = {
     home = "/Users/corey";
   };
-  security.pam.enableSudoTouchIdAuth = true;
-
-  # Auto upgrade nix package and the daemon service.
-  services.nix-daemon.enable = true;
-
-  nix.settings.experimental-features = "nix-command flakes";
 
   # TODO: Set Git commit hash for darwin-version.
   #system.configurationRevision = self.rev or self.dirtyRev or null;
