@@ -1,13 +1,10 @@
 {
   config,
   pkgs,
+  agenix,
   ...
 }: {
   age.secrets.cloudflare-dns.file = ./secrets/cloudflare-dns.age;
-  age.secrets.ldap-admin-password = {
-    file = ./secrets/ldap-admin-password.age;
-    mode = "444";
-  };
   age.secrets.jwt-secret.file = ./secrets/jwt-secret.age;
   age.secrets.session-secret.file = ./secrets/session-secret.age;
   age.secrets.storage-encryption-key.file = ./secrets/storage-encryption-key.age;
@@ -18,10 +15,6 @@
       cloudflareDns = {
         mountPoint = "/run/secrets/cloudflare-dns";
         hostPath = config.age.secrets.cloudflare-dns.path;
-      };
-      ldapAdminPassword = {
-        mountPoint = "/run/secrets/ldap-admin-password";
-        hostPath = config.age.secrets.ldap-admin-password.path;
       };
       jwtSecret = {
         mountPoint = "/run/secrets/jwt-secret";
@@ -39,6 +32,7 @@
         mountPoint = "/run/secrets/notifier-smtp-password";
         hostPath = config.age.secrets.notifier-smtp-password.path;
       };
+      "/etc/ssh/ssh_host_ed25519_key".isReadOnly = true;
     };
     ephemeral = true;
     config = {
@@ -46,6 +40,14 @@
       pkgs,
       ...
     }: {
+      imports = [agenix.nixosModules.default];
+      age.identityPaths = ["/etc/ssh/ssh_host_ed25519_key"];
+      age.secrets.ldap-admin-password = {
+        file = ./secrets/ldap-admin-password.age;
+        mode = "440";
+        owner = "openldap";
+        group = "openldap";
+      };
       security.acme = {
         acceptTerms = true;
         defaults.email = "admin@xor.ooo";
@@ -94,7 +96,7 @@
             
             olcSuffix = "dc=xor,dc=ooo";
             olcRootDN = "cn=admin,dc=xor,dc=ooo";
-            olcRootPW.path = "/run/secrets/ldap-admin-password";
+            olcRootPW.path = config.age.secrets.ldap-admin-password.path;
             olcAccess = [
               /* custom access rules for userPassword attributes */
               ''{0}to attrs=userPassword
