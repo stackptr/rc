@@ -40,6 +40,12 @@
         owner = "authelia-main";
         group = "authelia-main";
       };
+      age.secrets.authelia-ldap-password = {
+        file = ./secrets/ldap-admin-password.age;
+        mode = "440";
+        owner = "authelia-main";
+        group = "authelia-main";
+      };
       age.secrets.notifier-smtp-password = {
         file = ./secrets/notifier-smtp-password.age;
         mode = "440";
@@ -117,7 +123,7 @@
         environmentVariables = {
           # N.B.: `secrets.notifierSmtpPasswordFile` is not yet defined
           AUTHELIA_NOTIFIER_SMTP_PASSWORD_FILE = config.age.secrets.notifier-smtp-password.path;
-          AUTHELIA_AUTHENTICATION_BACKEND_LDAP_PASSWORD_FILE = config.age.secrets.ldap-admin-password.path;
+          AUTHELIA_AUTHENTICATION_BACKEND_LDAP_PASSWORD_FILE = config.age.secrets.authelia-ldap-password.path;
         };
         settings = {
           theme = "auto";
