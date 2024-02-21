@@ -91,7 +91,8 @@
             
             olcSuffix = "dc=xor,dc=ooo";
             olcRootDN = "cn=admin,dc=xor,dc=ooo";
-            olcRootPW.path = "/run/secrets/ldap-admin-password";
+            #olcRootPW.path = "/run/secrets/ldap-admin-password";
+            olcRootPW.path = pkgs.writeText "olcRootPW" "pass";
             olcAccess = [
               /* custom access rules for userPassword attributes */
               ''{0}to attrs=userPassword
