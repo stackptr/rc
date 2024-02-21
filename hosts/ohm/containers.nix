@@ -4,7 +4,12 @@
   ...
 }: {
   age.secrets.cloudflare-dns.file = ./secrets/cloudflare-dns.age;
-  age.secrets.ldap-admin-password.file = ./secrets/ldap-admin-password.age;
+  age.secrets.ldap-admin-password = {
+    file = ./secrets/ldap-admin-password.age;
+    mode = "440";
+    owner = "openldap";
+    group = "openldap";
+  };
   age.secrets.jwt-secret.file = ./secrets/jwt-secret.age;
   age.secrets.session-secret.file = ./secrets/session-secret.age;
   age.secrets.storage-encryption-key.file = ./secrets/storage-encryption-key.age;
