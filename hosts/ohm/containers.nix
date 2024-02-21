@@ -3,12 +3,12 @@
   pkgs,
   ...
 }: {
-  users.groups.web = { };
   age.secrets.cloudflare-dns.file = ./secrets/cloudflare-dns.age;
   age.secrets.ldap-admin-password = {
     file = ./secrets/ldap-admin-password.age;
     mode = "440";
-    group = "web";
+    owner = "openldap";
+    group = "openldap";
   };
   age.secrets.jwt-secret.file = ./secrets/jwt-secret.age;
   age.secrets.session-secret.file = ./secrets/session-secret.age;
@@ -64,7 +64,6 @@
         };
       };
       users.users.nginx.extraGroups = [ "acme" ];
-      users.groups.web = { };
       services.nginx = {
         enable = true;
         recommendedProxySettings = true;
@@ -87,7 +86,6 @@
       };
       services.openldap = {
         enable = true;
-        group = "web";
         urlList = [ "ldap:///" ];
         settings.children = {
           "olcDatabase={1}mdb".attrs = {
