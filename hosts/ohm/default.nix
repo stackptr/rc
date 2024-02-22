@@ -7,6 +7,7 @@
     ./system.nix
     ./hardware-configuration.nix
     ./networking.nix # generated at runtime by nixos-infect
+    ./containers.nix
   ];
 
   boot.tmp.cleanOnBoot = true;
@@ -18,4 +19,6 @@
   services.openssh.enable = true;
   services.tailscale.enable = true;
   services.do-agent.enable = true;
+
+  networking.firewall.allowedTCPPorts = [80 443];
 }
