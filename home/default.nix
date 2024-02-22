@@ -44,6 +44,13 @@
         m-cli
       ];
 
+  programs.bat = {
+    enable = true;
+    config = {
+      theme = "Sublime Snazzy";
+    };
+  };
+
   programs.btop.enable = true;
 
   programs.gh = {

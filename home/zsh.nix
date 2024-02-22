@@ -27,17 +27,25 @@
       }
     ];
 
-    sessionVariables =
-      if pkgs.stdenv.isDarwin
-      then {
-        FR_DOCKERHOST = "docker.for.mac.localhost";
-      }
-      else {
-        # See: https://www.gnupg.org/documentation/manuals/gnupg/Invoking-GPG_002dAGENT.html
-        GPG_TTY = "$(tty)";
+    sessionVariables = let
+      baseVars = {
+        MANPAGER = "sh -c 'col -bx | bat -l man -p'";
+        MANROFFOPT = "-c";
       };
+      osVars =
+        if pkgs.stdenv.isDarwin
+        then {
+          FR_DOCKERHOST = "docker.for.mac.localhost";
+        }
+        else {
+          # See: https://www.gnupg.org/documentation/manuals/gnupg/Invoking-GPG_002dAGENT.html
+          GPG_TTY = "$(tty)";
+        };
+    in
+      baseVars // osVars;
 
     shellAliases = {
+      cat = "bat -p";
       git = "hub";
       ssh = "mosh";
       vim = "nvim";
