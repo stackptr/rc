@@ -18,7 +18,10 @@
   }:
     nixpkgs.lib.nixosSystem {
       inherit system;
-      specialArgs = {inherit profile; inherit agenix;};
+      specialArgs = {
+        inherit profile;
+        inherit agenix;
+      };
       modules = [
         {environment.systemPackages = [agenix.packages.${system}.default];}
         ./../modules/base.nix

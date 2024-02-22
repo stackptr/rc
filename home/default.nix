@@ -90,7 +90,7 @@
     enable = true;
     defaultEditor = true;
   };
-  
+
   programs.nushell.enable = true;
 
   programs.ripgrep.enable = true;

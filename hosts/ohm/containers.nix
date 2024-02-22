@@ -138,7 +138,7 @@
             };
             refresh_interval = "5m";
             file = {
-              path =  pkgs.writeText "users.yaml" ''
+              path = pkgs.writeText "users.yaml" ''
                 users:
                   corey:
                     disabled: false
