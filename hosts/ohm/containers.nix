@@ -76,7 +76,7 @@
         enable = true;
         recommendedProxySettings = true;
         recommendedTlsSettings = true;
-        additionalModules = [pkgs.nginxModules.set-misc];
+        additionalModules = [pkgs.nginxModules.develkit pkgs.nginxModules.set-misc];
         virtualHosts."rey.foo" = {
           forceSSL = true;
           useACMEHost = "rey.foo";
