@@ -49,11 +49,8 @@
         
         ## Set the $target_url variable based on the original request.
         
-        ## Comment this line if you're using nginx without the http_set_misc module.
+        ## Requires nginx http_set_misc module.
         set_escape_uri $target_url $scheme://$http_host$request_uri;
-        
-        ## Uncomment this line if you're using NGINX without the http_set_misc module.
-        # set $target_url $scheme://$http_host$request_uri;
         
         ## Save the upstream response headers from Authelia to variables.
         auth_request_set $user $upstream_http_remote_user;
