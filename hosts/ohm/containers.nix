@@ -20,12 +20,6 @@
       ];
       age.identityPaths = ["/etc/ssh/ssh_host_ed25519_key"];
       age.secrets.cloudflare-dns.file = ./secrets/cloudflare-dns.age;
-      age.secrets.ldap-admin-password = {
-        file = ./secrets/ldap-admin-password.age;
-        mode = "440";
-        owner = "openldap";
-        group = "openldap";
-      };
       age.secrets.jwt-secret = {
         file = ./secrets/jwt-secret.age;
         mode = "440";
@@ -40,12 +34,6 @@
       };
       age.secrets.storage-encryption-key = {
         file = ./secrets/storage-encryption-key.age;
-        mode = "440";
-        owner = "authelia-main";
-        group = "authelia-main";
-      };
-      age.secrets.authelia-ldap-password = {
-        file = ./secrets/ldap-admin-password.age;
         mode = "440";
         owner = "authelia-main";
         group = "authelia-main";
@@ -106,37 +94,6 @@
           locations."/".proxyPass = "http://zeta.rove-duck.ts.net:3001";
         };
       };
-      services.openldap = {
-        enable = true;
-        urlList = ["ldap:///"];
-        settings.children = {
-          "olcDatabase={1}mdb".attrs = {
-            objectClass = ["olcDatabaseConfig" "olcMdbConfig"];
-
-            olcDatabase = "{1}mdb";
-            olcDbDirectory = "/var/lib/openldap/data";
-
-            olcSuffix = "dc=xor,dc=ooo";
-            olcRootDN = "cn=admin,dc=xor,dc=ooo";
-            olcRootPW.path = config.age.secrets.ldap-admin-password.path;
-            olcAccess = [
-              /*
-              custom access rules for userPassword attributes
-              */
-              ''                {0}to attrs=userPassword
-                                  by self write
-                                  by anonymous auth
-                                  by * none''
-
-              /*
-              allow read on anything else
-              */
-              ''                {1}to *
-                                  by * read''
-            ];
-          };
-        };
-      };
       services.authelia.instances.main = {
         enable = true;
         secrets.jwtSecretFile = config.age.secrets.jwt-secret.path;
@@ -145,7 +102,6 @@
         environmentVariables = {
           # N.B.: `secrets.notifierSmtpPasswordFile` is not yet defined
           AUTHELIA_NOTIFIER_SMTP_PASSWORD_FILE = config.age.secrets.notifier-smtp-password.path;
-          AUTHELIA_AUTHENTICATION_BACKEND_LDAP_PASSWORD_FILE = config.age.secrets.authelia-ldap-password.path;
         };
         settings = {
           theme = "auto";
@@ -175,21 +131,29 @@
               custom_url = "";
             };
             refresh_interval = "5m";
-            ldap = {
-              implementation = "custom";
-              url = "ldap://localhost:389";
-              timeout = "5s";
-              start_tls = false;
-              base_dn = "dc=xor,dc=ooo";
-              users_filter = "(&({username_attribute}={input})(objectClass=person))";
-              username_attribute = "uid";
-              mail_attribute = "mail";
-              display_name_attribute = "displayName";
-              groups_filter = "(&(member={dn})(objectClass=groupOfNames))";
-              group_name_attribute = "cn";
-              permit_referrals = false;
-              permit_unauthenticated_bind = false;
-              user = "cn=admin,dc=xor,dc=ooo";
+            file = {
+              path =  pkgs.writeText "users.yaml" ''
+                users:
+                  corey:
+                    disabled: false
+                    displayname: "Corey"
+                    password: "$argon2id$v=19$m=65536,t=3,p=4$+LRpQS4IVBqbuervtB+30Q$hPR1XADxM9+xQ2o0wLuM/aepOJip4cCn4gNWeEsxWYQ"
+                    email: corey@x64.co
+                    groups:
+                      - admins
+              '';
+              watch = false;
+              password = {
+                algorithm = "argon2";
+                argon2 = {
+                  variant = "argon2id";
+                  iterations = 3;
+                  memory = 65536;
+                  parallelism = 4;
+                  key_length = 32;
+                  salt_length = 16;
+                };
+              };
             };
           };
           password_policy = {

@@ -6,7 +6,6 @@ let
 in {
   "hosts/ohm/secrets/cloudflare-dns.age".publicKeys = keys;
   "hosts/ohm/secrets/jwt-secret.age".publicKeys = keys;
-  "hosts/ohm/secrets/ldap-admin-password.age".publicKeys = keys;
   "hosts/ohm/secrets/notifier-smtp-password.age".publicKeys = keys;
   "hosts/ohm/secrets/session-secret.age".publicKeys = keys;
   "hosts/ohm/secrets/storage-encryption-key.age".publicKeys = keys;
