@@ -40,6 +40,7 @@
     shellAliases = {
       git = "hub";
       ssh = "mosh";
+      vim = "nvim";
     };
 
     syntaxHighlighting = {

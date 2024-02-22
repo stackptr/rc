@@ -13,7 +13,6 @@
         # Apps
         mosh
         neofetch
-        neovim
 
         # Audio/video
         ffmpeg_6
@@ -87,6 +86,11 @@
     '';
   };
 
+  programs.neovim = {
+    enable = true;
+    defaultEditor = true;
+  };
+  
   programs.nushell.enable = true;
 
   programs.ripgrep.enable = true;
