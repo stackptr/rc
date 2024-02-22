@@ -87,11 +87,17 @@
           useACMEHost = "xor.ooo";
           locations."/".proxyPass = "https://zeta.rove-duck.ts.net:9443";
         };
-        virtualHosts."test.xor.ooo" = {
+        virtualHosts."dsm.xor.ooo" = {
+          forceSSL = true;
+          useACMEHost = "xor.ooo";
+          locations."/".proxyPass = "http://melchior.rove-duck.ts.net:5001";
+        };
+        virtualHosts."torrents.xor.ooo" = {
           forceSSL = true;
           useACMEHost = "xor.ooo";
           enableAutheliaAuth = true;
-          locations."/".proxyPass = "http://zeta.rove-duck.ts.net:3001";
+          locations."/".proxyPass = "http://melchior.rove-duck.ts.net:9091";
+          locations."~ (/transmission)?/rpc".proxyPass = "http://melchior.rove-duck.ts.net:9091";
         };
       };
       services.authelia.instances.main = {
