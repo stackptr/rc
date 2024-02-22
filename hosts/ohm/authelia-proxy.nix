@@ -19,7 +19,7 @@
         proxy_set_header X-Forwarded-For $remote_addr;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header Connection "";
-        
+
         ## Basic Proxy Configuration
         client_body_buffer_size 128k;
         proxy_next_upstream error timeout invalid_header http_500 http_502 http_503; ## Timeout if the real server is dead.
@@ -28,7 +28,7 @@
         proxy_cache_bypass $cookie_session;
         proxy_no_cache $cookie_session;
         proxy_buffers 64 256k;
-        
+
         ## Trusted Proxies Configuration
         ## Please read the following documentation before configuring this:
         ##     https://www.authelia.com/integration/proxies/nginx/#trusted-proxies
@@ -38,7 +38,7 @@
         # set_real_ip_from fc00::/7;
         real_ip_header X-Forwarded-For;
         real_ip_recursive on;
-        
+
         ## Advanced Proxy Configuration
         send_timeout 5m;
         proxy_read_timeout 360;
