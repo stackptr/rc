@@ -64,6 +64,9 @@
         prompt pure
       fi
 
+      # FIXME: Reset RPS1 until I find what is causing it to be set on macOS
+      RPS1=
+
       ## Wrappers for `stack`
 
       # Build project and specs without running tests:
