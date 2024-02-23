@@ -80,6 +80,18 @@
 
   programs.jq.enable = true;
 
+  programs.lsd = {
+    enable = true;
+    enableAliases = true;
+    settings = {
+      icons = {
+        # TODO: "fancy" theme requires patched font with icons
+        # https://github.com/lsd-rs/lsd#icons-not-showing-up
+        theme = "unicode";
+      };
+    };
+  };
+
   programs.neovim = {
     enable = true;
     defaultEditor = true;
