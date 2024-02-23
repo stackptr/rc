@@ -90,7 +90,7 @@
         virtualHosts."dsm.xor.ooo" = {
           forceSSL = true;
           useACMEHost = "xor.ooo";
-          locations."/".proxyPass = "http://melchior.rove-duck.ts.net:5001";
+          locations."/".proxyPass = "https://melchior.rove-duck.ts.net:5001";
         };
         virtualHosts."torrents.xor.ooo" = {
           forceSSL = true;
