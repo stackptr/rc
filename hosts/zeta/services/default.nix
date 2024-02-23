@@ -6,6 +6,7 @@
   imports = [
     ./home-assistant.nix
     ./portainer.nix
+    ./znc.nix
   ];
   age.secrets.dd-agent = {
     file = ./../secrets/dd-agent.age;
