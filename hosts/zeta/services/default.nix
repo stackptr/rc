@@ -3,6 +3,9 @@
   pkgs,
   ...
 }: {
+  imports = [
+    ./portainer.nix
+  ];
   age.secrets.dd-agent = {
     file = ./../secrets/dd-agent.age;
     mode = "440";
@@ -44,10 +47,4 @@
   programs.git.enable = true;
   programs.gnupg.agent.enable = true;
   programs.vim.defaultEditor = true;
-
-  virtualisation.docker.enable = true;
-  virtualisation.oci-containers.backend = "docker";
-  virtualisation.oci-containers.containers = {
-    portainer = import ./portainer.nix;
-  };
 }
