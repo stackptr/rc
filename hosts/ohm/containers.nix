@@ -51,12 +51,13 @@
           domain = "*.xor.ooo";
           dnsProvider = "cloudflare";
           environmentFile = config.age.secrets.cloudflare-dns.path;
-          extraDomainNames = ["xor.ooo" "foo.xor.ooo"];
+          extraDomainNames = ["xor.ooo"];
         };
         certs."rey.foo" = {
           domain = "rey.foo";
           dnsProvider = "cloudflare";
           environmentFile = config.age.secrets.cloudflare-dns.path;
+          extraDomainNames = ["co.rey.foo"];
         };
       };
       users.users.nginx.extraGroups = ["acme"];
