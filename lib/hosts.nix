@@ -6,6 +6,7 @@
   profile,
   ...
 }: let
+  keys = import ./keys.nix;
   baseHomeManager = username: {
     home-manager.useGlobalPkgs = true;
     home-manager.useUserPackages = true;
@@ -19,8 +20,7 @@
     nixpkgs.lib.nixosSystem {
       inherit system;
       specialArgs = {
-        inherit profile;
-        inherit agenix;
+        inherit profile agenix keys;
       };
       modules = [
         {environment.systemPackages = [agenix.packages.${system}.default];}
@@ -34,6 +34,7 @@
   darwinHomeManager = baseHomeManager "corey";
   darwinHost = {hostname, ...}:
     nix-darwin.lib.darwinSystem {
+      specialArgs = {inherit keys;};
       modules = [
         ./../modules/base.nix
         ./../modules/darwin.nix

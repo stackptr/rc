@@ -1,8 +1,5 @@
 let
-  firstLine = str: builtins.head (builtins.split "\n" str);
-  readKey = host:
-    firstLine (builtins.readFile ./hosts/${host}/key.pub);
-  keys = map readKey ["ohm" "Petrichor" "Rhizome" "zeta"];
+  keys = with (import ./lib/keys.nix); [ohm Petrichor Rhizome zeta];
 in {
   "hosts/ohm/secrets/cloudflare-dns.age".publicKeys = keys;
   "hosts/ohm/secrets/jwt-secret.age".publicKeys = keys;
