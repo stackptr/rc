@@ -80,6 +80,17 @@
 
   programs.jq.enable = true;
 
+  programs.neovim = {
+    enable = true;
+    defaultEditor = true;
+  };
+
+  programs.nushell.enable = true;
+
+  programs.ripgrep.enable = true;
+
+  programs.yt-dlp.enable = true;
+
   services.gpg-agent = {
     # TODO: nix-community/home-manager#2964
     enable =
@@ -92,17 +103,6 @@
       allow-loopback-pinentry
     '';
   };
-
-  programs.neovim = {
-    enable = true;
-    defaultEditor = true;
-  };
-
-  programs.nushell.enable = true;
-
-  programs.ripgrep.enable = true;
-
-  programs.yt-dlp.enable = true;
 
   home.stateVersion = "23.11";
 }
