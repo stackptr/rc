@@ -1,21 +1,23 @@
 {
   config,
   pkgs,
+  keys,
   ...
 }: {
-  age.secrets.userpassword.file = ./secrets/userpassword.age;
-
   security.sudo.wheelNeedsPassword = false;
 
   users = {
     mutableUsers = false;
     users.mu = {
       isNormalUser = true;
-      hashedPasswordFile = config.age.secrets.userpassword.path;
       extraGroups = ["wheel" "docker"];
       shell = pkgs.zsh;
+      openssh.authorizedKeys.keys = [
+        keys.Petrichor
+        keys.Rhizome
+      ];
     };
-    users.root.initialPassword = "password";
+    users.root.openssh.authorizedKeys.keys = [keys.Petrichor keys.Rhizome];
   };
 
   system.stateVersion = "23.11";
