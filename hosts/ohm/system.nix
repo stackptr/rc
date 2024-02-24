@@ -2,6 +2,7 @@
   config,
   pkgs,
   keys,
+  lib,
   ...
 }: {
   users = {
@@ -19,6 +20,7 @@
   ];
 
   security.sudo.wheelNeedsPassword = false;
+  security.pam.sshAgentAuth.authorizedKeysFiles = lib.mkForce ["/etc/ssh/authorized_keys.d/%u"];
 
   system.stateVersion = "23.11";
 }

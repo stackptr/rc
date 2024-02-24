@@ -2,10 +2,9 @@
   config,
   pkgs,
   keys,
+  lib,
   ...
 }: {
-  security.sudo.wheelNeedsPassword = false;
-
   users = {
     mutableUsers = false;
     users.mu = {
@@ -19,6 +18,9 @@
     };
     users.root.openssh.authorizedKeys.keys = [keys.Petrichor keys.Rhizome];
   };
+
+  security.sudo.wheelNeedsPassword = false;
+  security.pam.sshAgentAuth.authorizedKeysFiles = lib.mkForce ["/etc/ssh/authorized_keys.d/%u"];
 
   system.stateVersion = "23.11";
 }
