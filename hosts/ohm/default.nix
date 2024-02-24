@@ -4,7 +4,6 @@
   ...
 }: {
   imports = [
-    ./system.nix
     ./hardware-configuration.nix
     ./networking.nix # generated at runtime by nixos-infect
     ./containers.nix
@@ -21,4 +20,6 @@
   services.do-agent.enable = true;
 
   networking.firewall.allowedTCPPorts = [80 443];
+
+  system.stateVersion = "23.11";
 }

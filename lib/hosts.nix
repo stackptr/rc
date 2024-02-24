@@ -26,6 +26,7 @@
       modules = [
         {environment.systemPackages = [agenix.packages.${system}.default];}
         ./../modules/base.nix
+        ./../modules/nixos.nix
         ./../hosts/${hostname}
         agenix.nixosModules.default
         home-manager.nixosModules.home-manager

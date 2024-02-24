@@ -3,6 +3,7 @@
   pkgs,
   ...
 }: {
+  users.users.mu.extraGroups = ["docker"];
   virtualisation.docker.enable = true;
   virtualisation.oci-containers.backend = "docker";
   virtualisation.oci-containers.containers = {

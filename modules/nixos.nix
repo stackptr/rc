@@ -1,8 +1,8 @@
 {
+  lib,
   config,
   pkgs,
   keys,
-  lib,
   ...
 }: {
   users = {
@@ -21,9 +21,6 @@
     keys.Petrichor
     keys.Rhizome
   ];
-
   security.sudo.wheelNeedsPassword = false;
   security.pam.sshAgentAuth.authorizedKeysFiles = lib.mkForce ["/etc/ssh/authorized_keys.d/%u"];
-
-  system.stateVersion = "23.11";
 }
