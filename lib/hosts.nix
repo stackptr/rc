@@ -1,4 +1,5 @@
 {
+  self,
   nixpkgs,
   agenix,
   home-manager,
@@ -34,7 +35,7 @@
   darwinHomeManager = baseHomeManager "corey";
   darwinHost = {hostname, ...}:
     nix-darwin.lib.darwinSystem {
-      specialArgs = {inherit keys;};
+      specialArgs = {inherit self keys;};
       modules = [
         ./../modules/base.nix
         ./../modules/darwin.nix
