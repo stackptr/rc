@@ -47,7 +47,6 @@
     shellAliases = {
       cat = "bat -p";
       git = "hub";
-      ssh = "mosh";
       vim = "nvim";
     };
 
