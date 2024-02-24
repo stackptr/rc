@@ -4,6 +4,7 @@
   ...
 }: {
   imports = [
+    ./home-assistant.nix
     ./portainer.nix
   ];
   age.secrets.dd-agent = {
