@@ -1,6 +1,7 @@
 {pkgs, ...}: {
   programs.zsh = {
     enable = true;
+    defaultKeymap = "emacs";
 
     history = {
       extended = true;
