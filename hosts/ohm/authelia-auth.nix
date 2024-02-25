@@ -65,7 +65,7 @@
         proxy_set_header Remote-Email $email;
 
         ## If the subreqest returns 200 pass to the backend, if the subrequest returns 401 redirect to the portal.
-        error_page 401 =302 https://auth.xor.ooo/?rd=$target_url;
+        error_page 401 =302 https://auth.zx.dev/?rd=$target_url;
       '';
     };
   };
