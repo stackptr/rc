@@ -70,6 +70,7 @@
       sequence.editor = "interactive-rebase-tool";
       pull.rebase = true;
       push.autosetupremote = true;
+      init.defaultBranch = "main";
     };
   };
 
