@@ -69,6 +69,7 @@
     extraConfig = {
       sequence.editor = "interactive-rebase-tool";
       pull.rebase = true;
+      push.autosetupremote = true;
     };
   };
 
