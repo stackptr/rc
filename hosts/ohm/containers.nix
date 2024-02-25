@@ -47,16 +47,16 @@
       security.acme = {
         acceptTerms = true;
         defaults.server = "https://acme-staging-v02.api.letsencrypt.org/directory";
-        defaults.email = "admin@xor.ooo";
-        certs."xor.ooo" = {
-          domain = "xor.ooo";
+        defaults.email = "admin@zx.dev";
+        certs."zx.dev" = {
+          domain = "zx.dev";
           dnsProvider = "cloudflare";
           environmentFile = config.age.secrets.cloudflare-dns.path;
           extraDomainNames = [
-            "auth.xor.ooo"
-            "portainer.xor.ooo"
-            "dsm.xor.ooo"
-            "torrents.xor.ooo"
+            "auth.zx.dev"
+            "portainer.zx.dev"
+            "dsm.zx.dev"
+            "torrents.zx.dev"
           ];
         };
         certs."rey.foo" = {
@@ -75,33 +75,33 @@
         virtualHosts."rey.foo" = {
           forceSSL = true;
           useACMEHost = "rey.foo";
-          locations."/".return = "302 https://xor.ooo";
+          locations."/".return = "302 https://zx.dev";
         };
-        virtualHosts."xor.ooo" = {
+        virtualHosts."zx.dev" = {
           forceSSL = true;
-          useACMEHost = "xor.ooo";
+          useACMEHost = "zx.dev";
           locations."/".proxyPass = "http://zeta.rove-duck.ts.net:3001";
         };
-        virtualHosts."auth.xor.ooo" = {
+        virtualHosts."auth.zx.dev" = {
           forceSSL = true;
-          useACMEHost = "xor.ooo";
+          useACMEHost = "zx.dev";
           useAutheliaProxyConf = true;
           locations."/".proxyPass = "http://127.0.0.1:9091";
           locations."/api/verify".proxyPass = "http://127.0.0.1:9091";
         };
-        virtualHosts."portainer.xor.ooo" = {
+        virtualHosts."portainer.zx.dev" = {
           forceSSL = true;
-          useACMEHost = "xor.ooo";
+          useACMEHost = "zx.dev";
           locations."/".proxyPass = "https://zeta.rove-duck.ts.net:9443";
         };
-        virtualHosts."dsm.xor.ooo" = {
+        virtualHosts."dsm.zx.dev" = {
           forceSSL = true;
-          useACMEHost = "xor.ooo";
+          useACMEHost = "zx.dev";
           locations."/".proxyPass = "https://melchior.rove-duck.ts.net:5001";
         };
-        virtualHosts."torrents.xor.ooo" = {
+        virtualHosts."torrents.zx.dev" = {
           forceSSL = true;
-          useACMEHost = "xor.ooo";
+          useACMEHost = "zx.dev";
           enableAutheliaAuth = true;
           locations."/".proxyPass = "http://melchior.rove-duck.ts.net:9091";
           locations."~ (/transmission)?/rpc".proxyPass = "http://melchior.rove-duck.ts.net:9091";
@@ -118,13 +118,13 @@
         };
         settings = {
           theme = "auto";
-          default_redirection_url = "https://xor.ooo";
+          default_redirection_url = "https://zx.dev";
           default_2fa_method = "webauthn";
           log.level = "debug";
           server.disable_healthcheck = true;
           totp = {
             disable = false;
-            issuer = "auth.xor.ooo";
+            issuer = "auth.zx.dev";
             algorithm = "sha1";
             digits = 6;
             period = 30;
@@ -188,14 +188,14 @@
             default_policy = "deny";
             rules = [
               {
-                domain = "*.xor.ooo";
+                domain = "*.zx.dev";
                 policy = "two_factor";
               }
             ];
           };
           session = {
             name = "authelia_session";
-            domain = "xor.ooo";
+            domain = "zx.dev";
             same_site = "lax";
             expiration = "1h";
             inactivity = "5m";
@@ -214,10 +214,10 @@
               port = 587;
               timeout = "5s";
               username = "apikey";
-              sender = "Authelia <authelia@xor.ooo>";
-              identifier = "auth.xor.ooo";
+              sender = "Authelia <authelia@zx.dev>";
+              identifier = "auth.zx.dev";
               subject = "[Authelia] {title}";
-              startup_check_address = "test@xor.ooo";
+              startup_check_address = "test@zx.dev";
             };
           };
         };
