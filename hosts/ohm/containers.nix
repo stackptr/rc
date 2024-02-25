@@ -62,7 +62,7 @@
           domain = "rey.foo";
           dnsProvider = "cloudflare";
           environmentFile = config.age.secrets.cloudflare-dns.path;
-          extraDomainNames = ["co.rey.foo"];
+          extraDomainNames = ["co.rey.foo" "g.rey.foo"];
         };
       };
       users.users.nginx.extraGroups = ["acme"];
