@@ -48,10 +48,15 @@
         acceptTerms = true;
         defaults.email = "admin@xor.ooo";
         certs."xor.ooo" = {
-          domain = "*.xor.ooo";
+          domain = "xor.ooo";
           dnsProvider = "cloudflare";
           environmentFile = config.age.secrets.cloudflare-dns.path;
-          extraDomainNames = ["xor.ooo"];
+          extraDomainNames = [
+            "auth.xor.ooo"
+            "portainer.xor.ooo"
+            "dsm.xor.ooo"
+            "torrents.xor.ooo"
+          ];
         };
         certs."rey.foo" = {
           domain = "rey.foo";
