@@ -67,7 +67,7 @@
         recommendedTlsSettings = true;
         additionalModules = [pkgs.nginxModules.develkit pkgs.nginxModules.set-misc];
         virtualHosts."rey.foo" = {
-          forceSSL = true;
+          # forceSSL = true;
           # useACMEHost = "rey.foo";
           locations."/".return = "302 https://zx.dev";
         };
