@@ -71,6 +71,7 @@
       pull.rebase = true;
       push.autosetupremote = true;
       init.defaultBranch = "main";
+      merge.conflictstyle = "zdiff3";
     };
   };
 
