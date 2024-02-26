@@ -46,7 +46,7 @@
       };
       security.acme = {
         acceptTerms = true;
-        # defaults.server = "https://acme-staging-v02.api.letsencrypt.org/directory";
+        defaults.server = "https://acme-staging-v02.api.letsencrypt.org/directory";
         defaults.email = "corey@zx.dev";
         certs."zx.dev" = {
           domain = "zx.dev";
@@ -215,6 +215,40 @@
             };
           };
         };
+      };
+      services.mastodon = {
+        enable = true;
+        localDomain = "pub.zx.dev";
+        streamingProcesses = 1;
+        # TODO:
+        # secretKeyBaseFile = config.age.secrets.mastodon-secret-key-base.path;
+        # secretKeyBaseFile = config.age.secrets.mastodon-secret-key-base.path;
+        # vapidPublicKeyFile = config.age.secrets.mastodon-vapid-public-key.path;
+        # vapidPrivateKeyFile = config.age.secrets.mastodon-vapid-private-key.path;
+        configureNginx = true;
+        database = {
+          createLocally = false;
+          host = "127.0.0.1";
+          port = 5432;
+          user = "mastodon";
+          passwordFile = "/dev/null"; # Not needed
+          name = "mastodon";
+        };
+        redis = {
+          createLocally = false;
+          port = 31637;
+          enableUnixSocket = false;
+        };
+        smtp = {
+          createLocally = false;
+          host = "smtp.sendgrid.net";
+          port = 587;
+          authenticate = true;
+          user = "apikey";
+          passwordFile = config.age.secrets.notifier-smtp-password.path;
+          fromAddress = "mastodon@zx.dev";
+        };
+        extraConfig.SINGLE_USER_MODE = "true";
       };
       system.stateVersion = "24.05";
     };
