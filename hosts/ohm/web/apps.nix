@@ -143,15 +143,19 @@
     };
   };
 
+  age.secrets.mastodon-smtp-password.file = ./../secrets/notifier-smtp-password.age;
+  age.secrets.mastodon-secret-key-base.file = ./../secrets/mastodon-secret-key-base.age;
+  age.secrets.mastodon-otp-secret.file = ./../secrets/mastodon-otp-secret.age;
+  age.secrets.mastodon-vapid-public-key.file = ./../secrets/mastodon-vapid-public-key.age;
+  age.secrets.mastodon-vapid-private-key.file = ./../secrets/mastodon-vapid-private-key.age;
   services.mastodon = {
     enable = true;
     localDomain = "pub.zx.dev";
     streamingProcesses = 1;
-    # TODO:
-    # secretKeyBaseFile = config.age.secrets.mastodon-secret-key-base.path;
-    # secretKeyBaseFile = config.age.secrets.mastodon-secret-key-base.path;
-    # vapidPublicKeyFile = config.age.secrets.mastodon-vapid-public-key.path;
-    # vapidPrivateKeyFile = config.age.secrets.mastodon-vapid-private-key.path;
+    secretKeyBaseFile = config.age.secrets.mastodon-secret-key-base.path;
+    otpSecretFile = config.age.secrets.mastodon-otp-secret.path;
+    vapidPublicKeyFile = config.age.secrets.mastodon-vapid-public-key.path;
+    vapidPrivateKeyFile = config.age.secrets.mastodon-vapid-private-key.path;
     configureNginx = true;
     database = {
       createLocally = false;
@@ -172,7 +176,7 @@
       port = 587;
       authenticate = true;
       user = "apikey";
-      passwordFile = config.age.secrets.notifier-smtp-password.path;
+      passwordFile = config.age.secrets.mastodon-smtp-password.path;
       fromAddress = "mastodon@zx.dev";
     };
     extraConfig = {
