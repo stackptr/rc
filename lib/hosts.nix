@@ -21,7 +21,7 @@
     nixpkgs.lib.nixosSystem {
       inherit system;
       specialArgs = {
-        inherit profile agenix keys;
+        inherit profile keys;
       };
       modules = [
         {environment.systemPackages = [agenix.packages.${system}.default];}
