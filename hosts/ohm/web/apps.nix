@@ -175,6 +175,10 @@
       passwordFile = config.age.secrets.notifier-smtp-password.path;
       fromAddress = "mastodon@zx.dev";
     };
-    extraConfig.SINGLE_USER_MODE = "true";
+    extraConfig = {
+      SINGLE_USER_MODE = "true";
+      LOCAL_DOMAIN = "zx.dev";
+      WEB_DOMAIN = "pub.zx.dev";
+    };
   };
 }

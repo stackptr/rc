@@ -32,7 +32,15 @@
     virtualHosts."zx.dev" = {
       forceSSL = true;
       useACMEHost = "zx.dev";
-      locations."/".proxyPass = "http://zeta.rove-duck.ts.net:3001";
+      locations = {
+        "/".proxyPass = "http://zeta.rove-duck.ts.net:3001";
+        "/.well-known/webfinger" = {
+          extraConfig = ''
+            add_header Access-Control-Allow-Origin '*';
+          '';
+          return = "301 https://pub.zx.dev$request_uri";
+        };
+      };
     };
     virtualHosts."auth.zx.dev" = {
       forceSSL = true;
