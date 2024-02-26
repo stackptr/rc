@@ -11,15 +11,10 @@
     defaults.server = "https://acme-staging-v02.api.letsencrypt.org/directory";
     defaults.email = "corey@zx.dev";
     certs."zx.dev" = {
-      domain = "zx.dev";
+      domain = "*.zx.dev";
       dnsProvider = "cloudflare";
       environmentFile = config.age.secrets.cloudflare-dns.path;
-      extraDomainNames = [
-        "auth.zx.dev"
-        "portainer.zx.dev"
-        "dsm.zx.dev"
-        "torrents.zx.dev"
-      ];
+      extraDomainNames = ["zx.dev"];
     };
   };
   users.users.nginx.extraGroups = ["acme"];
