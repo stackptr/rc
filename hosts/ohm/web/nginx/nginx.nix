@@ -8,7 +8,7 @@
 
   security.acme = {
     acceptTerms = true;
-    # defaults.server = "https://acme-staging-v02.api.letsencrypt.org/directory";
+    defaults.server = "https://acme-staging-v02.api.letsencrypt.org/directory";
     defaults.email = "corey@zx.dev";
     certs."zx.dev" = {
       domain = "*.zx.dev";
