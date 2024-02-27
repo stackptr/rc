@@ -143,11 +143,36 @@
     };
   };
 
-  age.secrets.mastodon-smtp-password.file = ./../secrets/notifier-smtp-password.age;
-  age.secrets.mastodon-secret-key-base.file = ./../secrets/mastodon-secret-key-base.age;
-  age.secrets.mastodon-otp-secret.file = ./../secrets/mastodon-otp-secret.age;
-  age.secrets.mastodon-vapid-public-key.file = ./../secrets/mastodon-vapid-public-key.age;
-  age.secrets.mastodon-vapid-private-key.file = ./../secrets/mastodon-vapid-private-key.age;
+  age.secrets.mastodon-smtp-password = {
+    file = ./../secrets/notifier-smtp-password.age;
+    mode = "440";
+    owner = "mastodon";
+    group = "mastodon";
+  };
+  age.secrets.mastodon-secret-key-base = {
+    file = ./../secrets/mastodon-secret-key-base.age;
+    mode = "440";
+    owner = "mastodon";
+    group = "mastodon";
+  };
+  age.secrets.mastodon-otp-secret = {
+    file = ./../secrets/mastodon-otp-secret.age;
+    mode = "440";
+    owner = "mastodon";
+    group = "mastodon";
+  };
+  age.secrets.mastodon-vapid-public-key = {
+    file = ./../secrets/mastodon-vapid-public-key.age;
+    mode = "440";
+    owner = "mastodon";
+    group = "mastodon";
+  };
+  age.secrets.mastodon-vapid-private-key = {
+    file = ./../secrets/mastodon-vapid-private-key.age;
+    mode = "440";
+    owner = "mastodon";
+    group = "mastodon";
+  };
   services.mastodon = {
     enable = true;
     localDomain = "pub.zx.dev";
