@@ -7,13 +7,13 @@
     device = "/dev/vda1";
     fsType = "ext4";
   };
-  fileSystems."/opt/data" = {
+  fileSystems."/mnt/data" = {
     device = "/dev/disk/by-id/scsi-0DO_Volume_storage";
     fsType = "ext4";
   };
   swapDevices = [
     {
-      device = "/opt/data/swapfile";
+      device = "/mnt/data/swapfile";
       size = 8 * 1024;
     }
   ];
