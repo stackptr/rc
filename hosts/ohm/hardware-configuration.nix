@@ -17,7 +17,7 @@
   };
   swapDevices = [
     {
-      device = "/mnt/data/swapfile";
+      device = "/swapfile";
       size = 8 * 1024;
     }
   ];
