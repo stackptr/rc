@@ -70,7 +70,7 @@
               corey:
                 disabled: false
                 displayname: "Corey"
-                password: "$argon2id$v=19$m=65536,t=3,p=4$+LRpQS4IVBqbuervtB+30Q$hPR1XADxM9+xQ2o0wLuM/aepOJip4cCn4gNWeEsxWYQ"
+                password: "$argon2id$v=19$m=65536,t=3,p=4$/jiiAPT7PHKhKxb3ncrLBQ$8cWd3PZKhBJvEz8KfGnC3FEYS1LTMSKRbzR1WsDbCIg"
                 email: corey@x64.co
                 groups:
                   - admins
