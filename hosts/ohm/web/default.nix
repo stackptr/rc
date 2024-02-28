@@ -5,7 +5,8 @@
 }: {
   imports = [
     ./nginx
+    ./authelia.nix
     ./db.nix
-    ./apps.nix
+    ./mastodon.nix
   ];
 }
