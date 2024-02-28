@@ -12,8 +12,12 @@
         name = "mastodon";
         ensureDBOwnership = true;
       }
+      {
+        name = "matrix";
+        ensureDBOwnership = true;
+      }
     ];
-    ensureDatabases = ["mastodon"];
+    ensureDatabases = ["mastodon" "matrix"];
     authentication = pkgs.lib.mkOverride 10 ''
       # Any user can connect to any database via Unix socket or local loopback
       local  all   all                  trust
