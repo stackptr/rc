@@ -6,6 +6,7 @@
   serverName = "zx.dev";
   httpPort = 8008;
 in {
+  age.secrets.dendrite-env.file = ./../secrets/dendrite-env.age;
   age.secrets.dendrite-private-key.file = ./../secrets/dendrite-private-key.age;
   services.nginx = {
     enable = true;
@@ -46,6 +47,7 @@ in {
     loadCredential = [
       "private_key:${config.age.secrets.dendrite-private-key.path}"
     ];
+    environmentFile = config.age.secrets.dendrite-env.path;
     settings = let
       databaseBlocks = ["app_service_api.database" "federation_api.database" "key_server.database" "media_api.database" "mscs.database" "relay_api.database" "room_server.database" "sync_api.database" "user_api.account_database" "user_api.device_database"];
       connectionString = "postgres://127.0.0.1/matrix?sslmode=disable";
@@ -59,6 +61,10 @@ in {
         global = {
           server_name = serverName;
           private_key = "$CREDENTIALS_DIRECTORY/private_key";
+        };
+        client_api = {
+          registration_disabled = true;
+          registration_shared_secret = "$REGISTRATION_SHARED_SECRET";
         };
       }
       // globalConnectionPool;

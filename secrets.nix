@@ -2,6 +2,7 @@ let
   keys = with (import ./lib/keys.nix); [ohm Petrichor Rhizome zeta];
 in {
   "hosts/ohm/secrets/cloudflare-dns.age".publicKeys = keys;
+  "hosts/ohm/secrets/dendrite-env.age".publicKeys = keys;
   "hosts/ohm/secrets/dendrite-private-key.age".publicKeys = keys;
   "hosts/ohm/secrets/jwt-secret.age".publicKeys = keys;
   "hosts/ohm/secrets/mastodon-secret-key-base.age".publicKeys = keys;
