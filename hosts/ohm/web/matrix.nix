@@ -70,16 +70,46 @@ in {
         registration_disabled = true;
         registration_shared_secret = "$REGISTRATION_SHARED_SECRET";
       };
-      app_service_api.database.connection_string = connectionString;
-      federation_api.database.connection_string = connectionString;
-      key_server.database.connection_string = connectionString;
-      media_api.database.connection_string = connectionString;
-      mscs.database.connection_string = connectionString;
-      relay_api.database.connection_string = connectionString;
-      room_server.database.connection_string = connectionString;
-      sync_api.database.connection_string = connectionString;
-      user_api.account_database.connection_string = connectionString;
-      user_api.device_database.connection_string = connectionString;
+      app_service_api.database = {
+        connection_string = connectionString;
+        max_open_conns = 10;
+      };
+      federation_api.database = {
+        connection_string = connectionString;
+        max_open_conns = 10;
+      };
+      key_server.database = {
+        connection_string = connectionString;
+        max_open_conns = 10;
+      };
+      media_api.database = {
+        connection_string = connectionString;
+        max_open_conns = 5;
+      };
+      mscs.database = {
+        connection_string = connectionString;
+        max_open_conns = 10;
+      };
+      relay_api.database = {
+        connection_string = connectionString;
+        max_open_conns = 10;
+      };
+      room_server.database = {
+        connection_string = connectionString;
+        max_open_conns = 10;
+      };
+      sync_api.database = {
+        connection_string = connectionString;
+        max_open_conns = 10;
+      };
+      user_api.account_database = {
+        connection_string = connectionString;
+        max_open_conns = 5;
+      };
+      user_api.device_database = {
+        connection_string = connectionString;
+        max_open_conns = 5;
+      };
     };
     openRegistration = false;
   };
