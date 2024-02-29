@@ -59,13 +59,7 @@ in {
     ];
     environmentFile = config.age.secrets.dendrite-env.path;
     settings = let
-      databaseBlocks = ["app_service_api.database" "federation_api.database" "key_server.database" "media_api.database" "mscs.database" "relay_api.database" "room_server.database" "sync_api.database" "user_api.account_database" "user_api.device_database"];
       connectionString = "postgres://matrix@127.0.0.1/matrix?sslmode=disable";
-      mkConnectionString = name: {
-        name = "${name}.connection_string";
-        value = connectionString;
-      };
-      globalConnectionPool = builtins.listToAttrs (map mkConnectionString databaseBlocks);
     in
       {
         global = {
@@ -76,8 +70,17 @@ in {
           registration_disabled = true;
           registration_shared_secret = "$REGISTRATION_SHARED_SECRET";
         };
-      }
-      // globalConnectionPool;
+        app_service_api.database.connection_string = connectionString;
+        federation_api.database.connection_string = connectionString;
+        key_server.database.connection_string = connectionString;
+        media_api.database.connection_string = connectionString;
+        mscs.database.connection_string = connectionString;
+        relay_api.database.connection_string = connectionString;
+        room_server.database.connection_string = connectionString;
+        sync_api.database.connection_string = connectionString;
+        user_api.account_database.connection_string = connectionString;
+        user_api.device_database.connection_string = connectionString;
+      };
     openRegistration = false;
     inherit httpPort;
   };
