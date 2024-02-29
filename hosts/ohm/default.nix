@@ -18,7 +18,7 @@
   services.tailscale.enable = true;
   services.do-agent.enable = true;
 
-  networking.firewall.allowedTCPPorts = [80 443];
+  networking.firewall.allowedTCPPorts = [80 443 8448];
 
   system.stateVersion = "23.11";
 }
