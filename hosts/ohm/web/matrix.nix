@@ -91,4 +91,9 @@ in {
       Group = "dendrite";
     };
   };
+  users.users.dendrite = {
+    group = "dendrite";
+    isSystemUser = true;
+  };
+  users.groups.dendrite = {};
 }
