@@ -61,27 +61,26 @@ in {
     environmentFile = config.age.secrets.dendrite-env.path;
     settings = let
       connectionString = "postgres://127.0.0.1/dendrite?sslmode=disable";
-    in
-      {
-        global = {
-          server_name = serverName;
-          private_key = "$CREDENTIALS_DIRECTORY/private_key";
-        };
-        client_api = {
-          registration_disabled = true;
-          registration_shared_secret = "$REGISTRATION_SHARED_SECRET";
-        };
-        app_service_api.database.connection_string = connectionString;
-        federation_api.database.connection_string = connectionString;
-        key_server.database.connection_string = connectionString;
-        media_api.database.connection_string = connectionString;
-        mscs.database.connection_string = connectionString;
-        relay_api.database.connection_string = connectionString;
-        room_server.database.connection_string = connectionString;
-        sync_api.database.connection_string = connectionString;
-        user_api.account_database.connection_string = connectionString;
-        user_api.device_database.connection_string = connectionString;
+    in {
+      global = {
+        server_name = serverName;
+        private_key = "$CREDENTIALS_DIRECTORY/private_key";
       };
+      client_api = {
+        registration_disabled = true;
+        registration_shared_secret = "$REGISTRATION_SHARED_SECRET";
+      };
+      app_service_api.database.connection_string = connectionString;
+      federation_api.database.connection_string = connectionString;
+      key_server.database.connection_string = connectionString;
+      media_api.database.connection_string = connectionString;
+      mscs.database.connection_string = connectionString;
+      relay_api.database.connection_string = connectionString;
+      room_server.database.connection_string = connectionString;
+      sync_api.database.connection_string = connectionString;
+      user_api.account_database.connection_string = connectionString;
+      user_api.device_database.connection_string = connectionString;
+    };
     openRegistration = false;
   };
   systemd.services.dendrite = {
