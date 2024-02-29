@@ -60,7 +60,7 @@ in {
     environmentFile = config.age.secrets.dendrite-env.path;
     settings = let
       databaseBlocks = ["app_service_api.database" "federation_api.database" "key_server.database" "media_api.database" "mscs.database" "relay_api.database" "room_server.database" "sync_api.database" "user_api.account_database" "user_api.device_database"];
-      connectionString = "postgres://127.0.0.1/matrix?sslmode=disable";
+      connectionString = "postgres://matrix@127.0.0.1/matrix?sslmode=disable";
       mkConnectionString = name: {
         name = "${name}.connection_string";
         value = connectionString;
