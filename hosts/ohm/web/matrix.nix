@@ -6,6 +6,7 @@
 }: let
   serverName = "zx.dev";
   httpPort = 8008;
+  httpsPort = 8448;
 in {
   age.secrets.dendrite-env.file = ./../secrets/dendrite-env.age;
   age.secrets.dendrite-private-key.file = ./../secrets/dendrite-private-key.age;
@@ -25,7 +26,7 @@ in {
           add_header Access-Control-Allow-Origin '*';
         '';
         return = let
-          jsonResponse = builtins.toJSON {"m.server" = "matrix.${serverName}";};
+          jsonResponse = builtins.toJSON {"m.server" = "matrix.${serverName}:${toString httpsPort}";};
         in "200 '${jsonResponse}'";
       };
       locations."/.well-known/matrix/client" = {
@@ -36,7 +37,7 @@ in {
         return = let
           jsonResponse = builtins.toJSON {
             "m.homeserver" = {
-              base_url = "https://matrix.${serverName}";
+              base_url = "https://matrix.${serverName}:${toString httpsPort}";
             };
           };
         in "200 '${jsonResponse}'";
@@ -51,7 +52,7 @@ in {
   };
   services.dendrite = {
     enable = true;
-    httpsPort = 8448;
+    inherit httpPort httpsPort;
     tlsCert = "/var/lib/dendrite/server.cert";
     tlsKey = "/var/lib/dendrite/server.key";
     loadCredential = [
@@ -82,7 +83,6 @@ in {
         user_api.device_database.connection_string = connectionString;
       };
     openRegistration = false;
-    inherit httpPort;
   };
   systemd.services.dendrite = {
     # Wait for ACME certs
