@@ -1,6 +1,7 @@
 {
   config,
   pkgs,
+  lib,
   ...
 }: let
   serverName = "zx.dev";
@@ -8,6 +9,12 @@
 in {
   age.secrets.dendrite-env.file = ./../secrets/dendrite-env.age;
   age.secrets.dendrite-private-key.file = ./../secrets/dendrite-private-key.age;
+  security.acme.certs."zx.dev".postRun = ''
+    cp -vp fullchain.pem /var/lib/dendrite/server.cert
+    cp -vp key.pem /var/lib/dendrite/server.key
+    chown dendrite:dendrite /var/lib/dendrite/server.cert
+    chown dendrite:dendrite /var/lib/dendrite/server.key
+  '';
   services.nginx = {
     enable = true;
     recommendedProxySettings = true;
@@ -18,7 +25,7 @@ in {
           add_header Access-Control-Allow-Origin '*';
         '';
         return = let
-          jsonResponse = builtins.toJSON {"m.server" = "matrix.${serverName}";};
+          jsonResponse = builtins.toJSON {"m.server" = "matrix.${serverName}:8448";};
         in "200 '${jsonResponse}'";
       };
       locations."/.well-known/matrix/client" = {
@@ -29,7 +36,7 @@ in {
         return = let
           jsonResponse = builtins.toJSON {
             "m.homeserver" = {
-              base_url = "https://matrix.${serverName}";
+              base_url = "https://matrix.${serverName}:8448";
             };
           };
         in "200 '${jsonResponse}'";
@@ -44,6 +51,9 @@ in {
   };
   services.dendrite = {
     enable = true;
+    httpsPort = 8448;
+    tlsCert = "/var/lib/dendrite/server.cert";
+    tlsKey = "/var/lib/dendrite/server.key";
     loadCredential = [
       "private_key:${config.age.secrets.dendrite-private-key.path}"
     ];
@@ -70,5 +80,15 @@ in {
       // globalConnectionPool;
     openRegistration = false;
     inherit httpPort;
+  };
+  systemd.services.dendrite = {
+    # Wait for ACME certs
+    wants = ["acme-finished-zx.dev.target"];
+    after = ["acme-selfsigned-zx.dev.service"];
+    serviceConfig = {
+      DynamicUser = lib.mkForce false;
+      User = "dendrite";
+      Group = "dendrite";
+    };
   };
 }
