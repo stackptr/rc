@@ -25,7 +25,7 @@ in {
           add_header Access-Control-Allow-Origin '*';
         '';
         return = let
-          jsonResponse = builtins.toJSON {"m.server" = "matrix.${serverName}:8448";};
+          jsonResponse = builtins.toJSON {"m.server" = "matrix.${serverName}";};
         in "200 '${jsonResponse}'";
       };
       locations."/.well-known/matrix/client" = {
@@ -36,7 +36,7 @@ in {
         return = let
           jsonResponse = builtins.toJSON {
             "m.homeserver" = {
-              base_url = "https://matrix.${serverName}:8448";
+              base_url = "https://matrix.${serverName}";
             };
           };
         in "200 '${jsonResponse}'";
