@@ -59,7 +59,7 @@ in {
     ];
     environmentFile = config.age.secrets.dendrite-env.path;
     settings = let
-      connectionString = "postgres://matrix@127.0.0.1/matrix?sslmode=disable";
+      connectionString = "postgres://127.0.0.1/dendrite?sslmode=disable";
     in
       {
         global = {

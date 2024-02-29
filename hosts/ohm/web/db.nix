@@ -14,11 +14,11 @@
         ensureDBOwnership = true;
       }
       {
-        name = "matrix";
+        name = "dendrite";
         ensureDBOwnership = true;
       }
     ];
-    ensureDatabases = ["mastodon" "matrix"];
+    ensureDatabases = ["mastodon" "dendrite"];
     authentication = pkgs.lib.mkOverride 10 ''
       # Any user can connect to any database via Unix socket, local loopback,
       # or Tailscale
