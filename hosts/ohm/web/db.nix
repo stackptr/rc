@@ -27,7 +27,7 @@
       host   all   all   100.64.0.0/10  trust
     '';
     settings = {
-      max_connections = 200;
+      max_connections = 100;
     };
   };
   services.postgresqlBackup = {

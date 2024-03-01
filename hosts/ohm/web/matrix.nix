@@ -59,56 +59,18 @@ in {
       "private_key:${config.age.secrets.dendrite-private-key.path}"
     ];
     environmentFile = config.age.secrets.dendrite-env.path;
-    settings = let
-      connectionString = "postgres://127.0.0.1/dendrite?sslmode=disable";
-    in {
+    settings = {
       global = {
         server_name = serverName;
         private_key = "$CREDENTIALS_DIRECTORY/private_key";
+        database = {
+          connection_string = "postgres://127.0.0.1/dendrite?sslmode=disable";
+          max_open_conns = 75;
+        };
       };
       client_api = {
         registration_disabled = true;
         registration_shared_secret = "$REGISTRATION_SHARED_SECRET";
-      };
-      app_service_api.database = {
-        connection_string = connectionString;
-        max_open_conns = 10;
-      };
-      federation_api.database = {
-        connection_string = connectionString;
-        max_open_conns = 10;
-      };
-      key_server.database = {
-        connection_string = connectionString;
-        max_open_conns = 10;
-      };
-      media_api.database = {
-        connection_string = connectionString;
-        max_open_conns = 5;
-      };
-      mscs.database = {
-        connection_string = connectionString;
-        max_open_conns = 10;
-      };
-      relay_api.database = {
-        connection_string = connectionString;
-        max_open_conns = 10;
-      };
-      room_server.database = {
-        connection_string = connectionString;
-        max_open_conns = 10;
-      };
-      sync_api.database = {
-        connection_string = connectionString;
-        max_open_conns = 10;
-      };
-      user_api.account_database = {
-        connection_string = connectionString;
-        max_open_conns = 5;
-      };
-      user_api.device_database = {
-        connection_string = connectionString;
-        max_open_conns = 5;
       };
     };
     openRegistration = false;
