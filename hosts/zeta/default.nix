@@ -7,7 +7,6 @@
     ./hardware-configuration.nix
     ./wireless.nix
     ./services
-    ./containers.nix
   ];
 
   environment.pathsToLink = ["/share/zsh"];

@@ -20,7 +20,6 @@
         wantedBy = ["multi-user.target"];
         serviceConfig.ExecStart = "${profileApp}/bin/profile";
       };
-      networking.firewall.allowedTCPPorts = [80];
       system.stateVersion = "24.05";
     };
   };
