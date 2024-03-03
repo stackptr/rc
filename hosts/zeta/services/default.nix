@@ -5,6 +5,7 @@
 }: {
   imports = [
     ./home-assistant.nix
+    ./homebridge.nix
     ./portainer.nix
     ./znc.nix
   ];
