@@ -11,6 +11,8 @@ in {
   "hosts/ohm/secrets/mastodon-vapid-public-key.age".publicKeys = keys;
   "hosts/ohm/secrets/mastodon-vapid-private-key.age".publicKeys = keys;
   "hosts/ohm/secrets/notifier-smtp-password.age".publicKeys = keys;
+  "hosts/ohm/secrets/restic-env.age".publicKeys = keys;
+  "hosts/ohm/secrets/restic-password.age".publicKeys = keys;
   "hosts/ohm/secrets/session-secret.age".publicKeys = keys;
   "hosts/ohm/secrets/storage-encryption-key.age".publicKeys = keys;
   "hosts/zeta/secrets/wireless.age".publicKeys = keys;

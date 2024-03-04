@@ -5,6 +5,7 @@
 }: {
   imports = [
     ./hardware-configuration.nix
+    ./backup.nix
     ./web
   ];
 
