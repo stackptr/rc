@@ -32,7 +32,7 @@
   };
   services.postgresqlBackup = {
     enable = true;
-    databases = ["mastodon"];
+    databases = ["mastodon" "dendrite"];
   };
   services.redis.servers.mastodon = {
     enable = true;
