@@ -12,7 +12,7 @@
       environmentFile = config.age.secrets.restic-env.path;
       passwordFile = config.age.secrets.restic-password.path;
 
-      repository = "https://9c12166db465350c0f02410b390d0cbc.r2.cloudflarestorage.com/backup";
+      repository = "https://9c12166db465350c0f02410b390d0cbc.r2.cloudflarestorage.com/backup/postgres";
       paths = [
         config.services.postgresqlBackup.location
       ];
