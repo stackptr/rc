@@ -66,5 +66,10 @@
       locations."/".proxyPass = "http://melchior.rove-duck.ts.net:9091";
       locations."~ (/transmission)?/rpc".proxyPass = "http://melchior.rove-duck.ts.net:9091";
     };
+    virtualHosts."homebridge.zx.dev" = {
+      forceSSL = true;
+      useACMEHost = "zx.dev";
+      locations."/".proxyPass = "http://zeta.rove-duck.ts.net:8581";
+    };
   };
 }
