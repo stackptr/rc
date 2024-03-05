@@ -71,5 +71,10 @@
       useACMEHost = "zx.dev";
       locations."/".proxyPass = "http://zeta.rove-duck.ts.net:8581";
     };
+    virtualHosts."ha.zx.dev" = {
+      forceSSL = true;
+      useACMEHost = "zx.dev";
+      locations."/".proxyPass = "http://zeta.rove-duck.ts.net:8123";
+    };
   };
 }
