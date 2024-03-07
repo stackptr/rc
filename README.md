@@ -6,6 +6,7 @@ System configuration flake for NixOS / [nix-darwin][nix-darwin-repo] hosts:
 - 🌧️ [`Petrichor`](./hosts/Petrichor/default.nix): workstation / 16-inch MacBook Pro
 - 🌀 [`zeta`](./hosts/zeta/default.nix): ARM server / Raspberry Pi 4 Model B
 - ⚡️ [`ohm`](./hosts/ohm/default.nix): DigitalOcean virtual machine
+- 🧿 [`nazar`](./hosts/nazar/default.nix): Dedicated Xeon E3-1270 server
 
 <details>
 

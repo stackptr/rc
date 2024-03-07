@@ -7,6 +7,8 @@
     nix-darwin.url = "github:LnL7/nix-darwin";
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
     profile.url = "github:stackptr/profile";
+    disko.url = "github:nix-community/disko";
+    disko.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs = inputs:
@@ -18,6 +20,10 @@
         }
         {
           hostname = "ohm";
+          system = "x86_64-linux";
+        }
+        {
+          hostname = "nazar";
           system = "x86_64-linux";
         }
       ];

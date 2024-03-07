@@ -5,6 +5,7 @@
   home-manager,
   nix-darwin,
   profile,
+  disko,
   ...
 }: let
   keys = import ./keys.nix;
@@ -25,6 +26,7 @@
       };
       modules = [
         {environment.systemPackages = [agenix.packages.${system}.default];}
+        disko.nixosModules.disko
         ./../modules/base.nix
         ./../modules/nixos.nix
         ./../hosts/${hostname}
