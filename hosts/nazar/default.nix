@@ -24,5 +24,7 @@
   services.openssh.enable = true;
   services.tailscale.enable = true;
 
+  networking.firewall.allowedTCPPorts = [80 443 8448];
+
   system.stateVersion = "24.05";
 }
