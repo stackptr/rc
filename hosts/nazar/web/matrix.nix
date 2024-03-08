@@ -66,7 +66,9 @@ in {
         private_key = "$CREDENTIALS_DIRECTORY/private_key";
         database = {
           connection_string = "postgres://127.0.0.1/dendrite?sslmode=disable";
-          max_open_conns = 75;
+          max_open_conns = 100;
+          max_idle_conns = 10;
+          conn_max_lifetime = -1;
         };
         dns_cache = {
           enabled = true;
