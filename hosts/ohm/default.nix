@@ -5,8 +5,6 @@
 }: {
   imports = [
     ./hardware-configuration.nix
-    ./backup.nix
-    ./web
   ];
 
   boot.tmp.cleanOnBoot = true;
