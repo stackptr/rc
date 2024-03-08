@@ -5,5 +5,6 @@
 }: {
   imports = [
     ./dendrite.nix
+    ./heisenbridge.nix
   ];
 }
