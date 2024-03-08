@@ -8,8 +8,8 @@
   httpPort = 8008;
   httpsPort = 8448;
 in {
-  age.secrets.dendrite-env.file = ./../secrets/dendrite-env.age;
-  age.secrets.dendrite-private-key.file = ./../secrets/dendrite-private-key.age;
+  age.secrets.dendrite-env.file = ./../../secrets/dendrite-env.age;
+  age.secrets.dendrite-private-key.file = ./../../secrets/dendrite-private-key.age;
   security.acme.certs."zx.dev".postRun = ''
     cp -vp fullchain.pem /var/lib/dendrite/server.cert
     cp -vp key.pem /var/lib/dendrite/server.key
