@@ -1,5 +1,5 @@
 let
-  keys = with (import ./lib/keys.nix); [ohm Petrichor Rhizome zeta];
+  keys = with (import ./lib/keys.nix); [nazar ohm Petrichor Rhizome zeta];
 in {
   "hosts/ohm/secrets/cloudflare-dns.age".publicKeys = keys;
   "hosts/ohm/secrets/dendrite-env.age".publicKeys = keys;
