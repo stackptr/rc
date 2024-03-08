@@ -19,10 +19,6 @@
           system = "aarch64-linux";
         }
         {
-          hostname = "ohm";
-          system = "x86_64-linux";
-        }
-        {
           hostname = "nazar";
           system = "x86_64-linux";
         }

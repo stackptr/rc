@@ -8,7 +8,6 @@ let
       value = readKey h;
     }) [
       "nazar"
-      "ohm"
       "Petrichor"
       "Rhizome"
       "zeta"
