@@ -1,6 +1,8 @@
 let
   keys = with (import ./lib/keys.nix); [nazar ohm Petrichor Rhizome zeta];
 in {
+  "hosts/nazar/secrets/restic-env.age".publicKeys = keys;
+  "hosts/nazar/secrets/restic-password.age".publicKeys = keys;
   "hosts/ohm/secrets/cloudflare-dns.age".publicKeys = keys;
   "hosts/ohm/secrets/dendrite-env.age".publicKeys = keys;
   "hosts/ohm/secrets/dendrite-private-key.age".publicKeys = keys;

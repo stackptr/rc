@@ -7,6 +7,7 @@
   imports = [
     ./hardware-configuration.nix
     ./disk-config.nix
+    ./backup.nix
     ./web
   ];
 
