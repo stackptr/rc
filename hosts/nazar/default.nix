@@ -7,6 +7,7 @@
   imports = [
     ./hardware-configuration.nix
     ./disk-config.nix
+    ./web
   ];
 
   boot.loader.grub.enable = true;
