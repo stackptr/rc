@@ -72,6 +72,17 @@ in {
         registration_disabled = true;
         registration_shared_secret = "$REGISTRATION_SHARED_SECRET";
       };
+      # Use global.database.connection_string
+      app_service_api.database.connection_string = "";
+      federation_api.database.connection_string = "";
+      key_server.database.connection_string = "";
+      media_api.database.connection_string = "";
+      mscs.database.connection_string = "";
+      relay_api.database.connection_string = "";
+      room_server.database.connection_string = "";
+      sync_api.database.connection_string = "";
+      user_api.account_database.connection_string = "";
+      user_api.device_database.connection_string = "";
     };
     openRegistration = false;
   };
