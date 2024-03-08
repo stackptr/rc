@@ -60,12 +60,18 @@ in {
     ];
     environmentFile = config.age.secrets.dendrite-env.path;
     settings = {
+      versions = 2;
       global = {
         server_name = serverName;
         private_key = "$CREDENTIALS_DIRECTORY/private_key";
         database = {
           connection_string = "postgres://127.0.0.1/dendrite?sslmode=disable";
           max_open_conns = 75;
+        };
+        dns_cache = {
+          enabled = true;
+          cache_size = 256;
+          cache_lifetime = "5m";
         };
       };
       client_api = {
@@ -83,6 +89,28 @@ in {
       sync_api.database.connection_string = "";
       user_api.account_database.connection_string = "";
       user_api.device_database.connection_string = "";
+
+      federation_api = {
+        send_max_retries = 16;
+        disable_tls_validation = false;
+        disable_http_keepalives = false;
+        key_perspectives = [
+          {
+            server_name = "matrix.org";
+            keys = [
+              {
+                key_id = "ed25519:auto";
+                public_key = "Noi6WqcDj0QmPxCNQqgezwTlBKrfqehY1u2FyWP9uYw";
+              }
+              {
+                key_id = "ed25519:a_RXGa";
+                public_key = "l8Hft5qXKn1vfHrg3p4+W8gELQVo8N13JkluMfmn2sQ";
+              }
+            ];
+          }
+        ];
+        prefer_direct_fetch = false;
+      };
     };
     openRegistration = false;
   };
