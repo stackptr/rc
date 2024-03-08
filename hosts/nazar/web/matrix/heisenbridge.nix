@@ -25,14 +25,15 @@ in
     homeserver = "http://localhost:8008";
     owner = "@corey:zx.dev";
   };
-  # Copying systemd preStart to override...
+  # Override systemd service for Dendrite
+  systemd.services.heisenbridge.before = [ "dendrite.service" ];
   systemd.services.heisenbridge.preStart = ''
     umask 077
     set -e -u -o pipefail
   
     if ! [ -f "${registrationFile}" ]; then
       # Generate registration file if not present (actually, we only care about the tokens in it)
-      ${bin} --generate --config ${registrationFile}
+      ${bin} --generate --config-compat ${registrationFile}
     fi
   
     # Overwrite the registration file with our generated one (the config may have changed since then),
@@ -44,9 +45,9 @@ in
       > ${registrationFile}.new
     mv -f ${registrationFile}.new ${registrationFile}
   
-    # Grant Synapse access to the registration
-    if ${pkgs.getent}/bin/getent group matrix-synapse > /dev/null; then
-      chgrp -v matrix-synapse ${registrationFile}
+    # Grant Dendrite access to the registration
+    if ${pkgs.getent}/bin/getent group dendrite > /dev/null; then
+      chgrp -v dendrite ${registrationFile}
       chmod -v g+r ${registrationFile}
     fi
   '';
