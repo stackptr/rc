@@ -34,4 +34,5 @@
   services.dendrite.settings.app_service_api.config_files = [
     "/var/lib/mautrix-discord/discord-registration.yaml"
   ];
+  systemd.services.mautrix-discord.before = ["dendrite.service"];
 }
