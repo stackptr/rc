@@ -10,7 +10,7 @@
       appservice = {
         database = {
           type = "postgres";
-          uri = "postgres://127.0.0.1/mautrix_discord?sslmode=disable";
+          uri = "postgres://127.0.0.1/mautrix-discord?sslmode=disable";
         };
         id = "discord";
         ephemeral_events = false; # Requires MSC2409
