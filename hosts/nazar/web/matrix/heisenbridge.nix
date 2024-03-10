@@ -50,4 +50,8 @@ in {
       chmod -v g+r ${registrationFile}
     fi
   '';
+
+  services.dendrite.settings.app_service_api.config_files = [
+    registrationFile
+  ];
 }
