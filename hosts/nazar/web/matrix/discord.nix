@@ -32,7 +32,10 @@
         double_puppet_server_map = {};
         login_shared_secret_map = {};
         command_prefix = "!discord";
-        permissions."*" = "relay";
+        permissions = {
+          "*" = "relay";
+          "@corey:zx.dev" = "admin";
+        };
       };
     };
   };
