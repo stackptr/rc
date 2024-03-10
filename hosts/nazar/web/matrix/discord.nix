@@ -25,6 +25,14 @@
         provisioning = {
           shared_secret = "disable";
         };
+        username_template = "discord_{{.}}";
+        displayname_template = "{{or .GlobalName .Username}}{{if .Bot}} (bot){{end}}";
+        channel_name_template = "{{if or (eq .Type 3) (eq .Type 4)}}{{.Name}}{{else}}#{{.Name}}{{end}}";
+        guild_name_template = "{{.Name}}";
+        double_puppet_server_map = {};
+        login_shared_secret_map = {};
+        command_prefix = "!discord";
+        permissions."*" = "relay";
       };
     };
   };
