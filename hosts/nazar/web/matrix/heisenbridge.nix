@@ -18,24 +18,23 @@
     sender_localpart = "heisenbridge";
     namespaces = cfg.namespaces;
   });
-in
-{
+in {
   services.heisenbridge = {
     enable = true;
     homeserver = "http://localhost:8008";
     owner = "@corey:zx.dev";
   };
   # Override systemd service for Dendrite
-  systemd.services.heisenbridge.before = [ "dendrite.service" ];
+  systemd.services.heisenbridge.before = ["dendrite.service"];
   systemd.services.heisenbridge.preStart = ''
     umask 077
     set -e -u -o pipefail
-  
+
     if ! [ -f "${registrationFile}" ]; then
       # Generate registration file if not present (actually, we only care about the tokens in it)
       ${bin} --generate --config-compat ${registrationFile}
     fi
-  
+
     # Overwrite the registration file with our generated one (the config may have changed since then),
     # but keep the tokens. Two step procedure to be failure safe
     ${pkgs.yq}/bin/yq --slurp \
@@ -44,7 +43,7 @@ in
       ${registrationFile} \
       > ${registrationFile}.new
     mv -f ${registrationFile}.new ${registrationFile}
-  
+
     # Grant Dendrite access to the registration
     if ${pkgs.getent}/bin/getent group dendrite > /dev/null; then
       chgrp -v dendrite ${registrationFile}
