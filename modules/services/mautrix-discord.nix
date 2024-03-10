@@ -149,6 +149,12 @@ in {
         fi
         chmod 640 ${registrationFile}
 
+        # Grant Dendrite access to the registration
+        if ${pkgs.getent}/bin/getent group dendrite > /dev/null; then
+          chgrp -v dendrite ${registrationFile}
+          chmod -v g+r ${registrationFile}
+        fi
+
         umask 0177
         ${pkgs.yq}/bin/yq -s '.[0].appservice.as_token = .[1].as_token
           | .[0].appservice.hs_token = .[1].hs_token
