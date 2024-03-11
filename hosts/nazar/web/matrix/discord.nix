@@ -17,6 +17,7 @@
       };
       bridge = {
         private_chat_portal_meta = true;
+        encryption.allow = true;
         username_template = "discord_{{.}}";
         displayname_template = "{{or .GlobalName .Username}}{{if .Bot}} (bot){{end}}";
         channel_name_template = "{{if or (eq .Type 3) (eq .Type 4)}}{{.Name}}{{else}}#{{.Name}}{{end}}";
