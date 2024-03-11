@@ -23,6 +23,9 @@
   services.openssh.enable = true;
   services.tailscale.enable = true;
 
+  networking.search = ["rove-duck.ts.net"];
+  networking.nameservers = ["100.100.100.100"];
+
   networking.firewall.allowedTCPPorts = [80 443 8448];
 
   system.stateVersion = "24.05";
