@@ -20,7 +20,9 @@
         sox
 
         # Development
+        colima
         coreutils-full
+        docker
         fd
         git-interactive-rebase-tool
         hub
