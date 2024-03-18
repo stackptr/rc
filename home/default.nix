@@ -45,6 +45,7 @@
       ]
       ++ lib.optionals stdenv.isDarwin [
         m-cli
+        mas
       ];
 
   programs.bat = {
