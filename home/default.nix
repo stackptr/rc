@@ -13,6 +13,7 @@
         # Apps
         mosh
         neofetch
+        onefetch
 
         # Audio/video
         ffmpeg_6
