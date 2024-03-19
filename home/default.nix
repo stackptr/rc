@@ -118,7 +118,6 @@
       then false
       else true;
     enableZshIntegration = true;
-    pinentryFlavor = "tty";
     extraConfig = ''
       allow-loopback-pinentry
     '';
