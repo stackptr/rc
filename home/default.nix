@@ -28,6 +28,7 @@
         git-interactive-rebase-tool
         hub
         jo
+        lazydocker
         nodejs
         shellcheck
         tree
