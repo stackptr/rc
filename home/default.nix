@@ -1,5 +1,6 @@
 {pkgs, ...}: {
   imports = [
+    ./../modules/programs/colima.nix
     ./aws.nix
     ./zsh.nix
   ];
@@ -21,7 +22,6 @@
         sox
 
         # Development
-        colima
         coreutils-full
         docker
         fd
@@ -57,6 +57,32 @@
   };
 
   programs.btop.enable = true;
+  
+  programs.colima = {
+    enable =
+    if pkgs.stdenv.isDarwin
+    then true
+    else false;
+    settings = {
+      cpu = 4;
+      memory = 8;
+      arch = "aarch64";
+      hostname = "colima";
+      vmType = "vz";
+      mountType = "virtiofs";
+      cpuType = "";
+      mounts = [
+        {
+          location = "/tmp/freckle";
+          writable = false;
+        }
+        {
+          location = "~/Development/freckle";
+          writable = false;
+        }
+      ];
+    };
+  };
 
   programs.gh = {
     enable = true;
