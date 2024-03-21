@@ -74,6 +74,7 @@
       AppleShowAllFiles = false;
       ShowStatusBar = false;
       ShowPathbar = false;
+      FXDefaultSearchScope = "SCcf"; # Search current folder first when searching
       FXPreferredViewStyle = "Nlsv"; # Prefer list view
       AppleShowAllExtensions = true;
       FXEnableExtensionChangeWarning = false; # Do not warn when changing file extensions
@@ -88,6 +89,28 @@
       Clicking = true; # tap to click
       Dragging = true; # tap to drag
       TrackpadThreeFingerDrag = true;
+    };
+  };
+
+  system.defaults.CustomUserPreferences = {
+    "com.apple.desktopservices" = {
+      DSDontWriteNetworkStores = true;
+    };
+    "com.apple.Safari" = {
+      AutoOpenSafeDownloads = false; # Prevent opening "safe" files automatically
+      ShowFullURLInSmartSearchField = false;
+      ShowFavoritesBar = false;
+      WebContinuousSpellCheckingEnabled = true;
+      WebAutomaticSpellingCorrectionEnabled = false;
+      WarnAboutFraudulentWebsites = true;
+      "com.apple.Safari.ContentPageGroupIdentifier.WebKit2BackspaceKeyNavigationEnabled" = false;
+
+      # Develop menu
+      IncludeDevelopMenu = true;
+      WebKitDeveloperExtrasEnabledPreferenceKey = true;
+      "com.apple.Safari.ContentPageGroupIdentifier.WebKit2DeveloperExtrasEnabled" = true;
+
+      # TODO: Set "compact" tab layout
     };
   };
 
@@ -133,12 +156,6 @@
   #     };
   #   };
   # };
-
-  # TODO: Safari configuration
-  # - Disable: Open "safe" files after downloading
-  # - Tabs > Tab layout: Compact
-  # - Disable: Tabs > Always show website titles in tabs
-  # - Advanced > Show features for web developers
 
   # Auto upgrade nix package and the daemon service.
   services.nix-daemon.enable = true;
