@@ -59,11 +59,7 @@
       showhidden = false;
       show-recents = false;
       static-only = false;
-
-      # N.B.: Values from Petrichor; update conditionally for Rhizome
-      tilesize = 49;
       magnification = true;
-      largesize = 92;
 
       # Disable hot corners
       wvous-tl-corner = 1;
