@@ -4,6 +4,9 @@
   pkgs,
   ...
 }: {
+  fonts.fontDir.enable = true;
+  fonts.fonts = [pkgs.fira-code-nerdfont];
+
   security.pam.enableSudoTouchIdAuth = true;
 
   system.configurationRevision = self.rev or self.dirtyRev or null;

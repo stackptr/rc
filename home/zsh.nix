@@ -16,18 +16,6 @@
       searchDownKey = ["^[[B" "^[OB"];
     };
 
-    plugins = [
-      {
-        name = "pure-prompt";
-        src = pkgs.fetchFromGitHub {
-          owner = "sindresorhus";
-          repo = "pure";
-          rev = "v1.22.0";
-          sha256 = "sha256-TR4CyBZ+KoZRs9XDmWE5lJuUXXU1J8E2Z63nt+FS+5w=";
-        };
-      }
-    ];
-
     sessionVariables = let
       baseVars = {
         MANPAGER = "sh -c 'col -bx | bat -l man -p'";
@@ -66,15 +54,6 @@
 
       setopt hist_verify
       setopt inc_append_history
-
-      # Pure prompt is not supported by Warp
-      if [[ -n "$IN_NIX_SHELL" || -z "$WARP_IS_LOCAL_SHELL_SESSION" ]]; then
-        autoload -U promptinit; promptinit
-        prompt pure
-      fi
-
-      # FIXME: Reset RPS1 until I find what is causing it to be set on macOS
-      RPS1=
 
       ## Wrappers for `stack`
 
