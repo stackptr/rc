@@ -96,22 +96,23 @@
     "com.apple.desktopservices" = {
       DSDontWriteNetworkStores = true;
     };
-    "com.apple.Safari" = {
-      AutoOpenSafeDownloads = false; # Prevent opening "safe" files automatically
-      ShowFullURLInSmartSearchField = false;
-      ShowFavoritesBar = false;
-      WebContinuousSpellCheckingEnabled = true;
-      WebAutomaticSpellingCorrectionEnabled = false;
-      WarnAboutFraudulentWebsites = true;
-      "com.apple.Safari.ContentPageGroupIdentifier.WebKit2BackspaceKeyNavigationEnabled" = false;
+    # Requires disabling SIP?
+    # "com.apple.Safari" = {
+    #   AutoOpenSafeDownloads = false; # Prevent opening "safe" files automatically
+    #   ShowFullURLInSmartSearchField = false;
+    #   ShowFavoritesBar = false;
+    #   WebContinuousSpellCheckingEnabled = true;
+    #   WebAutomaticSpellingCorrectionEnabled = false;
+    #   WarnAboutFraudulentWebsites = true;
+    #   "com.apple.Safari.ContentPageGroupIdentifier.WebKit2BackspaceKeyNavigationEnabled" = false;
 
-      # Develop menu
-      IncludeDevelopMenu = true;
-      WebKitDeveloperExtrasEnabledPreferenceKey = true;
-      "com.apple.Safari.ContentPageGroupIdentifier.WebKit2DeveloperExtrasEnabled" = true;
+    #   # Develop menu
+    #   IncludeDevelopMenu = true;
+    #   WebKitDeveloperExtrasEnabledPreferenceKey = true;
+    #   "com.apple.Safari.ContentPageGroupIdentifier.WebKit2DeveloperExtrasEnabled" = true;
 
-      # TODO: Set "compact" tab layout
-    };
+    #   # TODO: Set "compact" tab layout
+    # };
   };
 
   # TODO: Keyboard shortcuts, see LnL7/nix-darwin#699
