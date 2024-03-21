@@ -21,6 +21,7 @@
       # "fastscripts" # TODO: Use pre-v3
       "github" # TODO: nixpkgs#github-desktop
       "gitify"
+      "google-chrome"
       "iina" # TODO: nixpkgs#iina
       "little-snitch"
       "notion"
