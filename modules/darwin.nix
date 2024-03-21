@@ -6,6 +6,73 @@
 }: {
   fonts.fontDir.enable = true;
   fonts.fonts = [pkgs.fira-code-nerdfont];
+  
+  nixpkgs.config.allowUnfree = true;
+  homebrew = {
+    enable = true;
+    caskArgs.no_quarantine = true;
+    onActivation.cleanup = "zap";
+    casks = [
+      "apparency" # TODO: nixpkgs#apparency
+      "bartender" # TODO: nixpkgs#bartender
+      "daisydisk"
+      "dash"
+      "discord" # TODO: nixpkgs#discord
+      # "fastscripts" # TODO: Use pre-v3
+      "github" # TODO: nixpkgs#github-desktop
+      "gitify"
+      "iina" # TODO: nixpkgs#iina
+      "little-snitch"
+      "notion"
+      "nova"
+      "popclip"
+      "postico"
+      "qlcolorcode"
+      "qlimagesize"
+      "qlmarkdown"
+      "qlstephen"
+      "qlvideo"
+      "quicklook-json"
+      "scroll-reverser"
+      "signal"
+      "slack"
+      "suspicious-package"
+      "tailscale"
+      "the-unarchiver"
+      "tripmode"
+      "vlc" # TODO: nixpkgs#vlc
+      "whatsapp"
+      "zoom" # TODO: nixpkgs#zoom-us
+    ];
+    # N.B.: Removed entries in `masApps` require manual uninstallation
+    masApps = {
+      "Amphetamine" = 937984704;
+      "Day One" = 1055511498;
+      "DeArrow" = 6451469297;
+      "Hand Mirror" = 1502839586;
+      "Hush" = 1544743900;
+      "Mapper" = 1589391989;
+      "MusicBox" = 1614730313;
+      "Numbers" = 409203825;
+      "Noir" = 1592917505;
+      "Omnivore" = 1564031042;
+      "Pages" = 409201541;
+      "Paku" = 1534130193;
+      "Parcel" = 639968404;
+      "Paste" = 967805235;
+      "Play" = 1596506190;
+      "Prompt" = 1594420480;
+      "Reeder" = 1529448980;
+      "Scrobbles for Last.fm" = 1344679160;
+      "SponsorBlock" = 1573461917;
+      "Timery" = 1425368544;
+      "Things" = 904280696;
+      "Vinegar" = 1591303229;
+      "Wipr" = 1320666476;
+      "Xcode" = 497799835;
+    };
+    # TODO: pippo, Soundsource, TV Forecast
+  };
 
   security.pam.enableSudoTouchIdAuth = true;
 
@@ -13,6 +80,7 @@
 
   system.defaults = {
     ".GlobalPreferences"."com.apple.mouse.scaling" = 1.5;
+    LaunchServices.LSQuarantine = false;
     NSGlobalDomain = {
       AppleScrollerPagingBehavior = true; # Jump to spot on scroll bar when clicked
       NSAutomaticCapitalizationEnabled = false;

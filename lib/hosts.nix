@@ -4,6 +4,10 @@
   agenix,
   home-manager,
   nix-darwin,
+  nix-homebrew,
+  homebrew-bundle,
+  homebrew-core,
+  homebrew-cask,
   profile,
   disko,
   ...
@@ -40,11 +44,25 @@
     nix-darwin.lib.darwinSystem {
       specialArgs = {inherit self keys;};
       modules = [
+        nix-homebrew.darwinModules.nix-homebrew
         ./../modules/base.nix
         ./../modules/darwin.nix
         ./../hosts/${hostname}
         home-manager.darwinModules.home-manager
         darwinHomeManager
+        {
+          nix-homebrew = {
+            enable = true;
+            enableRosetta = false;
+            user = "corey";
+            taps = {
+              "homebrew/homebrew-bundle" = homebrew-bundle;
+              "homebrew/homebrew-core" = homebrew-core;
+              "homebrew/homebrew-cask" = homebrew-cask;
+            };
+            mutableTaps = false;
+          };
+        }
       ];
     };
   mkHosts = f: hostEntries:
