@@ -222,8 +222,8 @@
     fi
 
     echo "starting utilties..." >&2
-    open /Applications/PopClip.app/
-    open /Applications/Scroll\ Reverser.app/
+    pgrep -q PopClip || open /Applications/PopClip.app/
+    pgrep -q Scroll\ Reverser || open /Applications/Scroll\ Reverser.app/
   '';
 
   # TODO: Keyboard shortcuts, see LnL7/nix-darwin#699
