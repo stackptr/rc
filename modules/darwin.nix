@@ -182,6 +182,22 @@
 
     #   # TODO: Set "compact" tab layout
     # };
+    "com.pilotmoon.popclip" = {
+      CombinedItemOrder = [
+        "openlink"
+        "search"
+        "cut"
+        "copy"
+        "paste"
+        "revealfile"
+        "lookup"
+        "ext-com.pilotmoon.popclip.extension.parcel"
+        "openmail"
+      ];
+      HasShownWelcome = true;
+      NMStatusItemHideIcon = true;
+      "extension#com.pilotmoon.popclip.builtin-search#template" = "https://kagi.com/search?q=***";
+    };
     "com.pilotmoon.scroll-reverser" = {
       InvertScrollingOn = true;
       ReverseTrackpad = false;
@@ -192,7 +208,21 @@
   };
 
   system.activationScripts.postUserActivation.text = ''
-    echo "starting scroll-reverser..." >&2
+    popclipExtPlist=~/Library/Application\ Support/PopClip/Extensions/Extensions.plist
+    if test -f "$popclipExtPlist"; then
+      if [[ ! `defaults read "$popclipExtPlist" "Installed Extensions"` =~ "Parcel.popclipext" ]]; then
+        echo "installing popclip parcel extension..." >&2
+        pkill PopClip || true # Kill process if needed; don't exit if command fails
+        temp=$(mktemp -d)
+        curl -s --output-dir "$temp" https://pilotmoon.com/popclip/extensions/ext/Parcel.popclipextz -O
+        open "$temp/Parcel.popclipextz"
+        sleep 2 # Allow extension to install before starting PopClip below
+        rm -r "$temp"
+      fi
+    fi
+
+    echo "starting utilties..." >&2
+    open /Applications/PopClip.app/
     open /Applications/Scroll\ Reverser.app/
   '';
 
