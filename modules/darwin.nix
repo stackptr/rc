@@ -182,7 +182,19 @@
 
     #   # TODO: Set "compact" tab layout
     # };
+    "com.pilotmoon.scroll-reverser" = {
+      InvertScrollingOn = true;
+      ReverseTrackpad = false;
+      ReverseMouse = true;
+      ReverseY = true;
+      StartAtLogin = true;
+    };
   };
+
+  system.activationScripts.postUserActivation.text = ''
+    echo "starting scroll-reverser..." >&2
+    open /Applications/Scroll\ Reverser.app/
+  '';
 
   # TODO: Keyboard shortcuts, see LnL7/nix-darwin#699
   # system.keyboard.shortcuts = let
