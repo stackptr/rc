@@ -12,17 +12,18 @@
     enable = true;
     caskArgs.no_quarantine = true;
     onActivation.cleanup = "zap";
+    # N.B.: prefer casks to nixpkgs for placement in ~/Applications
     casks = [
-      "apparency" # TODO: nixpkgs#apparency
-      "bartender" # TODO: nixpkgs#bartender
+      "apparency"
+      "bartender"
       "daisydisk"
       "dash"
-      "discord" # TODO: nixpkgs#discord
+      "discord"
       # "fastscripts" # TODO: Use pre-v3
-      "github" # TODO: nixpkgs#github-desktop
+      "github"
       "gitify"
       "google-chrome"
-      "iina" # TODO: nixpkgs#iina
+      "iina"
       "little-snitch"
       "notion"
       "nova"
@@ -41,9 +42,9 @@
       "tailscale"
       "the-unarchiver"
       "tripmode"
-      "vlc" # TODO: nixpkgs#vlc
+      "vlc"
       "whatsapp"
-      "zoom" # TODO: nixpkgs#zoom-us
+      "zoom"
     ];
     # N.B.: Removed entries in `masApps` require manual uninstallation
     masApps = {
