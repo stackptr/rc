@@ -6,7 +6,7 @@
 }: {
   fonts.fontDir.enable = true;
   fonts.fonts = [pkgs.fira-code-nerdfont];
-  
+
   nixpkgs.config.allowUnfree = true;
   homebrew = {
     enable = true;
@@ -38,6 +38,7 @@
       "scroll-reverser"
       "signal"
       "slack"
+      "soundsource"
       "suspicious-package"
       "tailscale"
       "the-unarchiver"
@@ -236,6 +237,7 @@
     pgrep -q Little\ Snitch || open /Applications/Little\ Snitch.app/
     pgrep -q PopClip || open /Applications/PopClip.app/
     pgrep -q Scroll\ Reverser || open /Applications/Scroll\ Reverser.app/
+    pgrep -q SoundSource || open /Applications/SoundSource.app/
     pgrep -q Tailscale || open /Applications/Tailscale.app/
   '';
 
