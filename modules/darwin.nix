@@ -229,8 +229,13 @@
     fi
 
     echo "starting utilties..." >&2
+    pgrep -q Bartender\ 5 || open /Applications/Bartender\ 5.app/
+    pgrep -q Gitify || open /Applications/Gitify.app/
+    pgrep -q Hand\ Mirror || open /Applications/Hand\ Mirror.app/
+    pgrep -q Little\ Snitch || open /Applications/Little\ Snitch.app/
     pgrep -q PopClip || open /Applications/PopClip.app/
     pgrep -q Scroll\ Reverser || open /Applications/Scroll\ Reverser.app/
+    pgrep -q Tailscale || open /Applications/Tailscale.app/
   '';
 
   # TODO: Keyboard shortcuts, see LnL7/nix-darwin#699
