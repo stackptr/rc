@@ -19,6 +19,7 @@
       "daisydisk"
       "dash"
       "discord"
+      "element"
       # "fastscripts" # TODO: Use pre-v3
       "github"
       "gitify"
