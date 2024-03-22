@@ -6,20 +6,24 @@
 }: {
   fonts.fontDir.enable = true;
   fonts.fonts = [pkgs.fira-code-nerdfont];
-  
+
   nixpkgs.config.allowUnfree = true;
   homebrew = {
     enable = true;
     caskArgs.no_quarantine = true;
     onActivation.cleanup = "zap";
     # N.B.: prefer casks to nixpkgs for placement in ~/Applications
-    casks = [
+    casks = let
+      # FastScripts v3 requires licensing to remove nagging
+      fastscripts_v2 = "https://raw.githubusercontent.com/Homebrew/homebrew-cask/8fea2b519ac49966b2a1fedb72d833d707ea2f1c/Casks/fastscripts.rb";
+    in [
       "apparency"
       "bartender"
       "daisydisk"
       "dash"
       "discord"
-      # "fastscripts" # TODO: Use pre-v3
+      # FIXME: Implied `brew uninstall --cask fastscripts`
+      fastscripts_v2
       "github"
       "gitify"
       "google-chrome"
@@ -215,6 +219,12 @@
     };
   };
 
+  system.activationScripts.extraUserActivation.text = ''
+    # FastScripts complains if it is updated while running
+    echo "terminating FastScripts..." >&2
+    pkill FastScripts || true
+  '';
+
   system.activationScripts.postUserActivation.text = ''
     popclipExtPlist=~/Library/Application\ Support/PopClip/Extensions/Extensions.plist
     if test -f "$popclipExtPlist"; then
@@ -231,6 +241,7 @@
 
     echo "starting utilties..." >&2
     pgrep -q Bartender\ 5 || open /Applications/Bartender\ 5.app/
+    pgrep -q FastScripts || open /Applications/FastScripts.app/
     pgrep -q Gitify || open /Applications/Gitify.app/
     pgrep -q Hand\ Mirror || open /Applications/Hand\ Mirror.app/
     pgrep -q Little\ Snitch || open /Applications/Little\ Snitch.app/

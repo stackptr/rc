@@ -1,6 +1,11 @@
-{pkgs, lib, ...}: {
+{
+  pkgs,
+  lib,
+  ...
+}: {
   imports = [
     ./aws.nix
+    ./darwin.nix
     ./zsh.nix
   ];
 
@@ -152,6 +157,11 @@
       allow-loopback-pinentry
     '';
   };
+
+  targets.darwin.home.enable =
+    if pkgs.stdenv.isDarwin
+    then true
+    else false;
 
   home.stateVersion = "23.11";
 }
