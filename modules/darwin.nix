@@ -48,12 +48,17 @@
     # N.B.: Removed entries in `masApps` require manual uninstallation
     masApps = {
       "Amphetamine" = 937984704;
+      "Copilot" = 1447330651;
       "Day One" = 1055511498;
       "DeArrow" = 6451469297;
+      "Flighty" = 1358823008;
       "Hand Mirror" = 1502839586;
       "Hush" = 1544743900;
       "Mapper" = 1589391989;
+      "Mela" = 1568924476;
+      "Messenger" = 1480068668;
       "MusicBox" = 1614730313;
+      "MusicHarbor" = 1440405750;
       "Numbers" = 409203825;
       "Noir" = 1592917505;
       "Omnivore" = 1564031042;
@@ -61,13 +66,15 @@
       "Paku" = 1534130193;
       "Parcel" = 639968404;
       "Paste" = 967805235;
+      "Pixea" = 1507782672;
       "Play" = 1596506190;
       "Prompt" = 1594420480;
       "Reeder" = 1529448980;
-      "Scrobbles for Last.fm" = 1344679160;
+      "SimpleScrobbler" = 495163497;
       "SponsorBlock" = 1573461917;
       "Timery" = 1425368544;
       "Things" = 904280696;
+      "Toggl Track" = 1291898086;
       "Vinegar" = 1591303229;
       "Wipr" = 1320666476;
       "Xcode" = 497799835;
