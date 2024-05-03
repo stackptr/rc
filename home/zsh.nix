@@ -56,6 +56,7 @@
       setopt inc_append_history
 
       ## Wrappers for `stack`
+      export STACK_ARGS=(--fast --pedantic)
 
       # Build project and specs without running tests:
       #   sbuild fancy-api
