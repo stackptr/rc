@@ -21,6 +21,7 @@
         sox
 
         # Development
+        cachix
         colima
         coreutils-full
         docker
