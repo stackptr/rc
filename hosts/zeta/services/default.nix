@@ -45,6 +45,9 @@
     site = "us3.datadoghq.com";
     enableLiveProcessCollection = true;
   };
+  services.avahi = {
+    enable = true;
+  };
 
   programs.mosh.enable = true;
   programs.git.enable = true;
