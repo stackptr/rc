@@ -19,7 +19,10 @@
     # N.B.: prefer casks to nixpkgs for placement in ~/Applications
     casks = [
       "apparency"
-      "bartender"
+      {
+        name = "bartender";
+        greedy = true;
+      }
       "daisydisk"
       "dash"
       "discord"
@@ -222,6 +225,9 @@
       ReverseMouse = true;
       ReverseY = true;
       StartAtLogin = true;
+    };
+    "com.surteesstudios.Bartender" = {
+      SUEnableAutomaticChecks = false;
     };
   };
 
