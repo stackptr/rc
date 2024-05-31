@@ -32,7 +32,10 @@
       "little-snitch"
       "notion"
       "nova"
-      "popclip"
+      {
+        name = "popclip";
+        greedy = true;
+      }
       "postico"
       "qlcolorcode"
       "qlimagesize"
@@ -211,6 +214,7 @@
       HasShownWelcome = true;
       NMStatusItemHideIcon = true;
       "extension#com.pilotmoon.popclip.builtin-search#template" = "https://kagi.com/search?q=***";
+      SUEnableAutomaticChecks = false;
     };
     "com.pilotmoon.scroll-reverser" = {
       InvertScrollingOn = true;
