@@ -12,6 +12,7 @@
     enable = true;
     caskArgs.no_quarantine = true;
     onActivation.cleanup = "zap";
+    taps = builtins.attrNames config.nix-homebrew.taps; # See: zhaofengli/nix-homebrew#5
     # N.B.: prefer casks to nixpkgs for placement in ~/Applications
     casks = [
       "apparency"
