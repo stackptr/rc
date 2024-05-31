@@ -17,6 +17,7 @@
     };
     taps = builtins.attrNames config.nix-homebrew.taps; # See: zhaofengli/nix-homebrew#5
     # N.B.: prefer casks to nixpkgs for placement in ~/Applications
+    # TODO: casks marked as auto_updates should be set as greedy with auto update setting disabled
     casks = [
       "apparency"
       {
@@ -27,39 +28,69 @@
         name = "daisydisk";
         greedy = true;
       }
-      "dash"
-      "discord"
-      "element"
+      {
+        name = "dash";
+        greedy = true;
+      }
+      "discord" # auto_updates
+      "element" # auto_updates
       # "fastscripts" # TODO: Use pre-v3
-      "github"
-      "gitify"
-      "google-chrome"
-      "iina"
-      "little-snitch"
-      "notion"
-      "nova"
+      "github" # auto_updates
+      "gitify" # auto_updates
+      "google-chrome" # auto_updates
+      {
+        name = "iina";
+        greedy = true;
+      }
+      {
+        name = "little-snitch";
+        greedy = true;
+      }
+      "notion" # auto_updates
+      {
+        name = "nova";
+        greedy = true;
+      }
       {
         name = "popclip";
         greedy = true;
       }
-      "postico"
+      {
+        name = "postico";
+        greedy = true;
+      }
       "qlcolorcode"
       "qlimagesize"
-      "qlmarkdown"
+      {
+        name = "qlmarkdown";
+        greedy = true;
+      }
       "qlstephen"
       "qlvideo"
       "quicklook-json"
       "scroll-reverser"
-      "signal"
-      "slack"
-      "soundsource"
-      "suspicious-package"
-      "tailscale"
-      "the-unarchiver"
-      "tripmode"
-      "vlc"
-      "whatsapp"
-      "zoom"
+      "signal" # auto_updates
+      "slack" # auto_updates
+      {
+        name = "soundsource";
+        greedy = true;
+      }
+      "suspicious-package" 
+      {
+        name = "tailscale";
+        greedy = true;
+      }
+      "the-unarchiver" # auto_updates
+      {
+        name = "tripmode";
+        greedy = true;
+      }
+      {
+        name = "vlc";
+        greedy = true;
+      }
+      "whatsapp" # auto_updates
+      "zoom" # auto_updates
     ];
     # N.B.: Removed entries in `masApps` require manual uninstallation
     masApps = {
@@ -205,9 +236,6 @@
 
     #   # TODO: Set "compact" tab layout
     # };
-    "com.daisydiskapp.DaisyDiskStandAlone" = {
-      SUEnableAutomaticChecks = false;
-    };
     "com.pilotmoon.popclip" = {
       CombinedItemOrder = [
         "openlink"
@@ -223,7 +251,6 @@
       HasShownWelcome = true;
       NMStatusItemHideIcon = true;
       "extension#com.pilotmoon.popclip.builtin-search#template" = "https://kagi.com/search?q=***";
-      SUEnableAutomaticChecks = false;
     };
     "com.pilotmoon.scroll-reverser" = {
       InvertScrollingOn = true;
@@ -232,9 +259,34 @@
       ReverseY = true;
       StartAtLogin = true;
     };
-    "com.surteesstudios.Bartender" = {
+
+    # Disable automatic updates for casks above marked greedy
+    # See: https://github.com/sparkle-project/Sparkle/blob/2.x/Sparkle/SUConstants.m
+    "at.eggerapps.Postico" = {
       SUEnableAutomaticChecks = false;
+      SUAutomaticallyUpdate = false;
     };
+    "at.obdev.littlesnitch.softwareupdate".SoftwareUpdateCheckAutomatically = false; # N.B.: Does not use Sparkle for updates
+    "ch.tripmode.TripMode".SUEnableAutomaticChecks = {
+      SUEnableAutomaticChecks = false;
+      SUAutomaticallyUpdate = false;
+    };
+    "com.colliderli.iina".SUEnableAutomaticChecks = false;
+    "com.daisydiskapp.DaisyDiskStandAlone".SUEnableAutomaticChecks = false;
+    "com.kapeli.dashdoc".SUEnableAutomaticChecks = false;
+    "com.panic.Nova" = {
+      SUEnableAutomaticChecks = false;
+      SUAutomaticallyUpdate = false;
+    };
+    "com.pilotmoon.popclip".SUEnableAutomaticChecks = false;
+    "com.rogueamoeba.soundsource" = {
+      SUEnableAutomaticChecks = false;
+      SUAutomaticallyUpdate = false;
+    };
+    "com.surteesstudios.Bartender".SUEnableAutomaticChecks = false;
+    "io.tailscale.ipn.macsys".SUEnableAutomaticChecks = false;
+    "org.sbarex.QLMarkdown".SUEnableAutomaticChecks = false;
+    "org.videolan.vlc".SUEnableAutomaticChecks = false;
   };
 
   system.activationScripts.postUserActivation.text = ''
