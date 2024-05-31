@@ -126,7 +126,7 @@
       "Wipr" = 1320666476;
       "Xcode" = 497799835;
     };
-    # TODO: pippo, Soundsource, TV Forecast
+    # TODO: Cannot add iOS apps: pippo, TV Forecast
   };
 
   security.pam.enableSudoTouchIdAuth = true;
