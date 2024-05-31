@@ -23,7 +23,10 @@
         name = "bartender";
         greedy = true;
       }
-      "daisydisk"
+      {
+        name = "daisydisk";
+        greedy = true;
+      }
       "dash"
       "discord"
       "element"
@@ -202,6 +205,9 @@
 
     #   # TODO: Set "compact" tab layout
     # };
+    "com.daisydiskapp.DaisyDiskStandAlone" = {
+      SUEnableAutomaticChecks = false;
+    };
     "com.pilotmoon.popclip" = {
       CombinedItemOrder = [
         "openlink"
