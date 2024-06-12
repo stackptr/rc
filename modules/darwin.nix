@@ -75,7 +75,7 @@
         name = "soundsource";
         greedy = true;
       }
-      "suspicious-package" 
+      "suspicious-package"
       {
         name = "tailscale";
         greedy = true;
