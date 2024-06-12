@@ -13,20 +13,21 @@
   ...
 }: let
   keys = import ./keys.nix;
-  baseHomeManager = username: {
+  baseHomeManager = {username, ...}: {
     home-manager.useGlobalPkgs = true;
     home-manager.useUserPackages = true;
     home-manager.users.${username} = import ./../home;
   };
-  nixosHomeManager = baseHomeManager "mu";
   nixosHost = {
     system,
     hostname,
-  }:
+  }: let
+    username = "mu";
+  in
     nixpkgs.lib.nixosSystem {
       inherit system;
       specialArgs = {
-        inherit profile keys;
+        inherit profile keys username;
       };
       modules = [
         {environment.systemPackages = [agenix.packages.${system}.default];}
@@ -36,25 +37,26 @@
         ./../hosts/${hostname}
         agenix.nixosModules.default
         home-manager.nixosModules.home-manager
-        nixosHomeManager
+        baseHomeManager
       ];
     };
-  darwinHomeManager = baseHomeManager "corey";
-  darwinHost = {hostname, ...}:
+  darwinHost = {hostname, ...}: let
+    username = "corey";
+  in
     nix-darwin.lib.darwinSystem {
-      specialArgs = {inherit self keys;};
+      specialArgs = {inherit self keys username;};
       modules = [
         nix-homebrew.darwinModules.nix-homebrew
         ./../modules/base.nix
         ./../modules/darwin.nix
         ./../hosts/${hostname}
         home-manager.darwinModules.home-manager
-        darwinHomeManager
+        baseHomeManager
         {
           nix-homebrew = {
             enable = true;
             enableRosetta = false;
-            user = "corey";
+            user = username;
             taps = {
               "homebrew/homebrew-bundle" = homebrew-bundle;
               "homebrew/homebrew-core" = homebrew-core;
