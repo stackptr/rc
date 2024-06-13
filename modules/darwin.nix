@@ -34,10 +34,10 @@
       }
       "discord" # auto_updates
       "element" # auto_updates
+      "eloston-chromium"
       # "fastscripts" # TODO: Use pre-v3
       "github" # auto_updates
       "gitify" # auto_updates
-      "google-chrome" # auto_updates
       {
         name = "iina";
         greedy = true;
