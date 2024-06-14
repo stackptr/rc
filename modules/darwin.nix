@@ -68,6 +68,7 @@
       "qlstephen"
       "qlvideo"
       "quicklook-json"
+      "rapidapi"
       "scroll-reverser"
       "signal" # auto_updates
       "slack" # auto_updates
