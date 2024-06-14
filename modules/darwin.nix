@@ -52,10 +52,6 @@
         greedy = true;
       }
       {
-        name = "popclip";
-        greedy = true;
-      }
-      {
         name = "postico";
         greedy = true;
       }
@@ -131,6 +127,25 @@
       "Xcode" = 497799835;
     };
     # TODO: Cannot add iOS apps: pippo, TV Forecast
+  };
+  programs.popclip = {
+    enable = true;
+    greedy = true;
+    autoStart = true;
+    extensions = [
+      "Parcel.popclipextz"
+    ];
+    items = [
+      "openlink"
+      "search"
+      "cut"
+      "copy"
+      "paste"
+      "revealfile"
+      "lookup"
+      "ext-com.pilotmoon.popclip.extension.parcel"
+      "openmail"
+    ];
   };
 
   security.pam.enableSudoTouchIdAuth = true;
@@ -240,22 +255,6 @@
 
     #   # TODO: Set "compact" tab layout
     # };
-    "com.pilotmoon.popclip" = {
-      CombinedItemOrder = [
-        "openlink"
-        "search"
-        "cut"
-        "copy"
-        "paste"
-        "revealfile"
-        "lookup"
-        "ext-com.pilotmoon.popclip.extension.parcel"
-        "openmail"
-      ];
-      HasShownWelcome = true;
-      NMStatusItemHideIcon = true;
-      "extension#com.pilotmoon.popclip.builtin-search#template" = "https://kagi.com/search?q=***";
-    };
     "com.pilotmoon.scroll-reverser" = {
       InvertScrollingOn = true;
       ReverseTrackpad = false;
@@ -283,7 +282,6 @@
       SUEnableAutomaticChecks = false;
       SUAutomaticallyUpdate = false;
     };
-    "com.pilotmoon.popclip".SUEnableAutomaticChecks = false;
     "com.rogueamoeba.soundsource" = {
       SUEnableAutomaticChecks = false;
       SUAutomaticallyUpdate = false;
@@ -295,25 +293,11 @@
   };
 
   system.activationScripts.postUserActivation.text = ''
-    popclipExtPlist=~/Library/Application\ Support/PopClip/Extensions/Extensions.plist
-    if test -f "$popclipExtPlist"; then
-      if [[ ! `defaults read "$popclipExtPlist" "Installed Extensions"` =~ "Parcel.popclipext" ]]; then
-        echo "installing popclip parcel extension..." >&2
-        pkill PopClip || true # Kill process if needed; don't exit if command fails
-        temp=$(mktemp -d)
-        curl -s --output-dir "$temp" https://pilotmoon.com/popclip/extensions/ext/Parcel.popclipextz -O
-        open "$temp/Parcel.popclipextz"
-        sleep 2 # Allow extension to install before starting PopClip below
-        rm -r "$temp"
-      fi
-    fi
-
     echo "starting utilties..." >&2
     pgrep -q Bartender\ 5 || open /Applications/Bartender\ 5.app/
     pgrep -q Gitify || open /Applications/Gitify.app/
     pgrep -q Hand\ Mirror || open /Applications/Hand\ Mirror.app/
     pgrep -q Little\ Snitch || open /Applications/Little\ Snitch.app/
-    pgrep -q PopClip || open /Applications/PopClip.app/
     pgrep -q Scroll\ Reverser || open /Applications/Scroll\ Reverser.app/
     pgrep -q SoundSource || open /Applications/SoundSource.app/
     pgrep -q Tailscale || open /Applications/Tailscale.app/
