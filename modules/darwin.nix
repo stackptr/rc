@@ -68,7 +68,10 @@
       "qlstephen"
       "qlvideo"
       "quicklook-json"
-      "rapidapi"
+      {
+        name = "rapidapi";
+        greedy = true;
+      }
       "scroll-reverser"
       "signal" # auto_updates
       "slack" # auto_updates
@@ -275,6 +278,7 @@
     "com.colliderli.iina".SUEnableAutomaticChecks = false;
     "com.daisydiskapp.DaisyDiskStandAlone".SUEnableAutomaticChecks = false;
     "com.kapeli.dashdoc".SUEnableAutomaticChecks = false;
+    "com.luckymarmot.Paw".SUEnableAutomaticChecks = false;
     "com.panic.Nova" = {
       SUEnableAutomaticChecks = false;
       SUAutomaticallyUpdate = false;
