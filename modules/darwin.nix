@@ -50,6 +50,7 @@
           "tailscale"
           "tripmode"
           "vlc"
+          "xld"
         ];
       # TODO: casks marked as auto_updates should be set as greedy with auto update setting disabled
       otherApps = [
@@ -65,7 +66,6 @@
         "scroll-reverser"
         "suspicious-package"
         "the-unarchiver" # auto_updates
-        "xld" # auto_updates
         "zoom" # auto_updates
       ];
     in
@@ -270,6 +270,7 @@
       SUAutomaticallyUpdate = false;
     };
     "io.tailscale.ipn.macsys".SUEnableAutomaticChecks = false;
+    "jp.tmkk.XLD".SUEnableAutomaticChecks = false;
     "org.sbarex.QLMarkdown".SUEnableAutomaticChecks = false;
     "org.videolan.vlc".SUEnableAutomaticChecks = false;
   };
