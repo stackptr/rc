@@ -21,10 +21,6 @@
     casks = [
       "apparency"
       {
-        name = "bartender";
-        greedy = true;
-      }
-      {
         name = "daisydisk";
         greedy = true;
       }
@@ -40,6 +36,10 @@
       "gitify" # auto_updates
       {
         name = "iina";
+        greedy = true;
+      }
+      {
+        name = "jordanbaird-ice"; # Bartender replacement
         greedy = true;
       }
       {
@@ -277,6 +277,10 @@
     };
     "com.colliderli.iina".SUEnableAutomaticChecks = false;
     "com.daisydiskapp.DaisyDiskStandAlone".SUEnableAutomaticChecks = false;
+    "com.jordanbaird.Ice"= {
+      SUEnableAutomaticChecks = false;
+      SUAutomaticallyUpdate = false;
+    };
     "com.kapeli.dashdoc".SUEnableAutomaticChecks = false;
     "com.luckymarmot.Paw".SUEnableAutomaticChecks = false;
     "com.panic.Nova" = {
@@ -288,7 +292,6 @@
       SUEnableAutomaticChecks = false;
       SUAutomaticallyUpdate = false;
     };
-    "com.surteesstudios.Bartender".SUEnableAutomaticChecks = false;
     "io.tailscale.ipn.macsys".SUEnableAutomaticChecks = false;
     "org.sbarex.QLMarkdown".SUEnableAutomaticChecks = false;
     "org.videolan.vlc".SUEnableAutomaticChecks = false;
@@ -309,7 +312,7 @@
     fi
 
     echo "starting utilties..." >&2
-    pgrep -q Bartender\ 5 || open /Applications/Bartender\ 5.app/
+    pgrep -q Ice || open /Applications/Ice.app/
     pgrep -q Gitify || open /Applications/Gitify.app/
     pgrep -q Hand\ Mirror || open /Applications/Hand\ Mirror.app/
     pgrep -q Little\ Snitch || open /Applications/Little\ Snitch.app/
