@@ -2,6 +2,7 @@
   self,
   config,
   pkgs,
+  lib,
   ...
 }: {
   fonts.fontDir.enable = true;
@@ -17,87 +18,62 @@
     };
     taps = builtins.attrNames config.nix-homebrew.taps; # See: zhaofengli/nix-homebrew#5
     # N.B.: prefer casks to nixpkgs for placement in ~/Applications
-    # TODO: casks marked as auto_updates should be set as greedy with auto update setting disabled
-    casks = [
-      "apparency"
-      "backblaze" # auto_updates
-      {
-        name = "daisydisk";
-        greedy = true;
-      }
-      {
-        name = "dash";
-        greedy = true;
-      }
-      "discord" # auto_updates
-      "element" # auto_updates
-      "eloston-chromium"
-      # "fastscripts" # TODO: Use pre-v3
-      "github" # auto_updates
-      "gitify" # auto_updates
-      {
-        name = "iina";
-        greedy = true;
-      }
-      {
-        name = "jordanbaird-ice"; # Bartender replacement
-        greedy = true;
-      }
-      {
-        name = "little-snitch";
-        greedy = true;
-      }
-      "notion" # auto_updates
-      {
-        name = "nova";
-        greedy = true;
-      }
-      {
-        name = "popclip";
-        greedy = true;
-      }
-      {
-        name = "postico";
-        greedy = true;
-      }
-      "qlcolorcode"
-      "qlimagesize"
-      {
-        name = "qlmarkdown";
-        greedy = true;
-      }
-      "qlstephen"
-      "qlvideo"
-      "quicklook-json"
-      {
-        name = "rapidapi";
-        greedy = true;
-      }
-      "scroll-reverser"
-      "signal" # auto_updates
-      "slack" # auto_updates
-      {
-        name = "soundsource";
-        greedy = true;
-      }
-      "suspicious-package"
-      {
-        name = "tailscale";
-        greedy = true;
-      }
-      "the-unarchiver" # auto_updates
-      {
-        name = "tripmode";
-        greedy = true;
-      }
-      {
-        name = "vlc";
-        greedy = true;
-      }
-      "whatsapp" # auto_updates
-      "xld" # auto_updates
-      "zoom" # auto_updates
-    ];
+    casks = let
+      # Electron apps generally are marked auto_updates
+      electronApps = [
+        "discord"
+        "element"
+        "github"
+        "gitify"
+        "notion"
+        "signal"
+        "slack"
+        "whatsapp"
+      ];
+      # Apps marked auto_updates but which have their updates disabled via CustomUserPreferences
+      greedyApps =
+        map (name: {
+          inherit name;
+          greedy = true;
+        }) [
+          "daisydisk"
+          "dash"
+          "iina"
+          "jordanbaird-ice" # Bartender replacement
+          "little-snitch"
+          "nova"
+          "popclip"
+          "postico"
+          "qlmarkdown"
+          "rapidapi"
+          "soundsource"
+          "tailscale"
+          "tripmode"
+          "vlc"
+        ];
+      # TODO: casks marked as auto_updates should be set as greedy with auto update setting disabled
+      otherApps = [
+        "apparency"
+        "backblaze" # auto_updates
+        "eloston-chromium"
+        # "fastscripts" # TODO: Use pre-v3
+        "qlcolorcode"
+        "qlimagesize"
+        "qlstephen"
+        "qlvideo"
+        "quicklook-json"
+        "scroll-reverser"
+        "suspicious-package"
+        "the-unarchiver" # auto_updates
+        "xld" # auto_updates
+        "zoom" # auto_updates
+      ];
+    in
+      lib.concatLists [
+        electronApps
+        greedyApps
+        otherApps
+      ];
     # N.B.: Removed entries in `masApps` require manual uninstallation
     masApps = {
       "Amphetamine" = 937984704;
@@ -132,7 +108,6 @@
       "Wipr" = 1320666476;
       "Xcode" = 497799835;
     };
-    # TODO: Cannot add iOS apps: pippo, TV Forecast
   };
 
   security.pam.enableSudoTouchIdAuth = true;
@@ -279,7 +254,7 @@
     };
     "com.colliderli.iina".SUEnableAutomaticChecks = false;
     "com.daisydiskapp.DaisyDiskStandAlone".SUEnableAutomaticChecks = false;
-    "com.jordanbaird.Ice"= {
+    "com.jordanbaird.Ice" = {
       SUEnableAutomaticChecks = false;
       SUAutomaticallyUpdate = false;
     };
