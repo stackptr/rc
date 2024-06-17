@@ -95,6 +95,7 @@
         greedy = true;
       }
       "whatsapp" # auto_updates
+      "xld" # auto_updates
       "zoom" # auto_updates
     ];
     # N.B.: Removed entries in `masApps` require manual uninstallation
