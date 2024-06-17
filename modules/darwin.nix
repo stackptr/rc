@@ -20,6 +20,7 @@
     # TODO: casks marked as auto_updates should be set as greedy with auto update setting disabled
     casks = [
       "apparency"
+      "backblaze" # auto_updates
       {
         name = "daisydisk";
         greedy = true;
