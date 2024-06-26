@@ -55,6 +55,7 @@
       otherApps = [
         "apparency"
         "backblaze" # auto_updates
+        "chatgpt" # auto_updates
         "eloston-chromium"
         # "fastscripts" # TODO: Use pre-v3
         "qlcolorcode"
