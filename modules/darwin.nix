@@ -5,8 +5,7 @@
   lib,
   ...
 }: {
-  fonts.fontDir.enable = true;
-  fonts.fonts = [pkgs.fira-code-nerdfont];
+  fonts.packages = [pkgs.fira-code-nerdfont];
 
   nixpkgs.config.allowUnfree = true;
   homebrew = {
