@@ -29,6 +29,10 @@
   };
 
   services.openssh.enable = true;
+  services.tailscale = {
+    enable = true;
+    extraUpFlags = ["--ssh"];
+  };
 
   system.stateVersion = "24.05";
 }
