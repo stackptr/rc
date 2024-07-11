@@ -6,6 +6,7 @@
 }: {
   imports = [
     ./hardware-configuration.nix
+    ./services.nix
   ];
 
   boot.loader.systemd-boot.enable = true;
