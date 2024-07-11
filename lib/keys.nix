@@ -7,6 +7,7 @@ let
       name = h;
       value = readKey h;
     }) [
+      "glyph"
       "nazar"
       "Petrichor"
       "Rhizome"
