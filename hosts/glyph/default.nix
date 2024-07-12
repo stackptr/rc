@@ -47,7 +47,7 @@
     openFirewall = true;
     invalidUsers = [];
     shares = {
-      media = {
+      Media = {
         path = "/mnt/media";
         browseable = "yes";
         "read only" = "no";
