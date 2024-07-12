@@ -13,6 +13,11 @@
   boot.loader.efi.canTouchEfiVariables = true;
   boot.zfs.forceImportRoot = false;
 
+  fileSystems."/mnt/zpool" = {
+    device = "zdata";
+    fsType = "zfs";
+  };
+
   networking.hostName = "glyph";
   networking.hostId = "e7bdc076"; # Ensure correct ZFS pool imported
   networking.firewall = {
