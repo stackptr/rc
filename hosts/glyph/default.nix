@@ -15,6 +15,10 @@
 
   networking.hostName = "glyph";
   networking.hostId = "e7bdc076"; # Ensure correct ZFS pool imported
+  networking.firewall = {
+    enable = true;
+    trustedInterfaces = ["tailscale0"];
+  };
 
   time.timeZone = "America/Los_Angeles";
   i18n.defaultLocale = "en_US.UTF-8";
