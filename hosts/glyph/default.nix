@@ -8,10 +8,13 @@
     ./hardware-configuration.nix
   ];
 
+  boot.supportedFilesystems = ["ext4" "zfs"];
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
+  boot.zfs.forceImportRoot = false;
 
   networking.hostName = "glyph";
+  networking.hostId = "e7bdc076"; # Ensure correct ZFS pool imported
 
   time.timeZone = "America/Los_Angeles";
   i18n.defaultLocale = "en_US.UTF-8";
