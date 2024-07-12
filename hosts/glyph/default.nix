@@ -44,7 +44,7 @@
   services.samba = {
     enable = true;
     securityType = "user";
-    openFirewall = true;
+    openFirewall = false; # Only allow over Tailscale
     invalidUsers = [];
     shares = {
       Media = {
