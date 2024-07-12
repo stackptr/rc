@@ -6,6 +6,7 @@
 }: {
   imports = [
     ./hardware-configuration.nix
+    ./desktop.nix
   ];
 
   boot.supportedFilesystems = ["ext4" "zfs"];
