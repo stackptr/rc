@@ -4,7 +4,7 @@
   lib,
   ...
 }: let
-  address = "127.0.0.1";
+  address = "";
   port = 8080;
   dataDir = "/var/lib/filebrowser";
   rootDir = "${dataDir}/files";
