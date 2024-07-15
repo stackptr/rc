@@ -1,24 +1,73 @@
 {
   config,
   pkgs,
+  lib,
   ...
-}: {
-  users.users.mu.extraGroups = ["docker"];
-  virtualisation.docker.enable = true;
-  virtualisation.oci-containers.backend = "docker";
-  virtualisation.oci-containers.containers = {
-    filebrowser = {
-      image = "filebrowser/filebrowser@sha256:862a8f4f4829cb2747ced869aea8593204bbc718c92f0f11c97e7b669a54b53d";
-      ports = [
-        "8080:80"
-      ];
-      volumes = [
-        "/mnt/media:/srv/Media"
-        "/mnt/docker:/srv/Docker"
-        "/mnt/docker/filebrowser.db:/database.db"
-      ];
-      user = "1001:100";
-      autoStart = true;
+}: let
+  address = "127.0.0.1";
+  port = 8080;
+  dataDir = "/var/lib/filebrowser";
+  rootDir = "${dataDir}/files";
+  cacheDir = "/var/cache/filebrowser";
+  configFile = pkgs.writeText "filebrowser-config.json" (lib.generators.toJSON {} {
+    inherit address port;
+    database = "${dataDir}/filebrowser.db";
+    root = rootDir;
+    cache-dir = cacheDir;
+    # TODO
+    #cert = cfg.tlsCertificate;
+    #key = cfg.tlsCertificateKey;
+  });
+in {
+  # TODO: Replace with module option after NixOS/nixpkgs#289750
+  users.users.filebrowser = {
+    group = "filebrowser";
+    home = dataDir;
+    createHome = true;
+    description = "File Browser daemon user";
+    isSystemUser = true;
+  };
+  users.groups.filebrowser = {};
+
+  systemd.packages = [pkgs.filebrowser];
+
+  systemd.services.filebrowser = {
+    description = "File Browser service";
+    after = ["network.target"];
+    wantedBy = ["multi-user.target"];
+    environment.HOME = "/var/lib/filebrowser";
+
+    serviceConfig = {
+      Type = "simple";
+      Restart = "on-failure";
+      User = "filebrowser";
+      Group = "filebrowser";
+      StateDirectory = "filebrowser";
+
+      DynamicUser = lib.mkForce false;
+
+      # Basic hardening
+      NoNewPrivileges = true;
+      PrivateTmp = true;
+      PrivateDevices = true;
+      DevicePolicy = "closed";
+      ProtectSystem = "strict";
+      ProtectHome = "tmpfs";
+      ProtectControlGroups = true;
+      ProtectKernelModules = true;
+      ProtectKernelTunables = true;
+      RestrictAddressFamilies = "AF_UNIX AF_INET AF_INET6";
+      RestrictNamespaces = true;
+      RestrictRealtime = true;
+      RestrictSUIDSGID = true;
+      MemoryDenyWriteExecute = true;
+      LockPersonality = true;
+
+      ExecStartPre = ''
+        ${pkgs.coreutils}/bin/mkdir -p ${toString rootDir}
+      '';
+
+      ExecStart = "${pkgs.filebrowser}/bin/filebrowser --config ${configFile}";
     };
   };
 }
