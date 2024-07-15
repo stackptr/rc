@@ -13,7 +13,8 @@
         "8080:80"
       ];
       volumes = [
-        "/mnt/media:/srv"
+        "/mnt/media:/srv/Media"
+        "/mnt/docker:/srv/Docker"
         "/mnt/docker/filebrowser.db:/database.db"
       ];
       user = "1001:100";
