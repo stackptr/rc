@@ -3,6 +3,10 @@
   pkgs,
   ...
 }: {
+ imports = [
+   ./filebrowser.nix
+ ];
+ 
  services.cockpit.enable = true;
  services.openssh.enable = true;
  services.samba = {
