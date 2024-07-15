@@ -13,7 +13,8 @@
         "8080:80"
       ];
       volumes = [
-        "/mnt:/srv"
+        "/mnt/media:/srv"
+        "/mnt/docker/filebrowser.db:/database.db"
       ];
       user = "1001:100";
       autoStart = true;
