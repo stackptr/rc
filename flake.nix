@@ -35,6 +35,10 @@
           hostname = "nazar";
           system = "x86_64-linux";
         }
+        {
+          hostname = "glyph";
+          system = "x86_64-linux";
+        }
       ];
 
       darwinConfigurations = mkDarwinHosts [
