@@ -1,0 +1,55 @@
+{
+  config,
+  pkgs,
+  ...
+}: {
+  age.secrets.pushover-user-token = {
+    file = ./../secrets/pushover-user-token.age;
+    mode = "440";
+    owner = config.services.transmission.user;
+    group = config.services.transmission.group;
+  };
+  age.secrets.pushover-app-token = {
+    file = ./../secrets/pushover-app-token.age;
+    mode = "440";
+    owner = config.services.transmission.user;
+    group = config.services.transmission.group;
+  };
+  services.transmission = {
+    enable = true;
+    settings = {
+      download-dir = "/mnt/torrents/complete";
+      incomplete-dir = "/mnt/torrents/incomplete";
+      peer-port = 53150;
+      rpc-bind-address = "0.0.0.0";
+      script-torrent-done-enabled = true;
+      script-torrent-done-filename = pkgs.writeText "torrent-done.sh" ''
+        TOKEN_USER=$(${config.age.secrets.pushover-user-token.path});
+        TOKEN_APP=$(${config.age.secrets.pushover-app-token.path});
+        MESSAGE="$TR_TORRENT_NAME finished downloading.
+        
+        $TR_TIME_LOCALTIME";
+        
+        PRIORITY=0;
+        SOUND="tugboat";
+        TITLE="Download complete";
+        
+        TIMESTAMP=$(date +%s);
+        
+        curl -s --form-string "token=$TOKEN_APP" \
+          --form-string "user=$TOKEN_USER" \
+          --form-string "timestamp=$TIMESTAMP" \
+          --form-string "priority=$PRIORITY" \
+          --form-string "sound=$SOUND" \
+          --form-string "title=$TITLE" \
+          --form-string "message=$MESSAGE" \
+          --form-string "url=https://torrents.zx.dev" \
+          --form-string "url_title=View torrents" \
+          https://api.pushover.net/1/messages.json
+      '';
+      utp-enabled = false;
+      watch-dir = "/mnt/torrents/watch";
+      watch-dir-enabled = true;
+    };
+  };
+}

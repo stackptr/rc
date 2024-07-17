@@ -1,6 +1,8 @@
 let
   keys = with (import ./lib/keys.nix); [glyph nazar Petrichor Rhizome zeta];
 in {
+  "hosts/glyph/secrets/pushover-app-token.age".publicKeys = keys;
+  "hosts/glyph/secrets/pushover-user-token.age".publicKeys = keys;
   "hosts/nazar/secrets/cloudflare-dns.age".publicKeys = keys;
   "hosts/nazar/secrets/dendrite-env.age".publicKeys = keys;
   "hosts/nazar/secrets/dendrite-private-key.age".publicKeys = keys;

@@ -5,6 +5,7 @@
 }: {
   imports = [
     ./filebrowser.nix
+    ./torrents.nix
   ];
 
   services.cockpit.enable = true;
