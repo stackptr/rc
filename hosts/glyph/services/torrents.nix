@@ -23,6 +23,7 @@
       peer-port = 53150;
       rpc-bind-address = "0.0.0.0";
       rpc-host-whitelist-enabled = false;
+      rpc-whitelist-enabled = false;
       script-torrent-done-enabled = true;
       script-torrent-done-filename = pkgs.writeText "torrent-done.sh" ''
         TOKEN_USER=$(${config.age.secrets.pushover-user-token.path});
