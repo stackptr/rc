@@ -18,6 +18,10 @@
     device = "zdata/media";
     fsType = "zfs";
   };
+  fileSystems."/mnt/torrents" = {
+    device = "zdata/torrents";
+    fsType = "zfs";
+  };
 
   networking.hostName = "glyph";
   networking.hostId = "e7bdc076"; # Ensure correct ZFS pool imported
