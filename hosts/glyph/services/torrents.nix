@@ -54,5 +54,7 @@
       watch-dir = "/mnt/torrents/watch";
       watch-dir-enabled = true;
     };
+    # TODO: Use 6c65726f79/Transmissionic
+    webHome = pkgs.flood-for-transmission;
   };
 }
