@@ -1,5 +1,5 @@
 let
-  keys = with (import ./lib/keys.nix); [nazar Petrichor Rhizome zeta];
+  keys = with (import ./lib/keys.nix); [glyph nazar Petrichor Rhizome zeta];
 in {
   "hosts/nazar/secrets/cloudflare-dns.age".publicKeys = keys;
   "hosts/nazar/secrets/dendrite-env.age".publicKeys = keys;
