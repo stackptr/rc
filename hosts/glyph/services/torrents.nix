@@ -17,6 +17,7 @@
   };
   services.transmission = {
     enable = true;
+    package = pkgs.transmission_4;
     settings = {
       download-dir = "/mnt/torrents/complete";
       incomplete-dir = "/mnt/torrents/incomplete";
