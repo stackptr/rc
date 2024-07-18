@@ -22,6 +22,10 @@
     device = "zdata/torrents";
     fsType = "zfs";
   };
+  fileSystems."/mnt/unsorted" = {
+    device = "zdata/unsorted";
+    fsType = "zfs";
+  };
 
   networking.hostName = "glyph";
   networking.hostId = "e7bdc076"; # Ensure correct ZFS pool imported
