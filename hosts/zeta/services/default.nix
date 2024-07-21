@@ -52,5 +52,4 @@
   programs.mosh.enable = true;
   programs.git.enable = true;
   programs.gnupg.agent.enable = true;
-  programs.vim.defaultEditor = true;
 }
