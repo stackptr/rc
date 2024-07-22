@@ -10,7 +10,10 @@
 
   services.cockpit.enable = true;
   services.openssh.enable = true;
-  services.plex.enable = true;
+  services.plex = {
+    enable = true;
+    openFirewall = true;
+  };
   services.samba = {
     enable = true;
     securityType = "user";
