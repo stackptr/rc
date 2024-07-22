@@ -14,6 +14,7 @@
     database = "${dataDir}/filebrowser.db";
     root = rootDir;
     cache-dir = cacheDir;
+    noauth = true;
     # TODO
     #cert = cfg.tlsCertificate;
     #key = cfg.tlsCertificateKey;
