@@ -30,15 +30,15 @@
         TOKEN_USER=$(${config.age.secrets.pushover-user-token.path});
         TOKEN_APP=$(${config.age.secrets.pushover-app-token.path});
         MESSAGE="$TR_TORRENT_NAME finished downloading.
-        
+
         $TR_TIME_LOCALTIME";
-        
+
         PRIORITY=0;
         SOUND="tugboat";
         TITLE="Download complete";
-        
+
         TIMESTAMP=$(date +%s);
-        
+
         curl -s --form-string "token=$TOKEN_APP" \
           --form-string "user=$TOKEN_USER" \
           --form-string "timestamp=$TIMESTAMP" \
