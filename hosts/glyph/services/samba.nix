@@ -24,8 +24,11 @@
     openFirewall = false; # Only allow over Tailscale
     invalidUsers = [];
     shares = {
+      Backup = mkShare "/mnt/backup" "mu" "users";
       Media = mkShare "/mnt/media" config.services.plex.user config.services.plex.group;
+      Stash = mkShare "/mnt/stash" "mu" "users";
       Torrents = mkShare "/mnt/torrents" config.services.transmission.user config.services.transmission.group;
+      Unsorted = mkShare "/mnt/unsorted" "mu" "users";
     };
   };
 }
