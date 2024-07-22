@@ -1,9 +1,9 @@
 # TODO: Upstream to NixOS/nixpkgs
-{ lib
-, buildNpmPackage
-, fetchFromGitHub
+{
+  lib,
+  buildNpmPackage,
+  fetchFromGitHub,
 }:
-
 buildNpmPackage rec {
   pname = "transmissionic";
   version = "v1.8.0";
