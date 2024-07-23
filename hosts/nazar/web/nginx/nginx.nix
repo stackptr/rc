@@ -63,6 +63,13 @@
       forceSSL = true;
       useACMEHost = "zx.dev";
       enableAutheliaAuth = true;
+      locations."/".proxyPass = "http://glyph.rove-duck.ts.net:9091";
+      locations."~ (/transmission)?/rpc".proxyPass = "http://glyph.rove-duck.ts.net:9091";
+    };
+    virtualHosts."torrents.melchior.zx.dev" = {
+      forceSSL = true;
+      useACMEHost = "zx.dev";
+      enableAutheliaAuth = true;
       locations."/".proxyPass = "http://melchior.rove-duck.ts.net:9091";
       locations."~ (/transmission)?/rpc".proxyPass = "http://melchior.rove-duck.ts.net:9091";
     };
