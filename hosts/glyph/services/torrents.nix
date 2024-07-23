@@ -27,8 +27,8 @@
       rpc-whitelist-enabled = false;
       script-torrent-done-enabled = true;
       script-torrent-done-filename = pkgs.writeShellScript "torrent-done.sh" ''
-        TOKEN_USER=$(${config.age.secrets.pushover-user-token.path});
-        TOKEN_APP=$(${config.age.secrets.pushover-app-token.path});
+        TOKEN_USER=$(cat ${config.age.secrets.pushover-user-token.path});
+        TOKEN_APP=$(cat ${config.age.secrets.pushover-app-token.path});
         MESSAGE="$TR_TORRENT_NAME finished downloading.
 
         $TR_TIME_LOCALTIME";
