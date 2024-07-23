@@ -27,6 +27,7 @@ in {
     createHome = true;
     description = "File Browser daemon user";
     isSystemUser = true;
+    extraGroups = ["media"];
   };
   users.groups.filebrowser = {};
 

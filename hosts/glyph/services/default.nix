@@ -8,6 +8,7 @@
     ./samba.nix
     ./torrents.nix
   ];
+  users.groups.media = {};
 
   services.cockpit.enable = true;
   services.openssh.enable = true;
