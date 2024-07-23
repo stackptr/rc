@@ -9,6 +9,7 @@
     ./torrents.nix
   ];
   users.groups.media = {};
+  users.users.mu.extraGroups = ["media"];
 
   services.cockpit.enable = true;
   services.openssh.enable = true;
