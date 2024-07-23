@@ -5,13 +5,13 @@
 }: {
   age.secrets.pushover-user-token = {
     file = ./../secrets/pushover-user-token.age;
-    mode = "440";
+    mode = "550";
     owner = config.services.transmission.user;
     group = config.services.transmission.group;
   };
   age.secrets.pushover-app-token = {
     file = ./../secrets/pushover-app-token.age;
-    mode = "440";
+    mode = "550";
     owner = config.services.transmission.user;
     group = config.services.transmission.group;
   };
