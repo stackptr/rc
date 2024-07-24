@@ -150,6 +150,16 @@
     baseIndex = 1;
     mouse = true;
     terminal = "tmux-256color";
+    plugins = with pkgs; [
+      {
+        plugin = tmuxPlugins.continuum;
+        extraConfig = ''
+          set -g @continuum-restore 'on'
+          set -g @continuum-save-interval '60' # minutes
+        '';
+      }
+      tmuxPlugins.yank
+    ];
   };
 
   programs.yt-dlp.enable = true;
