@@ -144,6 +144,14 @@
     };
   };
 
+  programs.tmux = {
+    enable = true;
+    shortcut = "a";
+    baseIndex = 1;
+    mouse = true;
+    terminal = "tmux-256color";
+  };
+
   programs.yt-dlp.enable = true;
 
   services.gpg-agent = {
