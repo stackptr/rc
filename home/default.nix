@@ -31,6 +31,7 @@
         coreutils-full
         docker
         fd
+	gitui
         git-interactive-rebase-tool
         hub
         jo
