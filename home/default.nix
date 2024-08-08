@@ -18,6 +18,7 @@
         mosh
         neofetch
         onefetch
+        ranger
 
         # Audio/video
         ffmpeg_6
