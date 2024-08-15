@@ -31,7 +31,7 @@
         coreutils-full
         docker
         fd
-	gitui
+        gitui
         git-interactive-rebase-tool
         hub
         jo
@@ -116,6 +116,14 @@
   programs.nushell.enable = true;
 
   programs.ripgrep.enable = true;
+
+  programs.ssh.enable = true;
+  programs.ssh.addKeysToAgent = "yes";
+  programs.ssh.matchBlocks = {
+    "github.com" = {
+      identityFile = "~/.ssh/id_ed25519";
+    };
+  };
 
   programs.starship = {
     enable = true;
