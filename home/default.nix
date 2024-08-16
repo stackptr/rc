@@ -181,9 +181,7 @@
       then false
       else true;
     enableZshIntegration = true;
-    extraConfig = ''
-      allow-loopback-pinentry
-    '';
+    pinentryPackage = pkgs.pinentry-tty;
   };
 
   home.stateVersion = "23.11";
