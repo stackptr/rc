@@ -1,6 +1,7 @@
 {
   self,
   nixpkgs,
+  nixpkgs-stable,
   agenix,
   home-manager,
   nix-darwin,
@@ -13,10 +14,17 @@
   ...
 }: let
   keys = import ./keys.nix;
-  baseHomeManager = {username, ...}: {
+  baseHomeManager = {
+    username,
+    pkgs-stable,
+    ...
+  }: {
     home-manager.useGlobalPkgs = true;
     home-manager.useUserPackages = true;
     home-manager.users.${username} = import ./../home;
+    home-manager.extraSpecialArgs = {
+      inherit pkgs-stable;
+    };
   };
   nixosHost = {
     system,
@@ -28,6 +36,9 @@
       inherit system;
       specialArgs = {
         inherit profile keys username;
+        pkgs-stable = import nixpkgs-stable {
+          inherit system;
+        };
       };
       modules = [
         {environment.systemPackages = [agenix.packages.${system}.default];}
@@ -42,9 +53,16 @@
     };
   darwinHost = {hostname, ...}: let
     username = "corey";
+    system = "aarch64-darwin";
   in
     nix-darwin.lib.darwinSystem {
-      specialArgs = {inherit self keys username;};
+      inherit system;
+      specialArgs = {
+        inherit self keys username;
+        pkgs-stable = import nixpkgs-stable {
+          inherit system;
+        };
+      };
       modules = [
         nix-homebrew.darwinModules.nix-homebrew
         ./../modules/base.nix

@@ -1,5 +1,5 @@
 {
-  pkgs,
+  pkgs-stable,
   lib,
   ...
 }: let
@@ -16,6 +16,7 @@
 in {
   programs.awscli = {
     enable = true;
+    package = pkgs-stable.awscli2;
     settings = patchSettings {
       freckle-dev = {
         sso_start_url = "https://d-90675613ab.awsapps.com/start";
