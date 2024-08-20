@@ -117,12 +117,18 @@
 
   programs.ripgrep.enable = true;
 
-  programs.ssh.enable = true;
-  programs.ssh.addKeysToAgent = "yes";
-  programs.ssh.matchBlocks = {
-    "github.com" = {
-      identityFile = "~/.ssh/id_ed25519";
+  programs.ssh = {
+    enable = true;
+    addKeysToAgent = "yes";
+    matchBlocks = {
+      "github.com" = {
+        identityFile = "~/.ssh/id_ed25519";
+      };
     };
+    extraConfig = ''
+      IgnoreUnknown UseKeychain
+      UseKeychain yes
+    '';
   };
 
   programs.starship = {
