@@ -21,8 +21,6 @@
       flake = false;
     };
     profile.url = "github:stackptr/profile";
-    disko.url = "github:nix-community/disko";
-    disko.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs = inputs:
