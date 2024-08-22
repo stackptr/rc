@@ -9,6 +9,7 @@
   homebrew-bundle,
   homebrew-core,
   homebrew-cask,
+  homebrew-wine,
   profile,
   ...
 }: let
@@ -77,6 +78,7 @@
               "homebrew/homebrew-bundle" = homebrew-bundle;
               "homebrew/homebrew-core" = homebrew-core;
               "homebrew/homebrew-cask" = homebrew-cask;
+              "gcenx/homebrew-wine" = homebrew-wine;
             };
             mutableTaps = false;
           };

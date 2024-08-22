@@ -148,6 +148,22 @@
         "type": "github"
       }
     },
+    "homebrew-wine": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1721264016,
+        "narHash": "sha256-GAobCUxStxeD2x3+a8y+eD33bN7UN1sFvEvHdRvZsBM=",
+        "owner": "gcenx",
+        "repo": "homebrew-wine",
+        "rev": "86f4cb84bc6523a58655fbdd9a5ffe901c9a6c52",
+        "type": "github"
+      },
+      "original": {
+        "owner": "gcenx",
+        "repo": "homebrew-wine",
+        "type": "github"
+      }
+    },
     "nix-darwin": {
       "inputs": {
         "nixpkgs": [
@@ -267,6 +283,7 @@
         "homebrew-bundle": "homebrew-bundle",
         "homebrew-cask": "homebrew-cask",
         "homebrew-core": "homebrew-core",
+        "homebrew-wine": "homebrew-wine",
         "nix-darwin": "nix-darwin",
         "nix-homebrew": "nix-homebrew",
         "nixpkgs": "nixpkgs_2",
