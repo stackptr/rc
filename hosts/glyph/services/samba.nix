@@ -20,19 +20,21 @@
       };
   in {
     enable = true;
-    securityType = "user";
     openFirewall = false; # Only allow over Tailscale
-    invalidUsers = [];
-    extraConfig = ''
-      vfs objects = fruit streams_xattr
-      fruit:metadata = stream
-      fruit:model = MacSamba
-      fruit:posix_rename = yes
-      fruit:veto_appledouble = no
-      fruit:nfs_aces = no
-      fruit:wipe_intentionally_left_blank_rfork = yes
-      fruit:delete_empty_adfiles = yes
-    '';
+    settings = {
+      global = {
+        "invalid users" = [];
+        securityType = "user";
+        "vfs objects" = "fruit streams_xattr";
+        "fruit:metadata" = "stream";
+        "fruit:model" = "MacSamba";
+        "fruit:posix_rename" = "yes";
+        "fruit:veto_appledouble" = "no";
+        "fruit:nfs_aces" = "no";
+        "fruit:wipe_intentionally_left_blank_rfork" = "yes";
+        "fruit:delete_empty_adfiles" = "yes";
+      };
+    };
     shares = {
       Backup = mkShare "/mnt/backup" "mu" "users" // {"fruit:time machine" = "yes";};
       Media = mkShare "/mnt/media" config.services.plex.user config.services.plex.group;
