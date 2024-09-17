@@ -89,5 +89,11 @@
       enableAutheliaAuth = true;
       locations."/".proxyPass = "http://glyph.rove-duck.ts.net:8080";
     };
+    virtualHosts."home.zx.dev" = {
+      forceSSL = true;
+      useACMEHost = "zx.dev";
+      enableAutheliaAuth = true;
+      locations."/".proxyPass = "http://127.0.0.1:8082";
+    };
   };
 }
