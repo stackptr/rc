@@ -15,6 +15,12 @@
     bookmarks = [];
     widgets = [
       {
+        resources = {
+          cpu = true;
+          memory = true;
+        };
+      }
+      {
         search = {
           provider = "custom";
           url = "https://kagi.com/search?q=";
