@@ -62,13 +62,25 @@
         Services = [
           {
             "Transmission" = {
-              description = "Torrent client with web UI.";
+              description = "Torrent client";
               href = "https://torrents.zx.dev";
               icon = "transmission";
               widget = {
                 type = "transmission";
                 url = "http://glyph.rove-duck.ts.net:9091";
                 rpcUrl = "/transmission/";
+              };
+            };
+          }
+          {
+            "Plex" = {
+              description = "TV & movie streaming";
+              href = "https://app.plex.tv";
+              icon = "plex";
+              widget = {
+                type = "plex";
+                url = "https://glyph.rove-duck.ts.net:32400";
+                key = "{{HOMEPAGE_VAR_PLEX_KEY}}";
               };
             };
           }
