@@ -6,6 +6,7 @@ in {
   "hosts/nazar/secrets/cloudflare-dns.age".publicKeys = keys;
   "hosts/nazar/secrets/dendrite-env.age".publicKeys = keys;
   "hosts/nazar/secrets/dendrite-private-key.age".publicKeys = keys;
+  "hosts/nazar/secrets/homepage-env.age".publicKeys = keys;
   "hosts/nazar/secrets/jwt-secret.age".publicKeys = keys;
   "hosts/nazar/secrets/mastodon-s3-env.age".publicKeys = keys;
   "hosts/nazar/secrets/mastodon-secret-key-base.age".publicKeys = keys;

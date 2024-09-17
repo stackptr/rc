@@ -3,14 +3,10 @@
   pkgs,
   ...
 }: {
-  age.secrets.jwt-secret = {
-    file = ./../secrets/jwt-secret.age;
-    mode = "440";
-    owner = "authelia-main";
-    group = "authelia-main";
-  };
+  age.secrets.homepage-env.file = ./../secrets/homepage-env.age;
   services.homepage-dashboard = {
     enable = true;
+    environmentFile = config.age.secrets.homepage-env.path;
     settings = {
       color = "sky";
       target = "_self";
@@ -36,6 +32,20 @@
     ];
     services = [
       {
+        Network = [
+          {
+            "Tailscale" = {
+              description = "Secured infrastructure";
+              href = "https://login.tailscale.com/admin/machines";
+              icon = "tailscale";
+              widget = {
+                type = "tailscale";
+                deviceid = "{{HOMEPAGE_VAR_TAILSCALE_DEVICEID}}";
+                key = "{{HOMEPAGE_VAR_TAILSCALE_KEY}}";
+              };
+            };
+          }
+        ];
         Services = [
           {
             "Transmission" = {
