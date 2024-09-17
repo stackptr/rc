@@ -15,6 +15,15 @@
     bookmarks = [];
     widgets = [
       {
+        search = {
+          provider = "custom";
+          url = "https://kagi.com/search?q=";
+          target = "_blank";
+          suggestionUrl = "https://kagi.com/api/autosuggest?q=";
+          showSearchSuggestions = true;
+        };
+      }
+      {
         datetime = {
           text_size = "xl";
           format.timeStyle = "short";
@@ -26,15 +35,6 @@
           provider = "openweathermap";
           cache = 5;
           apiKey = "{{HOMEPAGE_VAR_OPENWEATHERMAP_APIKEY}}";
-        };
-      }
-      {
-        search = {
-          provider = "custom";
-          url = "https://kagi.com/search?q=";
-          target = "_blank";
-          suggestionUrl = "https://kagi.com/api/autosuggest?q=";
-          showSearchSuggestions = true;
         };
       }
     ];
