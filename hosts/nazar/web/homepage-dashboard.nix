@@ -21,6 +21,14 @@
         };
       }
       {
+        openweathermap = {
+          units = "imperial";
+          provider = "openweathermap";
+          cache = 5;
+          apiKey = "{{HOMEPAGE_VAR_OPENWEATHERMAP_APIKEY}}";
+        };
+      }
+      {
         search = {
           provider = "custom";
           url = "https://kagi.com/search?q=";
