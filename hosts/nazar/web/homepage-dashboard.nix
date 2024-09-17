@@ -40,7 +40,7 @@
           {
             "Transmission" = {
               description = "Torrent client with web UI.";
-              href = "http://glyph.rove-duck.ts.net:9091";
+              href = "https://torrents.zx.dev";
               icon = "transmission";
               widget = {
                 type = "transmission";
