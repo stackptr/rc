@@ -45,6 +45,17 @@
               };
             };
           }
+          {
+            "NextDNS" = {
+              href = "https://my.nextdns.io";
+              icon = "nextdns";
+              widget = {
+                type = "nextdns";
+                profile = "{{HOMEPAGE_VAR_NEXTDNS_PROFILE_ID}}";
+                key = "{{HOMEPAGE_VAR_NEXTDNS_KEY}}";
+              };
+            };
+          }
         ];
       }
       {
