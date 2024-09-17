@@ -46,6 +46,8 @@
             };
           }
         ];
+      }
+      {
         Services = [
           {
             "Transmission" = {
