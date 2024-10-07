@@ -39,7 +39,6 @@
           "dash"
           "iina"
           "jordanbaird-ice" # Bartender replacement
-          "little-snitch"
           "nova"
           "popclip"
           "postico"
@@ -78,7 +77,6 @@
       ];
     # N.B.: Removed entries in `masApps` require manual uninstallation
     masApps = {
-      "Amphetamine" = 937984704;
       "Copilot" = 1447330651;
       "Day One" = 1055511498;
       "DeArrow" = 6451469297;
