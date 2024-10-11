@@ -29,7 +29,8 @@
       address = "74.48.202.1";
       interface = "eth0";
     };
-    nameservers = ["8.8.8.8"];
+    search = ["rove-duck.ts.net"];
+    nameservers = ["100.100.100.100"];
   };
 
   time.timeZone = "America/Los_Angeles";
