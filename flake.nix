@@ -45,6 +45,10 @@
           hostname = "glyph";
           system = "x86_64-linux";
         }
+        {
+          hostname = "spore";
+          system = "x86_64-linux";
+        }
       ];
 
       darwinConfigurations = mkDarwinHosts [

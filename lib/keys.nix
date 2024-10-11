@@ -11,6 +11,7 @@ let
       "nazar"
       "Petrichor"
       "Rhizome"
+      "spore"
       "zeta"
     ];
 in
