@@ -9,7 +9,6 @@
   homebrew-bundle,
   homebrew-core,
   homebrew-cask,
-  homebrew-wine,
   profile,
   disko,
   ...
@@ -80,7 +79,6 @@
               "homebrew/homebrew-bundle" = homebrew-bundle;
               "homebrew/homebrew-core" = homebrew-core;
               "homebrew/homebrew-cask" = homebrew-cask;
-              "gcenx/homebrew-wine" = homebrew-wine;
             };
             mutableTaps = false;
           };

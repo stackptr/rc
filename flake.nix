@@ -24,10 +24,6 @@
       url = "github:homebrew/homebrew-cask";
       flake = false;
     };
-    homebrew-wine = {
-      url = "github:gcenx/homebrew-wine";
-      flake = false;
-    };
     profile.url = "github:stackptr/profile";
     profile.inputs.nixpkgs.follows = "nixpkgs";
     disko.url = "github:nix-community/disko";

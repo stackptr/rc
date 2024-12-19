@@ -57,7 +57,6 @@
         "chatgpt" # auto_updates
         "eloston-chromium"
         # "fastscripts" # TODO: Use pre-v3
-        "gcenx/wine/wineskin"
         "plexamp" # auto_updates
         "qlcolorcode"
         "qlimagesize"
