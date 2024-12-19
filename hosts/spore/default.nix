@@ -24,9 +24,27 @@
           prefixLength = 24;
         }
       ];
+      ipv6.addresses = [
+        {
+          address = "2607:f130:0000:0173:0000:0000:71bb:96b0";
+          prefixLength = 64;
+        }
+        {
+          address = "2607:f130:0000:0173:0000:0000:59a9:2a5a";
+          prefixLength = 64;
+        }
+        {
+          address = "2607:f130:0000:0173:0000:0000:d7da:9af6";
+          prefixLength = 64;
+        }
+      ];
     };
     defaultGateway = {
       address = "74.48.202.1";
+      interface = "eth0";
+    };
+    defaultGateway6 = {
+      address = "2607:f130:0000:0173::1";
       interface = "eth0";
     };
     nameservers = ["8.8.8.8"];
