@@ -280,7 +280,7 @@
   system.activationScripts.postUserActivation.text = ''
     popclipExtPlist=~/Library/Application\ Support/PopClip/Extensions/Extensions.plist
     if test -f "$popclipExtPlist"; then
-      if [[ ! $(defaults read "$popclipExtPlist" "Installed Extensions") =~ "Parcel.popclipext" ]]; then
+      if [[ ! $(defaults read "$popclipExtPlist" "Installed Extensions") == *"Parcel.popclipext"* ]]; then
         echo "installing popclip parcel extension..." >&2
         pkill PopClip || true # Kill process if needed; don't exit if command fails
         temp=$(mktemp -d)
