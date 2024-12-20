@@ -4,8 +4,6 @@ in {
   "hosts/glyph/secrets/pushover-app-token.age".publicKeys = keys;
   "hosts/glyph/secrets/pushover-user-token.age".publicKeys = keys;
   "hosts/spore/secrets/cloudflare-dns.age".publicKeys = keys;
-  "hosts/spore/secrets/dendrite-env.age".publicKeys = keys;
-  "hosts/spore/secrets/dendrite-private-key.age".publicKeys = keys;
   "hosts/spore/secrets/homepage-env.age".publicKeys = keys;
   "hosts/spore/secrets/jwt-secret.age".publicKeys = keys;
   "hosts/spore/secrets/mastodon-s3-env.age".publicKeys = keys;

@@ -13,16 +13,8 @@
         name = "mastodon";
         ensureDBOwnership = true;
       }
-      {
-        name = "dendrite";
-        ensureDBOwnership = true;
-      }
-      {
-        name = "mautrix-discord";
-        ensureDBOwnership = true;
-      }
     ];
-    ensureDatabases = ["mastodon" "dendrite" "mautrix-discord"];
+    ensureDatabases = ["mastodon"];
     authentication = pkgs.lib.mkOverride 10 ''
       # Any user can connect to any database via Unix socket, local loopback,
       # or Tailscale
@@ -36,7 +28,7 @@
   };
   services.postgresqlBackup = {
     enable = true;
-    databases = ["mastodon" "dendrite"];
+    databases = ["mastodon"];
   };
   services.redis.servers.mastodon = {
     enable = true;
