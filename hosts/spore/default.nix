@@ -50,6 +50,9 @@
     nameservers = ["8.8.8.8"];
   };
   networking.dhcpcd.IPv6rs = false;
+  boot.kernel.sysctl = {
+    "net.ipv6.conf.all.accept_ra" = 0;
+  };
 
   time.timeZone = "America/Los_Angeles";
   i18n.defaultLocale = "en_US.UTF-8";
