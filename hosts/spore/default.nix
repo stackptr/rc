@@ -49,6 +49,7 @@
     };
     nameservers = ["8.8.8.8"];
   };
+  networking.dhcpcd.IPv6rs = false;
 
   time.timeZone = "America/Los_Angeles";
   i18n.defaultLocale = "en_US.UTF-8";
