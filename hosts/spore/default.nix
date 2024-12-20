@@ -18,6 +18,7 @@
   networking = {
     hostName = "spore";
     interfaces.eth0 = {
+      useDHCP = false;
       ipv4.addresses = [
         {
           address = "74.48.202.251";
