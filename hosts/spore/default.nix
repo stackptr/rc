@@ -57,6 +57,8 @@
     "net.ipv6.conf.all.accept_ra" = 0;
   };
 
+  networking.firewall.allowedTCPPorts = [80 443];
+
   time.timeZone = "America/Los_Angeles";
   i18n.defaultLocale = "en_US.UTF-8";
 
