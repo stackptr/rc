@@ -54,24 +54,12 @@
       useACMEHost = "zx.dev";
       locations."/".proxyPass = "https://zeta.rove-duck.ts.net:9443";
     };
-    virtualHosts."dsm.zx.dev" = {
-      forceSSL = true;
-      useACMEHost = "zx.dev";
-      locations."/".proxyPass = "https://melchior.rove-duck.ts.net:5001";
-    };
     virtualHosts."torrents.zx.dev" = {
       forceSSL = true;
       useACMEHost = "zx.dev";
       enableAutheliaAuth = true;
       locations."/".proxyPass = "http://glyph.rove-duck.ts.net:9091";
       locations."~ (/transmission)?/rpc".proxyPass = "http://glyph.rove-duck.ts.net:9091";
-    };
-    virtualHosts."torrents.melchior.zx.dev" = {
-      forceSSL = true;
-      useACMEHost = "zx.dev";
-      enableAutheliaAuth = true;
-      locations."/".proxyPass = "http://melchior.rove-duck.ts.net:9091";
-      locations."~ (/transmission)?/rpc".proxyPass = "http://melchior.rove-duck.ts.net:9091";
     };
     virtualHosts."homebridge.zx.dev" = {
       forceSSL = true;
