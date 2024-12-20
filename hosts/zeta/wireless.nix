@@ -9,8 +9,8 @@
     hostName = "zeta";
     wireless = {
       enable = true;
-      environmentFile = config.age.secrets.wireless.path;
-      networks.Ansible.psk = "@PSK_ANSIBLE@";
+      secretsFile = config.age.secrets.wireless.path;
+      networks.Ansible.pskRaw = "ext:psk_ansible";
       interfaces = ["wlan0"];
     };
   };
