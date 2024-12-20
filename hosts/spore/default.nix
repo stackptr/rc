@@ -9,6 +9,8 @@
     (modulesPath + "/installer/scan/not-detected.nix")
     (modulesPath + "/profiles/qemu-guest.nix")
     ./disk-config.nix
+    ./backup.nix
+    ./web
   ];
 
   boot.loader.grub.enable = true;
