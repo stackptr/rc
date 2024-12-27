@@ -19,6 +19,7 @@
 
   networking = {
     hostName = "spore";
+    enableIPv6 = false; # TODO: Avoid IPs auto added to interface after boot
     interfaces.eth0 = {
       useDHCP = false;
       ipv4.addresses = [
@@ -51,10 +52,6 @@
       interface = "eth0";
     };
     nameservers = ["8.8.8.8"];
-  };
-  networking.dhcpcd.IPv6rs = false;
-  boot.kernel.sysctl = {
-    "net.ipv6.conf.all.accept_ra" = 0;
   };
 
   networking.firewall.allowedTCPPorts = [80 443];
