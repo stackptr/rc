@@ -4,7 +4,6 @@
   ...
 }: {
   imports = [
-    ./matrix
     ./nginx
     ./authelia.nix
     ./db.nix

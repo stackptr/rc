@@ -38,11 +38,11 @@
           system = "aarch64-linux";
         }
         {
-          hostname = "nazar";
+          hostname = "glyph";
           system = "x86_64-linux";
         }
         {
-          hostname = "glyph";
+          hostname = "spore";
           system = "x86_64-linux";
         }
       ];

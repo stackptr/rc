@@ -8,9 +8,9 @@ let
       value = readKey h;
     }) [
       "glyph"
-      "nazar"
       "Petrichor"
       "Rhizome"
+      "spore"
       "zeta"
     ];
 in
