@@ -55,6 +55,9 @@
         m-cli
         mas
       ];
+  home.sessionPath = [
+    "$HOME/.local/bin"
+  ];
 
   programs.bat = {
     enable = true;
