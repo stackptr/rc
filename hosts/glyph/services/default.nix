@@ -21,6 +21,7 @@
     enable = true;
     openFirewall = true;
   };
+  networking.firewall.allowedTCPPorts = [55002]; # Roon ARC
   services.tailscale = {
     enable = true;
     extraUpFlags = ["--ssh"];
