@@ -17,6 +17,7 @@
     enable = true;
     openFirewall = true;
   };
+  services.roon-server.enable = true;
   services.tailscale = {
     enable = true;
     extraUpFlags = ["--ssh"];
