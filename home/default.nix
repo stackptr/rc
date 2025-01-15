@@ -1,6 +1,7 @@
 {
   pkgs,
   lib,
+  hostname,
   ...
 }: {
   imports = [
@@ -65,6 +66,9 @@
       theme = "Sublime Snazzy";
     };
   };
+
+  # TODO: Improve manner of per-host home-manager config
+  programs.beets.enable = hostname == "glyph";
 
   programs.btop.enable = true;
 

@@ -17,13 +17,14 @@
   baseHomeManager = {
     username,
     pkgs-stable,
+    hostname,
     ...
   }: {
     home-manager.useGlobalPkgs = true;
     home-manager.useUserPackages = true;
     home-manager.users.${username} = import ./../home;
     home-manager.extraSpecialArgs = {
-      inherit pkgs-stable;
+      inherit pkgs-stable hostname;
     };
   };
   nixosHost = {
@@ -35,7 +36,7 @@
     nixpkgs.lib.nixosSystem {
       inherit system;
       specialArgs = {
-        inherit profile keys username;
+        inherit profile keys username hostname;
         pkgs-stable = import nixpkgs-stable {
           inherit system;
         };
