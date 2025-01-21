@@ -21,7 +21,10 @@
     enable = true;
     openFirewall = true;
   };
-  networking.firewall.allowedTCPPorts = [55002]; # Roon ARC
+  networking.firewall = {
+    allowedTCPPorts = [55002]; # Roon ARC
+    allowedUDPPorts = [5353]; # mDNS
+  };
   services.tailscale = {
     enable = true;
     extraUpFlags = ["--ssh"];
