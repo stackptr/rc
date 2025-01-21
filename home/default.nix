@@ -70,6 +70,14 @@
   # TODO: Improve manner of per-host home-manager config
   programs.beets = if hostname == "glyph" then {
     enable = true;
+    package = pkgs.beets.override {
+      pluginOverrides = {
+        copyartifacts = {
+          enable = true;
+          propagatedBuildInputs = [pkgs.beetsPackages.copyartifacts];
+        };
+      };
+    };
     settings = {
       directory = "/mnt/media/beets";
       import = {
@@ -81,6 +89,7 @@
         default = "$albumartist/$album%aunique{}/$track $title";
         singleton = "Various Artists/$album%aunique{}/$track $title";
       };
+      plugins = "copyartifacts";
     };
   } else {
     enable = false;
