@@ -24,6 +24,7 @@
   networking.firewall = {
     allowedTCPPorts = [
       554 # AirPlay streaming
+      3689 # Digital Audio Access Protocol (DAAP)
       55002 # Roon ARC
     ];
     allowedUDPPorts = [5353]; # mDNS
