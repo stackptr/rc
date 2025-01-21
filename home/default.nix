@@ -68,7 +68,23 @@
   };
 
   # TODO: Improve manner of per-host home-manager config
-  programs.beets.enable = hostname == "glyph";
+  programs.beets = if hostname == "glyph" then {
+    enable = true;
+    settings = {
+      directory = "/mnt/media/beets";
+      import = {
+        copy = true;
+        move = false;
+        write = true;
+      };
+      paths = {
+        default = "$albumartist/$album%aunique{}/$track $title";
+        singleton = "Various Artists/$album%aunique{}/$track $title";
+      };
+    };
+  } else {
+    enable = false;
+  };
 
   programs.btop.enable = true;
 
