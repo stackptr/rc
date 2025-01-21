@@ -22,7 +22,10 @@
     openFirewall = true;
   };
   networking.firewall = {
-    allowedTCPPorts = [55002]; # Roon ARC
+    allowedTCPPorts = [
+      554 # AirPlay streaming
+      55002 # Roon ARC
+    ];
     allowedUDPPorts = [5353]; # mDNS
     allowedUDPPortRanges = [
       # Chromecast and Apple Airplay
