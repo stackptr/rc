@@ -90,6 +90,7 @@
         singleton = "Various Artists/$album%aunique{}/$track $title";
       };
       plugins = "copyartifacts";
+      asciify_paths = true;
     };
   } else {
     enable = false;
