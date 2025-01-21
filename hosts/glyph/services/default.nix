@@ -24,6 +24,13 @@
   networking.firewall = {
     allowedTCPPorts = [55002]; # Roon ARC
     allowedUDPPorts = [5353]; # mDNS
+    allowedUDPPortRanges = [
+      # Chromecast and Apple Airplay
+      {
+        from = 32768;
+        to = 65535;
+      }
+    ];
   };
   services.tailscale = {
     enable = true;
