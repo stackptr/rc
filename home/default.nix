@@ -80,6 +80,7 @@
     };
     settings = {
       directory = "/mnt/media/beets";
+      # TODO: Backup ~/.config/beets/library.db
       import = {
         copy = true;
         move = false;
