@@ -92,6 +92,10 @@
       };
       plugins = "copyartifacts edit info";
       asciify_paths = true;
+      copyartifacts = {
+        extensions = ".* */*";
+        print_ignored = true;
+      };
     };
   } else {
     enable = false;
