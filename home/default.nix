@@ -79,7 +79,7 @@
       };
     };
     settings = {
-      directory = "/mnt/media/beets";
+      directory = "/mnt/media/Music";
       # TODO: Backup ~/.config/beets/library.db
       import = {
         copy = true;
