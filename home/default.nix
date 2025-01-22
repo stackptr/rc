@@ -92,6 +92,7 @@
       };
       plugins = "copyartifacts edit info inline";
       asciify_paths = true;
+      per_disc_numbering = true;
       copyartifacts = {
         extensions = ".* */*";
         print_ignored = true;
