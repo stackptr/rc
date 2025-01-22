@@ -88,7 +88,7 @@
       };
       paths = {
         default = "$albumartist/$album%aunique{}/$track $title";
-        singleton = "Various Artists/$album%aunique{}/$track $title";
+        comp = "Various Artists/$album%aunique{}/$track $title";
       };
       plugins = "copyartifacts";
       asciify_paths = true;
