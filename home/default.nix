@@ -90,7 +90,7 @@
         default = "$albumartist/$album%aunique{}/$track $title";
         comp = "Various Artists/$album%aunique{}/$track $title";
       };
-      plugins = "copyartifacts info";
+      plugins = "copyartifacts edit info";
       asciify_paths = true;
     };
   } else {
