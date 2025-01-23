@@ -90,7 +90,7 @@
         default = "$albumartist/$album%aunique{}/%if{$multidisc,CD$disc0/}$track $title";
         comp = "Various Artists/$album%aunique{}/%if{$multidisc,CD$disc0/}$track $title";
       };
-      plugins = "copyartifacts edit fetchart info inline";
+      plugins = "copyartifacts discogs edit fetchart info inline";
       asciify_paths = true;
       per_disc_numbering = true;
       copyartifacts = {
