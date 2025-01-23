@@ -30,6 +30,7 @@
     allowedUDPPorts = [
       1900 # ssdp / Bonjour
       5353 # mDNS
+      5350 # Bonjour
     ];
     allowedUDPPortRanges = [
       # Chromecast and Apple Airplay
