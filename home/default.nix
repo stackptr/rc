@@ -85,13 +85,26 @@
         copy = true;
         move = false;
         write = true;
+        replace = {
+          # Default substitutions with extra escaping for Nix
+          "[\\\\/]" = "_";
+          "^\\." = "_";
+          "[\\x00-\\x1f]" = "_";
+          "[<>:\"\\?\\*\\|]" = "_";
+          "\\.$" = "_";
+          "\\s+$" = "";
+          "^\\s+" = "";
+          "^-" = "_";
+          # Remove smart quotes
+          "[\\u2018\\u2019]" = "\\'";
+          "[\\u201c\\u201d]" = "\"";
+        };
       };
       paths = {
         default = "$albumartist/$album%aunique{}/%if{$multidisc,CD$disc0/}$track $title";
         comp = "Various Artists/$album%aunique{}/%if{$multidisc,CD$disc0/}$track $title";
       };
       plugins = "copyartifacts discogs edit fetchart info inline";
-      asciify_paths = true;
       per_disc_numbering = true;
       copyartifacts = {
         extensions = ".* */*";
