@@ -27,7 +27,10 @@
       3689 # Digital Audio Access Protocol (DAAP)
       55002 # Roon ARC
     ];
-    allowedUDPPorts = [5353]; # mDNS
+    allowedUDPPorts = [
+      1900 # ssdp / Bonjour
+      5353 # mDNS
+    ];
     allowedUDPPortRanges = [
       # Chromecast and Apple Airplay
       {
