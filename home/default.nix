@@ -87,8 +87,8 @@
         write = true;
       };
       paths = {
-        default = "$albumartist/$album%aunique{}/%if{$multidisc,CD$disc/}$track $title";
-        comp = "Various Artists/$album%aunique{}/%if{$multidisc,CD$disc/}$track $title";
+        default = "$albumartist/$album%aunique{}/%if{$multidisc,CD$disc0/}$track $title";
+        comp = "Various Artists/$album%aunique{}/%if{$multidisc,CD$disc0/}$track $title";
       };
       plugins = "copyartifacts edit info inline";
       asciify_paths = true;
@@ -99,6 +99,7 @@
       };
       item_fields = {
         multidisc = "1 if disctotal > 1 else 0";
+        disc0 = "f\"{disc}\"";
       };
     };
   } else {
