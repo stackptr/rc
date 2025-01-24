@@ -56,4 +56,5 @@
     };
     webHome = pkgs.callPackage ./../../../packages/transmissionic {};
   };
+  networking.firewall.allowedTCPPorts = [config.services.transmission.settings.peer-port];
 }
