@@ -10,6 +10,10 @@
     openFirewall = true;
     config = {
       LoadModule = ["webadmin" "adminlog"];
+      Listener.l = {
+        Port = 5005;
+        SSL = true;
+      };
       User.mu = {
         Admin = true;
         Nick = "mu";
