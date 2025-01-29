@@ -8,8 +8,9 @@
     mutable = false;
     useLegacyConfig = false;
     openFirewall = true;
+    modulePackages = [pkgs.zncModules.palaver];
     config = {
-      LoadModule = ["webadmin" "adminlog"];
+      LoadModule = ["webadmin" "adminlog" "palaver"];
       User.mu = {
         Admin = true;
         Nick = "mu";
