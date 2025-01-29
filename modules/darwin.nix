@@ -65,6 +65,7 @@
         "quicklook-json"
         "scroll-reverser"
         "suspicious-package"
+        "textual"
         "the-unarchiver" # auto_updates
         "zoom" # auto_updates
       ];
