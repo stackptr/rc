@@ -59,7 +59,7 @@
     nix-darwin.lib.darwinSystem {
       inherit system;
       specialArgs = {
-        inherit self keys username;
+        inherit self keys username hostname;
         pkgs-stable = import nixpkgs-stable {
           inherit system;
         };
