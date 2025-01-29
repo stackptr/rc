@@ -3,7 +3,11 @@
   pkgs,
   ...
 }: {
-  age.secrets.znc-conf.file = ./../secrets/znc-conf.age;
+  age.secrets.znc-conf = {
+    file = ./../secrets/znc-conf.age;
+    owner = config.services.znc.user;
+    group = config.services.znc.group;
+  };
   services.znc = {
     enable = true;
     mutable = false;
