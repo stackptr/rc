@@ -14,6 +14,7 @@
     useLegacyConfig = false;
     openFirewall = true;
     modulePackages = [pkgs.zncModules.palaver];
+    # N.B.: Use services.znc.config after secrets can be interspersed
     configFile = config.age.secrets.znc-conf.path;
   };
 }
