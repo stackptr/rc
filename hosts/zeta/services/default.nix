@@ -4,6 +4,7 @@
   ...
 }: {
   imports = [
+    ./homebridge.nix
     ./znc.nix
   ];
   services.openssh.enable = true;
