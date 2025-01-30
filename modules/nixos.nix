@@ -23,5 +23,8 @@
     keys.Rhizome
   ];
   security.sudo.wheelNeedsPassword = false;
+  security.sudo.extraConfig = ''
+    Defaults env_keep += "EDITOR"
+  '';
   security.pam.sshAgentAuth.authorizedKeysFiles = lib.mkForce ["/etc/ssh/authorized_keys.d/%u"];
 }
