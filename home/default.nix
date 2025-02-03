@@ -47,6 +47,7 @@
         alejandra
         comma
         manix
+        nh
         nix-du
         nix-tree
         nix-your-shell
