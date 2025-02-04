@@ -28,6 +28,7 @@
       55002 # Roon ARC
     ];
     allowedUDPPorts = [
+      554
       1900 # ssdp / Bonjour
     ];
     allowedUDPPortRanges = [
