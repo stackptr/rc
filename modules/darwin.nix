@@ -155,13 +155,13 @@
         "/Applications/Nova.app"
         "/Applications/Prompt.app"
         "/Applications/Reeder.app"
-        "/Applications/Omnivore.app"
-        "/System/Applications/Music.app"
+        "/Applications/Roon.app"
         "/System/Applications/Calendar.app"
         "/Applications/Things3.app"
         "/System/Applications/Notes.app"
         "/System/Applications/Messages.app"
         "/Applications/Slack.app"
+        "/Applications/Textual.app"
         "/Applications/GitHub Desktop.app"
       ];
       show-process-indicators = false;
