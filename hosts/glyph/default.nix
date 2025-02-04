@@ -37,7 +37,6 @@
     enable = true;
     trustedInterfaces = ["tailscale0"];
   };
-  networking.nftables.enable = true;
 
   nixpkgs.config.allowUnfree = true;
 
