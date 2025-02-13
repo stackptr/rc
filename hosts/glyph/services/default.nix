@@ -45,10 +45,10 @@
     ];
     # Dynamically allocated ports for Roon Bridge opened for local network
     extraCommands = ''
-      iptables -A nixos-fw -p tcp -s 192.168.0.0/24 -j nixos-fw-accept
-      iptables -A nixos-fw -p udp -s 192.168.0.0/24 -j nixos-fw-accept
-      iptables -A nixos-fw -p tcp -s 127.0.0.0/8 -j nixos-fw-accept
-      iptables -A nixos-fw -p udp -s 127.0.0.0/8 -j nixos-fw-accept
+      iptables -A nixos-fw -p tcp -j nixos-fw-accept
+      iptables -A nixos-fw -p udp -j nixos-fw-accept
+      iptables -A nixos-fw -p tcp -j nixos-fw-accept
+      iptables -A nixos-fw -p udp -j nixos-fw-accept
     '';
   };
   services.tailscale = {
