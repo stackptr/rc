@@ -45,10 +45,8 @@
     ];
     # Dynamically allocated ports for Roon Bridge opened for local network
     extraCommands = ''
-      iptables -A nixos-fw -p tcp -j nixos-fw-accept
-      iptables -A nixos-fw -p udp -j nixos-fw-accept
-      iptables -A nixos-fw -p tcp -j nixos-fw-accept
-      iptables -A nixos-fw -p udp -j nixos-fw-accept
+      iptables -A nixos-fw -p tcp -j --dport 30000:65535 nixos-fw-accept
+      iptables -A nixos-fw -p udp -j --dport 30000:65535 nixos-fw-accept
     '';
   };
   services.tailscale = {
