@@ -102,6 +102,7 @@
             "[\\u2018\\u2019]" = "\\'";
             "[\\u201c\\u201d]" = "\"";
           };
+          languages = "en";
         };
         paths = {
           default = "$albumartist/$album%aunique{}/%if{$multidisc,CD$disc0/}$track $title";
