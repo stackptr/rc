@@ -295,7 +295,6 @@
     pgrep -q Ice || open /Applications/Ice.app/
     pgrep -q Gitify || open /Applications/Gitify.app/
     pgrep -q Hand\ Mirror || open /Applications/Hand\ Mirror.app/
-    pgrep -q Little\ Snitch || open /Applications/Little\ Snitch.app/
     pgrep -q PopClip || open /Applications/PopClip.app/
     pgrep -q Scroll\ Reverser || open /Applications/Scroll\ Reverser.app/
     pgrep -q SoundSource || open /Applications/SoundSource.app/
