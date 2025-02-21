@@ -52,6 +52,10 @@
         nix-tree
         nix-your-shell
         statix
+
+        # Utilities
+        mktorrent
+        unzip
       ]
       ++ lib.optionals stdenv.isDarwin [
         m-cli
