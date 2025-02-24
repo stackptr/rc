@@ -58,6 +58,7 @@
         "craft" # auto_updates
         "eloston-chromium"
         # "fastscripts" # TODO: Use pre-v3
+        "mochi"
         "qlcolorcode"
         "qlimagesize"
         "qlstephen"
