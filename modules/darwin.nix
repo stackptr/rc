@@ -55,6 +55,7 @@
         "apparency"
         "backblaze" # auto_updates
         "chatgpt" # auto_updates
+        "craft" # auto_updates
         "eloston-chromium"
         # "fastscripts" # TODO: Use pre-v3
         "plexamp" # auto_updates
@@ -159,6 +160,7 @@
         "/System/Applications/Calendar.app"
         "/Applications/Things3.app"
         "/System/Applications/Notes.app"
+        "/Applications/Craft.app"
         "/System/Applications/Messages.app"
         "/Applications/Slack.app"
         "/Applications/Textual.app"
