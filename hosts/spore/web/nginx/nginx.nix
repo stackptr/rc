@@ -49,11 +49,6 @@
       locations."/".proxyPass = "http://127.0.0.1:9091";
       locations."/api/verify".proxyPass = "http://127.0.0.1:9091";
     };
-    virtualHosts."portainer.zx.dev" = {
-      forceSSL = true;
-      useACMEHost = "zx.dev";
-      locations."/".proxyPass = "https://zeta.rove-duck.ts.net:9443";
-    };
     virtualHosts."torrents.zx.dev" = {
       forceSSL = true;
       useACMEHost = "zx.dev";
