@@ -1,6 +1,7 @@
 {
   config,
   pkgs,
+  pkgs-stable,
   ...
 }: {
   age.secrets.pushover-user-token = {
@@ -17,7 +18,7 @@
   };
   services.transmission = {
     enable = true;
-    package = pkgs.transmission_4;
+    package = pkgs-stable.transmission_4; # TODO: 4.0.6 is prohibited on some trackers
     settings = {
       download-dir = "/mnt/torrents/complete";
       incomplete-dir = "/mnt/torrents/incomplete";
