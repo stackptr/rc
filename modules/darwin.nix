@@ -66,7 +66,6 @@
         "quicklook-json"
         "roon" # auto_updates
         "scroll-reverser"
-        "suspicious-package"
         "textual"
         "the-unarchiver" # auto_updates
         "zoom" # auto_updates
