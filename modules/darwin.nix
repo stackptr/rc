@@ -114,7 +114,7 @@
     };
   };
 
-  security.pam.enableSudoTouchIdAuth = true;
+  security.pam.services.sudo_local.touchIdAuth = true;
 
   system.configurationRevision = self.rev or self.dirtyRev or null;
 
