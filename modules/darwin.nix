@@ -64,6 +64,7 @@
         "qlstephen"
         "qlvideo"
         "quicklook-json"
+        "roon" # auto_updates
         "scroll-reverser"
         "suspicious-package"
         "textual"
