@@ -3,8 +3,8 @@
 System configuration flake for NixOS / [nix-darwin][nix-darwin-repo] hosts:
 
 - 🗿 [`glyph`](./hosts/glyph/default.nix): NAS and homelab 
-- 🌿 [`Rhizome`](./hosts/Rhizome/default.nix): personal laptop / 14-inch MacBook Pro
 - 🌧️ [`Petrichor`](./hosts/Petrichor/default.nix): workstation / 16-inch MacBook Pro
+- 🌿 [`Rhizome`](./hosts/Rhizome/default.nix): personal laptop / 14-inch MacBook Pro
 - 🍄 [`spore`](./hosts/spore/default.nix): VPS hosted on CloudCone
 - 🌀 [`zeta`](./hosts/zeta/default.nix): ARM server / Raspberry Pi 4 Model B
 
