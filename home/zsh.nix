@@ -43,7 +43,7 @@
       enable = true;
     };
 
-    initExtra = ''
+    initContent = ''
       incog () {
         unset HISTFILE
       }
