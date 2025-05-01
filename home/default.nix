@@ -163,7 +163,6 @@
 
   programs.lsd = {
     enable = true;
-    enableAliases = true;
     settings = {
       icons = {
         # TODO: "fancy" theme requires patched font with icons
