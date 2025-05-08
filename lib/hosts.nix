@@ -9,6 +9,7 @@
   homebrew-bundle,
   homebrew-core,
   homebrew-cask,
+  mac-app-util,
   profile,
   disko,
   ...
@@ -74,11 +75,17 @@
       };
       modules = [
         nix-homebrew.darwinModules.nix-homebrew
+        mac-app-util.darwinModules.default
         ./../modules/base.nix
         ./../modules/darwin.nix
         ./../hosts/${hostname}
         home-manager.darwinModules.home-manager
         baseHomeManager
+        {
+          home-manager.sharedModules = [
+            mac-app-util.homeManagerModules.default
+          ];
+        }
         {
           nix-homebrew = {
             enable = true;

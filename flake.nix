@@ -24,6 +24,7 @@
       url = "github:homebrew/homebrew-cask";
       flake = false;
     };
+    mac-app-util.url = "github:hraban/mac-app-util";
     profile.url = "github:stackptr/profile";
     profile.inputs.nixpkgs.follows = "nixpkgs";
     disko.url = "github:nix-community/disko";
