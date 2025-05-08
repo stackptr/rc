@@ -158,7 +158,7 @@
         "/Applications/Reeder.app"
         "/Applications/Roon.app"
         "/System/Applications/Calendar.app"
-        "/Applications/Things3.app"
+        "/Applications/Things.app"
         "/System/Applications/Notes.app"
         "/Applications/Craft.app"
         "/System/Applications/Messages.app"
