@@ -2,6 +2,7 @@
   pkgs,
   lib,
   hostname,
+  enableGuiPackages,
   ...
 }: {
   imports = [
@@ -246,6 +247,14 @@
   };
 
   programs.yt-dlp.enable = true;
+
+  programs.zed-editor = {
+    enable = enableGuiPackages;
+    extensions = [
+      "haskell"
+      "nix"
+    ];
+  };
 
   services.gpg-agent = {
     # TODO: nix-community/home-manager#2964

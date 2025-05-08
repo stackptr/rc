@@ -18,13 +18,14 @@
     username,
     pkgs-stable,
     hostname,
+    enableGuiPackages,
     ...
   }: {
     home-manager.useGlobalPkgs = true;
     home-manager.useUserPackages = true;
     home-manager.users.${username} = import ./../home;
     home-manager.extraSpecialArgs = {
-      inherit pkgs-stable hostname;
+      inherit pkgs-stable hostname enableGuiPackages;
     };
   };
   nixosHost = {
@@ -40,6 +41,7 @@
         pkgs-stable = import nixpkgs-stable {
           inherit system;
         };
+        enableGuiPackages = false;
       };
       modules = [
         {environment.systemPackages = [agenix.packages.${system}.default];}
@@ -63,6 +65,7 @@
         pkgs-stable = import nixpkgs-stable {
           inherit system;
         };
+        enableGuiPackages = true;
       };
       modules = [
         nix-homebrew.darwinModules.nix-homebrew
