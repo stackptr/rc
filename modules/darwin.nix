@@ -3,6 +3,7 @@
   config,
   pkgs,
   lib,
+  allowVpn,
   ...
 }: {
   fonts.packages = [pkgs.fira-code-nerdfont];
@@ -45,11 +46,11 @@
           "qlmarkdown"
           "rapidapi"
           "soundsource"
-          "tailscale"
           "tripmode"
           "vlc"
           "xld"
-        ];
+        ]
+        ++ lib.optionals allowVpn ["tailscale"];
       # TODO: casks marked as auto_updates should be set as greedy with auto update setting disabled
       otherApps = [
         "apparency"
@@ -58,7 +59,7 @@
         "craft" # auto_updates
         "eloston-chromium"
         # "fastscripts" # TODO: Use pre-v3
-        "mochi"
+        #"mochi"
         "qlcolorcode"
         "qlimagesize"
         "qlstephen"
@@ -158,7 +159,7 @@
         "/Applications/Reeder.app"
         "/Applications/Roon.app"
         "/System/Applications/Calendar.app"
-        "/Applications/Things.app"
+        "/Applications/Things3.app"
         "/System/Applications/Notes.app"
         "/Applications/Craft.app"
         "/System/Applications/Messages.app"
@@ -279,29 +280,36 @@
     "org.videolan.vlc".SUEnableAutomaticChecks = false;
   };
 
-  system.activationScripts.postUserActivation.text = ''
-    popclipExtPlist=~/Library/Application\ Support/PopClip/Extensions/Extensions.plist
-    if test -f "$popclipExtPlist"; then
-      if [[ ! $(defaults read "$popclipExtPlist" "Installed Extensions") == *"Parcel.popclipext"* ]]; then
-        echo "installing popclip parcel extension..." >&2
-        pkill PopClip || true # Kill process if needed; don't exit if command fails
-        temp=$(mktemp -d)
-        curl -s --output-dir "$temp" https://pilotmoon.com/popclip/extensions/ext/Parcel.popclipextz -O
-        open "$temp/Parcel.popclipextz"
-        sleep 2 # Allow extension to install before starting PopClip below
-        rm -r "$temp"
+  system.activationScripts.postUserActivation.text =
+    ''
+      popclipExtPlist=~/Library/Application\ Support/PopClip/Extensions/Extensions.plist
+      if test -f "$popclipExtPlist"; then
+        if [[ ! $(defaults read "$popclipExtPlist" "Installed Extensions") == *"Parcel.popclipext"* ]]; then
+          echo "installing popclip parcel extension..." >&2
+          pkill PopClip || true # Kill process if needed; don't exit if command fails
+          temp=$(mktemp -d)
+          curl -s --output-dir "$temp" https://pilotmoon.com/popclip/extensions/ext/Parcel.popclipextz -O
+          open "$temp/Parcel.popclipextz"
+          sleep 2 # Allow extension to install before starting PopClip below
+          rm -r "$temp"
+        fi
       fi
-    fi
 
-    echo "starting utilties..." >&2
-    pgrep -q Ice || open /Applications/Ice.app/
-    pgrep -q Gitify || open /Applications/Gitify.app/
-    pgrep -q Hand\ Mirror || open /Applications/Hand\ Mirror.app/
-    pgrep -q PopClip || open /Applications/PopClip.app/
-    pgrep -q Scroll\ Reverser || open /Applications/Scroll\ Reverser.app/
-    pgrep -q SoundSource || open /Applications/SoundSource.app/
-    pgrep -q Tailscale || open /Applications/Tailscale.app/
-  '';
+      echo "starting utilties..." >&2
+      pgrep -q Ice || open /Applications/Ice.app/
+      pgrep -q Gitify || open /Applications/Gitify.app/
+      pgrep -q Hand\ Mirror || open /Applications/Hand\ Mirror.app/
+      pgrep -q PopClip || open /Applications/PopClip.app/
+      pgrep -q Scroll\ Reverser || open /Applications/Scroll\ Reverser.app/
+      pgrep -q SoundSource || open /Applications/SoundSource.app/
+    ''
+    + (
+      if allowVpn
+      then ''
+        pgrep -q Tailscale || open /Applications/Tailscale.app/
+      ''
+      else ""
+    );
 
   # TODO: Keyboard shortcuts, see LnL7/nix-darwin#699
   # system.keyboard.shortcuts = let

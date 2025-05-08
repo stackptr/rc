@@ -36,20 +36,29 @@
         {
           hostname = "zeta";
           system = "aarch64-linux";
+          allowVpn = true;
         }
         {
           hostname = "glyph";
           system = "x86_64-linux";
+          allowVpn = true;
         }
         {
           hostname = "spore";
           system = "x86_64-linux";
+          allowVpn = true;
         }
       ];
 
       darwinConfigurations = mkDarwinHosts [
-        "Rhizome"
-        "Petrichor"
+        {
+          hostname = "Rhizome";
+          allowVpn = true;
+        }
+        {
+          hostname = "Petrichor";
+          allowVpn = false;
+        }
       ];
     };
 

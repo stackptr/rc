@@ -31,13 +31,14 @@
   nixosHost = {
     system,
     hostname,
+    allowVpn,
   }: let
     username = "mu";
   in
     nixpkgs.lib.nixosSystem {
       inherit system;
       specialArgs = {
-        inherit profile keys username hostname;
+        inherit profile keys username hostname allowVpn;
         pkgs-stable = import nixpkgs-stable {
           inherit system;
         };
@@ -54,14 +55,18 @@
         baseHomeManager
       ];
     };
-  darwinHost = {hostname, ...}: let
+  darwinHost = {
+    hostname,
+    allowVpn,
+    ...
+  }: let
     username = "corey";
     system = "aarch64-darwin";
   in
     nix-darwin.lib.darwinSystem {
       inherit system;
       specialArgs = {
-        inherit self keys username hostname;
+        inherit self keys username hostname allowVpn;
         pkgs-stable = import nixpkgs-stable {
           inherit system;
         };
@@ -96,8 +101,7 @@
         value = f host;
       })
       hostEntries);
-  hostEntry = name: {hostname = name;};
 in {
   mkNixosHosts = mkHosts nixosHost;
-  mkDarwinHosts = names: mkHosts darwinHost (map hostEntry names);
+  mkDarwinHosts = mkHosts darwinHost;
 }
