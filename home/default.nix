@@ -132,6 +132,11 @@
 
   programs.btop.enable = true;
 
+  programs.direnv = {
+    enable = true;
+    nix-direnv.enable = true;
+  };
+
   programs.gh = {
     enable = true;
     gitCredentialHelper.enable = true;
