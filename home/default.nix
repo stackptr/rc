@@ -50,6 +50,7 @@
         comma
         manix
         nh
+        nil
         nix-du
         nix-tree
         nix-your-shell
