@@ -30,6 +30,7 @@
         # Development
         cachix
         colima
+        copilot-language-server
         coreutils-full
         docker
         fd
