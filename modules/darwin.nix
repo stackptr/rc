@@ -32,7 +32,6 @@
           "popclip"
           "postico"
           "qlmarkdown"
-          "soundsource"
         ]
         ++ lib.optionals allowVpn ["tailscale"];
       # TODO: casks marked as auto_updates should be set as greedy with auto update setting disabled
@@ -281,7 +280,7 @@
       pgrep -q Hand\ Mirror || open /Applications/Hand\ Mirror.app/
       pgrep -q PopClip || open /Applications/PopClip.app/
       pgrep -q Scroll\ Reverser || open /Applications/Scroll\ Reverser.app/
-      pgrep -q SoundSource || open /Applications/SoundSource.app/
+      pgrep -q SoundSource || open ${pkgs.soundsource}/Applications/SoundSource.app/
     ''
     + (
       if allowVpn

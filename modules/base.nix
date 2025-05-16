@@ -19,6 +19,7 @@
       "plexmediaserver"
       "roon-server"
       "slack"
+      "soundsource"
       "whatsapp-for-mac"
     ];
 

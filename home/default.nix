@@ -69,6 +69,7 @@
         m-cli
         mas
         slack
+        soundsource
         whatsapp-for-mac
       ];
   home.sessionPath = [
