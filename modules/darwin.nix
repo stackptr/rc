@@ -20,10 +20,8 @@
     casks = let
       # Electron apps generally are marked auto_updates
       electronApps = [
-        "element"
         "github"
         "gitify"
-        "notion"
         "signal"
         "whatsapp"
       ];
