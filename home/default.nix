@@ -17,12 +17,10 @@
     with pkgs;
       [
         # Apps
-        chatgpt
         mosh
         neofetch
         onefetch
         ranger
-        slack
 
         # Audio/video
         ffmpeg_6
@@ -64,8 +62,10 @@
         unzip
       ]
       ++ lib.optionals stdenv.isDarwin [
+        chatgpt
         m-cli
         mas
+        slack
         whatsapp-for-mac
       ];
   home.sessionPath = [
