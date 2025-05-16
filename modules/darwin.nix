@@ -157,7 +157,7 @@
         "/System/Applications/Notes.app"
         "/Applications/Craft.app"
         "/System/Applications/Messages.app"
-        "/Applications/Slack.app"
+        "${pkgs.slack}/Applications/Slack.app"
         "/Applications/Textual.app"
         "/Applications/GitHub Desktop.app"
       ];
