@@ -30,7 +30,6 @@
         }) [
           "daisydisk"
           "dash"
-          "iina"
           "jordanbaird-ice" # Bartender replacement
           "nova"
           "popclip"

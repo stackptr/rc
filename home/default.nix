@@ -64,6 +64,7 @@
       ++ lib.optionals stdenv.isDarwin [
         chatgpt
         gitify
+        iina
         m-cli
         mas
         slack
