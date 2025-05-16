@@ -23,7 +23,6 @@
         "github"
         "gitify"
         "signal"
-        "whatsapp"
       ];
       # Apps marked auto_updates but which have their updates disabled via CustomUserPreferences
       greedyApps =

@@ -18,6 +18,7 @@
       "plexmediaserver"
       "roon-server"
       "slack"
+      "whatsapp-for-mac"
     ];
 
   programs.zsh.enable = true;

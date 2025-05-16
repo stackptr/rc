@@ -99,6 +99,11 @@
             mutableTaps = false;
           };
         }
+        {
+          nixpkgs.overlays = [
+            (import ./../overlays/whatsapp-for-mac.nix)
+          ];
+        }
       ];
     };
   mkHosts = f: hostEntries:

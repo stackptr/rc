@@ -66,6 +66,7 @@
       ++ lib.optionals stdenv.isDarwin [
         m-cli
         mas
+        whatsapp-for-mac
       ];
   home.sessionPath = [
     "$HOME/.local/bin"
