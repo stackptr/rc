@@ -16,7 +16,6 @@
       upgrade = true;
     };
     taps = builtins.attrNames config.nix-homebrew.taps; # See: zhaofengli/nix-homebrew#5
-    # N.B.: prefer casks to nixpkgs for placement in ~/Applications
     casks = let
       # Electron apps generally are marked auto_updates
       electronApps = [
