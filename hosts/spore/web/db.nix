@@ -6,7 +6,6 @@
   services.postgresql = {
     enable = true;
     package = pkgs.postgresql_16;
-    port = 5432;
     enableTCPIP = true;
     ensureUsers = [
       {
@@ -23,6 +22,7 @@
       host   all   all   100.64.0.0/10  trust
     '';
     settings = {
+      port = 5432;
       max_connections = 150;
     };
   };
