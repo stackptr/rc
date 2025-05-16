@@ -8,7 +8,6 @@
 }: {
   fonts.packages = [pkgs.fira-code-nerdfont];
 
-  nixpkgs.config.allowUnfree = true;
   homebrew = {
     enable = true;
     caskArgs.no_quarantine = true;
