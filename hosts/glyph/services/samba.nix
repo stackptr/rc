@@ -18,6 +18,13 @@
         "force user" = user;
         "force group" = group;
       };
+    shares = {
+      Backup = mkShare "/mnt/backup" "mu" "users" // {"fruit:time machine" = "yes";};
+      Media = mkShare "/mnt/media" config.services.plex.user config.services.plex.group;
+      Stash = mkShare "/mnt/stash" "mu" "users";
+      Torrents = mkShare "/mnt/torrents" config.services.transmission.user config.services.transmission.group;
+      Unsorted = mkShare "/mnt/unsorted" "mu" "users";
+    };
   in {
     enable = true;
     openFirewall = false; # Only allow over Tailscale
@@ -34,13 +41,6 @@
         "fruit:wipe_intentionally_left_blank_rfork" = "yes";
         "fruit:delete_empty_adfiles" = "yes";
       };
-    };
-    shares = {
-      Backup = mkShare "/mnt/backup" "mu" "users" // {"fruit:time machine" = "yes";};
-      Media = mkShare "/mnt/media" config.services.plex.user config.services.plex.group;
-      Stash = mkShare "/mnt/stash" "mu" "users";
-      Torrents = mkShare "/mnt/torrents" config.services.transmission.user config.services.transmission.group;
-      Unsorted = mkShare "/mnt/unsorted" "mu" "users";
-    };
+    } // shares;
   };
 }
