@@ -20,7 +20,6 @@
       # Electron apps generally are marked auto_updates
       electronApps = [
         "github"
-        "signal"
       ];
       # Apps marked auto_updates but which have their updates disabled via CustomUserPreferences
       greedyApps =
@@ -29,32 +28,23 @@
           greedy = true;
         }) [
           "daisydisk"
-          "dash"
           "jordanbaird-ice" # Bartender replacement
           "nova"
           "popclip"
           "postico"
           "qlmarkdown"
-          "rapidapi"
           "soundsource"
-          "tripmode"
-          "vlc"
-          "xld"
         ]
         ++ lib.optionals allowVpn ["tailscale"];
       # TODO: casks marked as auto_updates should be set as greedy with auto update setting disabled
       otherApps = [
-        "apparency"
-        "backblaze" # auto_updates
         "craft" # auto_updates
         "eloston-chromium"
         # "fastscripts" # TODO: Use pre-v3
         "legcord"
         #"mochi"
         "qlcolorcode"
-        "qlimagesize"
         "qlstephen"
-        "qlvideo"
         "quicklook-json"
         "roon" # auto_updates
         "scroll-reverser"
