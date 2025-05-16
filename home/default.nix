@@ -271,7 +271,7 @@
       then false
       else true;
     enableZshIntegration = true;
-    pinentryPackage = pkgs.pinentry-tty;
+    pinentry.package = pkgs.pinentry-tty;
   };
 
   home.stateVersion = "23.11";
