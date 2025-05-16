@@ -21,7 +21,6 @@
     casks = let
       # Electron apps generally are marked auto_updates
       electronApps = [
-        "discord"
         "element"
         "github"
         "gitify"
@@ -59,6 +58,7 @@
         "craft" # auto_updates
         "eloston-chromium"
         # "fastscripts" # TODO: Use pre-v3
+        "legcord"
         #"mochi"
         "qlcolorcode"
         "qlimagesize"
