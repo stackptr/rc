@@ -72,6 +72,7 @@
         soundsource
         the-unarchiver
         whatsapp-for-mac
+        zoom-us
       ];
   home.sessionPath = [
     "$HOME/.local/bin"

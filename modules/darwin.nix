@@ -47,7 +47,6 @@
         "roon" # auto_updates
         "scroll-reverser"
         "textual"
-        "zoom" # auto_updates
       ];
     in
       lib.concatLists [

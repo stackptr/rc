@@ -22,6 +22,7 @@
       "soundsource"
       "the-unarchiver"
       "whatsapp-for-mac"
+      "zoom"
     ];
 
   programs.zsh.enable = true;
