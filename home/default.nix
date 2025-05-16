@@ -63,6 +63,7 @@
       ]
       ++ lib.optionals stdenv.isDarwin [
         chatgpt
+        daisydisk
         gitify
         iina
         m-cli

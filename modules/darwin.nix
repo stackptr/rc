@@ -27,7 +27,6 @@
           inherit name;
           greedy = true;
         }) [
-          "daisydisk"
           "jordanbaird-ice" # Bartender replacement
           "nova"
           "popclip"

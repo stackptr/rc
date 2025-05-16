@@ -15,6 +15,7 @@
       "chatgpt"
       "copilot-language-server"
       "cursor"
+      "daisydisk"
       "plexmediaserver"
       "roon-server"
       "slack"
