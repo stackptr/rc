@@ -17,6 +17,7 @@
     with pkgs;
       [
         # Apps
+        chatgpt
         mosh
         neofetch
         onefetch
