@@ -20,7 +20,6 @@
       # Electron apps generally are marked auto_updates
       electronApps = [
         "github"
-        "gitify"
         "signal"
       ];
       # Apps marked auto_updates but which have their updates disabled via CustomUserPreferences
@@ -290,7 +289,7 @@
 
       echo "starting utilties..." >&2
       pgrep -q Ice || open /Applications/Ice.app/
-      pgrep -q Gitify || open /Applications/Gitify.app/
+      pgrep -q Gitify || open ${pkgs.gitify}/Applications/Gitify.app/
       pgrep -q Hand\ Mirror || open /Applications/Hand\ Mirror.app/
       pgrep -q PopClip || open /Applications/PopClip.app/
       pgrep -q Scroll\ Reverser || open /Applications/Scroll\ Reverser.app/
