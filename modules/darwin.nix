@@ -47,7 +47,6 @@
         "roon" # auto_updates
         "scroll-reverser"
         "textual"
-        "the-unarchiver" # auto_updates
         "zoom" # auto_updates
       ];
     in

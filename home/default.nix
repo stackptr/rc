@@ -70,6 +70,7 @@
         mas
         slack
         soundsource
+        the-unarchiver
         whatsapp-for-mac
       ];
   home.sessionPath = [

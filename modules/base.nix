@@ -20,6 +20,7 @@
       "roon-server"
       "slack"
       "soundsource"
+      "the-unarchiver"
       "whatsapp-for-mac"
     ];
 
