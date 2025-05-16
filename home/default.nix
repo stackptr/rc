@@ -22,6 +22,7 @@
         neofetch
         onefetch
         ranger
+        slack
 
         # Audio/video
         ffmpeg_6

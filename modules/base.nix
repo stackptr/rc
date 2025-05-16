@@ -17,6 +17,7 @@
       "cursor"
       "plexmediaserver"
       "roon-server"
+      "slack"
     ];
 
   programs.zsh.enable = true;

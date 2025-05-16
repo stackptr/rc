@@ -25,7 +25,6 @@
         "gitify"
         "notion"
         "signal"
-        "slack"
         "whatsapp"
       ];
       # Apps marked auto_updates but which have their updates disabled via CustomUserPreferences
