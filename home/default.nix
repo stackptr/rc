@@ -30,6 +30,7 @@
         # Development
         cachix
         colima
+        code-cursor
         copilot-language-server
         coreutils-full
         docker
