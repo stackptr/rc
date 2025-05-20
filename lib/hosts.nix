@@ -77,7 +77,7 @@
         nix-homebrew.darwinModules.nix-homebrew
         mac-app-util.darwinModules.default
         ./../modules/base.nix
-        ./../modules/darwin.nix
+        ./../modules/darwin
         ./../hosts/${hostname}
         home-manager.darwinModules.home-manager
         baseHomeManager
