@@ -101,6 +101,7 @@
         }
         {
           nixpkgs.overlays = [
+            (import ./../overlays/github-desktop.nix)
             (import ./../overlays/whatsapp-for-mac.nix)
           ];
         }

@@ -21,10 +21,6 @@
     };
     taps = builtins.attrNames config.nix-homebrew.taps; # See: zhaofengli/nix-homebrew#5
     casks = let
-      # Electron apps generally are marked auto_updates
-      electronApps = [
-        "github"
-      ];
       # Apps marked auto_updates but which have their updates disabled via CustomUserPreferences
       greedyApps =
         map (name: {
@@ -53,7 +49,6 @@
       ];
     in
       lib.concatLists [
-        electronApps
         greedyApps
         otherApps
       ];
@@ -149,7 +144,7 @@
         "/System/Applications/Messages.app"
         "${pkgs.slack}/Applications/Slack.app"
         "/Applications/Textual.app"
-        "/Applications/GitHub Desktop.app"
+        "${pkgs.slack}/Applications/GitHub Desktop.app"
       ];
       show-process-indicators = false;
       showhidden = false;
