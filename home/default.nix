@@ -72,6 +72,7 @@
         slack
         soundsource
         the-unarchiver
+        ungoogled-chromium
         whatsapp-for-mac
         zoom-us
       ];

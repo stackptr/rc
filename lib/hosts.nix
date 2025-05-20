@@ -102,6 +102,7 @@
         {
           nixpkgs.overlays = [
             (import ./../overlays/github-desktop.nix)
+            (import ./../overlays/ungoogled-chromium.nix)
             (import ./../overlays/whatsapp-for-mac.nix)
           ];
         }
