@@ -70,6 +70,7 @@
         iina
         m-cli
         mas
+        mochi
         slack
         soundsource
         the-unarchiver

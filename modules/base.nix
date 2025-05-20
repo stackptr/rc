@@ -16,6 +16,7 @@
       "copilot-language-server"
       "cursor"
       "daisydisk"
+      "mochi"
       "plexmediaserver"
       "roon-server"
       "slack"

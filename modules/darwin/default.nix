@@ -37,7 +37,6 @@
         "craft" # auto_updates
         # "fastscripts" # TODO: Use pre-v3
         "legcord"
-        #"mochi"
         "qlcolorcode"
         "qlstephen"
         "quicklook-json"
