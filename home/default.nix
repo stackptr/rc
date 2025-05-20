@@ -66,6 +66,7 @@
         daisydisk
         github-desktop
         gitify
+        ice-bar
         iina
         m-cli
         mas

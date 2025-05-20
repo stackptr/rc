@@ -27,7 +27,6 @@
           inherit name;
           greedy = true;
         }) [
-          "jordanbaird-ice" # Bartender replacement
           "nova"
           "postico"
           "qlmarkdown"
@@ -244,7 +243,7 @@
   system.activationScripts.postUserActivation.text =
     ''
       echo "starting utilties..." >&2
-      pgrep -q Ice || open /Applications/Ice.app/
+      pgrep -q Ice || open ${pkgs.ice-bar}/Applications/Ice.app/
       pgrep -q Gitify || open ${pkgs.gitify}/Applications/Gitify.app/
       pgrep -q Hand\ Mirror || open /Applications/Hand\ Mirror.app/
       pgrep -q PopClip || open /Applications/PopClip.app/
