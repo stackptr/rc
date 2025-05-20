@@ -55,7 +55,7 @@
       watch-dir = "/mnt/torrents/watch";
       watch-dir-enabled = true;
     };
-    webHome = pkgs.callPackage ./../../../packages/transmissionic {};
+    webHome = pkgs.callPackage ./../../../packages/transmissionic/package.nix {};
   };
   networking.firewall.allowedTCPPorts = [config.services.transmission.settings.peer-port];
 }
