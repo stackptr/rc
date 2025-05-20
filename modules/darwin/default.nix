@@ -52,18 +52,12 @@
       ];
     # N.B.: Removed entries in `masApps` require manual uninstallation
     masApps = {
-      "Consent-O-Matic" = 1606897889;
       "Copilot" = 1447330651;
       "Day One" = 1055511498;
-      "DeArrow" = 6451469297;
-      "Flighty" = 1358823008;
-      "Flow" = 1423210932;
       "GoodLinks" = 1474335294;
       "Hand Mirror" = 1502839586;
       "Hush" = 1544743900;
-      "Kiwix" = 997079563;
       "Mapper" = 1589391989;
-      "Messenger" = 1480068668;
       "MusicBox" = 1614730313;
       "MusicHarbor" = 1440405750;
       "Numbers" = 409203825;
@@ -76,7 +70,6 @@
       "Play" = 1596506190;
       "Prompt" = 1594420480;
       "Reeder" = 1529448980;
-      "SimpleScrobbler" = 495163497;
       "SponsorBlock" = 1573461917;
       "Timery" = 1425368544;
       "Things" = 904280696;
