@@ -15,6 +15,10 @@
   ...
 }: let
   keys = import ./keys.nix;
+  overlays = [
+    (import ./../overlays/repo-packages.nix)
+    (import ./../overlays/whatsapp-for-mac.nix)
+  ];
   baseHomeManager = {
     username,
     pkgs-stable,
@@ -54,6 +58,9 @@
         agenix.nixosModules.default
         home-manager.nixosModules.home-manager
         baseHomeManager
+        {
+          nixpkgs.overlays = overlays;
+        }
       ];
     };
   darwinHost = {
@@ -100,10 +107,7 @@
           };
         }
         {
-          nixpkgs.overlays = [
-            (import ./../overlays/repo-packages.nix)
-            (import ./../overlays/whatsapp-for-mac.nix)
-          ];
+          nixpkgs.overlays = overlays;
         }
       ];
     };
