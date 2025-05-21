@@ -16,6 +16,7 @@
       "copilot-language-server"
       "cursor"
       "daisydisk"
+      "fastscripts"
       "mochi"
       "plexmediaserver"
       "roon-server"
