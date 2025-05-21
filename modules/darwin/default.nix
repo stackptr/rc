@@ -208,6 +208,7 @@
     "com.daisydiskapp.DaisyDiskStandAlone"
     "com.jordanbaird.Ice"
     "com.panic.Nova"
+    "com.red-sweater.fastscripts"
     "com.rogueamoeba.soundsource"
     "io.tailscale.ipn.macsys"
     "org.sbarex.QLMarkdown"
