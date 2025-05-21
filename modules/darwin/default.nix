@@ -237,7 +237,7 @@
       pgrep -q Gitify || open ${pkgs.gitify}/Applications/Gitify.app/
       pgrep -q Hand\ Mirror || open /Applications/Hand\ Mirror.app/
       pgrep -q PopClip || open /Applications/PopClip.app/
-      pgrep -q Scroll\ Reverser || open /Applications/Scroll\ Reverser.app/
+      pgrep -q Scroll\ Reverser || open ${pkgs.scroll-reverser}/Applications/Scroll\ Reverser.app/
       pgrep -q SoundSource || open ${pkgs.soundsource}/Applications/SoundSource.app/
     ''
     + (
