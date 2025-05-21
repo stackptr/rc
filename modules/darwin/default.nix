@@ -8,6 +8,7 @@
 }: {
   imports = [
     ./popclip.nix
+    ./scroll-reverser.nix
   ];
 
   fonts.packages = [pkgs.nerd-fonts.fira-code];
@@ -78,7 +79,12 @@
     };
   };
 
+  # TODO: Ideally this would be in a Darwin-specific home-manager module
   programs.popclip = {
+    enable = true;
+  };
+
+  programs.scroll-reverser = {
     enable = true;
   };
 
@@ -190,13 +196,6 @@
 
     #   # TODO: Set "compact" tab layout
     # };
-    "com.pilotmoon.scroll-reverser" = {
-      InvertScrollingOn = true;
-      ReverseTrackpad = false;
-      ReverseMouse = true;
-      ReverseY = true;
-      StartAtLogin = true;
-    };
 
     # Disable automatic updates for casks above marked greedy
     # See: https://github.com/sparkle-project/Sparkle/blob/2.x/Sparkle/SUConstants.m

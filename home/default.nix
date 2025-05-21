@@ -71,7 +71,6 @@
         m-cli
         mas
         mochi
-        scroll-reverser
         slack
         soundsource
         the-unarchiver
