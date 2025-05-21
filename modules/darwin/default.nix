@@ -9,6 +9,7 @@
   imports = [
     ./popclip.nix
     ./scroll-reverser.nix
+    ./start-on-activation.nix
   ];
 
   fonts.packages = [pkgs.nerd-fonts.fira-code];
@@ -230,23 +231,18 @@
     "org.videolan.vlc".SUEnableAutomaticChecks = false;
   };
 
-  system.activationScripts.postUserActivation.text =
-    ''
-      echo "starting utilties..." >&2
-      pgrep -q Ice || open ${pkgs.ice-bar}/Applications/Ice.app/
-      pgrep -q Gitify || open ${pkgs.gitify}/Applications/Gitify.app/
-      pgrep -q Hand\ Mirror || open /Applications/Hand\ Mirror.app/
-      pgrep -q PopClip || open /Applications/PopClip.app/
-      pgrep -q Scroll\ Reverser || open ${pkgs.scroll-reverser}/Applications/Scroll\ Reverser.app/
-      pgrep -q SoundSource || open ${pkgs.soundsource}/Applications/SoundSource.app/
-    ''
-    + (
-      if allowVpn
-      then ''
-        pgrep -q Tailscale || open /Applications/Tailscale.app/
-      ''
-      else ""
-    );
+  system.startOnActivation =
+    {
+      "Ice" = "${pkgs.ice-bar}/Applications/Ice.app/";
+      "Gitify" = "${pkgs.gitify}/Applications/Gitify.app/";
+      "Hand Mirror" = "/Applications/Hand\ Mirror.app/";
+      "PopClip" = "/Applications/PopClip.app/";
+      "Scroll Reverser" = "${pkgs.scroll-reverser}/Applications/Scroll\ Reverser.app/";
+      "SoundSource" = "${pkgs.soundsource}/Applications/SoundSource.app/";
+    }
+    // lib.optionalAttrs allowVpn {
+      "Tailscale" = "/Applications/Tailscale.app/";
+    };
 
   # TODO: Keyboard shortcuts, see LnL7/nix-darwin#699
   # system.keyboard.shortcuts = let
