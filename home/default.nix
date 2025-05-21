@@ -1,5 +1,6 @@
 {
   pkgs,
+  pkgs-stable,
   lib,
   hostname,
   enableGuiPackages,
@@ -11,8 +12,8 @@
   ];
 
   home.packages = let
-    nodejs = pkgs.nodejs_20;
-    yarn = pkgs.yarn.override {inherit nodejs;};
+    nodejs = pkgs-stable.nodejs_20;
+    yarn = pkgs-stable.yarn.override {inherit nodejs;};
   in
     with pkgs;
       [
