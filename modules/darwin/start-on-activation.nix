@@ -25,7 +25,7 @@ in {
   };
 
   config = mkIf (length (attrNames cfg) > 0) {
-    system.activationScripts.startApplications.text =
+    system.activationScripts.postActivation.text =
       ''
         echo "starting utilties..." >&2
       ''
