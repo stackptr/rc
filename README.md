@@ -18,10 +18,10 @@ On a Linux-based system:
 sudo nixos-rebuild switch --flake github:stackptr/rc
 ```
 
-On a macOS system (note that `darwin-rebuild` will invoke `sudo` during activation):
+On a macOS system:
 
 ```shell
-darwin-rebuild switch --flake github:stackptr/rc
+sudo darwin-rebuild switch --flake github:stackptr/rc
 ```
 
 </details>
