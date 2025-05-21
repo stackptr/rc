@@ -7,6 +7,7 @@
   ...
 }: {
   imports = [
+    ./disable-updates.nix
     ./popclip.nix
     ./scroll-reverser.nix
     ./start-on-activation.nix
@@ -198,30 +199,20 @@
     #   # TODO: Set "compact" tab layout
     # };
 
-    # Disable automatic updates for casks above marked greedy
-    # See: https://github.com/sparkle-project/Sparkle/blob/2.x/Sparkle/SUConstants.m
-    "at.eggerapps.Postico" = {
-      SUEnableAutomaticChecks = false;
-      SUAutomaticallyUpdate = false;
-    };
-    "at.obdev.littlesnitch.softwareupdate".SoftwareUpdateCheckAutomatically = false; # N.B.: Does not use Sparkle for updates
-    "com.colliderli.iina".SUEnableAutomaticChecks = false;
-    "com.daisydiskapp.DaisyDiskStandAlone".SUEnableAutomaticChecks = false;
-    "com.jordanbaird.Ice" = {
-      SUEnableAutomaticChecks = false;
-      SUAutomaticallyUpdate = false;
-    };
-    "com.panic.Nova" = {
-      SUEnableAutomaticChecks = false;
-      SUAutomaticallyUpdate = false;
-    };
-    "com.rogueamoeba.soundsource" = {
-      SUEnableAutomaticChecks = false;
-      SUAutomaticallyUpdate = false;
-    };
-    "io.tailscale.ipn.macsys".SUEnableAutomaticChecks = false;
-    "org.sbarex.QLMarkdown".SUEnableAutomaticChecks = false;
+    # TODO: Handle in disable-update module
+    "at.obdev.littlesnitch.softwareupdate".SoftwareUpdateCheckAutomatically = false;
   };
+
+  system.disableUpdates = [
+    "at.eggerapps.Postico"
+    "com.colliderli.iina"
+    "com.daisydiskapp.DaisyDiskStandAlone"
+    "com.jordanbaird.Ice"
+    "com.panic.Nova"
+    "com.rogueamoeba.soundsource"
+    "io.tailscale.ipn.macsys"
+    "org.sbarex.QLMarkdown"
+  ];
 
   system.startOnActivation =
     {

@@ -34,11 +34,9 @@ in {
         HasShownWelcome = true;
         NMStatusItemHideIcon = true;
         "extension#com.pilotmoon.popclip.builtin-search#template" = "https://kagi.com/search?q=***";
-
-        # Disable automatic updates and update through Homebrew
-        SUEnableAutomaticChecks = false;
       };
     };
+    system.disableUpdates = ["com.pilotmoon.popclip"];
     system.activationScripts.popclipExtensions.text = ''
       popclipExtPlist=~/Library/Application\ Support/PopClip/Extensions/Extensions.plist
       if test -f "$popclipExtPlist"; then
