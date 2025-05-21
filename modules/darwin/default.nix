@@ -205,18 +205,12 @@
       SUAutomaticallyUpdate = false;
     };
     "at.obdev.littlesnitch.softwareupdate".SoftwareUpdateCheckAutomatically = false; # N.B.: Does not use Sparkle for updates
-    "ch.tripmode.TripMode".SUEnableAutomaticChecks = {
-      SUEnableAutomaticChecks = false;
-      SUAutomaticallyUpdate = false;
-    };
     "com.colliderli.iina".SUEnableAutomaticChecks = false;
     "com.daisydiskapp.DaisyDiskStandAlone".SUEnableAutomaticChecks = false;
     "com.jordanbaird.Ice" = {
       SUEnableAutomaticChecks = false;
       SUAutomaticallyUpdate = false;
     };
-    "com.kapeli.dashdoc".SUEnableAutomaticChecks = false;
-    "com.luckymarmot.Paw".SUEnableAutomaticChecks = false;
     "com.panic.Nova" = {
       SUEnableAutomaticChecks = false;
       SUAutomaticallyUpdate = false;
@@ -226,9 +220,7 @@
       SUAutomaticallyUpdate = false;
     };
     "io.tailscale.ipn.macsys".SUEnableAutomaticChecks = false;
-    "jp.tmkk.XLD".SUEnableAutomaticChecks = false;
     "org.sbarex.QLMarkdown".SUEnableAutomaticChecks = false;
-    "org.videolan.vlc".SUEnableAutomaticChecks = false;
   };
 
   system.startOnActivation =
