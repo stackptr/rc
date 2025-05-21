@@ -41,7 +41,6 @@
         "qlstephen"
         "quicklook-json"
         "roon" # auto_updates
-        "scroll-reverser"
         "textual"
       ];
     in
