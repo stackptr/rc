@@ -140,7 +140,7 @@
         "/System/Applications/Messages.app"
         "${pkgs.slack}/Applications/Slack.app"
         "/Applications/Textual.app"
-        "${pkgs.slack}/Applications/GitHub Desktop.app"
+        "${pkgs.github-desktop}/Applications/GitHub Desktop.app"
       ];
       show-process-indicators = false;
       showhidden = false;
