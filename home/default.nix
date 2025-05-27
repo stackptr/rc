@@ -75,7 +75,6 @@
         slack
         soundsource
         the-unarchiver
-        ungoogled-chromium
         whatsapp-for-mac
         zoom-us
       ];
@@ -147,6 +146,15 @@
     };
 
   programs.btop.enable = true;
+
+  programs.chromium = {
+    enable = enableGuiPackages;
+    package = pkgs.ungoogled-chromium;
+    extensions = let
+      ublockOrigin = {id = "cjpalhdlnbpafiamejdnhcphjbkeiagm";};
+      reactDevTools = {id = "fmkadmapgofadopljbjfkapdkoienihi";};
+    in [ublockOrigin reactDevTools];
+  };
 
   programs.direnv = {
     enable = true;
