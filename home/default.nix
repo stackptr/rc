@@ -279,11 +279,7 @@
   };
 
   services.gpg-agent = {
-    # TODO: nix-community/home-manager#2964
-    enable =
-      if pkgs.stdenv.isDarwin
-      then false
-      else true;
+    enable = true;
     enableZshIntegration = true;
     pinentry.package = pkgs.pinentry-tty;
   };
