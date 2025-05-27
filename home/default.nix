@@ -65,7 +65,6 @@
       ++ lib.optionals stdenv.isDarwin [
         chatgpt
         daisydisk
-        fastscripts
         github-desktop
         gitify
         ice-bar

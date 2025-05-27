@@ -79,6 +79,7 @@
           inherit system;
         };
         enableGuiPackages = true;
+        nixDarwin = nix-darwin;
       };
       modules = [
         nix-homebrew.darwinModules.nix-homebrew

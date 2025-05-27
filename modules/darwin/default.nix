@@ -8,6 +8,7 @@
 }: {
   imports = [
     ./disable-updates.nix
+    ./fastscripts.nix
     ./popclip.nix
     ./scroll-reverser.nix
     ./start-on-activation.nix
@@ -77,6 +78,17 @@
       "Vinegar" = 1591303229;
       "Wipr" = 1320666476;
       "Xcode" = 497799835;
+    };
+  };
+
+  programs.fastscripts = {
+    enable = true;
+    userScripts = {
+      # TODO: Can this be tied to a hotkey during system activation?
+      SafariQuitWithConfirmation = {
+        source = pkgs.writeText "safari-quit-with-confirmation.applescript" (builtins.readFile ./fastscripts/safari-quit-with-confirmation.applescript);
+        target = "Applications/Safari/Quit With Confirmation.applescript";
+      };
     };
   };
 
