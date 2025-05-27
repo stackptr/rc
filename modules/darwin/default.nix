@@ -84,12 +84,12 @@
   programs.fastscripts = {
     enable = true;
     userScripts = {
-      # TODO: Can this be tied to a hotkey during system activation?
       SafariQuitWithConfirmation = {
         source = pkgs.writeText "safari-quit-with-confirmation.applescript" (builtins.readFile ./fastscripts/safari-quit-with-confirmation.applescript);
         target = "Applications/Safari/Quit With Confirmation.applescript";
       };
     };
+    plistFile = pkgs.writeText "fastscripts-keybindings.plist" (builtins.readFile ./fastscripts/keybindings.plist);
   };
 
   # TODO: Ideally this would be in a Darwin-specific home-manager module

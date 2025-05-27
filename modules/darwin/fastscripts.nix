@@ -24,6 +24,7 @@ with lib; let
     fi
   '';
   userScripts = filter (f: f.enable) (attrValues config.programs.fastscripts.userScripts);
+  plistFile = config.programs.fastscripts.plistFile;
 in {
   options.programs.fastscripts = {
     enable = mkEnableOption "Whether to enable FastScripts";
@@ -32,6 +33,16 @@ in {
       default = {};
       description = ''
         Set of files that have to be linked in {file}`~/Library/Scripts`.
+      '';
+    };
+    plistFile = mkOption {
+      type = types.nullOr types.path;
+      default = null;
+      description = ''
+        Plist file to be imported into FastScripts settings. This is useful to persist binary data such as the
+        ScriptKeyboardShortcuts key/data pair.
+
+        This file can be obtained using: `plutil -convert xml1 -o - ~/Library/Preferences/com.red-sweater.fastscripts.plist > fastscripts.xml`.
       '';
     };
   };
@@ -53,10 +64,17 @@ in {
     system.activationScripts.postActivation.text = let
       user = lib.escapeShellArg config.system.primaryUser;
     in
-      mkIf (userScripts != []) ''
-        echo "setting up fastscripts user scripts..."
-        sudo --user=${user} -- mkdir -p ~${user}/Library/Scripts
-        ${concatMapStringsSep "\n" (attr: userScriptActivation attr.target) userScripts}
+      mkIf (userScripts != [] || plistFile != null) ''
+        ${optionalString (userScripts != []) ''
+          echo "setting up fastscripts user scripts..."
+          sudo --user=${user} -- mkdir -p ~${user}/Library/Scripts
+          ${concatMapStringsSep "\n" (attr: userScriptActivation attr.target) userScripts}
+        ''}
+
+        ${optionalString (plistFile != null) ''
+          echo "importing fastscripts plist file..."
+          sudo --user=${user} -- defaults import com.red-sweater.fastscripts "${plistFile}"
+        ''}
       '';
   };
 }
