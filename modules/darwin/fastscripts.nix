@@ -20,6 +20,7 @@ with lib; let
       if test -L ~${user}/Library/Scripts/${target}; then
         sudo --user=${user} -- rm ~${user}/Library/Scripts/${target}
       fi
+      sudo --user=${user} -- mkdir -p ~${user}/Library/Scripts/"$(dirname ${target})"
       sudo --user=${user} -- cp -f ${config.system.build.fastscripts}/user/Library/Scripts/${target} ~${user}/Library/Scripts/${target}
     fi
   '';
