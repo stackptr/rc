@@ -262,6 +262,7 @@
       palette = "gruvbox_dark";
       palettes.gruvbox_dark = {
         color_fg0 = "#fbf1c7";
+        color_fg1 = "#fbded0";
         color_bg1 = "#3c3836";
         color_bg3 = "#665c54";
         color_blue = "#458588";
@@ -330,11 +331,18 @@
       git_branch = {
         symbol = "";
         style = "bg:color_aqua";
-        format = "[[ $symbol $branch ](fg:color_fg0 bg:color_aqua)]($style)";
+        format = "[[ $symbol $branch](fg:color_fg0 bg:color_aqua)]($style)";
       };
       git_status = {
         style = "bg:color_aqua";
-        format = "[[($all_status$ahead_behind )](fg:color_fg0 bg:color_aqua)]($style)";
+        format = "[[(*$conflicted$untracked$modified$staged$renamed$deleted)](fg:color_fg1 bg:color_aqua) [($ahead_behind$stashed) ](fg:color_fg0 bg:color_aqua)]($style)";
+        conflicted = "​";
+        untracked = "​";
+        modified = "​";
+        staged = "​";
+        renamed = "​";
+        deleted = "​";
+        stashed = "≡";
       };
       nix_shell = {
         symbol = "󱄅";
