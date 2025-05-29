@@ -21,7 +21,6 @@
         mosh
         neofetch
         onefetch
-        ranger
 
         # Audio/video
         ffmpeg_6
@@ -191,6 +190,8 @@
   programs.htop.enable = true;
 
   programs.jq.enable = true;
+
+  programs.lf.enable = true;
 
   programs.lsd = {
     enable = true;
