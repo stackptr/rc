@@ -196,9 +196,7 @@
     enable = true;
     settings = {
       icons = {
-        # TODO: "fancy" theme requires patched font with icons
-        # https://github.com/lsd-rs/lsd#icons-not-showing-up
-        theme = "unicode";
+        theme = "fancy";
       };
     };
   };
