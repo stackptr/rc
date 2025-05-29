@@ -278,7 +278,6 @@
         disabled = false;
         style = "bg:color_orange fg:color_fg0";
       };
-      # TODO: Source from github:fang2hou/starship-gruvbox-rainbow
       os.symbols = {
         Windows = "󰍲";
         Ubuntu = "󰕈";
