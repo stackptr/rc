@@ -337,7 +337,8 @@
       nix_shell = {
         symbol = "󱄅";
         style = "bg:color_blue";
-        format = "[[ $symbol( $state( \\($name\\))) ](fg:color_fg0 bg:color_blue)]($style)";
+        impure_msg = "";
+        format = "[[ $symbol( $name) ](fg:color_fg0 bg:color_blue)]($style)";
       };
       nodejs = {
         symbol = "";
