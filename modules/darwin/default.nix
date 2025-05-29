@@ -14,7 +14,9 @@
     ./start-on-activation.nix
   ];
 
-  fonts.packages = [pkgs.nerd-fonts.fira-code];
+  fonts.packages = [
+    pkgs.nerd-fonts.meslo-lg # Supplies MesloLGSDZ: Line Gap Small, Dotted Zero
+  ];
 
   homebrew = {
     enable = true;
