@@ -11,71 +11,73 @@
     ./zsh.nix
   ];
 
-  home.packages = let
+  home.packages = with pkgs; let
     nodejs = pkgs-stable.nodejs_20;
     yarn = pkgs-stable.yarn.override {inherit nodejs;};
+    development = [
+      colima
+      copilot-language-server
+      docker
+      hub
+      jo
+      nodejs
+      shellcheck
+      tree
+      yarn
+      yq
+    ];
+    nixSpecific = [
+      alejandra
+      cachix
+      comma
+      manix
+      nil
+      nix-du
+      nix-tree
+      nix-your-shell
+      statix
+    ];
+    tuiApps = [
+      gitui
+      git-interactive-rebase-tool
+      lazydocker
+    ];
+    utilities = [
+      coreutils-full
+      fd
+      ffmpeg_6
+      mediainfo
+      mktorrent
+      mosh
+      neofetch
+      onefetch
+      sox
+      unzip
+    ];
+    guiApps = [code-cursor];
+    darwinApps = [
+      chatgpt
+      daisydisk
+      github-desktop
+      gitify
+      ice-bar
+      iina
+      m-cli
+      mas
+      mochi
+      slack
+      soundsource
+      the-unarchiver
+      whatsapp-for-mac
+      zoom-us
+    ];
   in
-    with pkgs;
-      [
-        # Apps
-        mosh
-        neofetch
-        onefetch
-
-        # Audio/video
-        ffmpeg_6
-        mediainfo
-        sox
-
-        # Development
-        cachix
-        colima
-        code-cursor
-        copilot-language-server
-        coreutils-full
-        docker
-        fd
-        gitui
-        git-interactive-rebase-tool
-        hub
-        jo
-        lazydocker
-        nodejs
-        shellcheck
-        tree
-        yarn
-        yq
-
-        # Nix
-        alejandra
-        comma
-        manix
-        nil
-        nix-du
-        nix-tree
-        nix-your-shell
-        statix
-
-        # Utilities
-        mktorrent
-        unzip
-      ]
-      ++ lib.optionals stdenv.isDarwin [
-        chatgpt
-        daisydisk
-        github-desktop
-        gitify
-        ice-bar
-        iina
-        m-cli
-        mas
-        mochi
-        slack
-        soundsource
-        the-unarchiver
-        whatsapp-for-mac
-        zoom-us
-      ];
+    development
+    ++ nixSpecific
+    ++ tuiApps
+    ++ utilities
+    ++ lib.optionals enableGuiPackages guiApps
+    ++ lib.optionals stdenv.isDarwin darwinApps;
   home.sessionPath = [
     "$HOME/.local/bin"
   ];
