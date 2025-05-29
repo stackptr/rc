@@ -301,6 +301,7 @@
         Debian = "󰣚";
         Redhat = "󱄛";
         RedHatEnterprise = "󱄛";
+        NixOS = "󱄅";
       };
       username = {
         show_always = true;
