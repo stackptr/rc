@@ -316,11 +316,13 @@
         truncation_symbol = "…/";
       };
       directory.substitutions = {
+        "Applications" = " ";
+        "Development" = " ";
         "Documents" = "󰈙 ";
         "Downloads" = " ";
         "Music" = "󰝚 ";
         "Pictures" = " ";
-        "Developer" = "󰲋 ";
+        "github" = " ";
       };
       git_branch = {
         symbol = "";
