@@ -255,6 +255,7 @@
         "[](fg:color_bg3 bg:color_bg1)"
         "$time"
         "[ ](fg:color_bg1)"
+        "$battery"
         "$line_break$character"
       ];
       palette = "gruvbox_dark";
@@ -380,6 +381,15 @@
         time_format = "%R";
         style = "bg:color_bg1";
         format = "[[  $time ](fg:color_fg0 bg:color_bg1)]($style)";
+      };
+      battery = {
+        disabled = false;
+        full_symbol = "󰁹 ";
+        charging_symbol = "󰂄 ";
+        discharging_symbol = "󰂃 ";
+        unknown_symbol = "󰁽 ";
+        empty_symbol = "󰂎 ";
+        format = "[ $symbol]($style) ";
       };
       character = {
         success_symbol = "[❯](bold fg:color_green)";
