@@ -243,6 +243,7 @@
         "$git_branch"
         "$git_status"
         "[](fg:color_aqua bg:color_blue)"
+        "$nix_shell"
         "$c"
         "$rust"
         "$golang"
@@ -332,6 +333,11 @@
       git_status = {
         style = "bg:color_aqua";
         format = "[[($all_status$ahead_behind )](fg:color_fg0 bg:color_aqua)]($style)";
+      };
+      nix_shell = {
+        symbol = "󱄅";
+        style = "bg:color_blue";
+        format = "[[ $symbol( $state( \\($name\\))) ](fg:color_fg0 bg:color_blue)]($style)";
       };
       nodejs = {
         symbol = "";
