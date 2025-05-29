@@ -50,7 +50,6 @@
         alejandra
         comma
         manix
-        nh
         nil
         nix-du
         nix-tree
@@ -206,6 +205,8 @@
     enable = true;
     defaultEditor = true;
   };
+
+  programs.nh.enable = true;
 
   programs.nushell.enable = true;
 
