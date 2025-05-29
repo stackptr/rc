@@ -255,6 +255,7 @@
         "$docker_context"
         "[](fg:color_bg3 bg:color_bg1)"
         "$time"
+        "$cmd_duration"
         "[ ](fg:color_bg1)"
         "$battery"
         "$line_break$character"
@@ -401,6 +402,10 @@
         time_format = "%R";
         style = "bg:color_bg1";
         format = "[[  $time ](fg:color_fg0 bg:color_bg1)]($style)";
+      };
+      cmd_duration = {
+        style = "bg:color_bg1";
+        format = "[[  $duration ](fg:color_fg0 bg:color_bg1)]($style)";
       };
       battery = {
         disabled = false;
