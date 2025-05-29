@@ -17,10 +17,12 @@
   users.users.root.openssh.authorizedKeys.keys = [
     keys.Petrichor
     keys.Rhizome
+    keys.glyph
   ];
   users.users.mu.openssh.authorizedKeys.keys = [
     keys.Petrichor
     keys.Rhizome
+    keys.glyph
   ];
   security.sudo.wheelNeedsPassword = false;
   security.sudo.extraConfig = ''
