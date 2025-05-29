@@ -19,7 +19,7 @@ nh os switch github:stackptr/rc        # Linux
 nh darwin switch github:stackptr/rc    # macOS
 ```
 
-🗿 `glyph` can build to other, lower-specced machines:
+🗿 `glyph` can build to 🍄 `spore` to work around memory requirements:
 ```shell
 nixos-rebuild switch --flake .#spore --target-host root@spore --build-host localhost
 ```
