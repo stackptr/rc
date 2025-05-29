@@ -251,6 +251,7 @@
         "$haskell"
         "$python"
         "[](fg:color_blue bg:color_bg3)"
+        "$direnv"
         "$docker_context"
         "[](fg:color_bg3 bg:color_bg1)"
         "$time"
@@ -370,6 +371,17 @@
         symbol = "";
         style = "bg:color_blue";
         format = "[[ $symbol( $version) ](fg:color_fg0 bg:color_blue)]($style)";
+      };
+      direnv = {
+        disabled = false;
+        symbol = "󱁿 direnv";
+        style = "bg:color_bg3";
+        format = "[[ $symbol( $loaded($allowed)) ](fg:#83a598 bg:color_bg3)]($style)";
+        allowed_msg = "";
+        not_allowed_msg = "";
+        denied_msg = "";
+        loaded_msg = "loaded";
+        unloaded_msg = "";
       };
       docker_context = {
         symbol = "";
