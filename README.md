@@ -12,16 +12,11 @@ System configuration flake for NixOS / [nix-darwin][nix-darwin-repo] hosts:
 
 <summary>Command reference</summary>
 
-On a Linux-based system:
+`nh` is used for both Linux and macOS:
 
 ```shell
-sudo nixos-rebuild switch --flake github:stackptr/rc
-```
-
-On a macOS system:
-
-```shell
-sudo darwin-rebuild switch --flake github:stackptr/rc
+nh os switch github:stackptr/rc        # Linux
+nh darwin switch github:stackptr/rc    # macOS
 ```
 
 </details>
