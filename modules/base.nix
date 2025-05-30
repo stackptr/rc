@@ -13,6 +13,7 @@
   nixpkgs.config.allowUnfreePredicate = pkg:
     builtins.elem (lib.getName pkg) [
       "chatgpt"
+      "claude-code"
       "copilot-language-server"
       "cursor"
       "daisydisk"

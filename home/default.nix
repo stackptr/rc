@@ -37,6 +37,7 @@
       statix
     ];
     tuiApps = [
+      claude-code
       gitui
       git-interactive-rebase-tool
       lazydocker
