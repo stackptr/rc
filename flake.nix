@@ -33,36 +33,38 @@
 
   outputs = inputs: let
     inherit (import ./lib/hosts.nix inputs) mkNixosHosts mkDarwinHosts;
-  in {
-    nixosConfigurations = mkNixosHosts [
-      {
-        hostname = "zeta";
-        system = "aarch64-linux";
-        allowVpn = true;
-      }
-      {
-        hostname = "glyph";
-        system = "x86_64-linux";
-        allowVpn = true;
-      }
-      {
-        hostname = "spore";
-        system = "x86_64-linux";
-        allowVpn = true;
-      }
-    ];
+  in
+    {
+      nixosConfigurations = mkNixosHosts [
+        {
+          hostname = "zeta";
+          system = "aarch64-linux";
+          allowVpn = true;
+        }
+        {
+          hostname = "glyph";
+          system = "x86_64-linux";
+          allowVpn = true;
+        }
+        {
+          hostname = "spore";
+          system = "x86_64-linux";
+          allowVpn = true;
+        }
+      ];
 
-    darwinConfigurations = mkDarwinHosts [
-      {
-        hostname = "Rhizome";
-        allowVpn = true;
-      }
-      {
-        hostname = "Petrichor";
-        allowVpn = false;
-      }
-    ];
-  };
+      darwinConfigurations = mkDarwinHosts [
+        {
+          hostname = "Rhizome";
+          allowVpn = true;
+        }
+        {
+          hostname = "Petrichor";
+          allowVpn = false;
+        }
+      ];
+    }
+    // {};
 
   nixConfig = {
     experimental-features = ["nix-command" "flakes"];
