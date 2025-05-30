@@ -10,10 +10,13 @@
     };
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-24.05";
-    agenix.url = "github:ryantm/agenix";
-    agenix.inputs.darwin.follows = "nix-darwin";
-    agenix.inputs.home-manager.follows = "home-manager";
-    agenix.inputs.nixpkgs.follows = "nixpkgs";
+    agenix = {
+      url = "github:ryantm/agenix";
+      inputs.darwin.follows = "nix-darwin";
+      inputs.home-manager.follows = "home-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.systems.follows = "systems";
+    };
     home-manager.url = "github:nix-community/home-manager";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
     nix-darwin.url = "github:LnL7/nix-darwin";
@@ -35,6 +38,7 @@
     mac-app-util = {
       url = "github:hraban/mac-app-util";
       inputs.flake-utils.follows = "flake-utils";
+      inputs.systems.follows = "systems";
     };
     profile = {
       url = "github:stackptr/profile";
