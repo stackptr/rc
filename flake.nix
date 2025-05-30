@@ -31,7 +31,11 @@
     disko.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = inputs: let
+  outputs = inputs @ {
+    nixpkgs,
+    flake-utils,
+    ...
+  }: let
     inherit (import ./lib/hosts.nix inputs) mkNixosHosts mkDarwinHosts;
   in
     {
@@ -64,7 +68,13 @@
         }
       ];
     }
-    // {};
+    // flake-utils.lib.eachDefaultSystem (
+      system: let
+        pkgs = nixpkgs.legacyPackages.${system};
+      in {
+        devShells.default = pkgs.mkShell {packages = [pkgs.just];};
+      }
+    );
 
   nixConfig = {
     experimental-features = ["nix-command" "flakes"];
