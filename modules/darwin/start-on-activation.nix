@@ -5,7 +5,7 @@
 }:
 with lib; let
   cfg = config.system.startOnActivation;
-  openIfNotRunning = proc: path: "pgrep -q ${proc} || open ${path}";
+  openIfNotRunning = proc: path: "pgrep -q ${proc} || open ${escapeShellArg path}";
 in {
   options.system.startOnActivation = mkOption {
     type = types.attrsOf types.str;
