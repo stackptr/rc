@@ -98,6 +98,27 @@
         "type": "github"
       }
     },
+    "flake-parts": {
+      "inputs": {
+        "nixpkgs-lib": [
+          "profile",
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1743550720,
+        "narHash": "sha256-hIshGgKZCgWh6AYJpJmRgFdR3WUbkY04o82X05xqQiY=",
+        "owner": "hercules-ci",
+        "repo": "flake-parts",
+        "rev": "c621e8422220273271f52058f618c94e405bb0f5",
+        "type": "github"
+      },
+      "original": {
+        "owner": "hercules-ci",
+        "repo": "flake-parts",
+        "type": "github"
+      }
+    },
     "flake-utils": {
       "inputs": {
         "systems": [
@@ -157,11 +178,11 @@
     "homebrew-cask": {
       "flake": false,
       "locked": {
-        "lastModified": 1748641896,
-        "narHash": "sha256-yT6I5VQILIm/iRjCbVHZhEDuTpcj8nhuS2E3P9WIgCo=",
+        "lastModified": 1748642612,
+        "narHash": "sha256-QxC1N/9agWdLxYKKSaKdx74Z3VYeu1X3NNoZYcHsjYo=",
         "owner": "homebrew",
         "repo": "homebrew-cask",
-        "rev": "c524f84730765e174b5c7bf3647558284fdb82cf",
+        "rev": "6d1639601b6712a1378b701817d74d68eb0f113a",
         "type": "github"
       },
       "original": {
@@ -173,11 +194,11 @@
     "homebrew-core": {
       "flake": false,
       "locked": {
-        "lastModified": 1748641173,
-        "narHash": "sha256-NpMsBpW75l80325YB1lvEYTD5Gs2JXp1e3n/arKScpw=",
+        "lastModified": 1748642453,
+        "narHash": "sha256-5v2PMzLK180SoqxUKAEKhdW/NL/PQ0/zRwdThvPEx0c=",
         "owner": "homebrew",
         "repo": "homebrew-core",
-        "rev": "5bf13bbd7c5963d582a5248f3e23dfbc9dc451a0",
+        "rev": "0ab31c13c856607822bc1109adb33bb0a6d81f81",
         "type": "github"
       },
       "original": {
@@ -286,19 +307,17 @@
     },
     "profile": {
       "inputs": {
-        "flake-utils": [
-          "flake-utils"
-        ],
+        "flake-parts": "flake-parts",
         "nixpkgs": [
           "nixpkgs"
         ]
       },
       "locked": {
-        "lastModified": 1747424610,
-        "narHash": "sha256-mcKYOj9VxyV4sfhFEJg4s+KlMYUISz/8IAmsRF02bxc=",
+        "lastModified": 1748645862,
+        "narHash": "sha256-jUnHlXZrFxXoIzAJL+rmZ1aI+JxxTiFM9BrWiAYXOM0=",
         "owner": "stackptr",
         "repo": "profile",
-        "rev": "90c3f41c68394fe8f3a9d2c7ea317e08c663fcb5",
+        "rev": "80f14e519739b83d97aae0dd875abff472599b1d",
         "type": "github"
       },
       "original": {
