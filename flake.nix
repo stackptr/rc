@@ -1,6 +1,13 @@
 {
   inputs = {
-    flake-utils.url = "github:numtide/flake-utils";
+    systems = {
+      url = "path:./flake.systems.nix";
+      flake = false;
+    };
+    flake-utils = {
+      url = "github:numtide/flake-utils";
+      inputs.systems.follows = "systems";
+    };
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-24.05";
     agenix.url = "github:ryantm/agenix";
