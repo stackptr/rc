@@ -27,7 +27,6 @@
       yq
     ];
     nixSpecific = [
-      alejandra
       cachix
       comma
       manix

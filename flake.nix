@@ -99,6 +99,7 @@
         pkgs = nixpkgs.legacyPackages.${system};
       in {
         devShells.default = pkgs.mkShell {packages = [pkgs.just];};
+        formatter = pkgs.alejandra;
       }
     );
 
