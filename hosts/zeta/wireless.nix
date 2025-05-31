@@ -11,7 +11,8 @@
       enable = true;
       secretsFile = config.age.secrets.wireless.path;
       networks.Ansible.pskRaw = "ext:psk_ansible";
-      interfaces = ["wlan0"];
     };
   };
+
+  systemd.services.wpa_supplicant.enable = false;
 }
