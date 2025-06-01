@@ -16,6 +16,9 @@ jobs:
           - host: Rhizome
             system: aarch64-darwin
             runner: macos-latest
+          - host: zeta
+            system: aarch64-linux
+            runner: ubuntu-24.04-arm
     runs-on: ${{ matrix.runner }}
     steps:
     - uses: actions/checkout@v4
