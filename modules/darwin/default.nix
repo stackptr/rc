@@ -33,7 +33,6 @@
           inherit name;
           greedy = true;
         }) [
-          "nova"
           "postico"
           "qlmarkdown"
         ]
@@ -143,7 +142,7 @@
       persistent-apps = [
         "/System/Volumes/Preboot/Cryptexes/App/System/Applications/Safari.app"
         "/System/Applications/Mail.app"
-        "/Applications/Nova.app"
+        "${pkgs.nova-editor}/Applications/Nova.app"
         "/Applications/Prompt.app"
         "/Applications/Reeder.app"
         "/Applications/Roon.app"

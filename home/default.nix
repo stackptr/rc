@@ -14,22 +14,24 @@
   home.packages = with pkgs; let
     nodejs = pkgs-stable.nodejs_20;
     yarn = pkgs-stable.yarn.override {inherit nodejs;};
+    nova = (symlinkJoin {
+      name = "nova-wrapped";
+      paths = [nova-editor];
+      buildInputs = [makeWrapper];
+      postBuild = ''
+        wrapProgram "$out/Applications/Nova.app/Contents/MacOS/Nova" \
+          --set PATH ${lib.makeBinPath [copilot-language-server nil nodejs shellcheck typescript yarn]}
+      '';
+    });
     development = [
       colima
-      copilot-language-server
       docker
       hub
-      jo
-      nodejs
-      shellcheck
       tree
-      yarn
-      yq
     ];
     nixSpecific = [
       comma
       manix
-      nil
       nix-du
       nix-tree
       nix-your-shell
@@ -64,6 +66,7 @@
       m-cli
       mas
       mochi
+      nova
       slack
       soundsource
       the-unarchiver

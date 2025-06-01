@@ -19,6 +19,7 @@
       "daisydisk"
       "fastscripts"
       "mochi"
+      "nova-editor"
       "plexmediaserver"
       "roon-server"
       "slack"
