@@ -27,7 +27,6 @@
       yq
     ];
     nixSpecific = [
-      cachix
       comma
       manix
       nil

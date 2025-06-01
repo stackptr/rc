@@ -105,7 +105,7 @@
       system: let
         pkgs = nixpkgs.legacyPackages.${system};
       in {
-        devShells.default = pkgs.mkShell {packages = [pkgs.just];};
+        devShells.default = pkgs.mkShell {packages = [pkgs.cachix pkgs.just];};
         formatter = pkgs.alejandra;
       }
     );
