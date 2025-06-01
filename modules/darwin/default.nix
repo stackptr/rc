@@ -35,16 +35,12 @@
         }) [
           "nova"
           "postico"
-          "qlmarkdown"
         ]
         ++ lib.optionals allowVpn ["tailscale"];
       # TODO: casks marked as auto_updates should be set as greedy with auto update setting disabled
       otherApps = [
         "craft" # auto_updates
         "legcord"
-        "qlcolorcode"
-        "qlstephen"
-        "quicklook-json"
         "roon" # auto_updates
         "textual"
       ];
