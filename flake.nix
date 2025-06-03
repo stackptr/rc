@@ -67,6 +67,7 @@
   outputs = inputs @ {
     nixpkgs,
     flake-utils,
+    agenix,
     ...
   }: let
     inherit (import ./lib/hosts.nix inputs) mkNixosHosts mkDarwinHosts;
@@ -104,8 +105,9 @@
     // flake-utils.lib.eachDefaultSystem (
       system: let
         pkgs = nixpkgs.legacyPackages.${system};
+        agenixPkg = agenix.packages.${system}.default;
       in {
-        devShells.default = pkgs.mkShell {packages = [pkgs.cachix pkgs.just];};
+        devShells.default = pkgs.mkShell {packages = [agenixPkg pkgs.cachix pkgs.just];};
         formatter = pkgs.alejandra;
       }
     );
