@@ -1,5 +1,5 @@
 let
-  keys = with (import ./lib/keys.nix); [glyph Petrichor Rhizome spore zeta];
+  keys = with (import ./keys.nix); [glyph Petrichor Rhizome spore zeta];
 in {
   "hosts/glyph/secrets/pushover-app-token.age".publicKeys = keys;
   "hosts/glyph/secrets/pushover-user-token.age".publicKeys = keys;
