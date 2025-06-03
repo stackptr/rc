@@ -10,6 +10,7 @@
     (modulesPath + "/profiles/qemu-guest.nix")
     ./disk-config.nix
     ./backup.nix
+    ./services.nix
     ./web
   ];
 
@@ -40,9 +41,6 @@
 
   time.timeZone = "America/Los_Angeles";
   i18n.defaultLocale = "en_US.UTF-8";
-
-  services.openssh.enable = true;
-  services.tailscale.enable = true;
 
   system.stateVersion = "24.05";
 }
