@@ -26,4 +26,4 @@ nixos-rebuild switch --flake .#spore --target-host root@spore --build-host local
 
 </details>
 
-[nix-darwin-repo]: https://github.com/LnL7/nix-darwin
+[nix-darwin-repo]: https://github.com/nix-darwin/nix-darwin
