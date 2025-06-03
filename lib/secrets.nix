@@ -16,6 +16,7 @@ in {
   "hosts/spore/secrets/restic-password.age".publicKeys = keys;
   "hosts/spore/secrets/session-secret.age".publicKeys = keys;
   "hosts/spore/secrets/storage-encryption-key.age".publicKeys = keys;
+  "hosts/spore/secrets/tailscale-auth-key.age".publicKeys = keys;
   "hosts/zeta/secrets/wireless.age".publicKeys = keys;
   "hosts/zeta/secrets/dd-agent.age".publicKeys = keys;
   "hosts/zeta/secrets/znc-conf.age".publicKeys = keys;

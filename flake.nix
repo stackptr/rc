@@ -29,6 +29,11 @@
       url = "github:nix-community/disko";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    golink = {
+      url = "github:tailscale/golink";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.systems.follows = "systems";
+    };
 
     # macOS
     nix-darwin = {

@@ -12,6 +12,7 @@
   mac-app-util,
   profile,
   disko,
+  golink,
   ...
 }: let
   keys = import ./keys.nix;
@@ -62,6 +63,7 @@
         {
           nixpkgs.overlays = overlays;
         }
+        golink.nixosModules.default
       ];
     };
   darwinHost = {

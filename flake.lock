@@ -139,6 +139,29 @@
         "type": "github"
       }
     },
+    "golink": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ],
+        "systems": [
+          "systems"
+        ]
+      },
+      "locked": {
+        "lastModified": 1748546644,
+        "narHash": "sha256-HMoXUvYz+p3vTK0hp445Vc7Od9F6oHV0FrRBPx1b2Fs=",
+        "owner": "tailscale",
+        "repo": "golink",
+        "rev": "a98f4c4dffd89d9e2052904ac5abfa5b11016382",
+        "type": "github"
+      },
+      "original": {
+        "owner": "tailscale",
+        "repo": "golink",
+        "type": "github"
+      }
+    },
     "home-manager": {
       "inputs": {
         "nixpkgs": [
@@ -331,6 +354,7 @@
         "agenix": "agenix",
         "disko": "disko",
         "flake-utils": "flake-utils",
+        "golink": "golink",
         "home-manager": "home-manager",
         "homebrew-bundle": "homebrew-bundle",
         "homebrew-cask": "homebrew-cask",
