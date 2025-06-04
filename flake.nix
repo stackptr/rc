@@ -75,37 +75,42 @@
     agenix,
     ...
   }: let
-    inherit (import ./lib/hosts.nix inputs) mkNixosHosts mkDarwinHosts;
+    inherit (import ./lib/hosts.nix inputs) mkNixosHost mkDarwinHost;
   in
     {
-      nixosConfigurations = mkNixosHosts [
-        {
+      nixosConfigurations = {
+        zeta = mkNixosHost {
           hostname = "zeta";
           system = "aarch64-linux";
+          username = "mu";
           allowVpn = true;
-        }
-        {
+        };
+        glyph = mkNixosHost {
           hostname = "glyph";
           system = "x86_64-linux";
+          username = "mu";
           allowVpn = true;
-        }
-        {
+        };
+        spore = mkNixosHost {
           hostname = "spore";
           system = "x86_64-linux";
+          username = "mu";
           allowVpn = true;
-        }
-      ];
+        };
+      };
 
-      darwinConfigurations = mkDarwinHosts [
-        {
+      darwinConfigurations = {
+        Rhizome = mkDarwinHost {
           hostname = "Rhizome";
+          username = "corey";
           allowVpn = true;
-        }
-        {
+        };
+        Petrichor = mkDarwinHost {
           hostname = "Petrichor";
+          username = "corey";
           allowVpn = false;
-        }
-      ];
+        };
+      };
     }
     // flake-utils.lib.eachDefaultSystem (
       system: let

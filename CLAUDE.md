@@ -13,7 +13,7 @@ The configuration is organized into:
 - `hosts/`: Host-specific configurations
 - `modules/`: Shared modules split between `base.nix` (common), `nixos.nix` (Linux-specific), and `darwin/` (macOS-specific)
 - `home/`: Home-manager configurations
-- `lib/hosts.nix`: Host configuration factory functions
+- `lib/hosts.nix`: Simplified host builder functions (`mkNixosHost`, `mkDarwinHost`)
 - `overlays/`: Package overlays
 
 ## Common Commands

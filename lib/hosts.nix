@@ -21,13 +21,22 @@
     (import ./../overlays/repo-packages.nix)
     (import ./../overlays/whatsapp-for-mac.nix)
   ];
-  baseHomeManager = {
+
+  # Home-manager configuration builder
+  # Automatically detects and includes host-specific home configs if they exist
+  mkHomeManager = {
     username,
-    pkgs-stable,
+    hostname,
+    system,
     enableGuiPackages,
-    hostHomeConfig ? null,
-    ...
-  }: {
+  }: let
+    pkgs-stable = import nixpkgs-stable {inherit system;};
+    hostHomePath = ./../hosts/${hostname}/home.nix;
+    hostHomeConfig =
+      if builtins.pathExists hostHomePath
+      then hostHomePath
+      else null;
+  in {
     home-manager.useGlobalPkgs = true;
     home-manager.useUserPackages = true;
     home-manager.users.${username} =
@@ -44,26 +53,20 @@
       inherit pkgs-stable enableGuiPackages;
     };
   };
-  nixosHost = {
-    system,
+
+  # NixOS host configuration builder
+  # Creates a complete NixOS system with home-manager integration
+  mkNixosHost = {
     hostname,
+    system,
+    username,
     allowVpn,
-  }: let
-    username = "mu";
-    enableGuiPackages = false;
-    hostHomePath = ./../hosts/${hostname}/home.nix;
-    hostHomeConfig =
-      if builtins.pathExists hostHomePath
-      then hostHomePath
-      else null;
-  in
+  }:
     nixpkgs.lib.nixosSystem {
       inherit system;
       specialArgs = {
         inherit profile keys username hostname allowVpn;
-        pkgs-stable = import nixpkgs-stable {
-          inherit system;
-        };
+        pkgs-stable = import nixpkgs-stable {inherit system;};
       };
       modules = [
         {environment.systemPackages = [agenix.packages.${system}.default];}
@@ -73,9 +76,9 @@
         ./../hosts/${hostname}
         agenix.nixosModules.default
         home-manager.nixosModules.home-manager
-        (baseHomeManager {
-          inherit username enableGuiPackages hostHomeConfig;
-          pkgs-stable = import nixpkgs-stable {inherit system;};
+        (mkHomeManager {
+          inherit username hostname system;
+          enableGuiPackages = false;
         })
         {
           nixpkgs.overlays = overlays;
@@ -83,27 +86,21 @@
         golink.nixosModules.default
       ];
     };
-  darwinHost = {
+
+  # macOS (Darwin) host configuration builder
+  # Creates a complete macOS system with nix-homebrew integration
+  mkDarwinHost = {
     hostname,
+    username,
     allowVpn,
-    ...
   }: let
-    username = "corey";
     system = "aarch64-darwin";
-    enableGuiPackages = true;
-    hostHomePath = ./../hosts/${hostname}/home.nix;
-    hostHomeConfig =
-      if builtins.pathExists hostHomePath
-      then hostHomePath
-      else null;
   in
     nix-darwin.lib.darwinSystem {
       inherit system;
       specialArgs = {
         inherit self keys username hostname allowVpn;
-        pkgs-stable = import nixpkgs-stable {
-          inherit system;
-        };
+        pkgs-stable = import nixpkgs-stable {inherit system;};
         nixDarwin = nix-darwin;
       };
       modules = [
@@ -113,9 +110,9 @@
         ./../modules/darwin
         ./../hosts/${hostname}
         home-manager.darwinModules.home-manager
-        (baseHomeManager {
-          inherit username enableGuiPackages hostHomeConfig;
-          pkgs-stable = import nixpkgs-stable {inherit system;};
+        (mkHomeManager {
+          inherit username hostname system;
+          enableGuiPackages = true;
         })
         {
           home-manager.sharedModules = [
@@ -140,14 +137,6 @@
         }
       ];
     };
-  mkHosts = f: hostEntries:
-    builtins.listToAttrs (map
-      (host: {
-        name = host.hostname;
-        value = f host;
-      })
-      hostEntries);
 in {
-  mkNixosHosts = mkHosts nixosHost;
-  mkDarwinHosts = mkHosts darwinHost;
+  inherit mkNixosHost mkDarwinHost;
 }
