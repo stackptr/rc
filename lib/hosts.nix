@@ -24,15 +24,23 @@
   baseHomeManager = {
     username,
     pkgs-stable,
-    hostname,
     enableGuiPackages,
+    hostHomeConfig ? null,
     ...
   }: {
     home-manager.useGlobalPkgs = true;
     home-manager.useUserPackages = true;
-    home-manager.users.${username} = import ./../home;
+    home-manager.users.${username} = 
+      if hostHomeConfig != null
+      then {...}: {
+        imports = [
+          (import ./../home)
+          hostHomeConfig
+        ];
+      }
+      else import ./../home;
     home-manager.extraSpecialArgs = {
-      inherit pkgs-stable hostname enableGuiPackages;
+      inherit pkgs-stable enableGuiPackages;
     };
   };
   nixosHost = {
@@ -41,6 +49,9 @@
     allowVpn,
   }: let
     username = "mu";
+    enableGuiPackages = false;
+    hostHomePath = ./../hosts/${hostname}/home.nix;
+    hostHomeConfig = if builtins.pathExists hostHomePath then hostHomePath else null;
   in
     nixpkgs.lib.nixosSystem {
       inherit system;
@@ -49,7 +60,6 @@
         pkgs-stable = import nixpkgs-stable {
           inherit system;
         };
-        enableGuiPackages = false;
       };
       modules = [
         {environment.systemPackages = [agenix.packages.${system}.default];}
@@ -59,7 +69,7 @@
         ./../hosts/${hostname}
         agenix.nixosModules.default
         home-manager.nixosModules.home-manager
-        baseHomeManager
+        (baseHomeManager { inherit username enableGuiPackages hostHomeConfig; pkgs-stable = import nixpkgs-stable { inherit system; }; })
         {
           nixpkgs.overlays = overlays;
         }
@@ -73,6 +83,9 @@
   }: let
     username = "corey";
     system = "aarch64-darwin";
+    enableGuiPackages = true;
+    hostHomePath = ./../hosts/${hostname}/home.nix;
+    hostHomeConfig = if builtins.pathExists hostHomePath then hostHomePath else null;
   in
     nix-darwin.lib.darwinSystem {
       inherit system;
@@ -81,7 +94,6 @@
         pkgs-stable = import nixpkgs-stable {
           inherit system;
         };
-        enableGuiPackages = true;
         nixDarwin = nix-darwin;
       };
       modules = [
@@ -91,7 +103,7 @@
         ./../modules/darwin
         ./../hosts/${hostname}
         home-manager.darwinModules.home-manager
-        baseHomeManager
+        (baseHomeManager { inherit username enableGuiPackages hostHomeConfig; pkgs-stable = import nixpkgs-stable { inherit system; }; })
         {
           home-manager.sharedModules = [
             mac-app-util.homeManagerModules.default
