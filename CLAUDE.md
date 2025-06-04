@@ -11,7 +11,11 @@ This is a Nix flake-based system configuration repository that manages multiple 
 
 The configuration is organized into:
 - `hosts/`: Host-specific configurations
-- `modules/`: Shared modules split between `base.nix` (common), `nixos.nix` (Linux-specific), and `darwin/` (macOS-specific)
+- `modules/`: Shared modules with focused organization:
+  - `base.nix` - Base configuration (imports nix-config + unfree packages)
+  - `nixos.nix` - NixOS configuration (imports nixos/ submodules)
+  - `nixos/` - NixOS-specific modules (users, ssh, sudo)
+  - `darwin/` - macOS-specific modules
 - `home/`: Home-manager configurations
 - `lib/hosts.nix`: Simplified host builder functions (`mkNixosHost`, `mkDarwinHost`)
 - `overlays/`: Package overlays and customizations (managed via `overlays/default.nix`)
