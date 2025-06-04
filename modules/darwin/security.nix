@@ -5,7 +5,7 @@
   ...
 }: {
   security.pam.services.sudo_local.touchIdAuth = true;
-  
+
   system.disableUpdates = [
     "at.eggerapps.Postico"
     "com.colliderli.iina"

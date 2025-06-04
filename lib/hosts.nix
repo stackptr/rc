@@ -30,14 +30,15 @@
   }: {
     home-manager.useGlobalPkgs = true;
     home-manager.useUserPackages = true;
-    home-manager.users.${username} = 
+    home-manager.users.${username} =
       if hostHomeConfig != null
-      then {...}: {
-        imports = [
-          (import ./../home)
-          hostHomeConfig
-        ];
-      }
+      then
+        {...}: {
+          imports = [
+            (import ./../home)
+            hostHomeConfig
+          ];
+        }
       else import ./../home;
     home-manager.extraSpecialArgs = {
       inherit pkgs-stable enableGuiPackages;
@@ -51,7 +52,10 @@
     username = "mu";
     enableGuiPackages = false;
     hostHomePath = ./../hosts/${hostname}/home.nix;
-    hostHomeConfig = if builtins.pathExists hostHomePath then hostHomePath else null;
+    hostHomeConfig =
+      if builtins.pathExists hostHomePath
+      then hostHomePath
+      else null;
   in
     nixpkgs.lib.nixosSystem {
       inherit system;
@@ -69,7 +73,10 @@
         ./../hosts/${hostname}
         agenix.nixosModules.default
         home-manager.nixosModules.home-manager
-        (baseHomeManager { inherit username enableGuiPackages hostHomeConfig; pkgs-stable = import nixpkgs-stable { inherit system; }; })
+        (baseHomeManager {
+          inherit username enableGuiPackages hostHomeConfig;
+          pkgs-stable = import nixpkgs-stable {inherit system;};
+        })
         {
           nixpkgs.overlays = overlays;
         }
@@ -85,7 +92,10 @@
     system = "aarch64-darwin";
     enableGuiPackages = true;
     hostHomePath = ./../hosts/${hostname}/home.nix;
-    hostHomeConfig = if builtins.pathExists hostHomePath then hostHomePath else null;
+    hostHomeConfig =
+      if builtins.pathExists hostHomePath
+      then hostHomePath
+      else null;
   in
     nix-darwin.lib.darwinSystem {
       inherit system;
@@ -103,7 +113,10 @@
         ./../modules/darwin
         ./../hosts/${hostname}
         home-manager.darwinModules.home-manager
-        (baseHomeManager { inherit username enableGuiPackages hostHomeConfig; pkgs-stable = import nixpkgs-stable { inherit system; }; })
+        (baseHomeManager {
+          inherit username enableGuiPackages hostHomeConfig;
+          pkgs-stable = import nixpkgs-stable {inherit system;};
+        })
         {
           home-manager.sharedModules = [
             mac-app-util.homeManagerModules.default

@@ -87,7 +87,6 @@
     };
   };
 
-
   programs.btop.enable = true;
 
   programs.chromium = {

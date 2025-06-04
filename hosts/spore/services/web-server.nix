@@ -146,7 +146,7 @@ in {
       recommendedProxySettings = true;
       recommendedTlsSettings = true;
       additionalModules = [pkgs.nginxModules.develkit pkgs.nginxModules.set-misc];
-      
+
       # HTTP virtual hosts
       virtualHosts."rey.foo" = {
         # forceSSL = true;
@@ -237,7 +237,7 @@ in {
         }
       '';
     };
-    
+
     networking.firewall.allowedTCPPorts = [port];
   };
 }
