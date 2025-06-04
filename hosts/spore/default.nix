@@ -11,7 +11,6 @@
     ./disk-config.nix
     ./backup.nix
     ./services
-    ./web
   ];
 
   boot.loader.grub.enable = true;

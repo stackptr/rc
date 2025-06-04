@@ -3,6 +3,15 @@
   pkgs,
   ...
 }: {
+  imports = [
+    ./authelia.nix
+    ./db.nix
+    ./homepage-dashboard.nix
+    ./mastodon.nix
+    ./profile.nix
+    ./web-server.nix
+  ];
+
   age.secrets.tailscale-auth-key = {
     file = ../secrets/tailscale-auth-key.age;
     mode = "440";
