@@ -60,3 +60,7 @@ nix develop  # Provides agenix, cachix, just
 - Secrets managed via agenix
 - Home-manager integrated for user-space configuration
 - macOS hosts use nix-homebrew for Homebrew integration
+
+## Code style
+
+- All files should end with a newline.
