@@ -1,3 +1,5 @@
+# WhatsApp for Mac with updated version
+# Provides newer version than available in nixpkgs
 # See: https://github.com/NixOS/nixpkgs/pull/396440
 self: super: let
   version = "2.25.14.77";

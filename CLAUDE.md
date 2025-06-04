@@ -14,7 +14,8 @@ The configuration is organized into:
 - `modules/`: Shared modules split between `base.nix` (common), `nixos.nix` (Linux-specific), and `darwin/` (macOS-specific)
 - `home/`: Home-manager configurations
 - `lib/hosts.nix`: Simplified host builder functions (`mkNixosHost`, `mkDarwinHost`)
-- `overlays/`: Package overlays
+- `overlays/`: Package overlays and customizations (managed via `overlays/default.nix`)
+- `packages/`: Custom package definitions for applications not in nixpkgs
 
 ## Common Commands
 
@@ -67,6 +68,14 @@ Secrets are organized using the principle of least privilege:
 - `lib/secrets/` - Host-specific secrets modules
 - Each host only has access to its own secrets plus admin keys (Petrichor/Rhizome)
 - Global secrets (if any) are defined in `lib/secrets/default.nix`
+
+## Package and Overlay Management
+
+Custom packages and overlays are organized for clarity:
+- `packages/*/package.nix` - Custom package definitions
+- `overlays/custom-packages.nix` - Overlay exposing custom packages
+- `overlays/gitify.nix`, `overlays/whatsapp-for-mac.nix` - App-specific version overrides
+- `overlays/default.nix` - Consolidates all overlays for easy management
 
 ## Code style
 

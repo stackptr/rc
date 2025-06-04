@@ -16,11 +16,7 @@
   ...
 }: let
   keys = import ./keys.nix;
-  overlays = [
-    (import ./../overlays/gitify.nix)
-    (import ./../overlays/repo-packages.nix)
-    (import ./../overlays/whatsapp-for-mac.nix)
-  ];
+  overlays = import ./../overlays;
 
   mkHomeManager = {
     username,
