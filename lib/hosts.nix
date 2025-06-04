@@ -22,8 +22,6 @@
     (import ./../overlays/whatsapp-for-mac.nix)
   ];
 
-  # Home-manager configuration builder
-  # Automatically detects and includes host-specific home configs if they exist
   mkHomeManager = {
     username,
     hostname,
@@ -54,8 +52,6 @@
     };
   };
 
-  # NixOS host configuration builder
-  # Creates a complete NixOS system with home-manager integration
   mkNixosHost = {
     hostname,
     system,
@@ -87,8 +83,6 @@
       ];
     };
 
-  # macOS (Darwin) host configuration builder
-  # Creates a complete macOS system with nix-homebrew integration
   mkDarwinHost = {
     hostname,
     username,
