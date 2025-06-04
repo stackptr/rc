@@ -64,3 +64,4 @@ nix develop  # Provides agenix, cachix, just
 ## Code style
 
 - All files should end with a newline.
+- After executing large changes, run `nix fmt .`.
