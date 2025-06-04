@@ -57,9 +57,16 @@ nix develop  # Provides agenix, cachix, just
 - Linux username: `mu`
 - macOS username: `corey`
 - All hosts use SSH key authentication with keys defined in `lib/keys.nix`
-- Secrets managed via agenix
+- Secrets managed via agenix with host-specific access controls
 - Home-manager integrated for user-space configuration
 - macOS hosts use nix-homebrew for Homebrew integration
+
+## Secrets Organization
+
+Secrets are organized using the principle of least privilege:
+- `lib/secrets/` - Host-specific secrets modules
+- Each host only has access to its own secrets plus admin keys (Petrichor/Rhizome)
+- Global secrets (if any) are defined in `lib/secrets/default.nix`
 
 ## Code style
 
