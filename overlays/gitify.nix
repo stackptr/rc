@@ -1,5 +1,4 @@
-# Gitify GitHub notifications app
-# Uses specific version to avoid OAuth flow issues when building from source
+# TODO: Should use release artifacts from repo
 # See: https://github.com/gitify-app/gitify/issues/2013#issuecomment-2917834558
 self: super: let
   version = "6.4.1";
