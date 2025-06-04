@@ -9,7 +9,8 @@
     ./homepage-dashboard.nix
     ./mastodon.nix
     ./profile.nix
-    ./web-server.nix
+    ./web
+    ./infrastructure
   ];
 
   age.secrets.tailscale-auth-key = {
