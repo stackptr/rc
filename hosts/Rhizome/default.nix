@@ -4,7 +4,7 @@
   ...
 }: {
   imports = [
-    ./system.nix
+    ./hardware.nix
   ];
   system.defaults.dock = {
     tilesize = 42;

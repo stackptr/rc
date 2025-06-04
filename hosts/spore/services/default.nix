@@ -4,7 +4,7 @@
   ...
 }: {
   age.secrets.tailscale-auth-key = {
-    file = ./secrets/tailscale-auth-key.age;
+    file = ../secrets/tailscale-auth-key.age;
     mode = "440";
     owner = config.services.golink.user;
     group = config.services.golink.group;
