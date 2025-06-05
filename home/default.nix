@@ -154,7 +154,7 @@
   programs.neovim = {
     enable = true;
     defaultEditor = true;
-    plugins = [pkgs.vimPlugins.catppuccin-nvim];
+    plugins = with pkgs.vimPlugins; [catppuccin-nvim lualine-nvim];
     extraLuaConfig = ''
       require("catppuccin").setup {
         flavour = "mocha",
@@ -167,6 +167,11 @@
         },
       }
       vim.cmd.colorscheme "catppuccin"
+      require("lualine").setup {
+          options = {
+              theme = "catppuccin"
+          }
+      }
     '';
   };
 
