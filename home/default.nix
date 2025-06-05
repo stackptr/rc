@@ -382,7 +382,7 @@
     shortcut = "a";
     baseIndex = 1;
     mouse = true;
-    terminal = "tmux-256color";
+    terminal = "xterm-256color";
     sensibleOnTop = true;
     plugins = with pkgs; [
       {
