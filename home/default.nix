@@ -382,7 +382,7 @@
     shortcut = "a";
     baseIndex = 1;
     mouse = true;
-    terminal = "tmux-256color";
+    terminal = "xterm-256color";
     sensibleOnTop = true;
     plugins = with pkgs; [
       {
@@ -397,7 +397,7 @@
     ];
     extraConfig = ''
       # See: tmux/tmux#696
-      set-option -ga terminal-overrides ",tmux-256color:Tc"
+      set-option -ga terminal-overrides ",xterm-256color:Tc"
     '';
   };
 
