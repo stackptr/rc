@@ -382,7 +382,7 @@
     shortcut = "a";
     baseIndex = 1;
     mouse = true;
-    terminal = "xterm-256color";
+    terminal = "tmux-256color";
     sensibleOnTop = true;
     plugins = with pkgs; [
       {
@@ -395,6 +395,10 @@
       tmuxPlugins.gruvbox
       tmuxPlugins.yank
     ];
+    extraConfig = ''
+      # See: tmux/tmux#696
+      set-option -ga terminal-overrides ",tmux-256color:Tc"
+    '';
   };
 
   programs.yt-dlp.enable = true;
