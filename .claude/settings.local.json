@@ -3,7 +3,8 @@
     "allow": [
       "Bash(nix flake check)",
       "Bash(rg:*)",
-      "Bash(mkdir:*)"
+      "Bash(mkdir:*)",
+      "Bash(git add:*)"
     ],
     "deny": []
   }

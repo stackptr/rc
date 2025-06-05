@@ -74,6 +74,7 @@
         disko.nixosModules.disko
         ./../modules/base.nix
         ./../modules/nixos.nix
+        ./../modules/secrets-validation.nix
         ./../hosts/${hostname}
         agenix.nixosModules.default
         home-manager.nixosModules.home-manager
@@ -113,6 +114,7 @@
         mac-app-util.darwinModules.default
         ./../modules/base.nix
         ./../modules/darwin
+        ./../modules/secrets-validation.nix
         ./../hosts/${hostname}
         home-manager.darwinModules.home-manager
         (mkHomeManager {
