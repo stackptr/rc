@@ -383,6 +383,7 @@
     baseIndex = 1;
     mouse = true;
     terminal = "tmux-256color";
+    sensibleOnTop = true;
     plugins = with pkgs; [
       {
         plugin = tmuxPlugins.continuum;
