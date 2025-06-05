@@ -400,8 +400,8 @@
           set -g status-left-length 100
           set -g status-left ""
           set -g status-right "#{E:@catppuccin_status_application}"
-          set -agF status-right "#{E:@catppuccin_status_cpu}"
           set -ag status-right "#{E:@catppuccin_status_session}"
+          set -agF status-right "#{E:@catppuccin_status_cpu}"
           set -ag status-right "#{E:@catppuccin_status_uptime}"
 
           # See: catppuccin/tmux#409
