@@ -441,6 +441,8 @@
     extraConfig = ''
       # See: tmux/tmux#696
       set-option -ga terminal-overrides ",xterm-256color:Tc"
+      # Fix shell on startup, see: tmux/tmux#4166
+      set -g default-command '$SHELL'
     '';
   };
 
