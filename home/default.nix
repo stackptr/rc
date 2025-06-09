@@ -141,8 +141,6 @@
 
   programs.jq.enable = true;
 
-  programs.lf.enable = true;
-
   programs.lsd = {
     enable = true;
     settings = {
