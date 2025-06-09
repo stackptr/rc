@@ -24,6 +24,7 @@
     hostname,
     system,
     enableGuiPackages,
+    showBatteryStatus,
   }: let
     pkgs-stable = import nixpkgs-stable {inherit system;};
     hostHomePath = ./../hosts/${hostname}/home.nix;
@@ -45,7 +46,7 @@
         }
       else import ./../home;
     home-manager.extraSpecialArgs = {
-      inherit pkgs-stable enableGuiPackages;
+      inherit pkgs-stable enableGuiPackages showBatteryStatus;
     };
   };
 
@@ -81,6 +82,7 @@
         (mkHomeManager {
           inherit username hostname system;
           enableGuiPackages = false;
+          showBatteryStatus = false;
         })
         {
           nixpkgs.overlays = overlays;
@@ -120,6 +122,7 @@
         (mkHomeManager {
           inherit username hostname system;
           enableGuiPackages = true;
+          showBatteryStatus = true;
         })
         {
           home-manager.sharedModules = [
