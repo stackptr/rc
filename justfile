@@ -78,8 +78,3 @@ host-info host:
   @echo "Services enabled:"
   @nix eval .#nixosConfigurations.{{host}}.config.services --apply '(services: builtins.filter (name: services.${name}.enable or false) (builtins.attrNames services))' --json 2>/dev/null | jq -r '.[]' | head -10 | sed 's/^/  - /' || \
    echo "  Unable to determine services"
-
-# Enter development shell with debugging tools
-dev-shell:
-  @echo "🚀 Entering development shell with debugging tools..."
-  nix develop .#debug
