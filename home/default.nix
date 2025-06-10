@@ -475,7 +475,10 @@
   services.gpg-agent = {
     enable = true;
     enableZshIntegration = true;
-    pinentry.package = pkgs.pinentry-tty;
+    pinentry.package = with pkgs;
+      if stdenv.isDarwin
+      then pinentry_mac
+      else pinentry-tty;
   };
 
   home.stateVersion = "23.11";
