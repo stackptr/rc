@@ -27,6 +27,9 @@
             set -g @catppuccin_status_connect_separator "no"
             set -g @catppuccin_status_left_separator  " "
             set -g @catppuccin_status_right_separator " "
+
+            set -g @catppuccin_window_text " #W"
+            set -g @catppuccin_window_current_text " #W"
   
             # See: catppuccin/tmux#409
             set -g @catppuccin_window_status_style "custom"
@@ -45,8 +48,7 @@
             set -g status-right-length 100
             set -g status-left-length 100
             set -g status-left "#{E:@catppuccin_status_session}"
-            set -g status-right "#{E:@catppuccin_status_application}"
-            set -agF status-right "#{E:@catppuccin_status_cpu}"
+            set -gF status-right "#{E:@catppuccin_status_cpu}"
             set -ag status-right "#{E:@catppuccin_status_uptime}"
           '';
         }
