@@ -24,6 +24,9 @@
           plugin = tmuxPlugins.catppuccin;
           extraConfig = ''
             set -g @catppuccin_flavor "mocha"
+            set -g @catppuccin_status_connect_separator "no"
+            set -g @catppuccin_status_left_separator  " "
+            set -g @catppuccin_status_right_separator " "
   
             # See: catppuccin/tmux#409
             set -g @catppuccin_window_status_style "custom"
