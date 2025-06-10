@@ -3,7 +3,19 @@
   lib,
   showBatteryStatus,
   ...
-}: {
+}: let
+  tmux-nerd-font-window-name = pkgs.tmuxPlugins.mkTmuxPlugin {
+    pluginName = "tmux-nerd-font-window-name";
+    rtpFilePath = "tmux-nerd-font-window-name.tmux";
+    version = "unstable-2025-05-27";
+    src = pkgs.fetchFromGitHub {
+      owner = "joshmedeski";
+      repo = "tmux-nerd-font-window-name";
+      rev = "4c9e7a51387d0cead1465a3628244beb790a3c95";
+      hash = "sha256-UcfEsq7BqJMeYXtGDNMoi/E+iEnEe9iM2KVoi7ektOE=";
+    };
+  };
+in {
   programs.tmux = {
     enable = true;
     shortcut = "a";
@@ -20,6 +32,7 @@
             set -g @continuum-save-interval '60' # minutes
           '';
         }
+        tmux-nerd-font-window-name
         {
           plugin = tmuxPlugins.catppuccin;
           extraConfig = ''
@@ -30,7 +43,7 @@
 
             set -g @catppuccin_window_text " #W"
             set -g @catppuccin_window_current_text " #W"
-  
+
             # See: catppuccin/tmux#409
             set -g @catppuccin_window_status_style "custom"
             set -g @catppuccin_window_left_separator "#[bg=default,fg=#{@thm_surface_0}]#[bg=#{@thm_surface_0},fg=#{@thm_fg}]"
