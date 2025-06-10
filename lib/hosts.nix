@@ -1,4 +1,4 @@
-{
+inputs @ {
   self,
   nixpkgs,
   nixpkgs-stable,
@@ -64,7 +64,7 @@
     nixpkgs.lib.nixosSystem {
       inherit system;
       specialArgs = {
-        inherit profile keys username hostname allowVpn;
+        inherit inputs profile keys username hostname allowVpn;
         pkgs-stable = import nixpkgs-stable {inherit system;};
       };
       modules = [
@@ -104,7 +104,7 @@
     nix-darwin.lib.darwinSystem {
       inherit system;
       specialArgs = {
-        inherit self keys username hostname allowVpn;
+        inherit inputs self keys username hostname allowVpn;
         pkgs-stable = import nixpkgs-stable {inherit system;};
         nixDarwin = nix-darwin;
       };
