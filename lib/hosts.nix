@@ -35,16 +35,13 @@
   in {
     home-manager.useGlobalPkgs = true;
     home-manager.useUserPackages = true;
-    home-manager.users.${username} =
-      if hostHomeConfig != null
-      then
-        {...}: {
-          imports = [
-            (import ./../home)
-            hostHomeConfig
-          ];
-        }
-      else import ./../home;
+    home-manager.users.${username} = {...}: {
+      imports =
+        [
+          ./../home
+        ]
+        ++ nixpkgs.lib.optionals (hostHomeConfig != null) [hostHomeConfig];
+    };
     home-manager.extraSpecialArgs = {
       inherit pkgs-stable enableGuiPackages showBatteryStatus;
     };
