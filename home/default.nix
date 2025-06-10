@@ -462,6 +462,11 @@
     '';
   };
 
+  programs.yazi = {
+    enable = true;
+    enableZshIntegration = true;
+  };
+
   programs.yt-dlp.enable = true;
 
   programs.zed-editor = {
