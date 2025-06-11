@@ -41,7 +41,7 @@
 
   system.configurationRevision = self.rev or self.dirtyRev or null;
 
-  # TODO: Keyboard shortcuts, see LnL7/nix-darwin#699
+  # TODO: Keyboard shortcuts, see nix-darwin/nix-darwin#699
   # system.keyboard.shortcuts = let
   #   cmdOptLeft = {
   #     mods = {
