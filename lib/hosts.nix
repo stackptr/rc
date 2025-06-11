@@ -10,6 +10,7 @@ inputs @ {
   homebrew-core,
   homebrew-cask,
   mac-app-util,
+  zx-dev,
   disko,
   golink,
   ...
@@ -84,6 +85,7 @@ inputs @ {
           nixpkgs.overlays = overlays;
         }
         golink.nixosModules.default
+        zx-dev.nixosModules.default
       ];
     };
 
