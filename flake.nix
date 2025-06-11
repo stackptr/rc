@@ -34,6 +34,10 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.systems.follows = "systems";
     };
+    zx-dev = {
+      url = "github:stackptr/zx.dev";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     # macOS
     nix-darwin = {

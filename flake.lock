@@ -29,6 +29,22 @@
         "type": "github"
       }
     },
+    "anemone": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1749164920,
+        "narHash": "sha256-XwggfJBnk9bxOVe6EIeerjebsqDXpqeAJ8umq5GPbIg=",
+        "owner": "Speyll",
+        "repo": "anemone",
+        "rev": "0fa77c2eeccd096f6def3b540a9417a1b54fdd5f",
+        "type": "github"
+      },
+      "original": {
+        "owner": "Speyll",
+        "repo": "anemone",
+        "type": "github"
+      }
+    },
     "brew-src": {
       "flake": false,
       "locked": {
@@ -95,6 +111,27 @@
         "owner": "hraban",
         "ref": "fixed-output",
         "repo": "flake-compat",
+        "type": "github"
+      }
+    },
+    "flake-parts": {
+      "inputs": {
+        "nixpkgs-lib": [
+          "zx-dev",
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1749398372,
+        "narHash": "sha256-tYBdgS56eXYaWVW3fsnPQ/nFlgWi/Z2Ymhyu21zVM98=",
+        "owner": "hercules-ci",
+        "repo": "flake-parts",
+        "rev": "9305fe4e5c2a6fcf5ba6a3ff155720fbe4076569",
+        "type": "github"
+      },
+      "original": {
+        "owner": "hercules-ci",
+        "repo": "flake-parts",
         "type": "github"
       }
     },
@@ -322,7 +359,8 @@
         "nix-homebrew": "nix-homebrew",
         "nixpkgs": "nixpkgs",
         "nixpkgs-stable": "nixpkgs-stable",
-        "systems": "systems"
+        "systems": "systems",
+        "zx-dev": "zx-dev"
       }
     },
     "systems": {
@@ -336,6 +374,28 @@
         "type": "path"
       },
       "parent": []
+    },
+    "zx-dev": {
+      "inputs": {
+        "anemone": "anemone",
+        "flake-parts": "flake-parts",
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1749668953,
+        "narHash": "sha256-6VA+4hoS0WYbT9RO+nxQQjUR3NWhO3eET7Jaup7PxhY=",
+        "owner": "stackptr",
+        "repo": "zx.dev",
+        "rev": "3e83777f35cab33d8978d124a517ba49130b2a99",
+        "type": "github"
+      },
+      "original": {
+        "owner": "stackptr",
+        "repo": "zx.dev",
+        "type": "github"
+      }
     }
   },
   "root": "root",
