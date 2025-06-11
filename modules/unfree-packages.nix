@@ -9,6 +9,7 @@
     builtins.elem (lib.getName pkg) [
       "chatgpt"
       "claude-code"
+      "claude-desktop"
       "copilot-language-server"
       "cursor"
       "daisydisk"

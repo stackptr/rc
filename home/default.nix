@@ -57,6 +57,7 @@
     guiApps = [code-cursor];
     darwinApps = [
       chatgpt
+      claude-desktop
       daisydisk
       github-desktop
       gitify
