@@ -385,7 +385,7 @@
       },
       "locked": {
         "lastModified": 1749668953,
-        "narHash": "sha256-6VA+4hoS0WYbT9RO+nxQQjUR3NWhO3eET7Jaup7PxhY=",
+        "narHash": "sha256-zaqY/jEfpa62wDt8iO8XynwvJw2yaXaAFSmyYuprjIk=",
         "owner": "stackptr",
         "repo": "zx.dev",
         "rev": "3e83777f35cab33d8978d124a517ba49130b2a99",
