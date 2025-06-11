@@ -1,6 +1,9 @@
 # Custom package definitions
 # These are packages not available in nixpkgs or requiring customization
 self: super: {
+  # Claude desktop app
+  claude-desktop = super.callPackage ./../packages/claude-desktop/package.nix {};
+
   # GitHub Desktop with custom configuration
   github-desktop = super.callPackage ./../packages/github-desktop/package.nix {};
 
