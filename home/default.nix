@@ -54,7 +54,7 @@
       sox
       unzip
     ];
-    guiApps = [code-cursor];
+    guiApps = [cinny-desktop code-cursor];
     darwinApps = [
       chatgpt
       claude-desktop
