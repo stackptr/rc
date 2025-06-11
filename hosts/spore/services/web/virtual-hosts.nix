@@ -20,7 +20,6 @@
       forceSSL = true;
       useACMEHost = "zx.dev";
       locations = {
-        "/".proxyPass = "http://127.0.0.1:3001";
         "/.well-known/webfinger" = {
           extraConfig = ''
             add_header Access-Control-Allow-Origin '*';

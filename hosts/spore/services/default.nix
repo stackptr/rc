@@ -8,7 +8,6 @@
     ./db.nix
     ./homepage-dashboard.nix
     ./mastodon.nix
-    ./profile.nix
     ./web
     ./infrastructure
   ];

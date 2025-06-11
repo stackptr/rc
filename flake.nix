@@ -61,12 +61,6 @@
       inputs.flake-utils.follows = "flake-utils";
       inputs.systems.follows = "systems";
     };
-
-    # Packages
-    profile = {
-      url = "github:stackptr/profile";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
   };
 
   outputs = inputs @ {

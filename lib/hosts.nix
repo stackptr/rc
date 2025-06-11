@@ -10,7 +10,6 @@ inputs @ {
   homebrew-core,
   homebrew-cask,
   mac-app-util,
-  profile,
   disko,
   golink,
   ...
@@ -64,7 +63,7 @@ inputs @ {
     nixpkgs.lib.nixosSystem {
       inherit system;
       specialArgs = {
-        inherit inputs profile keys username hostname allowVpn;
+        inherit inputs keys username hostname allowVpn;
         pkgs-stable = import nixpkgs-stable {inherit system;};
       };
       modules = [
