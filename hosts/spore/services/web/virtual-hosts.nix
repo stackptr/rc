@@ -10,6 +10,10 @@
     expectedTailnet = "rove-duck.ts.net";
     virtualHosts = ["test.zx.dev"];
   };
+  services.zx-dev = {
+    enable = true;
+    domain = "zx.dev";
+  };
   services.nginx.virtualHosts = {
     "rey.foo" = {
       # forceSSL = true;
