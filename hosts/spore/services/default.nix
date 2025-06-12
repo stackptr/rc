@@ -18,6 +18,11 @@
     owner = config.services.golink.user;
     group = config.services.golink.group;
   };
+
+  services.glances = {
+    enable = config.services.homepage-dashboard.enable;
+  };
+
   services.golink = {
     enable = true;
     tailscaleAuthKeyFile = config.age.secrets.tailscale-auth-key.path;
