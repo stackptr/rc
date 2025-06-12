@@ -71,6 +71,16 @@
               };
             };
           }
+          {
+            "Network Usage" = {
+              widget = {
+                type = "glances";
+                url = "http://localhost:${builtins.toString config.services.glances.port}";
+                version = 4;
+                metric = "network:eth0";
+              };
+            };
+          }
         ];
       }
       {
