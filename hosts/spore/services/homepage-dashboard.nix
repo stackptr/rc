@@ -7,6 +7,7 @@
   services.homepage-dashboard = {
     enable = true;
     environmentFile = config.age.secrets.homepage-env.path;
+    allowedHosts = "localhost:8082,127.0.0.1:8082,home.zx.dev";
     settings = {
       color = "sky";
       target = "_self";
