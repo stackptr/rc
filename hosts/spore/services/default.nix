@@ -30,5 +30,4 @@
 
   services.openssh.enable = true;
   services.tailscale.enable = true;
-  services.tailscaleAuth.enable = true;
 }

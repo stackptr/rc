@@ -5,11 +5,6 @@
   lib,
   ...
 }: {
-  services.nginx.tailscaleAuth = {
-    enable = true;
-    expectedTailnet = "rove-duck.ts.net";
-    virtualHosts = ["test.zx.dev"];
-  };
   services.zx-dev = {
     enable = true;
     domain = "zx.dev";
@@ -67,11 +62,6 @@
       useACMEHost = "zx.dev";
       enableAutheliaAuth = true;
       locations."/".proxyPass = "http://127.0.0.1:8082";
-    };
-    "test.zx.dev" = {
-      forceSSL = true;
-      useACMEHost = "zx.dev";
-      locations."/".proxyPass = "http://127.0.0.1:3001";
     };
   };
 }
