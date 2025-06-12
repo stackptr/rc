@@ -15,6 +15,9 @@ switch host=hostname:
 update:
   nix flake update --commit-lock-file
 
+switch-remote target-host build-host="localhost":
+  nixos-rebuild switch --flake .#{{target-host}} --target-host root@{{target-host}} --build-host {{build-host}}
+
 # Development and testing recipes
 
 # Validate a specific host configuration without building
