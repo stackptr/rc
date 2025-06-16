@@ -19,9 +19,9 @@
         "force group" = group;
       };
     shares = {
+      Archive = mkShare "/mnt/archive" "mu" "users";
       Backup = mkShare "/mnt/backup" "mu" "users" // {"fruit:time machine" = "yes";};
       Media = mkShare "/mnt/media" config.services.plex.user config.services.plex.group;
-      Stash = mkShare "/mnt/stash" "mu" "users";
       Torrents = mkShare "/mnt/torrents" config.services.transmission.user config.services.transmission.group;
       Unsorted = mkShare "/mnt/unsorted" "mu" "users";
     };

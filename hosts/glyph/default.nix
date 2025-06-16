@@ -18,8 +18,8 @@
     device = "zdata/media";
     fsType = "zfs";
   };
-  fileSystems."/mnt/stash" = {
-    device = "zdata/stash";
+  fileSystems."/mnt/archive" = {
+    device = "zdata/archive";
     fsType = "zfs";
   };
   fileSystems."/mnt/torrents" = {
