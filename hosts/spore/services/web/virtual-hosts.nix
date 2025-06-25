@@ -30,6 +30,7 @@
           '';
           return = "301 https://pub.zx.dev$request_uri";
         };
+        "/pgp".return = "302 https://keyoxide.org/hkp/413d1a0152bcb08d2e3ddacaf88c08579051ab48";
       };
     };
     "auth.zx.dev" = {
