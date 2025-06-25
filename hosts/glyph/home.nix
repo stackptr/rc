@@ -52,7 +52,10 @@
   programs.gallery-dl = {
     enable = true;
     settings = {
-      extractor.base-directory = "/mnt/archive/gallery-dl";
+      extractor = {
+        base-directory = "/mnt/archive/gallery-dl";
+        archive = "/mnt/archive/gallery-dl/archive.sqlite3";
+      };
     };
   };
 }
