@@ -10,6 +10,11 @@
     domain = "zx.dev";
   };
   services.nginx.virtualHosts = {
+    "cjohns.com" = {
+      forceSSL = true;
+      useACMEHost = "zx.dev";
+      locations."/".return = "302 https://zx.dev";
+    };
     "rey.foo" = {
       # forceSSL = true;
       # useACMEHost = "rey.foo";

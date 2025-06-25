@@ -15,7 +15,7 @@
       domain = "*.zx.dev";
       dnsProvider = "cloudflare";
       environmentFile = config.age.secrets.cloudflare-dns.path;
-      extraDomainNames = ["zx.dev"];
+      extraDomainNames = ["zx.dev" "cjohns.com"];
     };
   };
   users.users.nginx.extraGroups = ["acme"];
