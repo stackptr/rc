@@ -384,11 +384,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1749679722,
-        "narHash": "sha256-drX8t1kv4phvodHD/Hog+rp7GK0O2uoXy4rZIT+bSNE=",
+        "lastModified": 1750890873,
+        "narHash": "sha256-2bFQNOyXcYwFuXeP3QEIUhm2pZMVyAFednZ1uyFukp8=",
         "owner": "stackptr",
         "repo": "zx.dev",
-        "rev": "2c5b86de76e2e0ee4c1401b01220278f766a54a7",
+        "rev": "21928cac077de2e3502387d2bab8c5fd412b5076",
         "type": "github"
       },
       "original": {
