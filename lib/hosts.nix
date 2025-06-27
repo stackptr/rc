@@ -38,6 +38,7 @@ inputs @ {
     home-manager.users.${username} = {...}: {
       imports =
         [
+          ./../modules/home
           ./../home
         ]
         ++ nixpkgs.lib.optionals (hostHomeConfig != null) [hostHomeConfig];
