@@ -71,9 +71,8 @@ inputs @ {
       modules = [
         {environment.systemPackages = [agenix.packages.${system}.default];}
         disko.nixosModules.disko
-        ./../modules/base.nix
-        ./../modules/nixos.nix
-        ./../modules/secrets-validation.nix
+        ./../modules/base
+        ./../modules/nixos
         ./../hosts/${hostname}
         agenix.nixosModules.default
         home-manager.nixosModules.home-manager
@@ -113,9 +112,8 @@ inputs @ {
       modules = [
         nix-homebrew.darwinModules.nix-homebrew
         mac-app-util.darwinModules.default
-        ./../modules/base.nix
+        ./../modules/base
         ./../modules/darwin
-        ./../modules/secrets-validation.nix
         ./../hosts/${hostname}
         home-manager.darwinModules.home-manager
         (mkHomeManager {

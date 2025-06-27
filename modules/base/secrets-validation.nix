@@ -5,7 +5,7 @@
   hostname,
   ...
 }: let
-  validation = import ../lib/validation.nix {inherit lib;};
+  validation = import ../../lib/validation.nix {inherit lib;};
 in {
   # Add runtime validation for secrets configuration
   config = {

@@ -2,6 +2,7 @@
 {
   imports = [
     ./nix-config.nix
+    ./secrets-validation.nix
     ./unfree-packages.nix
   ];
 }
