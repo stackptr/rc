@@ -48,13 +48,22 @@
       };
     };
   };
-  
+
   programs.gallery-dl = {
     enable = true;
     settings = {
       extractor = {
         base-directory = "/mnt/archive/gallery-dl";
         archive = "/mnt/archive/gallery-dl/archive.sqlite3";
+      };
+    };
+  };
+
+  programs.rustmission = {
+    enable = true;
+    settings = {
+      connection = {
+        url = "http://glyph.rove-duck.ts.net:9091/transmission/rpc";
       };
     };
   };
