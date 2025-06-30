@@ -128,12 +128,12 @@
       };
       storage.local.path = "/var/lib/authelia-main/db.sqlite3";
       notifier = {
-        disable_startup_check = true;
+        disable_startup_check = false;
         smtp = {
-          host = "smtp.sendgrid.net";
+          host = "smtp.mailgun.org";
           port = 587;
           timeout = "5s";
-          username = "apikey";
+          username = "stackptr@sandbox8379461c3c124a3d997b7b39f997da8e.mailgun.org";
           sender = "Authelia <authelia@zx.dev>";
           identifier = "auth.zx.dev";
           subject = "[Authelia] {title}";
