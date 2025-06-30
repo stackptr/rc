@@ -128,7 +128,7 @@
       };
       storage.local.path = "/var/lib/authelia-main/db.sqlite3";
       notifier = {
-        disable_startup_check = false;
+        disable_startup_check = true;
         smtp = {
           host = "smtp.sendgrid.net";
           port = 587;
