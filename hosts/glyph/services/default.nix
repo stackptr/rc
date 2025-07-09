@@ -4,6 +4,7 @@
   ...
 }: {
   imports = [
+    ./avahi.nix
     ./filebrowser.nix
     ./samba.nix
     ./torrents.nix
