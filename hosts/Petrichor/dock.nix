@@ -19,7 +19,6 @@
       "/Applications/Craft.app"
       "/System/Applications/Messages.app"
       "${pkgs.slack}/Applications/Slack.app"
-      "/Applications/Textual.app"
       "${pkgs.github-desktop}/Applications/GitHub Desktop.app"
     ];
   };
