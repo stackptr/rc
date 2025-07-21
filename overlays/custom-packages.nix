@@ -16,6 +16,9 @@ self: super: {
   # Scroll Reverser for macOS trackpad settings
   scroll-reverser = super.callPackage ./../packages/scroll-reverser/package.nix {};
 
+  # Tailscale
+  tailscale-desktop = super.callPackage ./../packages/tailscale-desktop/package.nix {};
+
   # Transmission client alternative
   transmissionic = super.callPackage ./../packages/transmissionic/package.nix {};
 
