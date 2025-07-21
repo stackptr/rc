@@ -23,7 +23,7 @@
           "nova"
           "postico"
         ]
-        ++ lib.optionals allowVpn ["tailscale"];
+        ++ lib.optionals allowVpn ["tailscale-app"];
       # TODO: casks marked as auto_updates should be set as greedy with auto update setting disabled
       otherApps = [
         "craft" # auto_updates
