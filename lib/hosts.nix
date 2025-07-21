@@ -6,7 +6,6 @@ inputs @ {
   home-manager,
   nix-darwin,
   nix-homebrew,
-  homebrew-bundle,
   homebrew-core,
   homebrew-cask,
   mac-app-util,
@@ -132,7 +131,6 @@ inputs @ {
             enableRosetta = false;
             user = username;
             taps = {
-              "homebrew/homebrew-bundle" = homebrew-bundle;
               "homebrew/homebrew-core" = homebrew-core;
               "homebrew/homebrew-cask" = homebrew-cask;
             };
