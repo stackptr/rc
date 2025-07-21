@@ -14,7 +14,8 @@ in {
     pnpmDeps = super.pnpm_9.fetchDeps {
       inherit version src;
       inherit (finalAttrs) pname;
-      hash = "sha256-4Ite75ZMMSbPnmNcpoYaggiH9r2xQYkOnl29CF/6swA=";
+      hash = "sha256-HrznFOHHLqQM7aDwhW5Xrl1noxDUkPEzU5ulZhaL6Nk=";
+      fetcherVersion = 2;
     };
   });
 }
