@@ -68,6 +68,7 @@
       mochi
       slack
       soundsource
+      tailscale-desktop
       the-unarchiver
       whatsapp-for-mac
       zoom-us

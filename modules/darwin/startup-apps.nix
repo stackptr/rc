@@ -16,6 +16,6 @@
       "SoundSource" = "${pkgs.soundsource}/Applications/SoundSource.app/";
     }
     // lib.optionalAttrs allowVpn {
-      "Tailscale" = "/Applications/Tailscale.app/";
+      "Tailscale" = "${pkgs.tailscale-desktop}/Applications/Tailscale.app/";
     };
 }
