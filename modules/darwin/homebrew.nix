@@ -13,8 +13,9 @@
       upgrade = true;
     };
     taps = builtins.attrNames config.nix-homebrew.taps; # See: zhaofengli/nix-homebrew#5
+    # N.B.: Apps marked auto_updates will not be updated by homebrew. These apps should
+    # have their updates disabled and then marked `greedy` to force homebrew to update.
     casks = let
-      # Apps marked auto_updates but which have their updates disabled via CustomUserPreferences
       greedyApps =
         map (name: {
           inherit name;
@@ -24,7 +25,8 @@
           "postico"
         ]
         ++ lib.optionals allowVpn ["tailscale-app"];
-      # TODO: casks marked as auto_updates should be set as greedy with auto update setting disabled
+      # TODO: casks marked as auto_updates should be set as greedy with auto update setting disabled,
+      # otherwise homebrew relies on the app to update itself.
       otherApps = [
         "craft" # auto_updates
         "legcord"
