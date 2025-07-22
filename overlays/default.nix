@@ -4,6 +4,5 @@
   (import ./custom-packages.nix)
 
   # Application-specific overlays for version pinning/customization
-  (import ./gitify.nix)
   (import ./whatsapp-for-mac.nix)
 ]
