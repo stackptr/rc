@@ -21,12 +21,6 @@
     owner = "mastodon";
     group = "mastodon";
   };
-  age.secrets.mastodon-otp-secret = {
-    file = ./../secrets/mastodon-otp-secret.age;
-    mode = "440";
-    owner = "mastodon";
-    group = "mastodon";
-  };
   age.secrets.mastodon-vapid-public-key = {
     file = ./../secrets/mastodon-vapid-public-key.age;
     mode = "440";
@@ -44,7 +38,6 @@
     localDomain = "pub.zx.dev";
     streamingProcesses = 1;
     secretKeyBaseFile = config.age.secrets.mastodon-secret-key-base.path;
-    otpSecretFile = config.age.secrets.mastodon-otp-secret.path;
     vapidPublicKeyFile = config.age.secrets.mastodon-vapid-public-key.path;
     vapidPrivateKeyFile = config.age.secrets.mastodon-vapid-private-key.path;
     configureNginx = true;

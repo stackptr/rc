@@ -6,7 +6,6 @@ in {
   "hosts/spore/secrets/jwt-secret.age".publicKeys = keys;
   "hosts/spore/secrets/mastodon-s3-env.age".publicKeys = keys;
   "hosts/spore/secrets/mastodon-secret-key-base.age".publicKeys = keys;
-  "hosts/spore/secrets/mastodon-otp-secret.age".publicKeys = keys;
   "hosts/spore/secrets/mastodon-vapid-public-key.age".publicKeys = keys;
   "hosts/spore/secrets/mastodon-vapid-private-key.age".publicKeys = keys;
   "hosts/spore/secrets/notifier-smtp-password.age".publicKeys = keys;
