@@ -208,14 +208,6 @@
 
   programs.yt-dlp.enable = true;
 
-  programs.zed-editor = {
-    enable = enableGuiPackages;
-    extensions = [
-      "haskell"
-      "nix"
-    ];
-  };
-
   services.gpg-agent = {
     enable = true;
     enableZshIntegration = true;
