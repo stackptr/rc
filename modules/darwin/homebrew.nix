@@ -24,13 +24,11 @@
           "craft"
           "nova"
           "postico"
+          "roon"
         ]
         ++ lib.optionals allowVpn ["tailscale-app"];
-      # TODO: casks marked as auto_updates should be set as greedy with auto update setting disabled,
-      # otherwise homebrew relies on the app to update itself.
       otherApps = [
         "legcord"
-        "roon" # auto_updates
         "textual"
       ];
     in
