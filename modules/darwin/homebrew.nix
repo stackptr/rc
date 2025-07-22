@@ -21,6 +21,7 @@
           inherit name;
           greedy = true;
         }) [
+          "craft"
           "nova"
           "postico"
         ]
@@ -28,7 +29,6 @@
       # TODO: casks marked as auto_updates should be set as greedy with auto update setting disabled,
       # otherwise homebrew relies on the app to update itself.
       otherApps = [
-        "craft" # auto_updates
         "legcord"
         "roon" # auto_updates
         "textual"
