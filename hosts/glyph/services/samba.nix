@@ -33,14 +33,20 @@
         global = {
           "invalid users" = [];
           securityType = "user";
-          "vfs objects" = "fruit streams_xattr";
+          "vfs objects" = "catia fruit streams_xattr";
           "fruit:metadata" = "stream";
+          "fruit:resource" = "file";
+          "fruit:locking" = "netatalk";
+          "fruit:encoding" = "native";
           "fruit:model" = "MacSamba";
           "fruit:posix_rename" = "yes";
           "fruit:veto_appledouble" = "no";
           "fruit:nfs_aces" = "no";
+          "fruit:zero_file_id" = "yes";
           "fruit:wipe_intentionally_left_blank_rfork" = "yes";
           "fruit:delete_empty_adfiles" = "yes";
+          "ea support" = "yes";
+          "mangled names" = "no";
         };
       }
       // shares;
