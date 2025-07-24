@@ -13,7 +13,6 @@
       "/Applications/Prompt.app"
       "/Applications/Reeder.app"
       "/Applications/Roon.app"
-      "/System/Applications/Calendar.app"
       "/Applications/Things3.app"
       "/Applications/Craft.app"
       "/System/Applications/Messages.app"
