@@ -9,6 +9,7 @@
     persistent-apps = [
       "/System/Volumes/Preboot/Cryptexes/App/System/Applications/Safari.app"
       "/Applications/Microsoft Outlook.app"
+      "/Applications/Microsoft Teams.app"
       "/Applications/Nova.app"
       "/Applications/Prompt.app"
       "/Applications/Reeder.app"
@@ -17,7 +18,6 @@
       "/Applications/Craft.app"
       "/System/Applications/Messages.app"
       "${pkgs.slack}/Applications/Slack.app"
-      "/Applications/Microsoft Teams.app"
       "${pkgs.github-desktop}/Applications/GitHub Desktop.app"
     ];
   };
