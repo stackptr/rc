@@ -16,11 +16,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1750173260,
-        "narHash": "sha256-9P1FziAwl5+3edkfFcr5HeGtQUtrSdk/MksX39GieoA=",
+        "lastModified": 1754337839,
+        "narHash": "sha256-fEc2/4YsJwtnLU7HCFMRckb0u9UNnDZmwGhXT5U5NTw=",
         "owner": "ryantm",
         "repo": "agenix",
-        "rev": "531beac616433bac6f9e2a19feb8e99a22a66baf",
+        "rev": "856df6f6922845abd4fd958ce21febc07ca2fa45",
         "type": "github"
       },
       "original": {
@@ -185,11 +185,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1754263839,
-        "narHash": "sha256-ck7lILfCNuunsLvExPI4Pw9OOCJksxXwozum24W8b+8=",
+        "lastModified": 1754365350,
+        "narHash": "sha256-NLWIkn1qM0wxtZu/2NXRaujWJ4Y1PSZlc7h0y6pOzOQ=",
         "owner": "nix-community",
         "repo": "home-manager",
-        "rev": "1d7abbd5454db97e0af51416f4960b3fb64a4773",
+        "rev": "c5d7e957397ecb7d48b99c928611c6e780db1b56",
         "type": "github"
       },
       "original": {
@@ -201,11 +201,11 @@
     "homebrew-cask": {
       "flake": false,
       "locked": {
-        "lastModified": 1754286206,
-        "narHash": "sha256-cJR+d7QvwxR/YiKHlwSVbjgrPrOvCt4eFTUn6Gijhw0=",
+        "lastModified": 1754372128,
+        "narHash": "sha256-kFhcgksJ/2aGMdsv6IPjoiRhs6GewmyyVH7FxAjV4GI=",
         "owner": "homebrew",
         "repo": "homebrew-cask",
-        "rev": "40f0d38bf2e74f4f7a3ef610b10da4f3622051a4",
+        "rev": "5dfc439b6a44533d83e36109063df360f7527070",
         "type": "github"
       },
       "original": {
@@ -217,11 +217,11 @@
     "homebrew-core": {
       "flake": false,
       "locked": {
-        "lastModified": 1754283369,
-        "narHash": "sha256-DIw1TywdtL8tSIEUvLVEpeQqEysj6md5iBdtIQnLemk=",
+        "lastModified": 1754367678,
+        "narHash": "sha256-Nr64ZoWmUMZF4GD7/Sc7yN64dYt25im3GQPJ/ostN6w=",
         "owner": "homebrew",
         "repo": "homebrew-core",
-        "rev": "67ae25d9ab6ccccfdd7274c9ad5eb7c591d25439",
+        "rev": "1a9cf6cf543647f3333180f44f6b2f1df61d3b52",
         "type": "github"
       },
       "original": {
@@ -298,11 +298,11 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1753939845,
-        "narHash": "sha256-K2ViRJfdVGE8tpJejs8Qpvvejks1+A4GQej/lBk5y7I=",
+        "lastModified": 1754214453,
+        "narHash": "sha256-Q/I2xJn/j1wpkGhWkQnm20nShYnG7TI99foDBpXm1SY=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "94def634a20494ee057c76998843c015909d6311",
+        "rev": "5b09dc45f24cf32316283e62aec81ffee3c3e376",
         "type": "github"
       },
       "original": {
