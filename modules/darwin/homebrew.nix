@@ -29,6 +29,7 @@
         ++ lib.optionals allowVpn ["tailscale-app"];
       otherApps = [
         "legcord"
+        "plex" # auto_updates
         "textual"
       ];
     in
