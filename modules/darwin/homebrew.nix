@@ -45,6 +45,7 @@
       "Hand Mirror" = 1502839586;
       "Hush" = 1544743900;
       "Mapper" = 1589391989;
+      "Mela" = 1568924476;
       "MusicBox" = 1614730313;
       "MusicHarbor" = 1440405750;
       "Numbers" = 409203825;
