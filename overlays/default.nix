@@ -4,5 +4,6 @@
   (import ./custom-packages.nix)
 
   # Application-specific overlays for version pinning/customization
+  (import ./gallery-dl.nix)
   (import ./whatsapp-for-mac.nix)
 ]
