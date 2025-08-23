@@ -43,7 +43,9 @@
       enable = true;
     };
 
-    initContent = ''
+    initContent = let
+      novaCompletion = "compdef _files nova";
+    in ''
       incog () {
         unset HISTFILE
       }
@@ -76,7 +78,7 @@
       spurge () {
         stack exec -- ghc-pkg unregister --force "$1"
       }
-    '';
+    '' + novaCompletion;
   };
 
   programs.zoxide = {
