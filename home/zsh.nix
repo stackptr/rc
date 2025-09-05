@@ -24,7 +24,7 @@
       osVars =
         if pkgs.stdenv.isDarwin
         then {
-          FR_DOCKERHOST = "docker.for.mac.localhost";
+          FR_DOCKERHOST = "host.docker.internal";
         }
         else {
           # See: https://www.gnupg.org/documentation/manuals/gnupg/Invoking-GPG_002dAGENT.html
