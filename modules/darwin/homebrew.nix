@@ -40,14 +40,12 @@
     # N.B.: Removed entries in `masApps` require manual uninstallation
     masApps = {
       "Copilot" = 1447330651;
-      "Day One" = 1055511498;
       "GoodLinks" = 1474335294;
       "Hand Mirror" = 1502839586;
       "Hush" = 1544743900;
       "Mapper" = 1589391989;
       "Mela" = 1568924476;
       "MusicBox" = 1614730313;
-      "MusicHarbor" = 1440405750;
       "Numbers" = 409203825;
       "Noir" = 1592917505;
       "Pages" = 409201541;
@@ -57,11 +55,8 @@
       "Play" = 1596506190;
       "Prompt" = 1594420480;
       "Reeder" = 1529448980;
-      "SponsorBlock" = 1573461917;
       "Timery" = 1425368544;
       "Things" = 904280696;
-      "Toggl Track" = 1291898086;
-      "Vinegar" = 1591303229;
       "Wipr" = 1320666476;
     };
   };
