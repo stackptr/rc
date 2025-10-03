@@ -30,6 +30,10 @@
     device = "zdata/unsorted";
     fsType = "zfs";
   };
+  fileSystems."/mnt/backup" = {
+    device = "zdata/backup";
+    fsType = "zfs";
+  };
 
   networking.hostName = "glyph";
   networking.hostId = "e7bdc076"; # Ensure correct ZFS pool imported
