@@ -36,6 +36,11 @@
         default = "$albumartist/$album%aunique{}/%if{$multidisc,CD$disc0/}$track $title";
         comp = "Various Artists/$album%aunique{}/%if{$multidisc,CD$disc0/}$track $title";
       };
+      match = {
+        ignored_media = [
+          "Hybrid SACD (SACD layer)"
+        ];
+      };
       plugins = "copyartifacts discogs edit fetchart info inline";
       per_disc_numbering = true;
       copyartifacts = {
