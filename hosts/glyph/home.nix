@@ -1,14 +1,6 @@
 {pkgs, ...}: {
   programs.beets = {
     enable = true;
-    package = pkgs.beets.override {
-      pluginOverrides = {
-        copyartifacts = {
-          enable = true;
-          propagatedBuildInputs = [pkgs.beetsPackages.copyartifacts];
-        };
-      };
-    };
     settings = {
       directory = "/mnt/media/Music";
       # TODO: Backup ~/.config/beets/library.db
@@ -43,12 +35,8 @@
           "Hybrid SACD (SACD layer, 2 channels)"
         ];
       };
-      plugins = "copyartifacts discogs edit fetchart info inline";
+      plugins = "discogs edit fetchart info inline";
       per_disc_numbering = true;
-      copyartifacts = {
-        extensions = ".* */*";
-        print_ignored = true;
-      };
       item_fields = {
         multidisc = "1 if disctotal > 1 else 0";
         disc0 = "f\"{disc}\"";
