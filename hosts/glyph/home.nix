@@ -39,6 +39,7 @@
       match = {
         ignored_media = [
           "Hybrid SACD (SACD layer)"
+          "Hybrid SACD (SACD layer, 2 channels)"
         ];
       };
       plugins = "copyartifacts discogs edit fetchart info inline";
