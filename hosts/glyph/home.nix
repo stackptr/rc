@@ -31,6 +31,7 @@
           "[\\u201c\\u201d]" = "\"";
         };
         languages = "en";
+        timid = true;
       };
       paths = {
         default = "$albumartist/$album%aunique{}/%if{$multidisc,CD$disc0/}$track $title";
