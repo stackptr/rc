@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 This is a Nix flake-based system configuration repository that manages multiple hosts across NixOS and macOS platforms:
 
 - **NixOS hosts**: `zeta` (ARM/Pi4), `glyph` (x86_64 NAS/homelab), `spore` (x86_64 VPS)
-- **macOS hosts**: `Rhizome` (personal laptop), `Petrichor` (work laptop)
+- **macOS hosts**: `Rhizome` (personal laptop)
 
 The configuration is organized into:
 - `hosts/`: Host-specific configurations
@@ -70,7 +70,7 @@ nix develop  # Provides agenix, cachix, just
 
 Secrets are organized using the principle of least privilege:
 - `lib/secrets/` - Host-specific secrets modules
-- Each host only has access to its own secrets plus admin keys (Petrichor/Rhizome)
+- Each host only has access to its own secrets plus admin keys
 - Global secrets (if any) are defined in `lib/secrets/default.nix`
 
 ## Package and Overlay Management

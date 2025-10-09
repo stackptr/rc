@@ -8,7 +8,6 @@ let
       value = readKey h;
     }) [
       "glyph"
-      "Petrichor"
       "Rhizome"
       "spore"
       "zeta"

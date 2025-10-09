@@ -1,5 +1,5 @@
 let
-  keys = with (import ../keys.nix); [spore Petrichor Rhizome];
+  keys = with (import ../keys.nix); [spore Rhizome];
 in {
   "hosts/spore/secrets/cloudflare-dns.age".publicKeys = keys;
   "hosts/spore/secrets/homepage-env.age".publicKeys = keys;

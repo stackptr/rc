@@ -82,9 +82,6 @@
         format = "[@$hostname ]($style)";
         style = "bg:color_orange fg:color_fg0";
         disabled = false;
-        aliases = {
-          "RL-17745394" = "Petrichor";
-        };
       };
       directory = {
         style = "fg:color_fg0 bg:color_yellow";

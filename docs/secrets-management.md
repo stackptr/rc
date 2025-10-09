@@ -36,7 +36,6 @@ Public keys are defined in `lib/keys.nix`:
   zeta = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5...";
   
   # Admin user keys (from ~/.ssh/id_ed25519.pub)
-  Petrichor = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5...";
   Rhizome = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5...";
 }
 ```
@@ -60,7 +59,7 @@ Public keys are defined in `lib/keys.nix`:
    ```nix
    # lib/secrets/newhostname.nix
    let
-     keys = with (import ../keys.nix); [newhostname Petrichor Rhizome];
+     keys = with (import ../keys.nix); [newhostname Rhizome];
    in {
      "hosts/newhostname/secrets/example-secret.age".publicKeys = keys;
    }
@@ -88,7 +87,7 @@ Add to `lib/secrets/<hostname>.nix`:
 
 ```nix
 let
-  keys = with (import ../keys.nix); [<hostname> Petrichor Rhizome];
+  keys = with (import ../keys.nix); [<hostname> Rhizome];
 in {
   "hosts/<hostname>/secrets/my-secret.age".publicKeys = keys;
 }
@@ -172,7 +171,7 @@ Each host only has access to its own secrets plus admin keys:
 ```nix
 # lib/secrets/spore.nix - spore host secrets
 let
-  keys = with (import ../keys.nix); [spore Petrichor Rhizome];
+  keys = with (import ../keys.nix); [spore Rhizome];
 in {
   "hosts/spore/secrets/cloudflare-dns.age".publicKeys = keys;
   "hosts/spore/secrets/jwt-secret.age".publicKeys = keys;
@@ -181,7 +180,7 @@ in {
 
 # lib/secrets/glyph.nix - glyph host secrets  
 let
-  keys = with (import ../keys.nix); [glyph Petrichor Rhizome];
+  keys = with (import ../keys.nix); [glyph Rhizome];
 in {
   "hosts/glyph/secrets/samba-password.age".publicKeys = keys;
   # ... other glyph secrets

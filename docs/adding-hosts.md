@@ -201,7 +201,6 @@ See existing hosts for examples:
 - **zeta**: Raspberry Pi with services
 - **glyph**: File server with Samba
 - **spore**: Web server with complex nginx setup
-- **Petrichor**: macOS workstation
 - **Rhizome**: macOS workstation
 
 ## Common Patterns

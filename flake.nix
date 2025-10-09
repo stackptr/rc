@@ -99,11 +99,6 @@
           username = "corey";
           allowVpn = true;
         };
-        Petrichor = mkDarwinHost {
-          hostname = "Petrichor";
-          username = "corey";
-          allowVpn = false;
-        };
       };
       # Individual service checks using existing configurations
       checks = flake-utils.lib.eachDefaultSystem (system: let
