@@ -11,7 +11,7 @@ in {
     default = [];
     example = literalExpression ''
       [
-        "com.jordanbaird.Ice"
+        "com.panic.Nova"
       ]
     '';
     description = ''

@@ -6,7 +6,6 @@
 }: {
   system.startOnActivation = {
     "FastScripts" = "${pkgs.fastscripts}/Applications/FastScripts.app/";
-    "Ice" = "${pkgs.ice-bar}/Applications/Ice.app/";
     "Gitify" = "${pkgs.gitify}/Applications/Gitify.app/";
     "Hand Mirror" = "/Applications/Hand\ Mirror.app/";
     "PopClip" = "/Applications/PopClip.app/";

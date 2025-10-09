@@ -13,7 +13,6 @@
     "at.eggerapps.Postico"
     "com.colliderli.iina"
     "com.daisydiskapp.DaisyDiskStandAlone"
-    "com.jordanbaird.Ice"
     "com.lukilabs.lukiapp" # Craft
     "com.panic.Nova"
     "com.red-sweater.fastscripts"
