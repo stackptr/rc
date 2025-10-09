@@ -72,7 +72,6 @@ hosts/
        hostname = "<hostname>";
        system = "x86_64-linux";  # or "aarch64-linux"
        username = "<username>";
-       allowVpn = true;  # or false
      };
    };
    ```
@@ -111,7 +110,6 @@ hosts/
      <hostname> = mkDarwinHost {
        hostname = "<hostname>";
        username = "<username>";
-       allowVpn = true;  # or false
      };
    };
    ```
@@ -205,7 +203,6 @@ See existing hosts for examples:
 
 ## Common Patterns
 
-- Use `allowVpn = true` for hosts that should have Tailscale VPN access
 - Place shared configuration in modules, host-specific config in host directories
 - Use descriptive hostnames that reflect the machine's purpose
 - Always include SSH public keys for remote access

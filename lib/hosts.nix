@@ -51,7 +51,6 @@ inputs @ {
     hostname,
     system,
     username,
-    allowVpn,
   }: let
     validateHostname = validation.validateHostname hostname;
     validateUsername = validation.validateUsername username;
@@ -64,7 +63,7 @@ inputs @ {
     nixpkgs.lib.nixosSystem {
       inherit system;
       specialArgs = {
-        inherit inputs keys username hostname allowVpn;
+        inherit inputs keys username hostname;
         pkgs-stable = import nixpkgs-stable {inherit system;};
       };
       modules = [
@@ -91,7 +90,6 @@ inputs @ {
   mkDarwinHost = {
     hostname,
     username,
-    allowVpn,
   }: let
     system = "aarch64-darwin";
     validateHostname = validation.validateHostname hostname;
@@ -104,7 +102,7 @@ inputs @ {
     nix-darwin.lib.darwinSystem {
       inherit system;
       specialArgs = {
-        inherit inputs self keys username hostname allowVpn;
+        inherit inputs self keys username hostname;
         pkgs-stable = import nixpkgs-stable {inherit system;};
         nixDarwin = nix-darwin;
       };

@@ -77,19 +77,16 @@
           hostname = "zeta";
           system = "aarch64-linux";
           username = "mu";
-          allowVpn = true;
         };
         glyph = mkNixosHost {
           hostname = "glyph";
           system = "x86_64-linux";
           username = "mu";
-          allowVpn = true;
         };
         spore = mkNixosHost {
           hostname = "spore";
           system = "x86_64-linux";
           username = "mu";
-          allowVpn = true;
         };
       };
 
@@ -97,7 +94,6 @@
         Rhizome = mkDarwinHost {
           hostname = "Rhizome";
           username = "corey";
-          allowVpn = true;
         };
       };
       # Individual service checks using existing configurations

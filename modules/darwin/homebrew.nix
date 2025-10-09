@@ -2,7 +2,6 @@
   config,
   pkgs,
   lib,
-  allowVpn,
   ...
 }: {
   homebrew = {
@@ -25,8 +24,8 @@
           "nova"
           "postico"
           "roon"
-        ]
-        ++ lib.optionals allowVpn ["tailscale-app"];
+          "tailscale-app"
+        ];
       otherApps = [
         "legcord"
         "plex" # auto_updates
