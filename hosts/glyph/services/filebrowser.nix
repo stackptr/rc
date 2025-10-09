@@ -9,12 +9,10 @@
   port = 8080;
   dataDir = "/var/lib/filebrowser";
   rootDir = "${dataDir}/files";
-  cacheDir = "/var/cache/filebrowser";
   settings = {
     inherit address port;
     database = "${dataDir}/filebrowser.db";
     root = rootDir;
-    cache-dir = cacheDir;
     noauth = true;
     # TODO
     #cert = cfg.tlsCertificate;
