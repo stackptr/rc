@@ -1,8 +1,7 @@
 # Build the system config and switch to it when running `just` with no args
 default: switch
 
-# Substitute work laptop hostname if necessary
-hostname := `[ "$(hostname | cut -d "." -f 1)" = "RL-17745394" ] && echo "Petrichor" || hostname | cut -d "." -f 1`
+hostname := `hostname | cut -d "." -f 1`
 
 [macos]
 switch host=hostname:
