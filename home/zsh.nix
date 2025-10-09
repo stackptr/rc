@@ -1,4 +1,8 @@
-{pkgs, lib, ...}: {
+{
+  pkgs,
+  lib,
+  ...
+}: {
   programs.zsh = {
     enable = true;
     defaultKeymap = "emacs";
@@ -16,10 +20,12 @@
       searchDownKey = ["^[[B" "^[OB"];
     };
 
-    sessionVariables = {
+    sessionVariables =
+      {
         MANPAGER = "sh -c 'col -bx | bat -l man -p'";
         MANROFFOPT = "-c";
-      } // lib.optionalAttrs (!pkgs.stdenv.isDarwin) {
+      }
+      // lib.optionalAttrs (!pkgs.stdenv.isDarwin) {
         # See: https://www.gnupg.org/documentation/manuals/gnupg/Invoking-GPG_002dAGENT.html
         GPG_TTY = "$(tty)";
       };
@@ -36,18 +42,20 @@
 
     initContent = let
       novaCompletion = "compdef _files nova";
-    in ''
-      incog () {
-        unset HISTFILE
-      }
+    in
+      ''
+        incog () {
+          unset HISTFILE
+        }
 
-      if command -v nix-your-shell > /dev/null; then
-        nix-your-shell zsh | source /dev/stdin
-      fi
+        if command -v nix-your-shell > /dev/null; then
+          nix-your-shell zsh | source /dev/stdin
+        fi
 
-      setopt hist_verify
-      setopt inc_append_history
-    '' + novaCompletion;
+        setopt hist_verify
+        setopt inc_append_history
+      ''
+      + novaCompletion;
   };
 
   programs.zoxide = {
