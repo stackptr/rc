@@ -6,7 +6,6 @@
   ...
 }: {
   imports = [
-    ./aws.nix
     ./starship.nix
     ./tmux.nix
     ./zsh.nix
