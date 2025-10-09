@@ -1,4 +1,4 @@
-{pkgs, ...}: {
+{pkgs, lib, ...}: {
   programs.zsh = {
     enable = true;
     defaultKeymap = "emacs";
@@ -16,22 +16,13 @@
       searchDownKey = ["^[[B" "^[OB"];
     };
 
-    sessionVariables = let
-      baseVars = {
+    sessionVariables = {
         MANPAGER = "sh -c 'col -bx | bat -l man -p'";
         MANROFFOPT = "-c";
+      } // lib.optionalAttrs (!pkgs.stdenv.isDarwin) {
+        # See: https://www.gnupg.org/documentation/manuals/gnupg/Invoking-GPG_002dAGENT.html
+        GPG_TTY = "$(tty)";
       };
-      osVars =
-        if pkgs.stdenv.isDarwin
-        then {
-          FR_DOCKERHOST = "host.docker.internal";
-        }
-        else {
-          # See: https://www.gnupg.org/documentation/manuals/gnupg/Invoking-GPG_002dAGENT.html
-          GPG_TTY = "$(tty)";
-        };
-    in
-      baseVars // osVars;
 
     shellAliases = {
       cat = "bat -p";
@@ -56,28 +47,6 @@
 
       setopt hist_verify
       setopt inc_append_history
-
-      ## Wrappers for `stack`
-      export STACK_ARGS=(--fast --pedantic)
-
-      # Build project and specs without running tests:
-      #   sbuild fancy-api
-      #
-      # Omit argument to build everything
-      sbuild () {
-        AWS_PROFILE=freckle-dev stack build "''${STACK_ARGS[@]}" "$1" --test --no-run-tests --file-watch
-      }
-
-      # Test specific matcher pattern with stack:
-      #   stest project "matcher pattern"
-      stest () {
-        AWS_PROFILE=freckle-dev stack build "''${STACK_ARGS[@]}" --test "$1" --test-arguments="--match \"$2\"" --file-watch
-      }
-
-      # Purge package from stack to force rebuild
-      spurge () {
-        stack exec -- ghc-pkg unregister --force "$1"
-      }
     '' + novaCompletion;
   };
 
