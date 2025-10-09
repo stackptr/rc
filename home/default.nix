@@ -1,6 +1,5 @@
 {
   pkgs,
-  pkgs-stable,
   lib,
   enableGuiPackages,
   ...
@@ -12,8 +11,8 @@
   ];
 
   home.packages = with pkgs; let
-    nodejs = pkgs-stable.nodejs_20;
-    yarn = pkgs-stable.yarn.override {inherit nodejs;};
+    nodejs = pkgs.nodejs_24;
+    yarn = pkgs.yarn-berry.override {inherit nodejs;};
     development = [
       colima
       copilot-language-server
