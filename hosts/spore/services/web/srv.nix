@@ -23,6 +23,21 @@
     ];
   };
 
+  services.nginx.virtualHosts."srv.zx.dev" = {
+    root = "/mnt/srv/www";
+    forceSSL = true;
+    useACMEHost = "zx.dev";
+
+    locations."/" = {
+      extraConfig = ''
+        autoindex on;
+        autoindex_exact_size off;
+        autoindex_localtime on;
+        charset utf-8;
+      '';
+    };
+  };
+
   # Make sure network-online.target can actually be reached
   systemd.services.NetworkManager-wait-online.enable = lib.mkDefault false;
   systemd.services.systemd-networkd-wait-online.enable = lib.mkDefault true;
