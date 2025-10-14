@@ -117,7 +117,7 @@ in {
       };
       locations."= /".extraConfig = ''
         auth_request /oauth2/auth;
-        error_page 401 =403 @oauth2_redirect;
+        error_page 401 = @oauth2_redirect;
 
         auth_request_set $auth_email $upstream_http_x_auth_request_email;
         add_header X-Auth-Email $auth_email always;
