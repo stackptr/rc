@@ -26,6 +26,11 @@ in {
     ];
   };
 
+  systemd.services.pocket-id = {
+    after = ["postgresql.service" "network-online.target"];
+    requires = ["postgresql.service"];
+  };
+
   services.nginx = {
     enable = true;
     recommendedProxySettings = true;
