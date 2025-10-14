@@ -86,5 +86,14 @@ in {
         '';
       };
     };
+
+    virtualHosts."test.zx.dev" = {
+      forceSSL = true;
+      useACMEHost = "zx.dev";
+      locations."= /".extraConfig = ''
+        default_type text/html;
+        return 200 '<!doctype html><meta charset="utf-8"><title>Test</title><h1>Test page</h1>';
+      '';
+    };
   };
 }
