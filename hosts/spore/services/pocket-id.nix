@@ -78,7 +78,16 @@ in {
       useACMEHost = "zx.dev";
       locations."/oauth2/" = {
         proxyPass = "http://127.0.0.1:4180";
-        proxyWebsockets = true;
+        extraConfig = ''
+          proxy_set_header X-Auth-Request-Redirect $scheme://$host$request_uri;
+        '';
+      };
+      locations."/oauth2/auth" = {
+        proxyPass = "http://127.0.0.1:4180";
+        extraConfig = ''
+          proxy_set_header Content-Length "";
+          proxy_pass_request_body off;
+        '';
       };
       locations."/" = {
         extraConfig = ''
