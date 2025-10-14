@@ -6,6 +6,7 @@
   imports = [
     ./avahi.nix
     ./filebrowser.nix
+    ./nfs.nix
     ./samba.nix
     ./torrents.nix
   ];
