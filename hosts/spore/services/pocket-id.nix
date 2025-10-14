@@ -56,7 +56,7 @@ in {
     clientID = "shared-sso";
     redirectURL = "https://${authHost}/oauth2/callback";
     cookie.domain = ".zx.dev";
-    email.domains = [".zx.dev"];
+    email.domains = ["zx.dev"];
   };
 
   services.nginx = {
