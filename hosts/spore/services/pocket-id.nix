@@ -82,6 +82,8 @@ in {
       };
       locations."/" = {
         extraConfig = ''
+          default_type text/html;
+          add_header Content-Type "text/html; charset=utf-8";
           return 200 '<!doctype html><title>Auth</title><p>oauth2-proxy at ${authHost}</p>';
         '';
       };
