@@ -8,6 +8,7 @@
     ./db.nix
     ./homepage-dashboard.nix
     ./mastodon.nix
+    ./pocket-id.nix
     ./web
     ./infrastructure
   ];
