@@ -9,6 +9,7 @@ in {
   "hosts/spore/secrets/mastodon-vapid-public-key.age".publicKeys = keys;
   "hosts/spore/secrets/mastodon-vapid-private-key.age".publicKeys = keys;
   "hosts/spore/secrets/notifier-smtp-password.age".publicKeys = keys;
+  "hosts/spore/secrets/oauth2-proxy-env.age".publicKeys = keys;
   "hosts/spore/secrets/pocket-id-encryption-key.age".publicKeys = keys;
   "hosts/spore/secrets/restic-env.age".publicKeys = keys;
   "hosts/spore/secrets/restic-password.age".publicKeys = keys;
