@@ -10,8 +10,22 @@ in {
     settings = {
       APP_URL = "https://${appHost}";
       TRUST_PROXY = true;
+      DB_PROVIDER = "postgres";
+      DB_CONNECTION_STRING = "host=/run/postgresql user=pocketid dbname=pocketid";
+      KEYS_STORAGE = "database";
     };
   };
+
+  services.postgresql = {
+    ensureDatabases = ["pocketid"];
+    ensureUsers = [
+      {
+        name = "pocketid";
+        ensureDBOwnership = true;
+      }
+    ];
+  };
+
   services.nginx = {
     enable = true;
     recommendedProxySettings = true;
