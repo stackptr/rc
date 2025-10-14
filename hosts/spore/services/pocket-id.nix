@@ -112,7 +112,7 @@ in {
       };
       locations."= /".extraConfig = ''
         auth_request /oauth2/auth;
-        error_page 401 = https://${authHost}/oauth2/start?rd=$scheme://$http_host$request_uri;
+        error_page 401 =403 https://${authHost}/oauth2/start?rd=$scheme://$http_host$request_uri;
 
         auth_request_set $auth_user  $upstream_http_x_auth_request_user;
         auth_request_set $auth_email $upstream_http_x_auth_request_email;
