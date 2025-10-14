@@ -110,9 +110,14 @@ in {
           proxy_set_header X-Forwarded-Host $host;
         '';
       };
+      locations."@oauth2_redirect" = {
+        extraConfig = ''
+          return 302 https://${authHost}/oauth2/start?rd=$scheme://$http_host$request_uri;
+        '';
+      };
       locations."= /".extraConfig = ''
         auth_request /oauth2/auth;
-        error_page 401 =403 https://${authHost}/oauth2/start?rd=$scheme://$http_host$request_uri;
+        error_page 401 =403 @oauth2_redirect;
 
         auth_request_set $auth_user  $upstream_http_x_auth_request_user;
         auth_request_set $auth_email $upstream_http_x_auth_request_email;
