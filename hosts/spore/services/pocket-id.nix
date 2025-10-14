@@ -5,6 +5,13 @@
 }: let
   appHost = "id.zx.dev";
 in {
+  age.secrets.pocket-id-encryption-key = {
+    file = ./../secrets/pocket-id-encryption-key.age;
+    mode = "440";
+    owner = config.services.pocket-id.user;
+    group = config.services.pocket-id.group;
+  };
+
   services.pocket-id = {
     enable = true;
     settings = {
@@ -13,6 +20,7 @@ in {
       DB_PROVIDER = "postgres";
       DB_CONNECTION_STRING = "host=/run/postgresql user=pocketid dbname=pocketid";
       KEYS_STORAGE = "database";
+      ENCRYPTION_KEY_FILE = config.age.secrets.pocket-id-encryption-key.path;
     };
   };
 
