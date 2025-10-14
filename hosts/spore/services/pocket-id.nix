@@ -119,13 +119,16 @@ in {
         auth_request /oauth2/auth;
         error_page 401 =403 @oauth2_redirect;
 
-        auth_request_set $auth_user  $upstream_http_x_auth_request_user;
         auth_request_set $auth_email $upstream_http_x_auth_request_email;
-        add_header X-Auth-User  $auth_user always;
         add_header X-Auth-Email $auth_email always;
 
         default_type text/html;
-        return 200 '<!doctype html><meta charset="utf-8"><title>Test</title><h1>Test page</h1>';
+        return 200 '<!doctype html><meta charset="utf-8"><title>Protected</title>
+        <body style="font-family:system-ui;margin:2rem">
+          <h1>✅ Authenticated via Pocket ID</h1>
+          <p>Hello <strong>$auth_email</strong> from test.zx.dev.</p>
+          <p><a href="https://auth.zx.dev/oauth2/sign_out">Sign out</a></p>
+        </body>';
       '';
     };
   };
