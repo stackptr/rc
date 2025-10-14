@@ -4,7 +4,7 @@
   ...
 }: let
   issuerHost = "id.zx.dev";
-  authHost = "auth2.zx.dev"; # TODO: Conflict with Authelia
+  authHost = "oauth.zx.dev"; # TODO: Conflict with Authelia
 in {
   age.secrets.oauth2-proxy-env = {
     file = ./../secrets/oauth2-proxy-env.age;
