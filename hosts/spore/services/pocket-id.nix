@@ -58,6 +58,9 @@ in {
     nginx.domain = authHost;
     cookie.domain = ".zx.dev";
     email.domains = ["zx.dev"];
+    extraConfig = {
+      whitelist-domain = ".zx.dev";
+    };
   };
 
   services.nginx = {
