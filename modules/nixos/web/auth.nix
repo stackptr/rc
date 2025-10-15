@@ -112,93 +112,95 @@ in {
       };
   };
 
-  config = mkIf cfg.enable {
-    # TODO: Add assertion for services.nginx.virtualHosts.<name>.requireAuth
-    # assertions = ...
+  config = lib.mkMerge [
+    (mkIf cfg.enable {
+      # TODO: Add assertion for services.nginx.virtualHosts.<name>.requireAuth
+      # assertions = ...
 
-    services.pocket-id = {
-      enable = true;
-      settings = {
-        APP_URL = "https://${cfg.issuer.host}";
-        TRUST_PROXY = true;
-        DB_PROVIDER = "postgres";
-        DB_CONNECTION_STRING = "host=/run/postgresql user=pocketid dbname=pocketid";
-        KEYS_STORAGE = "database";
-        ENCRYPTION_KEY_FILE = cfg.issuer.encryptionKeyFile;
-      };
-    };
-
-    services.postgresql = {
-      ensureDatabases = ["pocketid"];
-      ensureUsers = [
-        {
-          name = "pocketid";
-          ensureDBOwnership = true;
-        }
-      ];
-    };
-
-    systemd.services.pocket-id = {
-      after = ["postgresql.service" "network-online.target"];
-      requires = ["postgresql.service"];
-    };
-
-    services.oauth2-proxy = {
-      enable = true;
-      provider = "oidc";
-      oidcIssuerUrl = "https://${cfg.issuer.host}";
-      keyFile = cfg.authProxy.keyFile;
-      reverseProxy = true;
-      setXauthrequest = true;
-      clientID = cfg.authProxy.clientID;
-      redirectURL = "https://${cfg.authProxy.host}/oauth2/callback";
-      nginx.domain = cfg.authProxy.host;
-      cookie.domain = cfg.authProxy.domain;
-      email.domains = ["*"];
-      extraConfig = {
-        whitelist-domain = cfg.authProxy.domain;
-        insecure-oidc-allow-unverified-email = true;
-      };
-    };
-
-    services.nginx = {
-      enable = true;
-      recommendedProxySettings = true;
-      recommendedTlsSettings = true;
-
-      virtualHosts.${cfg.issuer.host} = {
-        forceSSL = true;
-        useACMEHost = cfg.issuer.useACMEHost;
-        locations."/" = {
-          proxyPass = "http://127.0.0.1:1411";
-          proxyWebsockets = true;
+      services.pocket-id = {
+        enable = true;
+        settings = {
+          APP_URL = "https://${cfg.issuer.host}";
+          TRUST_PROXY = true;
+          DB_PROVIDER = "postgres";
+          DB_CONNECTION_STRING = "host=/run/postgresql user=pocketid dbname=pocketid";
+          KEYS_STORAGE = "database";
+          ENCRYPTION_KEY_FILE = cfg.issuer.encryptionKeyFile;
         };
       };
 
-      virtualHosts.${cfg.authProxy.host} = {
-        forceSSL = true;
-        useACMEHost = cfg.authProxy.useACMEHost;
-        locations."/oauth2/" = {
-          proxyPass = "http://127.0.0.1:4180";
-          extraConfig = ''
-            proxy_set_header X-Auth-Request-Redirect $scheme://$host$request_uri;
-          '';
-        };
-        locations."/oauth2/auth" = {
-          proxyPass = "http://127.0.0.1:4180";
-          extraConfig = ''
-            proxy_set_header Content-Length "";
-            proxy_pass_request_body off;
-          '';
-        };
-        locations."/" = {
-          extraConfig = ''
-            default_type text/html;
-            add_header Content-Type "text/html; charset=utf-8";
-            return 200 '<!doctype html><title>Auth</title><p>oauth2-proxy at ${cfg.authProxy.host}</p>';
-          '';
+      services.postgresql = {
+        ensureDatabases = ["pocketid"];
+        ensureUsers = [
+          {
+            name = "pocketid";
+            ensureDBOwnership = true;
+          }
+        ];
+      };
+
+      systemd.services.pocket-id = {
+        after = ["postgresql.service" "network-online.target"];
+        requires = ["postgresql.service"];
+      };
+
+      services.oauth2-proxy = {
+        enable = true;
+        provider = "oidc";
+        oidcIssuerUrl = "https://${cfg.issuer.host}";
+        keyFile = cfg.authProxy.keyFile;
+        reverseProxy = true;
+        setXauthrequest = true;
+        clientID = cfg.authProxy.clientID;
+        redirectURL = "https://${cfg.authProxy.host}/oauth2/callback";
+        nginx.domain = cfg.authProxy.host;
+        cookie.domain = cfg.authProxy.domain;
+        email.domains = ["*"];
+        extraConfig = {
+          whitelist-domain = cfg.authProxy.domain;
+          insecure-oidc-allow-unverified-email = true;
         };
       };
-    };
-  };
+
+      services.nginx = {
+        enable = true;
+        recommendedProxySettings = true;
+        recommendedTlsSettings = true;
+
+        virtualHosts.${cfg.issuer.host} = {
+          forceSSL = true;
+          useACMEHost = cfg.issuer.useACMEHost;
+          locations."/" = {
+            proxyPass = "http://127.0.0.1:1411";
+            proxyWebsockets = true;
+          };
+        };
+
+        virtualHosts.${cfg.authProxy.host} = {
+          forceSSL = true;
+          useACMEHost = cfg.authProxy.useACMEHost;
+          locations."/oauth2/" = {
+            proxyPass = "http://127.0.0.1:4180";
+            extraConfig = ''
+              proxy_set_header X-Auth-Request-Redirect $scheme://$host$request_uri;
+            '';
+          };
+          locations."/oauth2/auth" = {
+            proxyPass = "http://127.0.0.1:4180";
+            extraConfig = ''
+              proxy_set_header Content-Length "";
+              proxy_pass_request_body off;
+            '';
+          };
+          locations."/" = {
+            extraConfig = ''
+              default_type text/html;
+              add_header Content-Type "text/html; charset=utf-8";
+              return 200 '<!doctype html><title>Auth</title><p>oauth2-proxy at ${cfg.authProxy.host}</p>';
+            '';
+          };
+        };
+      };
+    })
+  ];
 }
