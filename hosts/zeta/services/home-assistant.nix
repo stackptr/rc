@@ -15,6 +15,12 @@
       # Includes dependencies for a basic setup
       # https://www.home-assistant.io/integrations/default_config/
       default_config = {};
+      http = {
+        use_x_forwarded_for = true;
+        trusted_proxies = [
+          "100.64.0.0/10"
+        ];
+      };
     };
   };
   networking.firewall.allowedTCPPorts = [8123];
