@@ -5,7 +5,6 @@
   buildNpmPackage,
   pnpm_9,
   nix-update-script,
-  nixosTests,
 }: let
   version = "0.8.8-beta";
 
@@ -67,9 +66,6 @@ in
     passthru = {
       updateScript = nix-update-script {};
       inherit frontend;
-      tests = {
-        inherit (nixosTests) filebrowser;
-      };
     };
 
     meta = with lib; {
