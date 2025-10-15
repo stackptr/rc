@@ -43,7 +43,7 @@
     "torrents.zx.dev" = {
       forceSSL = true;
       useACMEHost = "zx.dev";
-      enableAutheliaAuth = true;
+      requireAuth = true;
       locations."/".proxyPass = "http://glyph.rove-duck.ts.net:9091";
       locations."~ (/transmission)?/rpc".proxyPass = "http://glyph.rove-duck.ts.net:9091";
     };
@@ -60,13 +60,13 @@
     "files.zx.dev" = {
       forceSSL = true;
       useACMEHost = "zx.dev";
-      enableAutheliaAuth = true;
+      requireAuth = true;
       locations."/".proxyPass = "http://glyph.rove-duck.ts.net:8080";
     };
     "home.zx.dev" = {
       forceSSL = true;
       useACMEHost = "zx.dev";
-      enableAutheliaAuth = true;
+      requireAuth = true;
       locations."/".proxyPass = "http://127.0.0.1:8082";
     };
   };
