@@ -3,12 +3,9 @@
   fetchFromGitHub,
   buildGoModule,
   buildNpmPackage,
-  pnpm_9,
   nix-update-script,
 }: let
   version = "0.8.8-beta";
-
-  pnpm = pnpm_9;
 
   src = fetchFromGitHub {
     owner = "gtsteffaniak";
@@ -23,19 +20,9 @@
 
     sourceRoot = "${src.name}/frontend";
 
-    npmConfigHook = pnpm.configHook;
-    npmDeps = pnpmDeps;
+    npmDepsHash = "";
 
-    pnpmDeps = pnpm.fetchDeps {
-      inherit
-        pname
-        version
-        src
-        sourceRoot
-        ;
-      fetcherVersion = 2;
-      hash = "";
-    };
+    npmBuildScript = "build";
 
     installPhase = ''
       runHook preInstall
