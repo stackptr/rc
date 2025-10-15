@@ -10,6 +10,9 @@ self: super: {
   # FastScripts automation tool for macOS
   fastscripts = super.callPackage ./../packages/fastscripts/package.nix {};
 
+  # FileBrowser quantum fork
+  filebrowser-quantum = super.callPackage ./../packages/filebrowser-quantum/package.nix {};
+
   # Mochi spaced repetition software
   mochi = super.callPackage ./../packages/mochi/package.nix {};
 
