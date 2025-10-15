@@ -139,7 +139,7 @@ in {
         auth_request_set $auth_email $upstream_http_x_auth_request_email;
         add_header X-Auth-Email $auth_email always;
 
-        try_files /__ok =404;
+        rewrite ^ /__ok last;
       '';
     };
   };
