@@ -57,7 +57,7 @@ in {
     redirectURL = "https://${authHost}/oauth2/callback";
     nginx.domain = authHost;
     cookie.domain = ".zx.dev";
-    email.domains = ["zx.dev"];
+    email.domains = ["*"];
     extraConfig = {
       whitelist-domain = ".zx.dev";
     };
