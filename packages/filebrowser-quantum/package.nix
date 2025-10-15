@@ -47,7 +47,10 @@ in
     '';
 
     ldflags = [
-      "-X github.com/filebrowser/filebrowser/v2/version.Version=v${version}"
+      "-w"
+      "-s"
+      "-X 'github.com/gtsteffaniak/filebrowser/backend/version.CommitSHA=testingCommit'"
+      "-X 'github.com/gtsteffaniak/filebrowser/backend/version.Version=testing'"
     ];
 
     passthru = {
