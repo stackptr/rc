@@ -18,6 +18,10 @@
       # Includes dependencies for a basic setup
       # https://www.home-assistant.io/integrations/default_config/
       default_config = {};
+      auth_oidc = {
+        client_id = "5717cfe0-7251-466b-a067-a7dd3a1c4f81";
+        discovery_url = "https://id.zx.dev/.well-known/openid-configuration";
+      };
     };
   };
   networking.firewall.allowedTCPPorts = [8123];
