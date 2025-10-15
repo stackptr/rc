@@ -33,13 +33,6 @@
         "/pgp".return = "302 https://keyoxide.org/hkp/413d1a0152bcb08d2e3ddacaf88c08579051ab48";
       };
     };
-    "auth.zx.dev" = {
-      forceSSL = true;
-      useACMEHost = "zx.dev";
-      useAutheliaProxyConf = true;
-      locations."/".proxyPass = "http://127.0.0.1:9091";
-      locations."/api/verify".proxyPass = "http://127.0.0.1:9091";
-    };
     "torrents.zx.dev" = {
       forceSSL = true;
       useACMEHost = "zx.dev";
