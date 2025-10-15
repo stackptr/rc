@@ -104,6 +104,10 @@ in {
               return 302 https://${cfg.authProxy.host}/oauth2/start?rd=$scheme://$http_host$request_uri;
             '';
           };
+          locations."/".extraConfig = ''
+            auth_request /oauth2/auth;
+            error_page 401 = @oauth2_redirect;
+          '';
         };
       };
     in

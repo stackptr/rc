@@ -38,10 +38,6 @@
       useACMEHost = "zx.dev";
       requireAuth = true;
       locations."/" = {
-        extraConfig = ''
-          auth_request /oauth2/auth;
-          error_page 401 = @oauth2_redirect;
-        '';
         root = "/var/www/test";
         index = "index.html";
       };
