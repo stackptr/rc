@@ -6,9 +6,7 @@
   pnpm_9,
   nix-update-script,
   nixosTests,
-}:
-
-let
+}: let
   version = "2.42.5";
 
   pnpm = pnpm_9;
@@ -49,37 +47,36 @@ let
       runHook postInstall
     '';
   };
-
 in
-buildGoModule {
-  pname = "filebrowser";
-  inherit version src;
+  buildGoModule {
+    pname = "filebrowser";
+    inherit version src;
 
-  vendorHash = "sha256-aVtL64Cm+nqum/qHFvplpEawgMXM2S6l8QFrJBzLVtU=";
+    vendorHash = "sha256-aVtL64Cm+nqum/qHFvplpEawgMXM2S6l8QFrJBzLVtU=";
 
-  excludedPackages = [ "tools" ];
+    excludedPackages = ["tools"];
 
-  preBuild = ''
-    cp -r ${frontend}/dist frontend/
-  '';
+    preBuild = ''
+      cp -r ${frontend}/dist frontend/
+    '';
 
-  ldflags = [
-    "-X github.com/filebrowser/filebrowser/v2/version.Version=v${version}"
-  ];
+    ldflags = [
+      "-X github.com/filebrowser/filebrowser/v2/version.Version=v${version}"
+    ];
 
-  passthru = {
-    updateScript = nix-update-script { };
-    inherit frontend;
-    tests = {
-      inherit (nixosTests) filebrowser;
+    passthru = {
+      updateScript = nix-update-script {};
+      inherit frontend;
+      tests = {
+        inherit (nixosTests) filebrowser;
+      };
     };
-  };
 
-  meta = with lib; {
-    description = "Web application for managing files and directories";
-    homepage = "https://filebrowser.org";
-    license = licenses.asl20;
-    maintainers = with maintainers; [ oakenshield ];
-    mainProgram = "filebrowser";
-  };
-}
+    meta = with lib; {
+      description = "Web application for managing files and directories";
+      homepage = "https://filebrowser.org";
+      license = licenses.asl20;
+      maintainers = with maintainers; [oakenshield];
+      mainProgram = "filebrowser";
+    };
+  }
