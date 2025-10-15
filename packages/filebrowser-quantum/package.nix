@@ -7,19 +7,19 @@
   nix-update-script,
   nixosTests,
 }: let
-  version = "2.42.5";
+  version = "0.8.8-beta";
 
   pnpm = pnpm_9;
 
   src = fetchFromGitHub {
-    owner = "filebrowser";
+    owner = "gtsteffaniak";
     repo = "filebrowser";
     rev = "v${version}";
     hash = "sha256-6AZwWdYQlaQ30Q5ohi9ovlUJZZ+u7Wqc5mfRW/3t7Zs=";
   };
 
   frontend = buildNpmPackage rec {
-    pname = "filebrowser-frontend";
+    pname = "filebrowser-quantum-frontend";
     inherit version src;
 
     sourceRoot = "${src.name}/frontend";
@@ -49,7 +49,7 @@
   };
 in
   buildGoModule {
-    pname = "filebrowser";
+    pname = "filebrowser-quantum";
     inherit version src;
 
     vendorHash = "sha256-aVtL64Cm+nqum/qHFvplpEawgMXM2S6l8QFrJBzLVtU=";
