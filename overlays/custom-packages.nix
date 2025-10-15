@@ -13,9 +13,6 @@ self: super: {
   # Mochi spaced repetition software
   mochi = super.callPackage ./../packages/mochi/package.nix {};
 
-  # Scroll Reverser for macOS trackpad settings
-  scroll-reverser = super.callPackage ./../packages/scroll-reverser/package.nix {};
-
   # Transmission client alternative
   transmissionic = super.callPackage ./../packages/transmissionic/package.nix {};
 
