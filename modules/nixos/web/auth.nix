@@ -114,9 +114,6 @@ in {
 
   config = lib.mkMerge [
     (mkIf cfg.enable {
-      # TODO: Add assertion for services.nginx.virtualHosts.<name>.requireAuth
-      # assertions = ...
-
       services.pocket-id = {
         enable = true;
         settings = {
@@ -202,5 +199,15 @@ in {
         };
       };
     })
+    (let
+      vhosts = config.services.nginx.virtualHosts;
+      vhostsRequiringAuth = mapNames (lib.filter (set: set.value.requireAuth == true) (lib.attrsToList vhosts));
+      mapNames = e: toString (lib.map (set: set.name) e);
+    in
+      mkIf (!cfg.enable && vhostsRequiringAuth != "") {
+        warnings = [
+          "The following nginx hosts have requireAuth, but config.rc.web.auth is not enabled: ${vhostsRequiringAuth}"
+        ];
+      })
   ];
 }
