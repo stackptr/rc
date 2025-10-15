@@ -60,6 +60,7 @@ in {
     email.domains = ["*"];
     extraConfig = {
       whitelist-domain = ".zx.dev";
+      insecure-oidc-allow-unverified-email = true;
     };
   };
 
