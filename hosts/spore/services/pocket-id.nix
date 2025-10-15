@@ -111,7 +111,7 @@ in {
         extraConfig = ''
           proxy_set_header X-Original-URI $request_uri;
           proxy_set_header X-Real-IP      $remote_addr;
-          proxy_set_header X-Scheme       $scheme;
+          proxy_set_header X-Forwarded-Proto $scheme;
           proxy_set_header X-Forwarded-Host $host;
         '';
       };
