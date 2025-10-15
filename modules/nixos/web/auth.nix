@@ -141,6 +141,7 @@ in {
       };
 
       systemd.services.pocket-id = {
+        wants = ["network-online.target"];
         after = ["postgresql.service" "network-online.target"];
         requires = ["postgresql.service"];
       };
