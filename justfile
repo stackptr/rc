@@ -55,7 +55,7 @@ build-host host:
 # Check specific service configurations
 check-services:
   @echo "🔍 Checking individual service configurations..."
-  nix flake check --print-build-logs | grep -E "(spore|glyph)-(nginx|authelia|postgresql|samba|transmission)" || echo "Service checks completed"
+  nix flake check --print-build-logs | grep -E "(spore|glyph)-(nginx|postgresql|samba|transmission)" || echo "Service checks completed"
 
 # List all available hosts
 list-hosts:

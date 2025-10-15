@@ -4,7 +4,6 @@
   ...
 }: {
   imports = [
-    ./authelia.nix
     ./db.nix
     ./homepage-dashboard.nix
     ./mastodon.nix

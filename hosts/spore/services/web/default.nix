@@ -1,7 +1,7 @@
 # Web services and nginx configuration
 {
   imports = [
-    ./nginx-options.nix
+    ./auth.nix
     ./ssl-acme.nix
     ./nginx-config.nix
     ./srv.nix
