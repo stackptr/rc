@@ -15,7 +15,7 @@
     owner = "gtsteffaniak";
     repo = "filebrowser";
     rev = "v${version}";
-    hash = "sha256-6AZwWdYQlaQ30Q5ohi9ovlUJZZ+u7Wqc5mfRW/3t7Zs=";
+    hash = "";
   };
 
   frontend = buildNpmPackage rec {
@@ -35,7 +35,7 @@
         sourceRoot
         ;
       fetcherVersion = 2;
-      hash = "sha256-uGEw6Wt6hXEcYQzXYzfgo3fcCX7Hj39bLHsT1rsGy74=";
+      hash = "";
     };
 
     installPhase = ''
@@ -52,7 +52,7 @@ in
     pname = "filebrowser-quantum";
     inherit version src;
 
-    vendorHash = "sha256-aVtL64Cm+nqum/qHFvplpEawgMXM2S6l8QFrJBzLVtU=";
+    vendorHash = "";
 
     excludedPackages = ["tools"];
 
