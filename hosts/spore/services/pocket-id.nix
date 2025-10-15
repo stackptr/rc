@@ -122,25 +122,42 @@ in {
           return 302 https://${authHost}/oauth2/start?rd=$scheme://$http_host$request_uri;
         '';
       };
-      locations."= /__ok".extraConfig = ''
-        internal;
-        default_type text/html;
-        return 200 '<!doctype html><meta charset="utf-8"><title>Protected</title>
-        <body style="font-family:system-ui;margin:2rem">
-          <h1>✅ Authenticated via Pocket ID</h1>
-          <p>Hello <strong>$upstream_http_x_auth_request_email</strong> from test.zx.dev.</p>
-          <p><a href="https://${authHost}/oauth2/sign_out">Sign out</a></p>
-        </body>';
-      '';
-      locations."/".extraConfig = ''
-        auth_request /oauth2/auth;
-        error_page 401 = @oauth2_redirect;
-
-        auth_request_set $auth_email $upstream_http_x_auth_request_email;
-        add_header X-Auth-Email $auth_email always;
-
-        rewrite ^ /__ok last;
-      '';
+      locations."/" = {
+        extraConfig = ''
+          auth_request /oauth2/auth;
+          error_page 401 = @oauth2_redirect;
+        '';
+        root = "/var/www/test";
+        index = "index.html";
+      };
     };
+  };
+
+  systemd.tmpfiles.rules = [
+    "d /var/www 0755 root root -"
+    "d /var/www/test 0755 root root -"
+  ];
+  systemd.mounts = let
+    testSite = pkgs.writeTextDir "index.html" ''
+      <!doctype html>
+      <meta charset="utf-8">
+      <title>Protected</title>
+      <body style="font-family:system-ui;margin:2rem">
+        <h1>✅ Authenticated via Pocket ID</h1>
+      </body>
+    '';
+  in [
+    {
+      what = "${testSite}";
+      where = "/var/www/test";
+      type = "none";
+      options = "bind,ro";
+      wantedBy = ["multi-user.target"];
+    }
+  ];
+  systemd.services.nginx = {
+    after = ["var-www-test.mount"];
+    requires = ["var-www-test.mount"];
+    serviceConfig.RequiresMountsFor = ["/var/www/test"];
   };
 }
