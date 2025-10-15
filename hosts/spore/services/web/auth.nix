@@ -24,7 +24,7 @@
       encryptionKeyFile = config.age.secrets.pocket-id-encryption-key.path;
     };
     authProxy = {
-      host = "oauth.zx.dev"; # TODO: Conflict with Authelia
+      host = "oauth.zx.dev";
       domain = ".zx.dev";
       clientID = "shared-sso";
       useACMEHost = "zx.dev";
