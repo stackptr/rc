@@ -73,10 +73,9 @@ in
     };
 
     meta = with lib; {
-      description = "Web application for managing files and directories";
-      homepage = "https://filebrowser.org";
+      description = "Fork of filebrowser project";
+      homepage = "https://github.com/gtsteffaniak/filebrowser";
       license = licenses.asl20;
-      maintainers = with maintainers; [oakenshield];
       mainProgram = "filebrowser";
     };
   }
