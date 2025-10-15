@@ -11,6 +11,9 @@
       "met"
       "radio_browser"
     ];
+    customComponents = with pkgs.home-assistant-custom-components; [
+      auth_oidc
+    ];
     config = {
       # Includes dependencies for a basic setup
       # https://www.home-assistant.io/integrations/default_config/
