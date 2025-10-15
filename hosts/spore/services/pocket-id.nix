@@ -106,7 +106,7 @@ in {
     virtualHosts."test.zx.dev" = {
       forceSSL = true;
       useACMEHost = "zx.dev";
-      locations."=/oauth2/auth" = {
+      locations."= /oauth2/auth" = {
         proxyPass = "http://127.0.0.1:4180";
         extraConfig = ''
           proxy_set_header X-Original-URI $request_uri;
