@@ -1,3 +1,4 @@
+# TODO: Upstream to NixOS/nixpkgs
 {
   lib,
   fetchFromGitHub,
