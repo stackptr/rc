@@ -55,6 +55,7 @@ in {
     setXauthrequest = true;
     clientID = "shared-sso";
     redirectURL = "https://${authHost}/oauth2/callback";
+    nginx.domain = authHost;
     cookie.domain = ".zx.dev";
     email.domains = ["zx.dev"];
   };
