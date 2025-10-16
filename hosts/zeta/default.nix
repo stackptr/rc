@@ -10,6 +10,9 @@
   ];
 
   systemd.package = pkgs.systemd;
+  environment.systemPackages = with pkgs; [
+    systemd
+  ];
 
   environment.pathsToLink = ["/share/zsh"];
   system.stateVersion = "23.11";
