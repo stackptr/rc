@@ -9,16 +9,9 @@
     ./services
   ];
 
-  systemd.package = pkgs.systemd;
-  environment.systemPackages = with pkgs; let
-    systemd-link = pkgs.runCommand "systemd-stdio-bridge-link" {} ''
-      mkdir -p $out/lib/systemd
-      ln -s ${pkgs.systemd}/bin/systemd-stdio-bridge \
-            $out/lib/systemd/systemd-stdio-bridge
-    '';
-  in [
-    systemd
-    systemd-link
+  systemd.package = pkgs.systemdWithBridge;
+  environment.systemPackages = with pkgs; [
+    systemdWithBridge
   ];
 
   environment.pathsToLink = ["/share/zsh"];
