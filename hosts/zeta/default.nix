@@ -14,6 +14,8 @@
     systemdWithBridge
   ];
 
+  services.dbus.implementation = "broker";
+
   environment.pathsToLink = ["/share/zsh"];
   system.stateVersion = "23.11";
 }
