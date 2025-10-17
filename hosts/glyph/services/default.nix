@@ -55,4 +55,8 @@
     enable = true;
     extraUpFlags = ["--ssh"];
   };
+  services.yt-dlp-web-ui = {
+    enable = true;
+    downloadDir = "/mnt/unsorted/yt-dlp";
+  };
 }
