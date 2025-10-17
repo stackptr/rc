@@ -8,15 +8,71 @@
   imports = [
     ./disable-updates.nix
     ./fastscripts.nix
-    ./fonts.nix
-    ./homebrew.nix
     ./popclip.nix
     ./scroll-reverser.nix
-    ./security.nix
     ./start-on-activation.nix
-    ./startup-apps.nix
-    ./system-defaults.nix
   ];
+
+  fonts.packages = [
+    pkgs.nerd-fonts.meslo-lg # Supplies MesloLGSDZ: Line Gap Small, Dotted Zero
+  ];
+
+  homebrew = {
+    enable = true;
+    caskArgs.no_quarantine = true;
+    onActivation = {
+      cleanup = "zap";
+      upgrade = true;
+    };
+    taps = builtins.attrNames config.nix-homebrew.taps; # See: zhaofengli/nix-homebrew#5
+    # N.B.: Apps marked auto_updates will not be updated by homebrew. These apps should
+    # have their updates disabled and then marked `greedy` to force homebrew to update.
+    casks = let
+      greedyApps =
+        map (name: {
+          inherit name;
+          greedy = true;
+        }) [
+          "craft"
+          "nova"
+          "postico"
+          "roon"
+          "tailscale-app"
+        ];
+      otherApps = [
+        "legcord"
+        "plex" # auto_updates
+        "textual"
+      ];
+    in
+      lib.concatLists [
+        greedyApps
+        otherApps
+      ];
+    # N.B.: Removed entries in `masApps` require manual uninstallation
+    masApps = {
+      "Copilot" = 1447330651;
+      "Folder Quick Look" = 6753110395;
+      "GoodLinks" = 1474335294;
+      "Hand Mirror" = 1502839586;
+      "Hush" = 1544743900;
+      "Mapper" = 1589391989;
+      "Mela" = 1568924476;
+      "MusicBox" = 1614730313;
+      "Numbers" = 409203825;
+      "Noir" = 1592917505;
+      "Pages" = 409201541;
+      "Paku" = 1534130193;
+      "Parcel" = 375589283;
+      "Pixea" = 1507782672;
+      "Play" = 1596506190;
+      "Prompt" = 1594420480;
+      "Reeder" = 1529448980;
+      "Timery" = 1425368544;
+      "Things" = 904280696;
+      "Wipr" = 1320666476;
+    };
+  };
 
   programs.fastscripts = {
     enable = true;
@@ -36,6 +92,117 @@
 
   programs.scroll-reverser = {
     enable = true;
+  };
+
+  security.pam.services.sudo_local = {
+    reattach = true;
+    touchIdAuth = true;
+  };
+
+  system.disableUpdates = [
+    "at.eggerapps.Postico"
+    "com.colliderli.iina"
+    "com.daisydiskapp.DaisyDiskStandAlone"
+    "com.lukilabs.lukiapp" # Craft
+    "com.panic.Nova"
+    "com.red-sweater.fastscripts"
+    "com.rogueamoeba.soundsource"
+    "io.tailscale.ipn.macsys"
+    "org.sbarex.QLMarkdown"
+  ];
+
+  system.startOnActivation = {
+    "FastScripts" = "${pkgs.fastscripts}/Applications/FastScripts.app/";
+    "Hand Mirror" = "/Applications/Hand\ Mirror.app/";
+    "PopClip" = "/Applications/PopClip.app/";
+    "Scroll Reverser" = "${pkgs.scroll-reverser}/Applications/Scroll\ Reverser.app/";
+    "SoundSource" = "${pkgs.soundsource}/Applications/SoundSource.app/";
+    "Tailscale" = "/Applications/Tailscale.app/";
+  };
+
+  system.defaults = {
+    ".GlobalPreferences"."com.apple.mouse.scaling" = 1.5;
+    LaunchServices.LSQuarantine = false;
+    NSGlobalDomain = {
+      AppleScrollerPagingBehavior = true; # Jump to spot on scroll bar when clicked
+      NSAutomaticCapitalizationEnabled = false;
+      NSAutomaticDashSubstitutionEnabled = false;
+      NSAutomaticPeriodSubstitutionEnabled = false;
+      NSAutomaticQuoteSubstitutionEnabled = false; # Disable smart quoting
+      NSAutomaticSpellingCorrectionEnabled = false;
+      "com.apple.springing.enabled" = true;
+      "com.apple.springing.delay" = 0.5;
+      # "com.apple.trackpad.forceClick" = 1; # TODO
+      "com.apple.trackpad.scaling" = 1.0;
+
+      # Always use expanded save panel
+      NSNavPanelExpandedStateForSaveMode = true;
+      NSNavPanelExpandedStateForSaveMode2 = true;
+
+      # Quickly repeat keys when held
+      InitialKeyRepeat = 15;
+      KeyRepeat = 2;
+    };
+    # TODO:
+    # showAppExposeGestureEnabled = 1;
+    # showMissionControlGestureEnabled = 1;
+    dock = {
+      appswitcher-all-displays = false;
+      autohide = false;
+      mineffect = "scale";
+      minimize-to-application = false;
+      mru-spaces = false;
+      orientation = "bottom";
+      show-process-indicators = false;
+      showhidden = false;
+      show-recents = false;
+      static-only = false;
+      magnification = true;
+
+      # Disable hot corners
+      wvous-tl-corner = 1;
+      wvous-bl-corner = 1;
+      wvous-tr-corner = 1;
+      wvous-br-corner = 1;
+    };
+    finder = {
+      AppleShowAllFiles = false;
+      ShowStatusBar = false;
+      ShowPathbar = false;
+      FXDefaultSearchScope = "SCcf"; # Search current folder first when searching
+      FXPreferredViewStyle = "Nlsv"; # Prefer list view
+      AppleShowAllExtensions = true;
+      FXEnableExtensionChangeWarning = false; # Do not warn when changing file extensions
+    };
+    menuExtraClock = {
+      ShowAMPM = true;
+      ShowDayOfWeek = false;
+      ShowDate = 0; # Show full date
+    };
+    screencapture.location = "~/Downloads";
+    trackpad = {
+      Clicking = true; # tap to click
+      Dragging = true; # tap to drag
+      TrackpadThreeFingerDrag = true;
+    };
+  };
+
+  system.defaults.CustomUserPreferences = {
+    "com.apple.desktopservices" = {
+      DSDontWriteNetworkStores = true;
+    };
+
+    # N.B.: Terminal requires Full Disk Access to apply Safari defaults
+    "com.apple.Safari" = {
+      AutoOpenSafeDownloads = false; # Prevent opening "safe" files automatically
+      ShowFullURLInSmartSearchField = false;
+      "ShowFavoritesBar-v2" = false;
+      IncludeDevelopMenu = true;
+      WebKitDeveloperExtrasEnabledPreferenceKey = true;
+    };
+
+    # TODO: Handle in disable-update module
+    "at.obdev.littlesnitch.softwareupdate".SoftwareUpdateCheckAutomatically = false;
   };
 
   system.configurationRevision = self.rev or self.dirtyRev or null;
