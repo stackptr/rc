@@ -29,6 +29,7 @@ with lib; let
 in {
   options.programs.fastscripts = {
     enable = mkEnableOption "FastScripts";
+
     userScripts = mkOption {
       type = types.attrsOf (types.submodule text);
       default = {};
@@ -36,6 +37,7 @@ in {
         Set of files that have to be linked in {file}`~/Library/Scripts`.
       '';
     };
+
     plistFile = mkOption {
       type = types.nullOr types.path;
       default = null;
