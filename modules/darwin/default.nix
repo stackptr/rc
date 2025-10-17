@@ -30,7 +30,6 @@
           inherit name;
           greedy = true;
         }) [
-          "craft"
           "nova"
           "postico"
           "roon"
@@ -70,6 +69,10 @@
     };
   };
 
+  programs.craft = {
+    enable = true;
+  };
+
   programs.fastscripts = {
     enable = true;
     userScripts = {
@@ -107,7 +110,6 @@
     "at.eggerapps.Postico"
     "com.colliderli.iina"
     "com.daisydiskapp.DaisyDiskStandAlone"
-    "com.lukilabs.lukiapp" # Craft
     "com.panic.Nova"
     "com.rogueamoeba.soundsource"
     "org.sbarex.QLMarkdown"
