@@ -34,7 +34,6 @@
           "nova"
           "postico"
           "roon"
-          "tailscale-app"
         ];
       otherApps = [
         "legcord"
@@ -94,6 +93,11 @@
     startOnActivation = true;
   };
 
+  programs.tailscale = {
+    enable = true;
+    startOnActivation = true;
+  };
+
   security.pam.services.sudo_local = {
     reattach = true;
     touchIdAuth = true;
@@ -106,7 +110,6 @@
     "com.lukilabs.lukiapp" # Craft
     "com.panic.Nova"
     "com.rogueamoeba.soundsource"
-    "io.tailscale.ipn.macsys"
     "org.sbarex.QLMarkdown"
     {
       domain = "at.obdev.littlesnitch.softwareupdate";
@@ -117,7 +120,6 @@
   system.startOnActivation = {
     "Hand Mirror" = "/Applications/Hand\ Mirror.app/";
     "SoundSource" = "${pkgs.soundsource}/Applications/SoundSource.app/";
-    "Tailscale" = "/Applications/Tailscale.app/";
   };
 
   system.defaults = {
