@@ -83,15 +83,18 @@
       };
     };
     plistFile = pkgs.writeText "fastscripts-keybindings.plist" (builtins.readFile ./fastscripts/keybindings.plist);
+    startOnActivation = true;
   };
 
   # TODO: Ideally this would be in a Darwin-specific home-manager module
   programs.popclip = {
     enable = true;
+    startOnActivation = true;
   };
 
   programs.scroll-reverser = {
     enable = true;
+    startOnActivation = true;
   };
 
   security.pam.services.sudo_local = {
@@ -112,10 +115,7 @@
   ];
 
   system.startOnActivation = {
-    "FastScripts" = "${pkgs.fastscripts}/Applications/FastScripts.app/";
     "Hand Mirror" = "/Applications/Hand\ Mirror.app/";
-    "PopClip" = "/Applications/PopClip.app/";
-    "Scroll Reverser" = "${pkgs.scroll-reverser}/Applications/Scroll\ Reverser.app/";
     "SoundSource" = "${pkgs.soundsource}/Applications/SoundSource.app/";
     "Tailscale" = "/Applications/Tailscale.app/";
   };

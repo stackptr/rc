@@ -48,6 +48,8 @@ in {
         This file can be obtained using: `plutil -convert xml1 -o - ~/Library/Preferences/com.red-sweater.fastscripts.plist > fastscripts.xml`.
       '';
     };
+
+    startOnActivation = mkEnableOption "starting FastScripts on activation";
   };
 
   config = mkIf cfg.enable {
@@ -64,6 +66,9 @@ in {
           '')
           userScripts}
       '';
+    system.startOnActivation = mkIf cfg.startOnActivation {
+      "FastScripts" = "${pkgs.fastscripts}/Applications/FastScripts.app/";
+    };
     system.activationScripts.postActivation.text = let
       user = lib.escapeShellArg config.system.primaryUser;
     in

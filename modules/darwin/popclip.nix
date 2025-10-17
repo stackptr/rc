@@ -9,6 +9,8 @@ with lib; let
 in {
   options.programs.popclip = {
     enable = mkEnableOption "PopClip";
+
+    startOnActivation = mkEnableOption "starting PopClip on activation";
   };
 
   config = mkIf cfg.enable {
@@ -37,6 +39,9 @@ in {
       };
     };
     system.disableUpdates = ["com.pilotmoon.popclip"];
+    system.startOnActivation = mkIf cfg.startOnActivation {
+      PopClip = "/Applications/PopClip.app/";
+    };
     system.activationScripts.popclipExtensions.text = ''
       popclipExtPlist=~/Library/Application\ Support/PopClip/Extensions/Extensions.plist
       if test -f "$popclipExtPlist"; then

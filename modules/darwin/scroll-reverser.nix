@@ -9,6 +9,8 @@ with lib; let
 in {
   options.programs.scroll-reverser = {
     enable = mkEnableOption "Scroll Reverser";
+
+    startOnActivation = mkEnableOption "starting Scroll Reverser on activation";
   };
 
   config = mkIf cfg.enable {
@@ -21,6 +23,9 @@ in {
         ReverseY = true;
         StartAtLogin = true;
       };
+    };
+    system.startOnActivation = mkIf cfg.startOnActivation {
+      "Scroll Reverser" = "${pkgs.scroll-reverser}/Applications/Scroll\ Reverser.app/";
     };
   };
 }
