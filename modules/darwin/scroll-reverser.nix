@@ -8,7 +8,7 @@ with lib; let
   cfg = config.programs.scroll-reverser;
 in {
   options.programs.scroll-reverser = {
-    enable = mkEnableOption "Whether to enable Scroll Reverser";
+    enable = mkEnableOption "Scroll Reverser";
   };
 
   config = mkIf cfg.enable {

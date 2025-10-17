@@ -28,7 +28,7 @@ with lib; let
   plistFile = config.programs.fastscripts.plistFile;
 in {
   options.programs.fastscripts = {
-    enable = mkEnableOption "Whether to enable FastScripts";
+    enable = mkEnableOption "FastScripts";
     userScripts = mkOption {
       type = types.attrsOf (types.submodule text);
       default = {};

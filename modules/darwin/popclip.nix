@@ -8,7 +8,7 @@ with lib; let
   cfg = config.programs.popclip;
 in {
   options.programs.popclip = {
-    enable = mkEnableOption "Whether to enable PopClip";
+    enable = mkEnableOption "PopClip";
   };
 
   config = mkIf cfg.enable {
