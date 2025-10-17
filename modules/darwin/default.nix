@@ -6,11 +6,8 @@
   ...
 }: {
   imports = [
-    ./disable-updates.nix
-    ./fastscripts.nix
-    ./popclip.nix
-    ./scroll-reverser.nix
-    ./start-on-activation.nix
+    ./programs
+    ./system
   ];
 
   fonts.packages = [
