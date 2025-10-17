@@ -37,10 +37,13 @@
     yt-dlp-web-ui = {
       url = "github:marcopiovanello/yt-dlp-web-ui";
       inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-parts.follows = "flake-parts";
+      inputs.pre-commit-hooks-nix.follows = "pre-commit-hooks-nix";
     };
     zx-dev = {
       url = "github:stackptr/zx.dev";
       inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-parts.follows = "flake-parts";
     };
 
     # macOS
@@ -64,6 +67,28 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.flake-utils.follows = "flake-utils";
       inputs.systems.follows = "systems";
+      inputs.flake-compat.follows = "flake-compat";
+      inputs.treefmt-nix.follows = "treefmt-nix";
+    };
+
+    # Transitive dependency pinning
+    flake-compat = {
+      url = "github:edolstra/flake-compat";
+      flake = false;
+    };
+    pre-commit-hooks-nix = {
+      url = "github:cachix/pre-commit-hooks.nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-compat.follows = "flake-compat";
+    };
+    nixpkgs-lib.url = "github:nix-community/nixpkgs.lib";
+    flake-parts = {
+      url = "github:hercules-ci/flake-parts";
+      inputs.nixpkgs-lib.follows = "nixpkgs-lib";
+    };
+    treefmt-nix = {
+      url = "github:numtide/treefmt-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 
