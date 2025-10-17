@@ -79,7 +79,7 @@
     "com.apple.Safari" = {
       AutoOpenSafeDownloads = false; # Prevent opening "safe" files automatically
       ShowFullURLInSmartSearchField = false;
-      ShowFavoritesBar = false;
+      "ShowFavoritesBar-v2" = false;
       IncludeDevelopMenu = true;
       WebKitDeveloperExtrasEnabledPreferenceKey = true;
     };
