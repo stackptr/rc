@@ -76,6 +76,7 @@
       DSDontWriteNetworkStores = true;
     };
 
+    # N.B.: Terminal requires Full Disk Access to apply Safari defaults
     "com.apple.Safari" = {
       AutoOpenSafeDownloads = false; # Prevent opening "safe" files automatically
       ShowFullURLInSmartSearchField = false;
