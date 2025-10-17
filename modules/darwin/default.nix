@@ -30,7 +30,6 @@
           inherit name;
           greedy = true;
         }) [
-          "postico"
           "roon"
         ];
       otherApps = [
@@ -94,6 +93,10 @@
     startOnActivation = true;
   };
 
+  programs.postico = {
+    enable = true;
+  };
+
   programs.scroll-reverser = {
     enable = true;
     startOnActivation = true;
@@ -110,7 +113,6 @@
   };
 
   system.disableUpdates = [
-    "at.eggerapps.Postico"
     "com.colliderli.iina"
     "com.daisydiskapp.DaisyDiskStandAlone"
     "com.rogueamoeba.soundsource"
