@@ -40,49 +40,6 @@
 
   system.configurationRevision = self.rev or self.dirtyRev or null;
 
-  # TODO: Keyboard shortcuts, see nix-darwin/nix-darwin#699
-  # system.keyboard.shortcuts = let
-  #   cmdOptLeft = {
-  #     mods = {
-  #       option = true;
-  #       command = true;
-  #     };
-  #     key = "left";
-  #   };
-  #   cmdOptRight = {
-  #     mods = {
-  #       option = true;
-  #       command = true;
-  #     };
-  #     key = "right";
-  #   };
-  # in {
-  #   enable = true;
-  #   appShortcuts = {
-  #     "Preview.app" = {
-  #       "Show Previous Tab" = cmdOptLeft;
-  #       "Show Next Tab" = cmdOptRight
-  #     };
-  #     "Finder.app" = {
-  #       "Show Previous Tab" = cmdOptLeft;
-  #       "Show Next Tab" = cmdOptRight
-  #     };
-  #     "Prompt.app" = {
-  #       "Show Previous Tab" = cmdOptLeft;
-  #       "Show Next Tab" = cmdOptRight
-  #     };
-  #     "Mail.app" = {
-  #       "Archive" = {
-  #         key = "right";
-  #       };
-  #     };
-  #     "Nova.app" = {
-  #       "Show Previous Tab" = cmdOptLeft;
-  #       "Show Next Tab" = cmdOptRight
-  #     };
-  #   };
-  # };
-
   # Auto upgrade nix package and the daemon service.
   nix.enable = true;
   nix.package = pkgs.nix;
