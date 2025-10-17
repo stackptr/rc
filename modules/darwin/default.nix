@@ -108,7 +108,6 @@
     "com.daisydiskapp.DaisyDiskStandAlone"
     "com.lukilabs.lukiapp" # Craft
     "com.panic.Nova"
-    "com.red-sweater.fastscripts"
     "com.rogueamoeba.soundsource"
     "io.tailscale.ipn.macsys"
     "org.sbarex.QLMarkdown"

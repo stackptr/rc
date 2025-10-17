@@ -66,6 +66,7 @@ in {
           '')
           userScripts}
       '';
+    system.disableUpdates = ["com.red-sweater.fastscripts"];
     system.startOnActivation = mkIf cfg.startOnActivation {
       "FastScripts" = "${pkgs.fastscripts}/Applications/FastScripts.app/";
     };
