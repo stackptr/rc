@@ -75,23 +75,14 @@
     "com.apple.desktopservices" = {
       DSDontWriteNetworkStores = true;
     };
-    # Requires disabling SIP?
-    # "com.apple.Safari" = {
-    #   AutoOpenSafeDownloads = false; # Prevent opening "safe" files automatically
-    #   ShowFullURLInSmartSearchField = false;
-    #   ShowFavoritesBar = false;
-    #   WebContinuousSpellCheckingEnabled = true;
-    #   WebAutomaticSpellingCorrectionEnabled = false;
-    #   WarnAboutFraudulentWebsites = true;
-    #   "com.apple.Safari.ContentPageGroupIdentifier.WebKit2BackspaceKeyNavigationEnabled" = false;
 
-    #   # Develop menu
-    #   IncludeDevelopMenu = true;
-    #   WebKitDeveloperExtrasEnabledPreferenceKey = true;
-    #   "com.apple.Safari.ContentPageGroupIdentifier.WebKit2DeveloperExtrasEnabled" = true;
-
-    #   # TODO: Set "compact" tab layout
-    # };
+    "com.apple.Safari" = {
+      AutoOpenSafeDownloads = false; # Prevent opening "safe" files automatically
+      ShowFullURLInSmartSearchField = false;
+      ShowFavoritesBar = false;
+      IncludeDevelopMenu = true;
+      WebKitDeveloperExtrasEnabledPreferenceKey = true;
+    };
 
     # TODO: Handle in disable-update module
     "at.obdev.littlesnitch.softwareupdate".SoftwareUpdateCheckAutomatically = false;
