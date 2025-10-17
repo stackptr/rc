@@ -9,9 +9,9 @@
     ./services
   ];
 
-  systemd.package = pkgs.systemdWithBridge;
+  systemd.package = pkgs.systemd;
   environment.systemPackages = with pkgs; [
-    systemdWithBridge
+    systemd
   ];
 
   services.dbus.implementation = "broker";
