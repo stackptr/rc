@@ -28,7 +28,8 @@ with lib; let
   plistFile = config.programs.fastscripts.plistFile;
 in {
   options.programs.fastscripts = {
-    enable = mkEnableOption "Whether to enable FastScripts";
+    enable = mkEnableOption "FastScripts";
+
     userScripts = mkOption {
       type = types.attrsOf (types.submodule text);
       default = {};
@@ -36,6 +37,7 @@ in {
         Set of files that have to be linked in {file}`~/Library/Scripts`.
       '';
     };
+
     plistFile = mkOption {
       type = types.nullOr types.path;
       default = null;
@@ -46,6 +48,8 @@ in {
         This file can be obtained using: `plutil -convert xml1 -o - ~/Library/Preferences/com.red-sweater.fastscripts.plist > fastscripts.xml`.
       '';
     };
+
+    startOnActivation = mkEnableOption "starting FastScripts on activation";
   };
 
   config = mkIf cfg.enable {
@@ -62,6 +66,10 @@ in {
           '')
           userScripts}
       '';
+    system.disableUpdates = ["com.red-sweater.fastscripts"];
+    system.startOnActivation = mkIf cfg.startOnActivation {
+      "FastScripts" = "${pkgs.fastscripts}/Applications/FastScripts.app/";
+    };
     system.activationScripts.postActivation.text = let
       user = lib.escapeShellArg config.system.primaryUser;
     in
