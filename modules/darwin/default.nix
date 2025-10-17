@@ -30,7 +30,6 @@
           inherit name;
           greedy = true;
         }) [
-          "nova"
           "postico"
           "roon"
         ];
@@ -85,6 +84,10 @@
     startOnActivation = true;
   };
 
+  programs.nova-editor = {
+    enable = true;
+  };
+
   # TODO: Ideally this would be in a Darwin-specific home-manager module
   programs.popclip = {
     enable = true;
@@ -110,7 +113,6 @@
     "at.eggerapps.Postico"
     "com.colliderli.iina"
     "com.daisydiskapp.DaisyDiskStandAlone"
-    "com.panic.Nova"
     "com.rogueamoeba.soundsource"
     "org.sbarex.QLMarkdown"
     {
