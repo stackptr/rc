@@ -34,6 +34,10 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.systems.follows = "systems";
     };
+    yt-dlp-web-ui = {
+      url = "github:marcopiovanello/yt-dlp-web-ui";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     zx-dev = {
       url = "github:stackptr/zx.dev";
       inputs.nixpkgs.follows = "nixpkgs";
