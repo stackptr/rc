@@ -111,6 +111,10 @@
     "com.rogueamoeba.soundsource"
     "io.tailscale.ipn.macsys"
     "org.sbarex.QLMarkdown"
+    {
+      domain = "at.obdev.littlesnitch.softwareupdate";
+      keys = ["SoftwareUpdateCheckAutomatically"];
+    }
   ];
 
   system.startOnActivation = {
@@ -199,9 +203,6 @@
       IncludeDevelopMenu = true;
       WebKitDeveloperExtrasEnabledPreferenceKey = true;
     };
-
-    # TODO: Handle in disable-update module
-    "at.obdev.littlesnitch.softwareupdate".SoftwareUpdateCheckAutomatically = false;
   };
 
   system.configurationRevision = self.rev or self.dirtyRev or null;
