@@ -3,6 +3,7 @@
   lib,
   pkgs,
   nixDarwin,
+  username,
   ...
 }:
 with lib; let
@@ -53,7 +54,7 @@ in {
   };
 
   config = mkIf cfg.enable {
-    environment.systemPackages = [pkgs.fastscripts];
+    home-manager.users.${username}.home.packages = [pkgs.fastscripts];
     system.build.fastscripts =
       pkgs.runCommand "fastscripts"
       {preferLocalBuild = true;}

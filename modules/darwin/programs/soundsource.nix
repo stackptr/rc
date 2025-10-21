@@ -2,6 +2,7 @@
   config,
   lib,
   pkgs,
+  username,
   ...
 }:
 with lib; let
@@ -14,7 +15,7 @@ in {
   };
 
   config = mkIf cfg.enable {
-    environment.systemPackages = [pkgs.soundsource];
+    home-manager.users.${username}.home.packages = [pkgs.soundsource];
     system.disableUpdates = ["com.rogueamoeba.soundsource"];
     system.startOnActivation = mkIf cfg.startOnActivation {
       "SoundSource" = "${pkgs.soundsource}/Applications/SoundSource.app/";
