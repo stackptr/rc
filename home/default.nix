@@ -98,13 +98,15 @@
 
   programs.git = {
     enable = true;
-    userName = "✿ corey";
-    userEmail = "corey@x64.co";
     signing = {
       key = "F88C08579051AB48";
       signByDefault = true;
     };
-    extraConfig = {
+    settings = {
+      user = {
+        name = "✿ corey";
+        email = "corey@x64.co";
+      };
       sequence.editor = "interactive-rebase-tool";
       pull.rebase = true;
       push.autosetupremote = true;
