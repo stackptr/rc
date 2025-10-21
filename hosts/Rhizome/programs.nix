@@ -47,6 +47,7 @@
     enable = true;
     startOnActivation = true;
   };
+  rc.darwin.defaults.fastscripts = true;
 
   programs.iina = {
     enable = true;
