@@ -1,6 +1,7 @@
 {
   imports = [
     ./craft.nix
+    ./daisydisk.nix
     ./fastscripts.nix
     ./iina.nix
     ./nova-editor.nix
