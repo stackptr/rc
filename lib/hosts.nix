@@ -16,7 +16,6 @@ inputs @ {
 }: let
   keys = import ./keys.nix;
   overlays = import ./../overlays;
-  validation = import ./validation.nix {inherit (nixpkgs) lib;};
 
   mkHomeManager = {
     username,
@@ -51,15 +50,7 @@ inputs @ {
     hostname,
     system,
     username,
-  }: let
-    validateHostname = validation.validateHostname hostname;
-    validateUsername = validation.validateUsername username;
-    validateSystem = validation.validateSystem system;
-    validateHostFiles = validation.validateHostFiles {
-      inherit hostname;
-      hostType = "nixos";
-    };
-  in
+  }:
     nixpkgs.lib.nixosSystem {
       inherit system;
       specialArgs = {
@@ -92,12 +83,6 @@ inputs @ {
     username,
   }: let
     system = "aarch64-darwin";
-    validateHostname = validation.validateHostname hostname;
-    validateUsername = validation.validateUsername username;
-    validateHostFiles = validation.validateHostFiles {
-      inherit hostname;
-      hostType = "darwin";
-    };
   in
     nix-darwin.lib.darwinSystem {
       inherit system;

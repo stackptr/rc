@@ -96,26 +96,6 @@
           username = "corey";
         };
       };
-      # Individual service checks using existing configurations
-      checks = flake-utils.lib.eachDefaultSystem (system: let
-        pkgs = nixpkgs.legacyPackages.${system};
-
-        # Simple syntax validation checks for services
-        serviceChecks = {
-          host-validation = pkgs.runCommand "host-validation" {} ''
-            echo "✅ All host configurations are syntactically valid" > $out
-          '';
-
-          secrets-structure = pkgs.runCommand "secrets-structure" {} ''
-            echo "✅ Secrets structure validation passed" > $out
-          '';
-
-          flake-structure = pkgs.runCommand "flake-structure" {} ''
-            echo "✅ Flake structure validation passed" > $out
-          '';
-        };
-      in
-        serviceChecks);
     }
     // flake-utils.lib.eachDefaultSystem (
       system: let
