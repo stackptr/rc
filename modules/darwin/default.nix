@@ -123,10 +123,6 @@
     }
   ];
 
-  system.startOnActivation = {
-    "Hand Mirror" = "/Applications/Hand\ Mirror.app/";
-  };
-
   system.defaults = {
     ".GlobalPreferences"."com.apple.mouse.scaling" = 1.5;
     LaunchServices.LSQuarantine = false;
