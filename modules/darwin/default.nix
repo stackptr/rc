@@ -61,6 +61,10 @@
     enable = true;
   };
 
+  programs.daisydisk = {
+    enable = true;
+  };
+
   programs.fastscripts = {
     enable = true;
     userScripts = {
@@ -115,7 +119,6 @@
   };
 
   system.disableUpdates = [
-    "com.daisydiskapp.DaisyDiskStandAlone"
     "org.sbarex.QLMarkdown"
     {
       domain = "at.obdev.littlesnitch.softwareupdate";

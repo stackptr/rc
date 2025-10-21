@@ -8,7 +8,6 @@
   home.packages = with pkgs; [
     chatgpt
     claude-desktop
-    daisydisk
     github-desktop
     gitify
     m-cli
