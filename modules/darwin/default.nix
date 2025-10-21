@@ -3,6 +3,7 @@
   config,
   pkgs,
   lib,
+  username,
   ...
 }: {
   imports = [
@@ -13,6 +14,10 @@
   fonts.packages = [
     pkgs.nerd-fonts.meslo-lg # Supplies MesloLGSDZ: Line Gap Small, Dotted Zero
   ];
+
+  home-manager.users.${username} = {...}: {
+    imports = [./home.nix];
+  };
 
   homebrew = {
     enable = true;

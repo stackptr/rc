@@ -52,28 +52,12 @@
       unzip
     ];
     guiApps = [cinny-desktop code-cursor];
-    darwinApps = [
-      chatgpt
-      claude-desktop
-      daisydisk
-      github-desktop
-      gitify
-      iina
-      m-cli
-      mas
-      mochi
-      slack
-      the-unarchiver
-      whatsapp-for-mac
-      zoom-us
-    ];
   in
     development
     ++ nixSpecific
     ++ tuiApps
     ++ utilities
-    ++ lib.optionals enableGuiPackages guiApps
-    ++ lib.optionals stdenv.isDarwin darwinApps;
+    ++ lib.optionals enableGuiPackages guiApps;
   home.sessionPath = [
     "$HOME/.local/bin"
   ];
