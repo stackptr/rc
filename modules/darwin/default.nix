@@ -22,11 +22,9 @@
       upgrade = true;
     };
     taps = builtins.attrNames config.nix-homebrew.taps; # See: zhaofengli/nix-homebrew#5
-    # N.B.: Apps marked auto_updates will not be updated by homebrew. These apps should
-    # have their updates disabled and then marked `greedy` to force homebrew to update.
     casks = [
       "legcord"
-      "plex" # auto_updates
+      "plex"
       "textual"
     ];
     # N.B.: Removed entries in `masApps` require manual uninstallation
