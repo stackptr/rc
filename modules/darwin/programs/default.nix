@@ -4,6 +4,7 @@
     ./daisydisk.nix
     ./fastscripts.nix
     ./iina.nix
+    ./little-snitch.nix
     ./nova-editor.nix
     ./popclip.nix
     ./postico.nix
