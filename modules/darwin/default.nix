@@ -74,7 +74,6 @@
     enable = true;
   };
 
-  # TODO: Ideally this would be in a Darwin-specific home-manager module
   programs.popclip = {
     enable = true;
     startOnActivation = true;
