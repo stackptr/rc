@@ -2,6 +2,7 @@
   imports = [
     ./craft.nix
     ./fastscripts.nix
+    ./iina.nix
     ./nova-editor.nix
     ./popclip.nix
     ./postico.nix
