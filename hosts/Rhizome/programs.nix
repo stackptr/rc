@@ -87,8 +87,4 @@
     enable = true;
     startOnActivation = true;
   };
-
-  system.disableUpdates = [
-    "org.sbarex.QLMarkdown"
-  ];
 }
