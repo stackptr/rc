@@ -52,6 +52,10 @@
     enable = true;
   };
 
+  programs.little-snitch = {
+    enable = true;
+  };
+
   programs.nova-editor = {
     enable = true;
   };
@@ -86,9 +90,5 @@
 
   system.disableUpdates = [
     "org.sbarex.QLMarkdown"
-    {
-      domain = "at.obdev.littlesnitch.softwareupdate";
-      keys = ["SoftwareUpdateCheckAutomatically"];
-    }
   ];
 }
