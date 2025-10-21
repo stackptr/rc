@@ -93,6 +93,11 @@
     startOnActivation = true;
   };
 
+  programs.soundsource = {
+    enable = true;
+    startOnActivation = true;
+  };
+
   programs.tailscale = {
     enable = true;
     startOnActivation = true;
@@ -106,7 +111,6 @@
   system.disableUpdates = [
     "com.colliderli.iina"
     "com.daisydiskapp.DaisyDiskStandAlone"
-    "com.rogueamoeba.soundsource"
     "org.sbarex.QLMarkdown"
     {
       domain = "at.obdev.littlesnitch.softwareupdate";
@@ -116,7 +120,6 @@
 
   system.startOnActivation = {
     "Hand Mirror" = "/Applications/Hand\ Mirror.app/";
-    "SoundSource" = "${pkgs.soundsource}/Applications/SoundSource.app/";
   };
 
   system.defaults = {

@@ -63,7 +63,6 @@
       mas
       mochi
       slack
-      soundsource
       the-unarchiver
       whatsapp-for-mac
       zoom-us
