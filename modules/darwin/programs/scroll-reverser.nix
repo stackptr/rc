@@ -2,17 +2,20 @@
   config,
   lib,
   pkgs,
+  username,
   ...
 }:
 with lib; let
   cfg = config.programs.scroll-reverser;
 in {
   options.programs.scroll-reverser = {
-    enable = mkEnableOption "Whether to enable Scroll Reverser";
+    enable = mkEnableOption "Scroll Reverser";
+
+    startOnActivation = mkEnableOption "starting Scroll Reverser on activation";
   };
 
   config = mkIf cfg.enable {
-    environment.systemPackages = [pkgs.scroll-reverser];
+    home-manager.users.${username}.home.packages = [pkgs.scroll-reverser];
     system.defaults.CustomUserPreferences = {
       "com.pilotmoon.scroll-reverser" = {
         InvertScrollingOn = true;
@@ -21,6 +24,9 @@ in {
         ReverseY = true;
         StartAtLogin = true;
       };
+    };
+    system.startOnActivation = mkIf cfg.startOnActivation {
+      "Scroll Reverser" = "${pkgs.scroll-reverser}/Applications/Scroll\ Reverser.app/";
     };
   };
 }
