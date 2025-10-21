@@ -11,7 +11,6 @@
     daisydisk
     github-desktop
     gitify
-    iina
     m-cli
     mas
     mochi

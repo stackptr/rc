@@ -73,6 +73,10 @@
     startOnActivation = true;
   };
 
+  programs.iina = {
+    enable = true;
+  };
+
   programs.nova-editor = {
     enable = true;
   };
@@ -111,7 +115,6 @@
   };
 
   system.disableUpdates = [
-    "com.colliderli.iina"
     "com.daisydiskapp.DaisyDiskStandAlone"
     "org.sbarex.QLMarkdown"
     {
