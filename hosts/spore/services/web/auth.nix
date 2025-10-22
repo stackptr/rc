@@ -13,7 +13,7 @@
     file = ./../../secrets/pocket-id-encryption-key.age;
     mode = "440";
     owner = config.services.pocket-id.user;
-    group = config.services.pocket-id.group;
+    inherit (config.services.pocket-id) group;
   };
 
   rc.web.auth = {

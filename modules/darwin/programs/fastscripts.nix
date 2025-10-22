@@ -26,7 +26,7 @@ with lib; let
     fi
   '';
   userScripts = filter (f: f.enable) (attrValues config.programs.fastscripts.userScripts);
-  plistFile = config.programs.fastscripts.plistFile;
+  inherit (config.programs.fastscripts) plistFile;
 in {
   options.programs.fastscripts = {
     enable = mkEnableOption "FastScripts";

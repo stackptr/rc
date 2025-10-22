@@ -15,11 +15,11 @@
     file = ../secrets/tailscale-auth-key.age;
     mode = "440";
     owner = config.services.golink.user;
-    group = config.services.golink.group;
+    inherit (config.services.golink) group;
   };
 
   services.glances = {
-    enable = config.services.homepage-dashboard.enable;
+    inherit (config.services.homepage-dashboard) enable;
   };
 
   services.golink = {
