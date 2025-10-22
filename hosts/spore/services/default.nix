@@ -5,6 +5,7 @@
 }: {
   imports = [
     ./db.nix
+    ./grafana.nix
     ./homepage-dashboard.nix
     ./mastodon.nix
     ./web
