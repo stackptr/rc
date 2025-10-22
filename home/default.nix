@@ -14,7 +14,6 @@
     yarn = pkgs.yarn-berry.override {inherit nodejs;};
     development = [
       colima
-      copilot-language-server
       docker
       hub
       jo

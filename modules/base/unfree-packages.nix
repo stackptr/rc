@@ -10,7 +10,6 @@
       "chatgpt"
       "claude-code"
       "claude-desktop"
-      "copilot-language-server"
       "cursor"
       "daisydisk"
       "fastscripts"
