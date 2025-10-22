@@ -126,7 +126,13 @@
       }: {
         devShells = {
           default = pkgs.mkShell {
-            packages = [inputs'.agenix.packages.default pkgs.cachix pkgs.just];
+            packages =
+              [
+                inputs'.agenix.packages.default
+                pkgs.cachix
+                pkgs.just
+              ]
+              ++ config.pre-commit.settings.enabledPackages;
             inherit (config.pre-commit) shellHook;
           };
         };
