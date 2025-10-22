@@ -8,9 +8,9 @@
       url = "path:./flake.systems.nix";
       flake = false;
     };
-    flake-utils = {
-      url = "github:numtide/flake-utils";
-      inputs.systems.follows = "systems";
+    flake-parts = {
+      url = "github:hercules-ci/flake-parts";
+      inputs.nixpkgs-lib.follows = "nixpkgs";
     };
     agenix = {
       url = "github:ryantm/agenix";
@@ -21,6 +21,10 @@
     };
     home-manager = {
       url = "github:nix-community/home-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    git-hooks-nix = {
+      url = "github:cachix/git-hooks.nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -37,6 +41,7 @@
     zx-dev = {
       url = "github:stackptr/zx.dev";
       inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-parts.follows = "flake-parts";
     };
 
     # macOS
@@ -58,66 +63,90 @@
     mac-app-util = {
       url = "github:hraban/mac-app-util";
       inputs.nixpkgs.follows = "nixpkgs";
-      inputs.flake-utils.follows = "flake-utils";
       inputs.systems.follows = "systems";
     };
   };
 
-  outputs = inputs @ {
-    nixpkgs,
-    flake-utils,
-    agenix,
-    ...
-  }: let
-    inherit (import ./lib/hosts.nix inputs) mkNixosHost mkDarwinHost;
-  in
-    {
-      nixosConfigurations = {
-        zeta = mkNixosHost {
-          hostname = "zeta";
-          system = "aarch64-linux";
-          username = "mu";
-        };
-        glyph = mkNixosHost {
-          hostname = "glyph";
-          system = "x86_64-linux";
-          username = "mu";
-        };
-        spore = mkNixosHost {
-          hostname = "spore";
-          system = "x86_64-linux";
-          username = "mu";
-        };
-      };
+  outputs = inputs @ {flake-parts, ...}:
+    flake-parts.lib.mkFlake {inherit inputs;} ({
+      config,
+      withSystem,
+      moduleWithSystem,
+      ...
+    }: {
+      imports = [
+        inputs.git-hooks-nix.flakeModule
+      ];
 
-      darwinConfigurations = {
-        Rhizome = mkDarwinHost {
-          hostname = "Rhizome";
-          username = "corey";
-        };
-      };
-    }
-    // flake-utils.lib.eachDefaultSystem (
-      system: let
-        pkgs = nixpkgs.legacyPackages.${system};
-        agenixPkg = agenix.packages.${system}.default;
+      flake = let
+        inherit (import ./lib/hosts.nix inputs) mkNixosHost mkDarwinHost;
       in {
-        devShells = {
-          default = pkgs.mkShell {
-            packages = [agenixPkg pkgs.cachix pkgs.just];
+        nixosConfigurations = {
+          zeta = mkNixosHost {
+            hostname = "zeta";
+            system = "aarch64-linux";
+            username = "mu";
+          };
+          glyph = mkNixosHost {
+            hostname = "glyph";
+            system = "x86_64-linux";
+            username = "mu";
+          };
+          spore = mkNixosHost {
+            hostname = "spore";
+            system = "x86_64-linux";
+            username = "mu";
           };
         };
-        formatter = pkgs.alejandra;
-      }
-    );
 
-  nixConfig = {
-    experimental-features = ["nix-command" "flakes"];
-    extra-substituters = [
-      "https://stackptr.cachix.org"
-    ];
-    extra-trusted-public-keys = [
-      "stackptr.cachix.org-1:5e2q7OxdRdAtvRmHTeogpgJKzQhbvFqNMmCMw71opZA="
-    ];
-  };
+        darwinConfigurations = {
+          Rhizome = mkDarwinHost {
+            hostname = "Rhizome";
+            username = "corey";
+          };
+        };
+
+        nixConfig = {
+          experimental-features = ["nix-command" "flakes"];
+          extra-substituters = [
+            "https://stackptr.cachix.org"
+          ];
+          extra-trusted-public-keys = [
+            "stackptr.cachix.org-1:5e2q7OxdRdAtvRmHTeogpgJKzQhbvFqNMmCMw71opZA="
+          ];
+        };
+      };
+
+      systems = import inputs.systems;
+      perSystem = {
+        pkgs,
+        inputs',
+        config,
+        ...
+      }: {
+        devShells = {
+          default = pkgs.mkShell {
+            packages =
+              [
+                inputs'.agenix.packages.default
+                pkgs.cachix
+                pkgs.just
+              ]
+              ++ config.pre-commit.settings.enabledPackages;
+            inherit (config.pre-commit) shellHook;
+          };
+        };
+        formatter = let
+          inherit (config.pre-commit.settings) package configFile;
+        in
+          pkgs.writeShellScriptBin "pre-commit-run" ''
+            ${pkgs.lib.getExe package} run --all-files --config ${configFile}
+          '';
+        pre-commit.settings.hooks = {
+          alejandra.enable = true;
+          nil.enable = true;
+          statix.enable = true;
+        };
+      };
+    });
 }
