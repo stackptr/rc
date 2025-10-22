@@ -27,7 +27,6 @@
     nixSpecific = [
       comma
       manix
-      nil
       nix-du
       nix-tree
       nix-your-shell
