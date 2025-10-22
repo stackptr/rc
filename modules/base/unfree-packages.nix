@@ -10,7 +10,6 @@
       "chatgpt"
       "claude-code"
       "claude-desktop"
-      "cursor"
       "daisydisk"
       "fastscripts"
       "mochi"

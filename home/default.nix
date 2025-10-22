@@ -47,7 +47,7 @@
       sox
       unzip
     ];
-    guiApps = [cinny-desktop code-cursor];
+    guiApps = [cinny-desktop];
   in
     development
     ++ nixSpecific
