@@ -11,6 +11,10 @@
       port = 9100;
       enabledCollectors = ["systemd"];
     };
+    exporters.zfs = {
+      enable = true;
+      port = 9134;
+    };
     scrapeConfigs = [
       {
         job_name = "node";
@@ -18,6 +22,16 @@
           {
             targets = [
               "localhost:${toString config.services.prometheus.exporters.node.port}"
+            ];
+          }
+        ];
+      }
+      {
+        job_name = "zfs";
+        static_configs = [
+          {
+            targets = [
+              "localhost:${toString config.services.prometheus.exporters.zfs.port}"
             ];
           }
         ];
