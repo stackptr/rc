@@ -130,7 +130,12 @@
             shellHook = config.pre-commit.shellHook;
           };
         };
-        formatter = pkgs.alejandra;
+        formatter = let
+          inherit (config.pre-commit.settings) package configFile;
+        in
+          pkgs.writeShellScriptBin "pre-commit-run" ''
+            ${pkgs.lib.getExe package} run --all-files --config ${configFile}
+          '';
         pre-commit.settings.hooks = {
           alejandra.enable = true;
         };
