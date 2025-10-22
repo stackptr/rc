@@ -41,5 +41,17 @@
         admin_email = "corey@zx.dev";
       };
     };
+    provision = {
+      enable = true;
+      datasources.settings.datasources = [
+        {
+          name = "Prometheus";
+          type = "prometheus";
+          url = "http://glyph.rove-duck.ts.net:9099";
+          isDefault = true;
+          editable = false;
+        }
+      ];
+    };
   };
 }
