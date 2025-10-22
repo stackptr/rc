@@ -7,6 +7,7 @@
     ./avahi.nix
     ./filebrowser.nix
     ./nfs.nix
+    ./prometheus.nix
     ./samba.nix
     ./torrents.nix
   ];

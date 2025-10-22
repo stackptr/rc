@@ -62,5 +62,10 @@
       requireAuth = true;
       locations."/".proxyPass = "http://127.0.0.1:8082";
     };
+    "grafana.zx.dev" = {
+      forceSSL = true;
+      useACMEHost = "zx.dev";
+      locations."/".proxyPass = "http://127.0.0.1:${toString config.services.grafana.settings.server.http_port}";
+    };
   };
 }
