@@ -74,6 +74,10 @@
       moduleWithSystem,
       ...
     }: {
+      imports = [
+        inputs.git-hooks-nix.flakeModule
+      ];
+
       flake = let
         inherit (import ./lib/hosts.nix inputs) mkNixosHost mkDarwinHost;
       in {
@@ -125,6 +129,9 @@
           };
         };
         formatter = pkgs.alejandra;
+        pre-commit.settings.hooks = {
+          alejandra.enable = true;
+        };
       };
     });
 }
