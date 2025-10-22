@@ -18,7 +18,7 @@ in {
 
       # TODO: Require settings.connection.url to be set
       settings = mkOption {
-        type = tomlFormat.type;
+        inherit (tomlFormat) type;
         default = {};
         example = lib.literalExpression ''
           {

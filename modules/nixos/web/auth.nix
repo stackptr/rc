@@ -150,10 +150,10 @@ in {
         enable = true;
         provider = "oidc";
         oidcIssuerUrl = "https://${cfg.issuer.host}";
-        keyFile = cfg.authProxy.keyFile;
+        inherit (cfg.authProxy) keyFile;
         reverseProxy = true;
         setXauthrequest = true;
-        clientID = cfg.authProxy.clientID;
+        inherit (cfg.authProxy) clientID;
         redirectURL = "https://${cfg.authProxy.host}/oauth2/callback";
         nginx.domain = cfg.authProxy.host;
         cookie.domain = cfg.authProxy.domain;
@@ -171,7 +171,7 @@ in {
 
         virtualHosts.${cfg.issuer.host} = {
           forceSSL = true;
-          useACMEHost = cfg.issuer.useACMEHost;
+          inherit (cfg.issuer) useACMEHost;
           locations."/" = {
             proxyPass = "http://127.0.0.1:1411";
             proxyWebsockets = true;
@@ -180,7 +180,7 @@ in {
 
         virtualHosts.${cfg.authProxy.host} = {
           forceSSL = true;
-          useACMEHost = cfg.authProxy.useACMEHost;
+          inherit (cfg.authProxy) useACMEHost;
           locations."/oauth2/" = {
             proxyPass = "http://127.0.0.1:4180";
             extraConfig = ''
@@ -206,7 +206,7 @@ in {
     })
     (let
       vhosts = config.services.nginx.virtualHosts;
-      vhostsRequiringAuth = mapNames (lib.filter (set: set.value.requireAuth == true) (lib.attrsToList vhosts));
+      vhostsRequiringAuth = mapNames (lib.filter (set: set.value.requireAuth) (lib.attrsToList vhosts));
       mapNames = e: toString (lib.map (set: set.name) e);
     in
       mkIf (!cfg.enable && vhostsRequiringAuth != "") {
