@@ -8,10 +8,6 @@
       url = "path:./flake.systems.nix";
       flake = false;
     };
-    flake-utils = {
-      url = "github:numtide/flake-utils";
-      inputs.systems.follows = "systems";
-    };
     flake-parts = {
       url = "github:hercules-ci/flake-parts";
       inputs.nixpkgs-lib.follows = "nixpkgs";
@@ -63,66 +59,68 @@
     mac-app-util = {
       url = "github:hraban/mac-app-util";
       inputs.nixpkgs.follows = "nixpkgs";
-      inputs.flake-utils.follows = "flake-utils";
       inputs.systems.follows = "systems";
     };
   };
 
-  outputs = inputs @ {
-    nixpkgs,
-    flake-utils,
-    agenix,
-    ...
-  }: let
-    inherit (import ./lib/hosts.nix inputs) mkNixosHost mkDarwinHost;
-  in
-    {
-      nixosConfigurations = {
-        zeta = mkNixosHost {
-          hostname = "zeta";
-          system = "aarch64-linux";
-          username = "mu";
+  outputs = inputs @ {flake-parts, ...}:
+    flake-parts.lib.mkFlake {inherit inputs;} ({
+      config,
+      withSystem,
+      moduleWithSystem,
+      ...
+    }: {
+      flake = let
+        inherit (import ./lib/hosts.nix inputs) mkNixosHost mkDarwinHost;
+      in {
+        nixosConfigurations = {
+          zeta = mkNixosHost {
+            hostname = "zeta";
+            system = "aarch64-linux";
+            username = "mu";
+          };
+          glyph = mkNixosHost {
+            hostname = "glyph";
+            system = "x86_64-linux";
+            username = "mu";
+          };
+          spore = mkNixosHost {
+            hostname = "spore";
+            system = "x86_64-linux";
+            username = "mu";
+          };
         };
-        glyph = mkNixosHost {
-          hostname = "glyph";
-          system = "x86_64-linux";
-          username = "mu";
+
+        darwinConfigurations = {
+          Rhizome = mkDarwinHost {
+            hostname = "Rhizome";
+            username = "corey";
+          };
         };
-        spore = mkNixosHost {
-          hostname = "spore";
-          system = "x86_64-linux";
-          username = "mu";
+
+        nixConfig = {
+          experimental-features = ["nix-command" "flakes"];
+          extra-substituters = [
+            "https://stackptr.cachix.org"
+          ];
+          extra-trusted-public-keys = [
+            "stackptr.cachix.org-1:5e2q7OxdRdAtvRmHTeogpgJKzQhbvFqNMmCMw71opZA="
+          ];
         };
       };
 
-      darwinConfigurations = {
-        Rhizome = mkDarwinHost {
-          hostname = "Rhizome";
-          username = "corey";
-        };
-      };
-    }
-    // flake-utils.lib.eachDefaultSystem (
-      system: let
-        pkgs = nixpkgs.legacyPackages.${system};
-        agenixPkg = agenix.packages.${system}.default;
-      in {
+      systems = import inputs.systems;
+      perSystem = {
+        pkgs,
+        inputs',
+        ...
+      }: {
         devShells = {
           default = pkgs.mkShell {
-            packages = [agenixPkg pkgs.cachix pkgs.just];
+            packages = [inputs'.agenix.packages.default pkgs.cachix pkgs.just];
           };
         };
         formatter = pkgs.alejandra;
-      }
-    );
-
-  nixConfig = {
-    experimental-features = ["nix-command" "flakes"];
-    extra-substituters = [
-      "https://stackptr.cachix.org"
-    ];
-    extra-trusted-public-keys = [
-      "stackptr.cachix.org-1:5e2q7OxdRdAtvRmHTeogpgJKzQhbvFqNMmCMw71opZA="
-    ];
-  };
+      };
+    });
 }

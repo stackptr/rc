@@ -137,6 +137,7 @@
     "flake-utils": {
       "inputs": {
         "systems": [
+          "mac-app-util",
           "systems"
         ]
       },
@@ -149,9 +150,8 @@
         "type": "github"
       },
       "original": {
-        "owner": "numtide",
-        "repo": "flake-utils",
-        "type": "github"
+        "id": "flake-utils",
+        "type": "indirect"
       }
     },
     "golink": {
@@ -233,9 +233,7 @@
       "inputs": {
         "cl-nix-lite": "cl-nix-lite",
         "flake-compat": "flake-compat",
-        "flake-utils": [
-          "flake-utils"
-        ],
+        "flake-utils": "flake-utils",
         "nixpkgs": [
           "nixpkgs"
         ],
@@ -349,7 +347,6 @@
         "agenix": "agenix",
         "disko": "disko",
         "flake-parts": "flake-parts",
-        "flake-utils": "flake-utils",
         "golink": "golink",
         "home-manager": "home-manager",
         "homebrew-cask": "homebrew-cask",
