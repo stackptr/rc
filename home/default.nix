@@ -30,7 +30,6 @@
       nix-du
       nix-tree
       nix-your-shell
-      statix
     ];
     tuiApps = [
       claude-code
