@@ -121,11 +121,13 @@
       perSystem = {
         pkgs,
         inputs',
+        config,
         ...
       }: {
         devShells = {
           default = pkgs.mkShell {
             packages = [inputs'.agenix.packages.default pkgs.cachix pkgs.just];
+            shellHook = config.pre-commit.shellHook;
           };
         };
         formatter = pkgs.alejandra;
