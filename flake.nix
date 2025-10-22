@@ -12,6 +12,10 @@
       url = "github:numtide/flake-utils";
       inputs.systems.follows = "systems";
     };
+    flake-parts = {
+      url = "github:hercules-ci/flake-parts";
+      inputs.nixpkgs-lib.follows = "nixpkgs";
+    };
     agenix = {
       url = "github:ryantm/agenix";
       inputs.darwin.follows = "nix-darwin";
@@ -37,6 +41,7 @@
     zx-dev = {
       url = "github:stackptr/zx.dev";
       inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-parts.follows = "flake-parts";
     };
 
     # macOS

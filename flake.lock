@@ -117,16 +117,15 @@
     "flake-parts": {
       "inputs": {
         "nixpkgs-lib": [
-          "zx-dev",
           "nixpkgs"
         ]
       },
       "locked": {
-        "lastModified": 1749398372,
-        "narHash": "sha256-tYBdgS56eXYaWVW3fsnPQ/nFlgWi/Z2Ymhyu21zVM98=",
+        "lastModified": 1760948891,
+        "narHash": "sha256-TmWcdiUUaWk8J4lpjzu4gCGxWY6/Ok7mOK4fIFfBuU4=",
         "owner": "hercules-ci",
         "repo": "flake-parts",
-        "rev": "9305fe4e5c2a6fcf5ba6a3ff155720fbe4076569",
+        "rev": "864599284fc7c0ba6357ed89ed5e2cd5040f0c04",
         "type": "github"
       },
       "original": {
@@ -349,6 +348,7 @@
       "inputs": {
         "agenix": "agenix",
         "disko": "disko",
+        "flake-parts": "flake-parts",
         "flake-utils": "flake-utils",
         "golink": "golink",
         "home-manager": "home-manager",
@@ -396,7 +396,9 @@
     "zx-dev": {
       "inputs": {
         "anemone": "anemone",
-        "flake-parts": "flake-parts",
+        "flake-parts": [
+          "flake-parts"
+        ],
         "nixpkgs": [
           "nixpkgs"
         ]
