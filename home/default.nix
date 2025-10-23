@@ -47,13 +47,11 @@
       sox
       unzip
     ];
-    guiApps = [cinny-desktop];
   in
     development
     ++ nixSpecific
     ++ tuiApps
-    ++ utilities
-    ++ lib.optionals enableGuiPackages guiApps;
+    ++ utilities;
   home.sessionPath = [
     "$HOME/.local/bin"
   ];

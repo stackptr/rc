@@ -8,7 +8,6 @@ inputs @ {
   nix-homebrew,
   homebrew-core,
   homebrew-cask,
-  mac-app-util,
   zx-dev,
   disko,
   golink,
@@ -93,7 +92,6 @@ inputs @ {
       };
       modules = [
         nix-homebrew.darwinModules.nix-homebrew
-        mac-app-util.darwinModules.default
         ./../modules/base
         ./../modules/darwin
         ./../hosts/${hostname}
@@ -103,11 +101,6 @@ inputs @ {
           enableGuiPackages = true;
           showBatteryStatus = true;
         })
-        {
-          home-manager.sharedModules = [
-            mac-app-util.homeManagerModules.default
-          ];
-        }
         {
           nix-homebrew = {
             enable = true;

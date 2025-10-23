@@ -2,7 +2,6 @@
   config,
   lib,
   pkgs,
-  username,
   ...
 }:
 with lib; let
@@ -13,7 +12,7 @@ in {
   };
 
   config = mkIf cfg.enable {
-    home-manager.users.${username}.home.packages = [pkgs.daisydisk];
+    environment.systemPackages = [pkgs.daisydisk];
     system.disableUpdates = ["com.daisydiskapp.DaisyDiskStandAlone"];
   };
 }

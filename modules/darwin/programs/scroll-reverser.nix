@@ -2,7 +2,6 @@
   config,
   lib,
   pkgs,
-  username,
   ...
 }:
 with lib; let
@@ -15,7 +14,7 @@ in {
   };
 
   config = mkIf cfg.enable {
-    home-manager.users.${username}.home.packages = [pkgs.scroll-reverser];
+    environment.systemPackages = [pkgs.scroll-reverser];
     system.defaults.CustomUserPreferences = {
       "com.pilotmoon.scroll-reverser" = {
         InvertScrollingOn = true;

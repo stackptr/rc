@@ -2,7 +2,6 @@
   config,
   lib,
   pkgs,
-  username,
   ...
 }:
 with lib; let
@@ -13,7 +12,7 @@ in {
   };
 
   config = mkIf cfg.enable {
-    home-manager.users.${username}.home.packages = [pkgs.iina];
+    environment.systemPackages = [pkgs.iina];
     system.disableUpdates = ["com.colliderli.iina"];
   };
 }
