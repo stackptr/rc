@@ -35,6 +35,16 @@
     };
   };
 
+  programs.chromium = {
+    enable = true;
+    package = pkgs.ungoogled-chromium;
+    extensions = let
+      cookiesTxtLocally = "cclelndahbckbenkjhflpdbgdldlbecc";
+      ublockOrigin = "cjpalhdlnbpafiamejdnhcphjbkeiagm";
+      reactDevTools = "fmkadmapgofadopljbjfkapdkoienihi";
+    in [cookiesTxtLocally ublockOrigin reactDevTools];
+  };
+
   programs.craft = {
     enable = true;
   };
