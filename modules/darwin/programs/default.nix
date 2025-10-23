@@ -1,5 +1,6 @@
 {
   imports = [
+    ./chromium.nix
     ./craft.nix
     ./daisydisk.nix
     ./fastscripts.nix
