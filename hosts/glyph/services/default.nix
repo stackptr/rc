@@ -5,6 +5,7 @@
 }: {
   imports = [
     ./avahi.nix
+    ./dns.nix
     ./filebrowser.nix
     ./nfs.nix
     ./prometheus.nix
