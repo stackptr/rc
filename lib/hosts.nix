@@ -20,7 +20,6 @@ inputs @ {
     username,
     hostname,
     system,
-    enableGuiPackages,
     showBatteryStatus,
   }: let
     pkgs-stable = import nixpkgs-stable {inherit system;};
@@ -41,7 +40,7 @@ inputs @ {
         ++ nixpkgs.lib.optionals (hostHomeConfig != null) [hostHomeConfig];
     };
     home-manager.extraSpecialArgs = {
-      inherit pkgs-stable enableGuiPackages showBatteryStatus;
+      inherit pkgs-stable showBatteryStatus;
     };
   };
 
@@ -66,7 +65,6 @@ inputs @ {
         home-manager.nixosModules.home-manager
         (mkHomeManager {
           inherit username hostname system;
-          enableGuiPackages = false;
           showBatteryStatus = false;
         })
         {
@@ -98,7 +96,6 @@ inputs @ {
         home-manager.darwinModules.home-manager
         (mkHomeManager {
           inherit username hostname system;
-          enableGuiPackages = true;
           showBatteryStatus = true;
         })
         {

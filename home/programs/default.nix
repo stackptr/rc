@@ -1,8 +1,4 @@
-{
-  pkgs,
-  enableGuiPackages,
-  ...
-}: {
+{pkgs, ...}: {
   imports = [
     ./starship.nix
     ./tmux.nix
