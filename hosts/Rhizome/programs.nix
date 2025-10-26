@@ -3,6 +3,21 @@
   pkgs,
   ...
 }: {
+  environment.systemPackages = with pkgs; [
+    chatgpt
+    cinny-desktop
+    claude-desktop
+    github-desktop
+    gitify
+    m-cli
+    mas
+    mochi
+    slack
+    the-unarchiver
+    whatsapp-for-mac
+    zoom-us
+  ];
+
   homebrew = {
     enable = true;
     casks = [
