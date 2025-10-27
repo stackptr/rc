@@ -7,6 +7,7 @@
 }: {
   imports = [
     ./auth.nix
+    ./irc-proxy.nix
     ./srv.nix
   ];
 
