@@ -34,7 +34,7 @@
     group = "mastodon";
   };
   services.mastodon = {
-    enable = true;
+    enable = false;
     localDomain = "pub.zx.dev";
     streamingProcesses = 1;
     secretKeyBaseFile = config.age.secrets.mastodon-secret-key-base.path;
