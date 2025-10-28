@@ -31,6 +31,7 @@
     ];
     tuiApps = [
       claude-code
+      dua
       git-interactive-rebase-tool
       lazydocker
     ];
