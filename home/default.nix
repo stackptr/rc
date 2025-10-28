@@ -1,6 +1,7 @@
 {
   pkgs,
   lib,
+  hostname,
   ...
 }: {
   imports = [
@@ -48,10 +49,10 @@
       unzip
     ];
   in
-    development
-    ++ nixSpecific
+    nixSpecific
     ++ tuiApps
-    ++ utilities;
+    ++ utilities
+    ++ lib.optionals (hostname != "spore") development;
   home.sessionPath = [
     "$HOME/.local/bin"
   ];

@@ -40,7 +40,7 @@ inputs @ {
         ++ nixpkgs.lib.optionals (hostHomeConfig != null) [hostHomeConfig];
     };
     home-manager.extraSpecialArgs = {
-      inherit pkgs-stable showBatteryStatus;
+      inherit hostname pkgs-stable showBatteryStatus;
     };
   };
 
