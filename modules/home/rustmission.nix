@@ -16,7 +16,6 @@ in {
 
       package = lib.mkPackageOption pkgs "rustmission" {};
 
-      # TODO: Require settings.connection.url to be set
       settings = mkOption {
         inherit (tomlFormat) type;
         default = {};
@@ -40,6 +39,10 @@ in {
   };
 
   config = mkIf cfg.enable {
+    warnings = lib.optional (cfg.settings.connection.url == null) ''
+      You have enabled `rustmission` without setting a connection url.
+    '';
+
     home.packages = [cfg.package];
 
     xdg.configFile."rustmission/config.toml" = mkIf (cfg.settings != {}) {
