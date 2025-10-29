@@ -60,5 +60,7 @@
     webHome = pkgs.transmissionic;
   };
 
+  systemd.services.transmission.path = [pkgs.curl];
+
   networking.firewall.allowedTCPPorts = [config.services.transmission.settings.peer-port];
 }
