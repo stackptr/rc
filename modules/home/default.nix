@@ -2,5 +2,6 @@
 {
   imports = [
     ./programs
+    ./development.nix
   ];
 }
