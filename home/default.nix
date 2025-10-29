@@ -10,17 +10,10 @@
   ];
 
   home.packages = with pkgs; let
-    nodejs = pkgs.nodejs_24;
-    yarn = pkgs.yarn-berry.override {inherit nodejs;};
     development = [
-      colima
-      docker
       hub
-      jo
-      nodejs
       shellcheck
       tree
-      yarn
       yq
     ];
     nixSpecific = [
@@ -34,7 +27,6 @@
       claude-code
       dua
       git-interactive-rebase-tool
-      lazydocker
     ];
     utilities = [
       coreutils-full
@@ -52,10 +44,15 @@
     nixSpecific
     ++ tuiApps
     ++ utilities
-    ++ lib.optionals (hostname != "spore") development;
+    ++ development;
   home.sessionPath = [
     "$HOME/.local/bin"
   ];
+
+  rc.development = lib.mkIf (hostname != "spore") {
+    containers.enable = true;
+    javascript.enable = true;
+  };
 
   home.stateVersion = "23.11";
 }
