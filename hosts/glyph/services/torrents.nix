@@ -10,12 +10,14 @@
     owner = config.services.transmission.user;
     inherit (config.services.transmission) group;
   };
+
   age.secrets.pushover-app-token = {
     file = ./../secrets/pushover-app-token.age;
     mode = "550";
     owner = config.services.transmission.user;
     inherit (config.services.transmission) group;
   };
+
   services.transmission = {
     enable = true;
     package = pkgs-stable.transmission_4; # TODO: 4.0.6 is prohibited on some trackers
@@ -57,5 +59,6 @@
     };
     webHome = pkgs.transmissionic;
   };
+
   networking.firewall.allowedTCPPorts = [config.services.transmission.settings.peer-port];
 }
