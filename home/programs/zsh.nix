@@ -20,15 +20,10 @@
       searchDownKey = ["^[[B" "^[OB"];
     };
 
-    sessionVariables =
-      {
-        MANPAGER = "sh -c 'col -bx | bat -l man -p'";
-        MANROFFOPT = "-c";
-      }
-      // lib.optionalAttrs (!pkgs.stdenv.isDarwin) {
-        # See: https://www.gnupg.org/documentation/manuals/gnupg/Invoking-GPG_002dAGENT.html
-        GPG_TTY = "$(tty)";
-      };
+    sessionVariables = {
+      MANPAGER = "sh -c 'col -bx | bat -l man -p'";
+      MANROFFOPT = "-c";
+    };
 
     shellAliases = {
       cat = "bat -p";
