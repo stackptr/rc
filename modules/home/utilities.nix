@@ -14,6 +14,8 @@ in {
 
       media.enable = lib.mkEnableOption "media utilities";
 
+      nix.enable = lib.mkEnableOption "Nix utilities";
+
       system.enable = lib.mkEnableOption "system utilities";
     };
   };
@@ -43,6 +45,18 @@ in {
       ];
 
       programs.yt-dlp.enable = true;
+    })
+
+    (mkIf cfg.nix.enable {
+      home.packages = [
+        pkgs.comma
+        pkgs.manix
+        pkgs.nix-du
+        pkgs.nix-tree
+        pkgs.nix-your-shell
+      ];
+
+      programs.nh.enable = true;
     })
 
     (mkIf cfg.system.enable {
