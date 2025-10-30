@@ -10,12 +10,9 @@
   ];
 
   home.packages = with pkgs; [
-    claude-code
     coreutils-full
-    mosh
     neofetch
     onefetch
-    yq
   ];
 
   rc = lib.mkMerge [
