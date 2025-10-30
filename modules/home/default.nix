@@ -4,5 +4,6 @@
     ./programs
     ./development.nix
     ./git.nix
+    ./utilities.nix
   ];
 }
