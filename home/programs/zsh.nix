@@ -26,7 +26,6 @@
     };
 
     shellAliases = {
-      cat = "bat -p";
       vim = "nvim";
     };
 

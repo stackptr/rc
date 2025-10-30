@@ -43,6 +43,10 @@ in {
           };
         };
       };
+
+      programs.zsh.shellAliases = {
+        cat = "${lib.getExe config.programs.bat.package} -p";
+      };
     })
 
     (mkIf cfg.file.enable {
