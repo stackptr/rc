@@ -22,25 +22,27 @@
     "$HOME/.local/bin"
   ];
 
-  rc.development = lib.mkIf (hostname != "spore") {
-    containers.enable = true;
-    javascript.enable = true;
-  };
-
-  rc.git = {
-    enable = true;
-    enableInteractiveRebase = true;
-  };
-
-  rc.utilities = lib.mkMerge [
+  rc = lib.mkMerge [
     {
-      nix.enable = true;
-      system.enable = true;
+      git = {
+        enable = true;
+        enableInteractiveRebase = true;
+      };
+      utilities = {
+        nix.enable = true;
+        system.enable = true;
+      };
     }
 
     (lib.mkIf (hostname != "spore") {
-      file.enable = true;
-      media.enable = true;
+      development = {
+        containers.enable = true;
+        javascript.enable = true;
+      };
+      utilties = {
+        file.enable = true;
+        media.enable = true;
+      };
     })
   ];
 
