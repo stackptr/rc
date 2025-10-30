@@ -60,6 +60,8 @@ in {
     })
 
     (mkIf cfg.system.enable {
+      home.packages = [pkgs.neofetch];
+
       programs.btop.enable = true;
 
       programs.htop.enable = true;

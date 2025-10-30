@@ -11,7 +11,6 @@
 
   home.packages = with pkgs; [
     coreutils-full
-    neofetch
   ];
 
   rc = lib.mkMerge [
