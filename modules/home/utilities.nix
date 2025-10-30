@@ -24,7 +24,7 @@ in {
 
   config = lib.mkMerge [
     (mkIf cfg.base.enable {
-      home.packages = [pkgs.coreutils-full];
+      home.packages = [pkgs.uutils-coreutils-noprefix];
 
       programs.bat = {
         enable = true;
