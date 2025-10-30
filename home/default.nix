@@ -9,23 +9,15 @@
     ./services.nix
   ];
 
-  home.packages = with pkgs; let
-    development = [
-      yq
-    ];
-    tuiApps = [
-      claude-code
-    ];
-    utilities = [
-      coreutils-full
-      mosh
-      neofetch
-      onefetch
-    ];
-  in
-    tuiApps
-    ++ utilities
-    ++ development;
+  home.packages = with pkgs; [
+    claude-code
+    coreutils-full
+    mosh
+    neofetch
+    onefetch
+    yq
+  ];
+
   home.sessionPath = [
     "$HOME/.local/bin"
   ];
