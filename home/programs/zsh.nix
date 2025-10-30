@@ -25,10 +25,6 @@
       MANROFFOPT = "-c";
     };
 
-    shellAliases = {
-      vim = "nvim";
-    };
-
     syntaxHighlighting = {
       enable = true;
     };

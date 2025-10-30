@@ -11,6 +11,7 @@
 
   rc = lib.mkMerge [
     {
+      editor.enable = true;
       git.enable = true;
       ssh.enable = true;
       utilities = {
