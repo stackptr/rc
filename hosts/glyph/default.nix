@@ -42,6 +42,17 @@
     trustedInterfaces = ["tailscale0"];
   };
 
+  systemd.network.networks."10-wan" = {
+    matchConfig.Name = "enp5s0";
+    cakeConfig = {
+      Parent = "root";
+      Bandwidth = "900M";
+      RTTSec = "10ms";
+      FlowIsolation = "triple-isolate";
+      Preset = "diffserv3";
+    };
+  };
+
   time.timeZone = "America/Los_Angeles";
   i18n.defaultLocale = "en_US.UTF-8";
 
