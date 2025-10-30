@@ -3,5 +3,6 @@
   imports = [
     ./programs
     ./development.nix
+    ./git.nix
   ];
 }
