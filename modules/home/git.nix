@@ -12,9 +12,19 @@ in {
     rc.git = {
       enable = lib.mkEnableOption "Git-related configuration";
 
-      enableHubWrapper = lib.mkEnableOption "hub wrapper for git";
+      enableHubWrapper = mkOption {
+        default = true;
+        example = true;
+        description = "Whether to enable hub wrapper for git.";
+        type = lib.types.bool;
+      };
 
-      enableInteractiveRebase = lib.mkEnableOption "interactive rebase";
+      enableInteractiveRebase = mkOption {
+        default = true;
+        example = true;
+        description = "Whether to enable interactive rebase.";
+        type = lib.types.bool;
+      };
     };
   };
 
