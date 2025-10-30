@@ -10,6 +10,8 @@
 in {
   options = {
     rc.utilities = {
+      base.enable = lib.mkEnableOption "base utilities";
+
       file.enable = lib.mkEnableOption "file utilities";
 
       media.enable = lib.mkEnableOption "media utilities";
@@ -21,6 +23,28 @@ in {
   };
 
   config = lib.mkMerge [
+    (mkIf cfg.base.enable {
+      home.packages = [pkgs.coreutils-full];
+
+      programs.bat = {
+        enable = true;
+        config = {
+          theme = "Sublime Snazzy";
+        };
+      };
+
+      programs.jq.enable = true;
+
+      programs.lsd = {
+        enable = true;
+        settings = {
+          icons = {
+            theme = "fancy";
+          };
+        };
+      };
+    })
+
     (mkIf cfg.file.enable {
       home.packages = [
         pkgs.dua
