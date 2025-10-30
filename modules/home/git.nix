@@ -67,7 +67,7 @@ in {
       home.packages = [pkgs.hub];
 
       programs.zsh.shellAliases = {
-        git = "hub";
+        git = "${lib.getExe pkgs.hub}";
       };
     })
 
