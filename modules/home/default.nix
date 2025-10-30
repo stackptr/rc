@@ -3,6 +3,7 @@
   imports = [
     ./programs
     ./development.nix
+    ./editor.nix
     ./git.nix
     ./ssh.nix
     ./utilities.nix
