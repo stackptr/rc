@@ -22,6 +22,7 @@ in {
 
   config = lib.mkMerge [
     (mkIf cfg.containers.enable {
+      # TODO: Use services.colima after nix-community/home-manager#7913
       home.packages = with pkgs; [
         colima
         docker
