@@ -11,7 +11,6 @@
 
   home.packages = with pkgs; let
     development = [
-      hub
       shellcheck
       tree
       yq
@@ -26,7 +25,6 @@
     tuiApps = [
       claude-code
       dua
-      git-interactive-rebase-tool
     ];
     utilities = [
       coreutils-full
@@ -52,6 +50,11 @@
   rc.development = lib.mkIf (hostname != "spore") {
     containers.enable = true;
     javascript.enable = true;
+  };
+
+  rc.git = {
+    enable = true;
+    enableInteractiveRebase = true;
   };
 
   home.stateVersion = "23.11";

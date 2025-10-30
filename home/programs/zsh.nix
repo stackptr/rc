@@ -27,7 +27,6 @@
 
     shellAliases = {
       cat = "bat -p";
-      git = "hub";
       vim = "nvim";
     };
 
