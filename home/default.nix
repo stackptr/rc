@@ -13,13 +13,6 @@
     development = [
       yq
     ];
-    nixSpecific = [
-      comma
-      manix
-      nix-du
-      nix-tree
-      nix-your-shell
-    ];
     tuiApps = [
       claude-code
     ];
@@ -30,8 +23,7 @@
       onefetch
     ];
   in
-    nixSpecific
-    ++ tuiApps
+    tuiApps
     ++ utilities
     ++ development;
   home.sessionPath = [
@@ -50,6 +42,7 @@
 
   rc.utilities = lib.mkMerge [
     {
+      nix.enable = true;
       system.enable = true;
     }
 

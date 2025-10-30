@@ -60,8 +60,6 @@
     '';
   };
 
-  programs.nh.enable = true;
-
   programs.nushell.enable = true;
 
   programs.ssh = {
