@@ -18,6 +18,7 @@
     {
       git = {
         enable = true;
+        enableHubWrapper = true;
         enableInteractiveRebase = true;
       };
       utilities = {

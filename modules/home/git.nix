@@ -12,6 +12,8 @@ in {
     rc.git = {
       enable = lib.mkEnableOption "Git-related configuration";
 
+      enableHubWrapper = lib.mkEnableOption "hub wrapper for git";
+
       enableInteractiveRebase = lib.mkEnableOption "interactive rebase";
     };
   };
@@ -19,7 +21,6 @@ in {
   config = lib.mkMerge [
     (mkIf cfg.enable {
       home.packages = [
-        pkgs.hub
         pkgs.onefetch
       ];
 
@@ -50,6 +51,10 @@ in {
       programs.gpg = {
         enable = true;
       };
+    })
+
+    (mkIf cfg.enableHubWrapper {
+      home.packages = [pkgs.hub];
 
       programs.zsh.shellAliases = {
         git = "hub";
