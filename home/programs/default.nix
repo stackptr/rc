@@ -92,8 +92,5 @@
       IgnoreUnknown UseKeychain
       UseKeychain yes
     '';
-    includes = [
-      "~/.colima/ssh_config"
-    ];
   };
 }

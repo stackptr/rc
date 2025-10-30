@@ -27,6 +27,10 @@ in {
         docker
         lazydocker
       ];
+
+      programs.ssh.includes = [
+        "~/.colima/ssh_config"
+      ];
     })
 
     (mkIf cfg.javascript.enable {
