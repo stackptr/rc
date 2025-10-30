@@ -41,6 +41,4 @@
       }
     '';
   };
-
-  programs.nushell.enable = true;
 }
