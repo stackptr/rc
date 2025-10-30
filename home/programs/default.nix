@@ -5,13 +5,6 @@
     ./zsh.nix
   ];
 
-  programs.bat = {
-    enable = true;
-    config = {
-      theme = "Sublime Snazzy";
-    };
-  };
-
   programs.direnv = {
     enable = true;
     nix-direnv.enable = true;
@@ -19,17 +12,6 @@
       global = {
         strict_env = true;
         hide_env_diff = true;
-      };
-    };
-  };
-
-  programs.jq.enable = true;
-
-  programs.lsd = {
-    enable = true;
-    settings = {
-      icons = {
-        theme = "fancy";
       };
     };
   };

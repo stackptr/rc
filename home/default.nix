@@ -9,16 +9,13 @@
     ./services.nix
   ];
 
-  home.packages = with pkgs; [
-    coreutils-full
-  ];
-
   rc = lib.mkMerge [
     {
       git = {
         enable = true;
       };
       utilities = {
+        base.enable = true;
         nix.enable = true;
         system.enable = true;
       };
