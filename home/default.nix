@@ -11,7 +11,6 @@
 
   home.packages = with pkgs; let
     development = [
-      tree
       yq
     ];
     nixSpecific = [
@@ -23,19 +22,13 @@
     ];
     tuiApps = [
       claude-code
-      dua
     ];
     utilities = [
       coreutils-full
-      fd
-      ffmpeg_6
-      mediainfo
       mktorrent
       mosh
       neofetch
       onefetch
-      sox
-      unzip
     ];
   in
     nixSpecific
@@ -55,6 +48,17 @@
     enable = true;
     enableInteractiveRebase = true;
   };
+
+  rc.utilities = lib.mkMerge [
+    {
+      system.enable = true;
+    }
+
+    (lib.mkIf (hostname != "spore") {
+      file.enable = true;
+      media.enable = true;
+    })
+  ];
 
   home.stateVersion = "23.11";
 }

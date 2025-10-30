@@ -12,8 +12,6 @@
     };
   };
 
-  programs.btop.enable = true;
-
   programs.direnv = {
     enable = true;
     nix-direnv.enable = true;
@@ -24,8 +22,6 @@
       };
     };
   };
-
-  programs.htop.enable = true;
 
   programs.jq.enable = true;
 
@@ -68,8 +64,6 @@
 
   programs.nushell.enable = true;
 
-  programs.ripgrep.enable = true;
-
   programs.ssh = {
     enable = true;
     enableDefaultConfig = false;
@@ -104,11 +98,4 @@
       "~/.colima/ssh_config"
     ];
   };
-
-  programs.yazi = {
-    enable = true;
-    enableZshIntegration = true;
-  };
-
-  programs.yt-dlp.enable = true;
 }
