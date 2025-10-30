@@ -11,9 +11,7 @@
 
   rc = lib.mkMerge [
     {
-      git = {
-        enable = true;
-      };
+      git.enable = true;
       ssh.enable = true;
       utilities = {
         base.enable = true;
