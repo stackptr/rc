@@ -138,7 +138,12 @@
             ${pkgs.lib.getExe package} run --all-files --config ${configFile}
           '';
         pre-commit.settings.hooks = {
-          alejandra.enable = true;
+          alejandra = {
+            enable = true;
+            args = [
+              "--quiet"
+            ];
+          };
           nil.enable = true;
           statix.enable = true;
         };
