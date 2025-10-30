@@ -18,10 +18,6 @@
     yq
   ];
 
-  home.sessionPath = [
-    "$HOME/.local/bin"
-  ];
-
   rc = lib.mkMerge [
     {
       git = {
