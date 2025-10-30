@@ -18,7 +18,10 @@ in {
 
   config = lib.mkMerge [
     (mkIf cfg.enable {
-      home.packages = [pkgs.hub];
+      home.packages = [
+        pkgs.hub
+        pkgs.onefetch
+      ];
 
       programs.gh = {
         enable = true;
