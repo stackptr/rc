@@ -67,6 +67,7 @@ in {
       home.packages = [pkgs.hub];
 
       programs.zsh.shellAliases = {
+        # TODO: Define hub.meta.mainProgram = "hub"
         git = "${lib.getExe pkgs.hub}";
       };
     })
