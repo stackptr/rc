@@ -2,6 +2,7 @@
   config,
   lib,
   pkgs,
+  username,
   ...
 }:
 with lib; let
@@ -23,6 +24,10 @@ in {
     system.disableUpdates = ["com.panic.Nova"];
     system.startOnActivation = mkIf cfg.startOnActivation {
       "Nova" = "/Applications/Nova.app/";
+    };
+    # Fix prompt completion
+    home-manager.users.${username} = {
+      programs.zsh.initContent = "compdef _files nova";
     };
   };
 }

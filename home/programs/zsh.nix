@@ -33,22 +33,18 @@
       enable = true;
     };
 
-    initContent = let
-      novaCompletion = "compdef _files nova";
-    in
-      ''
-        incog () {
-          unset HISTFILE
-        }
+    initContent = ''
+      incog () {
+        unset HISTFILE
+      }
 
-        if command -v nix-your-shell > /dev/null; then
-          nix-your-shell zsh | source /dev/stdin
-        fi
+      if command -v nix-your-shell > /dev/null; then
+        nix-your-shell zsh | source /dev/stdin
+      fi
 
-        setopt hist_verify
-        setopt inc_append_history
-      ''
-      + novaCompletion;
+      setopt hist_verify
+      setopt inc_append_history
+    '';
   };
 
   programs.zoxide = {
