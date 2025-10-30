@@ -14,6 +14,7 @@
       git = {
         enable = true;
       };
+      ssh.enable = true;
       utilities = {
         base.enable = true;
         nix.enable = true;
