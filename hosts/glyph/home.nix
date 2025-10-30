@@ -1,4 +1,6 @@
 {pkgs, ...}: {
+  home.packages = [pkgs.mktorrent];
+
   programs.beets = {
     enable = true;
     settings = {

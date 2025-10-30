@@ -25,7 +25,6 @@
     ];
     utilities = [
       coreutils-full
-      mktorrent
       mosh
       neofetch
       onefetch
