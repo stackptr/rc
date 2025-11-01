@@ -32,9 +32,7 @@
       script-torrent-done-filename = pkgs.writeShellScript "torrent-done.sh" ''
         TOKEN_USER=$(cat ${config.age.secrets.pushover-user-token.path});
         TOKEN_APP=$(cat ${config.age.secrets.pushover-app-token.path});
-        MESSAGE="$TR_TORRENT_NAME finished downloading.
-
-        $TR_TIME_LOCALTIME";
+        MESSAGE="$TR_TORRENT_NAME finished downloading.";
 
         PRIORITY=0;
         SOUND="tugboat";
