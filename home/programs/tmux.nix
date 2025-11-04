@@ -18,6 +18,16 @@
 in {
   programs.tmux = {
     enable = true;
+    # tmux-nerd-font-window-name requires yq
+    package = pkgs.tmux.overrideAttrs (oldAttrs: {
+      nativeBuildInputs = (oldAttrs.nativeBuildInputs or []) ++ [pkgs.makeWrapper];
+      postInstall = ''
+        ${oldAttrs.postInstall or ""}
+
+        wrapProgram $out/bin/tmux \
+          --prefix PATH : "${lib.makeBinPath [pkgs.yq]}"
+      '';
+    });
     shortcut = "a";
     baseIndex = 1;
     mouse = true;
