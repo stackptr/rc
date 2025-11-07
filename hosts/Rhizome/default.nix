@@ -15,4 +15,9 @@
     security = true;
     system = true;
   };
+
+  rc.darwin.smb-mount = {
+    enable = true;
+    smbPath = "smb://glyph/Media";
+  };
 }
