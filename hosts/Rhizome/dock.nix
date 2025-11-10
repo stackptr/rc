@@ -15,6 +15,7 @@
       "/Applications/Roon.app"
       "/System/Applications/Calendar.app"
       "/Applications/Things3.app"
+      "/System/Applications/Reminders.app"
       "/System/Applications/Notes.app"
       "/Applications/Craft.app"
       "/System/Applications/Messages.app"
