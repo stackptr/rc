@@ -39,14 +39,6 @@ in {
           freeformType = format.type;
 
           options = {
-            address = lib.mkOption {
-              default = "localhost";
-              description = ''
-                The address to listen on.
-              '';
-              type = types.str;
-            };
-
             port = lib.mkOption {
               default = 8080;
               description = ''
