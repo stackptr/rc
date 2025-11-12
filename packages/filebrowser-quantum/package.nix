@@ -39,7 +39,9 @@ in
     pname = "filebrowser-quantum";
     inherit version src;
 
-    vendorHash = "";
+    modRoot = "./backend";
+
+    vendorHash = "sha256-urJZMOkZzoN//kecpJ47ldZk+H2qvMGTr/Pw90bMpDc=";
 
     excludedPackages = ["tools"];
 
