@@ -13,7 +13,7 @@ in {
     services.filebrowser-quantum = {
       enable = lib.mkEnableOption "FileBrowser";
 
-      package = lib.mkPackageOption pkgs "filebrowser" {};
+      package = lib.mkPackageOption pkgs "filebrowser-quantum" {};
 
       user = lib.mkOption {
         type = types.str;
