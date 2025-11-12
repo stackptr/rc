@@ -43,8 +43,6 @@ in
 
     vendorHash = "sha256-urJZMOkZzoN//kecpJ47ldZk+H2qvMGTr/Pw90bMpDc=";
 
-    excludedPackages = ["tools"];
-
     preBuild = ''
       rm -rf http/dist/*
       rm -rf http/embed/*
