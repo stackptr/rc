@@ -5,12 +5,12 @@
   utils,
   ...
 }: let
-  cfg = config.services.filebrowser;
+  cfg = config.services.filebrowser-quantum;
   format = pkgs.formats.json {};
   inherit (lib) types;
 in {
   options = {
-    services.filebrowser = {
+    services.filebrowser-quantum = {
       enable = lib.mkEnableOption "FileBrowser";
 
       package = lib.mkPackageOption pkgs "filebrowser" {};
@@ -87,7 +87,7 @@ in {
 
   config = lib.mkIf cfg.enable {
     systemd = {
-      services.filebrowser = {
+      services.filebrowser-quantum = {
         after = ["network.target"];
         description = "FileBrowser";
         wantedBy = ["multi-user.target"];
