@@ -6,13 +6,13 @@
   buildNpmPackage,
   nix-update-script,
 }: let
-  version = "0.8.8-beta";
+  version = "1.0.1-dev";
 
   src = fetchFromGitHub {
-    owner = "gtsteffaniak";
+    owner = "stackptr";
     repo = "filebrowser";
     rev = "v${version}";
-    hash = "";
+    hash = "sha256-BE+WQwRFHvGakGNPl84eVkkQMqKqF31CG0Y3E1nJkNk=";
   };
 
   frontend = buildNpmPackage rec {
