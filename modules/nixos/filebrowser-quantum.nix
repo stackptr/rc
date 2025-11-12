@@ -17,13 +17,13 @@ in {
 
       user = lib.mkOption {
         type = types.str;
-        default = "filebrowser";
+        default = "filebrowser-quantum";
         description = "User account under which FileBrowser Quantum runs.";
       };
 
       group = lib.mkOption {
         type = types.str;
-        default = "filebrowser";
+        default = "filebrowser-quantum";
         description = "Group under which FileBrowser Quantum runs.";
       };
 
@@ -144,15 +144,15 @@ in {
       };
     };
 
-    users.users = lib.mkIf (cfg.user == "filebrowser") {
-      filebrowser = {
+    users.users = lib.mkIf (cfg.user == "filebrowser-quantum") {
+      filebrowser-quantum = {
         inherit (cfg) group;
         isSystemUser = true;
       };
     };
 
-    users.groups = lib.mkIf (cfg.group == "filebrowser") {
-      filebrowser = {};
+    users.groups = lib.mkIf (cfg.group == "filebrowser-quantum") {
+      filebrowser-quantum = {};
     };
 
     networking.firewall.allowedTCPPorts = lib.mkIf cfg.openFirewall [cfg.settings.port];
