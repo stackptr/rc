@@ -23,7 +23,7 @@
 
     npmDepsHash = "sha256-Ro58WpzrreDb23sHiI9/ZekQBDl+VO271SImtEFgvYg=";
 
-    npmBuildScript = "build";
+    npmBuildScript = "build:docker"; # Default build target requires writing outside frontend dir
 
     installPhase = ''
       runHook preInstall
