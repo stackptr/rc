@@ -33,7 +33,7 @@ in {
         default = {};
         description = ''
           Settings for FileBrowser Quantum.
-          Refer to <https://filebrowserquantum.com/en/docs/getting-started/config/> for all supported values.
+          Refer to <https://filebrowserquantum.com/en/docs/configuration/configuration-overview/> for all supported values.
         '';
         type = types.submodule {
           freeformType = format.type;
