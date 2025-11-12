@@ -47,20 +47,20 @@ in {
                 '';
                 type = types.port;
               };
+
+              database = lib.mkOption {
+                default = "/var/lib/filebrowser/database.db";
+                description = ''
+                  The path to FileBrowser's Bolt database.
+                '';
+                type = types.path;
+              };
             };
 
             root = lib.mkOption {
               default = "/var/lib/filebrowser/data";
               description = ''
                 The directory where FileBrowser stores files.
-              '';
-              type = types.path;
-            };
-
-            database = lib.mkOption {
-              default = "/var/lib/filebrowser/database.db";
-              description = ''
-                The path to FileBrowser's Bolt database.
               '';
               type = types.path;
             };
@@ -131,7 +131,7 @@ in {
           inherit (cfg) user group;
           mode = "0700";
         };
-        "${builtins.dirOf cfg.settings.database}".d = {
+        "${builtins.dirOf cfg.settings.server.database}".d = {
           inherit (cfg) user group;
           mode = "0700";
         };
