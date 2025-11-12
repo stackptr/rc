@@ -89,20 +89,20 @@ in {
     systemd = {
       services.filebrowser-quantum = {
         after = ["network.target"];
-        description = "FileBrowser";
+        description = "FileBrowser Quantum";
         wantedBy = ["multi-user.target"];
         serviceConfig = {
           ExecStart = let
             args = [
               (lib.getExe cfg.package)
-              "--config"
-              (format.generate "config.json" cfg.settings)
+              "-c"
+              (format.generate "config.yaml" cfg.settings)
             ];
           in
             utils.escapeSystemdExecArgs args;
 
-          StateDirectory = "filebrowser";
-          CacheDirectory = "filebrowser";
+          StateDirectory = "filebrowser-quantum";
+          CacheDirectory = "filebrowser-quantum";
           WorkingDirectory = cfg.settings.root;
 
           User = cfg.user;
