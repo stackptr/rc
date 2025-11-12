@@ -48,8 +48,8 @@ in
     preBuild = ''
       rm -rf http/dist/*
       rm -rf http/embed/*
-      cp -r ${frontend}/dist http/dist/
-      cp -r ${frontend}/dist http/embed/
+      cp -r ${frontend}/dist http/
+      cp -r ${frontend}/dist/* http/embed
     '';
 
     ldflags = [
