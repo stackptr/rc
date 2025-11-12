@@ -49,9 +49,9 @@ in {
               };
 
               database = lib.mkOption {
-                default = "/var/lib/filebrowser/database.db";
+                default = "/var/lib/filebrowser-quantum/database.db";
                 description = ''
-                  The path to FileBrowser's Bolt database.
+                  The path to FileBrowser Quantum's database.
                 '';
                 type = types.path;
               };
