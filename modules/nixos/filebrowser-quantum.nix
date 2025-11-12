@@ -159,6 +159,6 @@ in {
   };
 
   meta.maintainers = [
-    lib.maintainers.lukaswrz
+    lib.maintainers.stackptr
   ];
 }
