@@ -39,12 +39,14 @@ in {
           freeformType = format.type;
 
           options = {
-            port = lib.mkOption {
-              default = 8080;
-              description = ''
-                The port to listen on.
-              '';
-              type = types.port;
+            server = {
+              port = lib.mkOption {
+                default = 8080;
+                description = ''
+                  The port to listen on.
+                '';
+                type = types.port;
+              };
             };
 
             root = lib.mkOption {
@@ -147,7 +149,7 @@ in {
       filebrowser-quantum = {};
     };
 
-    networking.firewall.allowedTCPPorts = lib.mkIf cfg.openFirewall [cfg.settings.port];
+    networking.firewall.allowedTCPPorts = lib.mkIf cfg.openFirewall [cfg.settings.server.port];
   };
 
   meta.maintainers = [
