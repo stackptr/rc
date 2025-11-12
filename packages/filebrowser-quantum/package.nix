@@ -21,7 +21,7 @@
 
     sourceRoot = "${src.name}/frontend";
 
-    npmDepsHash = "";
+    npmDepsHash = "sha256-Ro58WpzrreDb23sHiI9/ZekQBDl+VO271SImtEFgvYg=";
 
     npmBuildScript = "build";
 
