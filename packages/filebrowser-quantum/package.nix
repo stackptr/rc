@@ -46,7 +46,10 @@ in
     excludedPackages = ["tools"];
 
     preBuild = ''
-      cp -r ${frontend}/dist frontend/
+      rm -rf http/dist/*
+      rm -rf http/embed/*
+      cp -r ${frontend}/dist http/dist/
+      cp -r ${frontend}/dist http/embed/
     '';
 
     ldflags = [
