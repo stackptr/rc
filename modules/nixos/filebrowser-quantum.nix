@@ -11,29 +11,29 @@
 in {
   options = {
     services.filebrowser-quantum = {
-      enable = lib.mkEnableOption "FileBrowser";
+      enable = lib.mkEnableOption "FileBrowser Quantum";
 
       package = lib.mkPackageOption pkgs "filebrowser-quantum" {};
 
       user = lib.mkOption {
         type = types.str;
         default = "filebrowser";
-        description = "User account under which FileBrowser runs.";
+        description = "User account under which FileBrowser Quantum runs.";
       };
 
       group = lib.mkOption {
         type = types.str;
         default = "filebrowser";
-        description = "Group under which FileBrowser runs.";
+        description = "Group under which FileBrowser Quantum runs.";
       };
 
-      openFirewall = lib.mkEnableOption "opening firewall ports for FileBrowser";
+      openFirewall = lib.mkEnableOption "opening firewall ports for FileBrowser Quantum";
 
       settings = lib.mkOption {
         default = {};
         description = ''
-          Settings for FileBrowser.
-          Refer to <https://filebrowser.org/cli/filebrowser#options> for all supported values.
+          Settings for FileBrowser Quantum.
+          Refer to <https://filebrowserquantum.com/en/docs/getting-started/config/> for all supported values.
         '';
         type = types.submodule {
           freeformType = format.type;
