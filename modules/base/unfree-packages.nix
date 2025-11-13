@@ -18,7 +18,6 @@
       "slack"
       "soundsource"
       "the-unarchiver"
-      "whatsapp-for-mac"
       "zoom"
     ];
 }
