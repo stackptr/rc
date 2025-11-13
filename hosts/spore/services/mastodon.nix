@@ -1,6 +1,7 @@
 {
   config,
   pkgs,
+  lib,
   ...
 }: let
   enable = false; # TODO: Move Mastodon to different host
@@ -81,8 +82,7 @@ in {
     ];
   };
 
-  services.postgresql = {
-    inherit enable;
+  services.postgresql = lib.mkIf enable {
     ensureUsers = [
       {
         name = "mastodon";
