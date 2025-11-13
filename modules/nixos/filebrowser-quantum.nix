@@ -57,9 +57,9 @@ in {
               };
 
               cacheDir = lib.mkOption {
-                default = "/var/cache/filebrowser";
+                default = "/var/cache/filebrowser-quantum";
                 description = ''
-                  The directory where FileBrowser stores its cache.
+                  The directory where FileBrowser Quantum stores its cache.
                 '';
                 type = types.path;
                 readOnly = true;
