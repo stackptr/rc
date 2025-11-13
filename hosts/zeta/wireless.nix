@@ -14,5 +14,6 @@
     };
   };
 
+  services.resolved.enable = true;
   systemd.services.wpa_supplicant.enable = false;
 }
