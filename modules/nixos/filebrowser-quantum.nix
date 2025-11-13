@@ -78,7 +78,7 @@ in {
                 description = ''
                   A list of file system locations accessible to users.
                 '';
-                type = types.listOf types.submodule {
+                type = types.listOf (types.submodule {
                   options = {
                     path = lib.mkOption {
                       description = ''
@@ -102,7 +102,7 @@ in {
                       type = types.bool;
                     };
                   };
-                };
+                });
               };
             };
           };
