@@ -6,7 +6,7 @@
   ...
 }: let
   cfg = config.services.filebrowser-quantum;
-  format = pkgs.formats.json {};
+  format = pkgs.formats.yaml {};
   inherit (lib) types;
 in {
   options = {
