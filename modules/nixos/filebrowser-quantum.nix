@@ -163,10 +163,6 @@ in {
           inherit (cfg) user group;
           mode = "0700";
         };
-        "${builtins.dirOf cfg.settings.server.database}".d = {
-          inherit (cfg) user group;
-          mode = "0700";
-        };
       };
     };
 
