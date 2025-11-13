@@ -1,0 +1,75 @@
+# TODO: Upstream to NixOS/nixpkgs
+{
+  lib,
+  fetchFromGitHub,
+  buildGoModule,
+  buildNpmPackage,
+  nix-update-script,
+}: let
+  version = "1.0.1-dev";
+
+  src = fetchFromGitHub {
+    owner = "stackptr";
+    repo = "filebrowser";
+    rev = "v${version}";
+    hash = "sha256-BE+WQwRFHvGakGNPl84eVkkQMqKqF31CG0Y3E1nJkNk=";
+  };
+
+  frontend = buildNpmPackage rec {
+    pname = "filebrowser-quantum-frontend";
+    inherit version src;
+
+    sourceRoot = "${src.name}/frontend";
+
+    npmDepsHash = "sha256-Ro58WpzrreDb23sHiI9/ZekQBDl+VO271SImtEFgvYg=";
+
+    npmBuildScript = "build:docker"; # Default build target requires writing outside frontend dir
+
+    installPhase = ''
+      runHook preInstall
+
+      mkdir $out
+      mv dist $out
+
+      runHook postInstall
+    '';
+  };
+in
+  buildGoModule {
+    pname = "filebrowser-quantum";
+    inherit version src;
+
+    modRoot = "./backend";
+
+    vendorHash = "sha256-urJZMOkZzoN//kecpJ47ldZk+H2qvMGTr/Pw90bMpDc=";
+
+    preBuild = ''
+      rm -rf http/dist/*
+      rm -rf http/embed/*
+      cp -r ${frontend}/dist http/
+      cp -r ${frontend}/dist/* http/embed
+    '';
+
+    postInstall = ''
+      mv $out/bin/backend $out/bin/filebrowser
+    '';
+
+    ldflags = [
+      "-w"
+      "-s"
+      "-X 'github.com/gtsteffaniak/filebrowser/backend/version.CommitSHA=testingCommit'"
+      "-X 'github.com/gtsteffaniak/filebrowser/backend/version.Version=testing'"
+    ];
+
+    passthru = {
+      updateScript = nix-update-script {};
+      inherit frontend;
+    };
+
+    meta = with lib; {
+      description = "Fork of filebrowser project";
+      homepage = "https://github.com/gtsteffaniak/filebrowser";
+      license = licenses.asl20;
+      mainProgram = "filebrowser";
+    };
+  }
