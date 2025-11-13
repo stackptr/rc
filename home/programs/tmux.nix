@@ -90,6 +90,10 @@ in {
       set-option -ga terminal-overrides ",xterm-256color:Tc"
       # Fix shell on startup, see: tmux/tmux#4166
       set -g default-command '$SHELL'
+      # See: https://yazi-rs.github.io/docs/image-preview/#tmux
+      set -g allow-passthrough on
+      set -ga update-environment TERM
+      set -ga update-environment TERM_PROGRAM
     '';
   };
 }
