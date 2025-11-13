@@ -37,5 +37,7 @@
   # networking.interfaces.usb0.useDHCP = lib.mkDefault true;
 
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
+  boot.binfmt.emulatedSystems = ["aarch64-linux"];
+
   hardware.cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
 }
