@@ -6,6 +6,13 @@
 }: let
   cfg = config.services.filebrowser-quantum;
 in {
+  age.secrets.filebrowser-env = {
+    file = ./../secrets/filebrowser-env.age;
+    mode = "550";
+    owner = cfg.user;
+    inherit (cfg) group;
+  };
+
   services.filebrowser-quantum = {
     enable = true;
     openFirewall = false;
@@ -22,9 +29,21 @@ in {
         ];
       };
       auth = {
-        adminUsername = "admin";
+        methods = {
+          password.enabled = false;
+          oidc = {
+            enabled = true;
+            # N.B.: clientId and clientSecret supplied via environment variable
+            issuerUrl = "https://id.zx.dev";
+            scopes = "email openid profile groups";
+            userIdentifier = "preferred_username";
+            disableVerifyTLS = false;
+            createUser = true;
+          };
+        };
       };
     };
+    environmentFile = config.age.secrets.filebrowser-env.path;
   };
   users.users.${cfg.user}.extraGroups = ["media"];
 }
