@@ -79,7 +79,7 @@
         nixosConfigurations = {
           zeta = mkNixosHost {
             hostname = "zeta";
-            system = "x86_64-linux";
+            system = "aarch64-linux";
             username = "mu";
           };
           glyph = mkNixosHost {

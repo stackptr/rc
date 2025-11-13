@@ -18,8 +18,8 @@ jobs:
             system: aarch64-darwin
             runner: macos-latest
           - host: zeta
-            system: x86_64-linux
-            runner: ubuntu-latest
+            system: aarch64-linux
+            runner: ubuntu-24.04-arm
     runs-on: ${{ matrix.runner }}
     steps:
     - uses: actions/checkout@v4
