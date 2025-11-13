@@ -92,6 +92,7 @@ in {
                         Display name shown in the UI. If not specified, uses the base folder name from the path. Useful for providing user-friendly names like “Company Files” instead of just “documents”.
                       '';
                       type = types.nullOr types.str;
+                      default = null;
                     };
 
                     defaultEnabled = lib.mkOption {
