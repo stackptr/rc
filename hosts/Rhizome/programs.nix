@@ -14,7 +14,6 @@
     mochi
     slack
     the-unarchiver
-    whatsapp-for-mac
     zoom-us
   ];
 
@@ -24,6 +23,7 @@
       "legcord"
       "plex"
       "textual"
+      "whatsapp"
     ];
     # N.B.: Removed entries in `masApps` require manual uninstallation
     masApps = {
