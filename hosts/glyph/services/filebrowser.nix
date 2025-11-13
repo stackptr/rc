@@ -4,19 +4,24 @@
   lib,
   ...
 }: let
-  cfg = config.services.filebrowser;
-  address = "";
+  cfg = config.services.filebrowser-quantum;
   port = 8080;
-  dataDir = "/var/lib/filebrowser";
-  rootDir = "${dataDir}/files";
   settings = {
-    inherit address port;
-    database = "${dataDir}/filebrowser.db";
-    root = rootDir;
-    noauth = true;
+    server = {
+      inherit port;
+      sources = [
+        {
+          path = "/mnt/media";
+          defaultEnabled = true;
+        }
+      ];
+    };
+    auth = {
+      adminUsername = "admin";
+    };
   };
 in {
-  services.filebrowser = {
+  services.filebrowser-quantum = {
     enable = true;
     openFirewall = false;
     inherit settings;
