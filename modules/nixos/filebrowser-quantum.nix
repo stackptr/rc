@@ -8,6 +8,7 @@
   cfg = config.services.filebrowser-quantum;
   format = pkgs.formats.yaml {};
   inherit (lib) types;
+  dataDir = "/var/lib/filebrowser-quantum";
 in {
   options = {
     services.filebrowser-quantum = {
@@ -73,14 +74,6 @@ in {
                 readOnly = true;
               };
             };
-
-            root = lib.mkOption {
-              default = "/var/lib/filebrowser/data";
-              description = ''
-                The directory where FileBrowser stores files.
-              '';
-              type = types.path;
-            };
           };
         };
       };
@@ -105,7 +98,7 @@ in {
 
           StateDirectory = "filebrowser-quantum";
           CacheDirectory = "filebrowser-quantum";
-          WorkingDirectory = cfg.settings.root;
+          WorkingDirectory = dataDir;
 
           User = cfg.user;
           Group = cfg.group;
@@ -131,7 +124,7 @@ in {
       };
 
       tmpfiles.settings.filebrowser = {
-        "${cfg.settings.root}".d = {
+        "${dataDir}".d = {
           inherit (cfg) user group;
           mode = "0700";
         };
