@@ -5,14 +5,14 @@ hostname := `hostname | cut -d "." -f 1`
 
 [macos]
 switch host=hostname:
-  nh darwin switch .#darwinConfigurations.{{host}}
+  nh darwin switch --hostname {{host}} .
 
 [linux]
 switch host=hostname:
-  nh os switch .#nixosConfigurations.{{host}}
+  nh os switch --hostname {{host}} .
 
 update:
   nix flake update --commit-lock-file
 
 switch-remote target-host build-host="localhost":
-  nh os switch --flake .#{{target-host}} --target-host root@{{target-host}} --build-host {{build-host}}
+  nh os switch --target-host root@{{target-host}} --build-host {{build-host}} --hostname {{target-host}} .
