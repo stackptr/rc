@@ -12,7 +12,9 @@
       sources = [
         {
           path = "/mnt/media";
-          defaultEnabled = true;
+          config = {
+            defaultEnabled = true;
+          };
         }
       ];
     };
