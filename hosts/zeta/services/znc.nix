@@ -9,7 +9,7 @@
     inherit (config.services.znc) group;
   };
   services.znc = {
-    enable = true;
+    enable = false;
     mutable = false;
     useLegacyConfig = false;
     openFirewall = true;
