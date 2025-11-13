@@ -78,4 +78,23 @@
       config.age.secrets.mastodon-s3-env.path
     ];
   };
+
+  services.postgresql = {
+    enable = true;
+    ensureUsers = [
+      {
+        name = "mastodon";
+        ensureDBOwnership = true;
+      }
+    ];
+    ensureDatabases = ["mastodon"];
+  };
+  services.postgresqlBackup = {
+    enable = true;
+    databases = ["mastodon"];
+  };
+  services.redis.servers.mastodon = {
+    enable = true;
+    port = 31637;
+  };
 }
