@@ -48,6 +48,14 @@ in {
                 type = types.port;
               };
 
+              baseUrl = lib.mkOption {
+                default = "/";
+                description = ''
+                  Base URL, primarily for reverse proxy.
+                '';
+                type = types.str;
+              };
+
               database = lib.mkOption {
                 default = "/var/lib/filebrowser-quantum/database.db";
                 description = ''
