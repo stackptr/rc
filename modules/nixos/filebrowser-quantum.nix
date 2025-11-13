@@ -118,6 +118,15 @@ in {
           };
         };
       };
+
+      environmentFile = lib.mkOption {
+        type = types.nullOr types.str;
+        default = null;
+        description = ''
+          file containing the credentials to access the repository, in the
+          format of an EnvironmentFile as described by {manpage}`systemd.exec(5)`
+        '';
+      };
     };
   };
 
@@ -127,41 +136,45 @@ in {
         after = ["network.target"];
         description = "FileBrowser Quantum";
         wantedBy = ["multi-user.target"];
-        serviceConfig = {
-          ExecStart = let
-            args = [
-              (lib.getExe cfg.package)
-              "-c"
-              (format.generate "config.yaml" cfg.settings)
+        serviceConfig =
+          {
+            ExecStart = let
+              args = [
+                (lib.getExe cfg.package)
+                "-c"
+                (format.generate "config.yaml" cfg.settings)
+              ];
+            in
+              utils.escapeSystemdExecArgs args;
+
+            StateDirectory = "filebrowser-quantum";
+            CacheDirectory = "filebrowser-quantum";
+            WorkingDirectory = dataDir;
+
+            User = cfg.user;
+            Group = cfg.group;
+            UMask = "0077";
+
+            NoNewPrivileges = true;
+            PrivateDevices = true;
+            ProtectKernelTunables = true;
+            ProtectKernelModules = true;
+            ProtectControlGroups = true;
+            MemoryDenyWriteExecute = true;
+            LockPersonality = true;
+            RestrictAddressFamilies = [
+              "AF_UNIX"
+              "AF_INET"
+              "AF_INET6"
             ];
-          in
-            utils.escapeSystemdExecArgs args;
-
-          StateDirectory = "filebrowser-quantum";
-          CacheDirectory = "filebrowser-quantum";
-          WorkingDirectory = dataDir;
-
-          User = cfg.user;
-          Group = cfg.group;
-          UMask = "0077";
-
-          NoNewPrivileges = true;
-          PrivateDevices = true;
-          ProtectKernelTunables = true;
-          ProtectKernelModules = true;
-          ProtectControlGroups = true;
-          MemoryDenyWriteExecute = true;
-          LockPersonality = true;
-          RestrictAddressFamilies = [
-            "AF_UNIX"
-            "AF_INET"
-            "AF_INET6"
-          ];
-          DevicePolicy = "closed";
-          RestrictNamespaces = true;
-          RestrictRealtime = true;
-          RestrictSUIDSGID = true;
-        };
+            DevicePolicy = "closed";
+            RestrictNamespaces = true;
+            RestrictRealtime = true;
+            RestrictSUIDSGID = true;
+          }
+          // lib.optionalAttrs (cfg.environmentFile != null) {
+            EnvironmentFile = cfg.environmentFile;
+          };
       };
 
       tmpfiles.settings.filebrowser = {
