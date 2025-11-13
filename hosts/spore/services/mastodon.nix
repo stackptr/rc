@@ -6,35 +6,37 @@
 }: let
   enable = false; # TODO: Move Mastodon to different host
 in {
-  age.secrets.mastodon-s3-env = {
-    file = ./../secrets/mastodon-s3-env.age;
-    mode = "440";
-    owner = "mastodon";
-    group = "mastodon";
-  };
-  age.secrets.mastodon-smtp-password = {
-    file = ./../secrets/notifier-smtp-password.age;
-    mode = "440";
-    owner = "mastodon";
-    group = "mastodon";
-  };
-  age.secrets.mastodon-secret-key-base = {
-    file = ./../secrets/mastodon-secret-key-base.age;
-    mode = "440";
-    owner = "mastodon";
-    group = "mastodon";
-  };
-  age.secrets.mastodon-vapid-public-key = {
-    file = ./../secrets/mastodon-vapid-public-key.age;
-    mode = "440";
-    owner = "mastodon";
-    group = "mastodon";
-  };
-  age.secrets.mastodon-vapid-private-key = {
-    file = ./../secrets/mastodon-vapid-private-key.age;
-    mode = "440";
-    owner = "mastodon";
-    group = "mastodon";
+  age.secrets = lib.mkIf enable {
+    mastodon-s3-env = {
+      file = ./../secrets/mastodon-s3-env.age;
+      mode = "440";
+      owner = "mastodon";
+      group = "mastodon";
+    };
+    mastodon-smtp-password = {
+      file = ./../secrets/notifier-smtp-password.age;
+      mode = "440";
+      owner = "mastodon";
+      group = "mastodon";
+    };
+    mastodon-secret-key-base = {
+      file = ./../secrets/mastodon-secret-key-base.age;
+      mode = "440";
+      owner = "mastodon";
+      group = "mastodon";
+    };
+    mastodon-vapid-public-key = {
+      file = ./../secrets/mastodon-vapid-public-key.age;
+      mode = "440";
+      owner = "mastodon";
+      group = "mastodon";
+    };
+    mastodon-vapid-private-key = {
+      file = ./../secrets/mastodon-vapid-private-key.age;
+      mode = "440";
+      owner = "mastodon";
+      group = "mastodon";
+    };
   };
   services.mastodon = {
     inherit enable;
