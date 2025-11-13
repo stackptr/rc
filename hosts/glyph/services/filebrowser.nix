@@ -39,6 +39,7 @@ in {
             userIdentifier = "preferred_username";
             disableVerifyTLS = false;
             createUser = true;
+            adminGroup = "admins";
           };
         };
       };
