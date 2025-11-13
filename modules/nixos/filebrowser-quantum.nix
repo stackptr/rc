@@ -95,12 +95,21 @@ in {
                       default = null;
                     };
 
-                    defaultEnabled = lib.mkOption {
-                      default = false;
+                    config = lib.mkOption {
                       description = ''
-                        Whether new users automatically get access to this source. Defaults to `false`. Set to `true` for shared sources that all users should see.
+                        Configuration options for the source.
                       '';
-                      type = types.bool;
+                      type = types.submodule {
+                        options = {
+                          defaultEnabled = lib.mkOption {
+                            default = false;
+                            description = ''
+                              Whether new users automatically get access to this source. Defaults to `false`. Set to `true` for shared sources that all users should see.
+                            '';
+                            type = types.bool;
+                          };
+                        };
+                      };
                     };
                   };
                 });
