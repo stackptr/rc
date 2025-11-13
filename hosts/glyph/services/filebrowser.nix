@@ -19,12 +19,30 @@ in {
     settings = {
       server = {
         port = 8080;
-        sources = [
+        sources = let
+          config = {
+            defaultEnabled = true;
+          };
+        in [
+          {
+            path = "/mnt/archive";
+            inherit config;
+          }
+          {
+            path = "/mnt/backup";
+            inherit config;
+          }
           {
             path = "/mnt/media";
-            config = {
-              defaultEnabled = true;
-            };
+            inherit config;
+          }
+          {
+            path = "/mnt/torrents";
+            inherit config;
+          }
+          {
+            path = "/mnt/unsorted";
+            inherit config;
           }
         ];
       };
