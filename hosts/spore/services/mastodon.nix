@@ -2,7 +2,9 @@
   config,
   pkgs,
   ...
-}: {
+}: let
+  enable = false; # TODO: Move Mastodon to different host
+in {
   age.secrets.mastodon-s3-env = {
     file = ./../secrets/mastodon-s3-env.age;
     mode = "440";
@@ -34,7 +36,7 @@
     group = "mastodon";
   };
   services.mastodon = {
-    enable = false;
+    inherit enable;
     localDomain = "pub.zx.dev";
     streamingProcesses = 1;
     secretKeyBaseFile = config.age.secrets.mastodon-secret-key-base.path;
@@ -80,7 +82,7 @@
   };
 
   services.postgresql = {
-    enable = true;
+    inherit enable;
     ensureUsers = [
       {
         name = "mastodon";
@@ -90,11 +92,11 @@
     ensureDatabases = ["mastodon"];
   };
   services.postgresqlBackup = {
-    enable = true;
+    inherit enable;
     databases = ["mastodon"];
   };
   services.redis.servers.mastodon = {
-    enable = true;
+    inherit enable;
     port = 31637;
   };
 }
