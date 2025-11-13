@@ -50,6 +50,10 @@ in
       cp -r ${frontend}/dist/* http/embed
     '';
 
+    postInstall = ''
+      mv $out/bin/backend $out/bin/filebrowser
+    '';
+
     ldflags = [
       "-w"
       "-s"
