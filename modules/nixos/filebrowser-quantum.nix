@@ -55,6 +55,15 @@ in {
                 '';
                 type = types.path;
               };
+
+              cacheDir = lib.mkOption {
+                default = "/var/cache/filebrowser";
+                description = ''
+                  The directory where FileBrowser stores its cache.
+                '';
+                type = types.path;
+                readOnly = true;
+              };
             };
 
             root = lib.mkOption {
@@ -63,15 +72,6 @@ in {
                 The directory where FileBrowser stores files.
               '';
               type = types.path;
-            };
-
-            cache-dir = lib.mkOption {
-              default = "/var/cache/filebrowser";
-              description = ''
-                The directory where FileBrowser stores its cache.
-              '';
-              type = types.path;
-              readOnly = true;
             };
           };
         };
@@ -127,7 +127,7 @@ in {
           inherit (cfg) user group;
           mode = "0700";
         };
-        "${cfg.settings.cache-dir}".d = {
+        "${cfg.settings.server.cacheDir}".d = {
           inherit (cfg) user group;
           mode = "0700";
         };
