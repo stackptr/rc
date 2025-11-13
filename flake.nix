@@ -119,8 +119,6 @@
         config,
         ...
       }: {
-        # TODO: Expose each ./packages/${name}/package.nix as packages.${name}
-        packages.filebrowser-quantum = pkgs.callPackage ./packages/filebrowser-quantum/package.nix {};
         devShells = {
           default = pkgs.mkShell {
             packages =
