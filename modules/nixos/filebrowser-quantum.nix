@@ -49,7 +49,7 @@ in {
                 type = types.port;
               };
 
-              baseUrl = lib.mkOption {
+              baseURL = lib.mkOption {
                 default = "/";
                 description = ''
                   Base URL, primarily for reverse proxy.
