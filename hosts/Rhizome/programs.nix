@@ -20,6 +20,7 @@
   homebrew = {
     enable = true;
     casks = [
+      "dash"
       "legcord"
       "plex"
       "textual"
