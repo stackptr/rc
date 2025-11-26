@@ -2,4 +2,7 @@
 [
   # Custom packages defined in this repository
   (import ./custom-packages.nix)
+
+  # Fix Daisydisk ahead of upstream
+  (import ./daisydisk.nix)
 ]
