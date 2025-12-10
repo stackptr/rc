@@ -51,4 +51,33 @@
       }
       // shares;
   };
+
+  systemd.services.ensureSambaPermissions = {
+    description = "Ensures correct permissions within Samba shares";
+    serviceConfig = {
+      Type = "oneshot";
+      ExecStart = let
+        defaultUsrGrp = "mu:users";
+        plexUsrGrp = with config.services.plex; "${user}:${group}";
+        transmissionUsrGrp = with config.services.transmission; "${user}:${group}";
+      in [
+        "${pkgs.coreutils}/bin/chown -R ${defaultUsrGrp} archive"
+        "${pkgs.coreutils}/bin/chown -R ${defaultUsrGrp} backup"
+        # N.B.: /mnt/media/Music is used by Roon, not Plex
+        "${pkgs.coreutils}/bin/chown -R ${plexUsrGrp} media/Movies media/TV media/Video"
+        "${pkgs.coreutils}/bin/chown -R ${defaultUsrGrp} media/Music"
+        "${pkgs.coreutils}/bin/chown -R ${transmissionUsrGrp} torrents"
+        "${pkgs.coreutils}/bin/chown -R ${defaultUsrGrp} unsorted"
+      ];
+      WorkingDirectory = "/mnt";
+    };
+  };
+
+  systemd.timers.ensureSambaPermissions = {
+    wantedBy = ["timers.target"];
+    timerConfig = {
+      OnCalendar = "hourly";
+      Persistent = true;
+    };
+  };
 }
