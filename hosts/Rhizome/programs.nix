@@ -23,6 +23,7 @@
       "boltai"
       "dash"
       "legcord"
+      "nook"
       "plex"
       "textual"
       "whatsapp"
