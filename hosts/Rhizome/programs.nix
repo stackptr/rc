@@ -20,6 +20,7 @@
   homebrew = {
     enable = true;
     casks = [
+      "boltai"
       "dash"
       "legcord"
       "plex"
