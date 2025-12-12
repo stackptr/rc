@@ -65,6 +65,11 @@ in {
         };
       };
 
+      programs.delta = {
+        enable = true;
+        enableGitIntegration = true;
+      };
+
       programs.gpg = {
         enable = true;
       };
