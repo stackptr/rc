@@ -96,6 +96,11 @@ in {
       programs.jjui = {
         enable = true;
       };
+
+      programs.delta = {
+        enable = true;
+        enableJujutsuIntegration = true;
+      };
     })
   ];
 }
