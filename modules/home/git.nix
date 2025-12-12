@@ -25,6 +25,13 @@ in {
         description = "Whether to enable interactive rebase.";
         type = lib.types.bool;
       };
+
+      enableJujutsu = mkOption {
+        default = false;
+        example = true;
+        description = "Whether to enable jujutsu.";
+        type = lib.types.bool;
+      };
     };
   };
 
@@ -75,6 +82,15 @@ in {
       home.packages = [pkgs.git-interactive-rebase-tool];
 
       programs.git.settings.sequence.editor = "interactive-rebase-tool";
+    })
+
+    (mkIf cfg.enableJujutsu {
+      programs.jujutsu = {
+        enable = true;
+      };
+      programs.jjui = {
+        enable = true;
+      };
     })
   ];
 }

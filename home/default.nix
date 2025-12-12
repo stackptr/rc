@@ -26,6 +26,7 @@
         containers.enable = true;
         javascript.enable = true;
       };
+      git.enableJujutsu = true;
       utilities = {
         file.enable = true;
         media.enable = true;
