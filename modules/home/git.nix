@@ -65,6 +65,11 @@ in {
         };
       };
 
+      programs.delta = {
+        enable = true;
+        enableGitIntegration = true;
+      };
+
       programs.gpg = {
         enable = true;
       };
@@ -90,6 +95,11 @@ in {
       };
       programs.jjui = {
         enable = true;
+      };
+
+      programs.delta = {
+        enable = true;
+        enableJujutsuIntegration = true;
       };
     })
   ];
