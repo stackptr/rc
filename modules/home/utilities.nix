@@ -33,6 +33,11 @@ in {
         };
       };
 
+      programs.fzf = {
+        enable = true;
+        enableZshIntegration = true;
+      };
+
       programs.jq.enable = true;
 
       programs.lsd = {
