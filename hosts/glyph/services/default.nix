@@ -37,6 +37,10 @@
       1900 # ssdp / Bonjour
     ];
     allowedUDPPortRanges = [
+      {
+        from = 6001;
+        to = 6002;
+      }
       # Bonjour
       {
         from = 5350;
