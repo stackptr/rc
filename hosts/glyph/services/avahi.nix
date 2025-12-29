@@ -6,13 +6,11 @@
   services.avahi = {
     enable = true;
     nssmdns4 = true;
-    reflector = true;
     publish = {
       enable = true;
       userServices = true;
       workstation = true;
     };
-    allowInterfaces = ["enp5s0"];
     extraServiceFiles = {
       smb = ''
         <?xml version="1.0" standalone='no'?>
