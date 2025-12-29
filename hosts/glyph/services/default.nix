@@ -53,9 +53,8 @@
     ];
     # Dynamically allocated ports for Roon Bridge opened for local network
     extraCommands = ''
-      iptables -A INPUT -p tcp --match multiport --dports 30000:65535 -s 192.168.4.0/24 -j ACCEPT
-      iptables -A INPUT -p udp --match multiport --dports 30000:65535 -s 192.168.4.0/24 -j ACCEPT
-      iptables -A INPUT -p tcp --match multiport --dports 40000:65535 -s 127.0.0.0/8 -j ACCEPT
+      iptables -A nixos-fw -p tcp --dport 30000:65535 -s 192.168.4.0/24 -j nixos-fw-accept
+      iptables -A nixos-fw -p udp --dport 30000:65535 -s 192.168.4.0/24 -j nixos-fw-accept
     '';
   };
   services.tailscale = {
