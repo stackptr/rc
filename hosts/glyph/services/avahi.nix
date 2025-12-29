@@ -4,7 +4,7 @@
   ...
 }: {
   services.avahi = {
-    enable = false;
+    enable = true;
     nssmdns4 = true;
     reflector = true;
     publish = {
