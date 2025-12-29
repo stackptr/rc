@@ -51,6 +51,8 @@
     extraCommands = ''
       iptables -A nixos-fw -p tcp -m tcp --dport 30000:65535 -s 192.168.4.0/24 -j nixos-fw-accept
       iptables -A nixos-fw -p udp -m udp --dport 30000:65535 -s 192.168.4.0/24 -j nixos-fw-accept
+      iptables -A nixos-fw -p tcp -m tcp --dport 30000:65535 -s 127.0.0.0/8 -j nixos-fw-accept
+      iptables -A nixos-fw -p udp -m udp --dport 30000:65535 -s 127.0.0.0/8 -j nixos-fw-accept
     '';
   };
   services.tailscale = {
