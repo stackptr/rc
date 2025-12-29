@@ -29,6 +29,7 @@
     allowedTCPPorts = [
       554 # AirPlay streaming
       3689 # Digital Audio Access Protocol (DAAP)
+      7000 # AirPlay control
       55002 # Roon ARC
     ];
     allowedUDPPorts = [
