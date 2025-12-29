@@ -36,6 +36,7 @@
       1900 # ssdp / Bonjour
     ];
     allowedUDPPortRanges = [
+      # Apple Airplay
       {
         from = 6001;
         to = 6002;
