@@ -5,11 +5,11 @@ hostname := `hostname | cut -d "." -f 1`
 
 [macos]
 switch host=hostname:
-  nh darwin switch --hostname {{host}} .
+  nh darwin switch --hostname {{host}} . --ask
 
 [linux]
 switch host=hostname:
-  nh os switch --hostname {{host}} .
+  nh os switch --hostname {{host}} . --ask
 
 update:
   nix flake update --commit-lock-file
