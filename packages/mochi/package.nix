@@ -10,7 +10,7 @@ stdenvNoCC.mkDerivation (finalAttrs: {
   version = "1.18.11";
 
   src = fetchurl {
-    url = "https://mochi.cards/releases/Mochi-${finalAttrs.version}-arm64.dmg";
+    url = "https://download.mochi.cards/releases/Mochi-${finalAttrs.version}-arm64.dmg";
     hash = "sha256-IzJx8IMuX/zK3GRIkwnqW7OCcmPLUSld3pVD6sCLAxA=";
   };
 
