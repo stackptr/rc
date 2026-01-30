@@ -20,6 +20,7 @@
   homebrew = {
     enable = true;
     casks = [
+      "adguard"
       "boltai"
       "dash"
       "legcord"
@@ -34,7 +35,6 @@
       "Folder Quick Look" = 6753110395;
       "GoodLinks" = 1474335294;
       "Hand Mirror" = 1502839586;
-      "Hush" = 1544743900;
       "Infuse" = 1136220934;
       "Mapper" = 1589391989;
       "Mela" = 1568924476;
@@ -49,7 +49,6 @@
       "Reeder" = 1529448980;
       "Timery" = 1425368544;
       "Things" = 904280696;
-      "Wipr 2" = 1662217862;
     };
   };
 
