@@ -21,7 +21,7 @@
       };
     }
 
-    (lib.mkIf (hostname != "spore") {
+    (lib.mkIf (hostname != "loam") {
       development = {
         containers.enable = true;
         javascript.enable = true;
