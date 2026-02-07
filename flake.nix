@@ -132,6 +132,7 @@
                 inputs'.agenix.packages.default
                 pkgs.cachix
                 pkgs.just
+                pkgs.nh
               ]
               ++ config.pre-commit.settings.enabledPackages;
             inherit (config.pre-commit) shellHook;
