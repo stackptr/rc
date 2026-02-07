@@ -88,6 +88,11 @@
             system = "x86_64-linux";
             username = "mu";
           };
+          loam = mkNixosHost {
+            hostname = "loam";
+            system = "x86_64-linux";
+            username = "mu";
+          };
           spore = mkNixosHost {
             hostname = "spore";
             system = "x86_64-linux";
