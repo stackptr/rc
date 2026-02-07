@@ -5,8 +5,7 @@
 
     # General
     systems = {
-      url = "path:./flake.systems.nix";
-      flake = false;
+      url = "github:nix-systems/default";
     };
     flake-parts = {
       url = "github:hercules-ci/flake-parts";
