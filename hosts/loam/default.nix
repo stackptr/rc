@@ -8,6 +8,7 @@
   imports = [
     ./hardware-configuration.nix
     ./networking.nix # generated at runtime by nixos-infect
+    ./services
   ];
 
   # Workaround for https://github.com/NixOS/nix/issues/8502
@@ -17,6 +18,5 @@
   zramSwap.enable = true;
   networking.hostName = "loam-west";
   networking.domain = "";
-  services.openssh.enable = true;
   system.stateVersion = "23.11";
 }
