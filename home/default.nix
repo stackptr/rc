@@ -23,6 +23,7 @@
 
     (lib.mkIf (hostname != "spore") {
       development = {
+        ai.enable = true;
         containers.enable = true;
         javascript.enable = true;
       };
