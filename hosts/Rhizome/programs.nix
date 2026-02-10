@@ -7,6 +7,7 @@
     chatgpt
     cinny-desktop
     claude-desktop
+    ghostty-bin
     github-desktop
     gitify
     m-cli
