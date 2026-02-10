@@ -137,6 +137,10 @@ in {
           }
         ];
       };
+      services.postgresqlBackup = {
+        enable = lib.mkDefault true;
+        databases = ["pocketid"];
+      };
 
       systemd.services.pocket-id = {
         wants = ["network-online.target"];
