@@ -123,9 +123,7 @@ in {
         settings = {
           APP_URL = "https://${cfg.issuer.host}";
           TRUST_PROXY = true;
-          DB_PROVIDER = "postgres";
-          DB_CONNECTION_STRING = "host=/run/postgresql user=pocketid dbname=pocketid";
-          KEYS_STORAGE = "database";
+          DB_CONNECTION_STRING = "postgres://pocketid@/pocketid?host=/run/postgresql";
           ENCRYPTION_KEY_FILE = cfg.issuer.encryptionKeyFile;
         };
       };
