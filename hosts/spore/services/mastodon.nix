@@ -94,7 +94,7 @@ in {
     ensureDatabases = ["mastodon"];
   };
   services.postgresqlBackup = {
-    inherit enable;
+    #inherit enable; TODO
     databases = ["mastodon"];
   };
   services.redis.servers.mastodon = {
