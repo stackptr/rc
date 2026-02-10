@@ -10,6 +10,10 @@
 in {
   options = {
     rc.development = {
+      ai = {
+        enable = lib.mkEnableOption "tools using LLMs";
+      };
+
       containers = {
         enable = lib.mkEnableOption "container-related tooling";
       };
@@ -21,6 +25,12 @@ in {
   };
 
   config = lib.mkMerge [
+    (mkIf cfg.ai.enable {
+      programs.claude-code = {
+        enable = true;
+      };
+    })
+
     (mkIf cfg.containers.enable {
       # TODO: Use services.colima after nix-community/home-manager#7913
       home.packages = with pkgs; [
