@@ -19,6 +19,12 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.systems.follows = "systems";
     };
+    agenix-rekey = {
+      url = "github:oddlama/agenix-rekey";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-parts.follows = "flake-parts";
+      inputs.pre-commit-hooks.follows = "git-hooks-nix";
+    };
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -72,6 +78,7 @@
     }: {
       imports = [
         inputs.git-hooks-nix.flakeModule
+        inputs.agenix-rekey.flakeModule
       ];
 
       flake = let
@@ -122,6 +129,7 @@
       }: {
         devShells = {
           default = pkgs.mkShell {
+            nativeBuildInputs = [config.agenix-rekey.package];
             packages =
               [
                 inputs'.agenix.packages.default
