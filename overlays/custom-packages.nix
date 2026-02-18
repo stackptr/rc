@@ -21,4 +21,7 @@ self: super: {
 
   # Ungoogled Chromium with privacy enhancements
   ungoogled-chromium = super.callPackage ./../packages/ungoogled-chromium/package.nix {};
+
+  # wBlock Safari extension
+  wblock = super.callPackage ./../packages/wblock/package.nix {};
 }
