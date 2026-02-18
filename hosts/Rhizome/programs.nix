@@ -20,7 +20,6 @@
   homebrew = {
     enable = true;
     casks = [
-      "adguard"
       "boltai"
       "dash"
       "legcord"
