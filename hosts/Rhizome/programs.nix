@@ -27,6 +27,7 @@
       "nook"
       "plex"
       "textual"
+      "wblock"
       "whatsapp"
 
       # Work apps
