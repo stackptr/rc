@@ -18,6 +18,8 @@
       "slack"
       "soundsource"
       "the-unarchiver"
+      "vscode"
+      "vscode-extension-anthropic-claude-code"
       "zoom"
     ];
 }
