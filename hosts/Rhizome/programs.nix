@@ -14,6 +14,7 @@
     mochi
     slack
     the-unarchiver
+    wblock
     zoom-us
   ];
 
