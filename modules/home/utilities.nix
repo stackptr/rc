@@ -76,13 +76,19 @@ in {
     })
 
     (mkIf cfg.nix.enable {
-      home.packages = [
-        pkgs.comma
-        pkgs.manix
-        pkgs.nix-du
-        pkgs.nix-tree
-        pkgs.nix-your-shell
-      ];
+      home.packages =
+        [
+          pkgs.comma
+          pkgs.manix
+          pkgs.nix-du
+          pkgs.nix-tree
+          pkgs.nix-your-shell
+        ]
+        ++ [
+          # TODO: Expose these to Zed editor specifically
+          pkgs.alejandra
+          pkgs.nil
+        ];
 
       programs.nh.enable = true;
     })
