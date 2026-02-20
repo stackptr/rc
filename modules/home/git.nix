@@ -72,6 +72,9 @@ in {
 
       programs.gpg = {
         enable = true;
+        settings = {
+          default-key = "413D1A0152BCB08D2E3DDACAF88C08579051AB48";
+        };
       };
     })
 
