@@ -82,7 +82,6 @@ in {
         pkgs.nix-du
         pkgs.nix-tree
         pkgs.nix-your-shell
-        pkgs.nixd
       ];
 
       programs.nh.enable = true;
