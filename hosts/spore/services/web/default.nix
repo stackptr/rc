@@ -83,6 +83,11 @@
         useACMEHost = "zx.dev";
         locations."/".proxyPass = "https://glyph.rove-duck.ts.net:32400";
       };
+      "jellyfin.zx.dev" = {
+        forceSSL = true;
+        useACMEHost = "zx.dev";
+        locations."/".proxyPass = "http://glyph.rove-duck.ts.net:8096";
+      };
     };
   };
 
