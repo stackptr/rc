@@ -7,6 +7,7 @@
     ./avahi.nix
     ./dns.nix
     ./filebrowser.nix
+    ./jellyfin.nix
     ./nfs.nix
     ./prometheus.nix
     ./samba.nix
