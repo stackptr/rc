@@ -34,4 +34,8 @@
     "video"
     "render"
   ];
+
+  services.meilisearch = {
+    enable = true;
+  };
 }
