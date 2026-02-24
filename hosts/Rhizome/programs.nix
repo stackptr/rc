@@ -4,11 +4,8 @@
   ...
 }: {
   environment.systemPackages = with pkgs; [
-    chatgpt
     cinny-desktop
-    claude-desktop
     github-desktop
-    gitify
     m-cli
     mas
     mochi
@@ -87,10 +84,6 @@
   };
 
   programs.little-snitch = {
-    enable = true;
-  };
-
-  programs.nova-editor = {
     enable = true;
   };
 

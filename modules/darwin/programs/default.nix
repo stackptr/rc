@@ -6,7 +6,6 @@
     ./fastscripts.nix
     ./iina.nix
     ./little-snitch.nix
-    ./nova-editor.nix
     ./popclip.nix
     ./postico.nix
     ./roon.nix
