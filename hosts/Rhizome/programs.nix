@@ -87,10 +87,6 @@
     enable = true;
   };
 
-  programs.nova-editor = {
-    enable = true;
-  };
-
   programs.popclip = {
     enable = true;
     startOnActivation = true;
