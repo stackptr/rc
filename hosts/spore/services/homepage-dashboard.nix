@@ -106,7 +106,7 @@
                 type = "jellyfin";
                 url = "http://glyph.rove-duck.ts.net:8096";
                 key = "{{HOMEPAGE_VAR_JELLYFIN_KEY}}";
-                version = 2;
+                version = 1;
                 enableBlocks = true;
                 enableNowPlaying = true;
                 enableUser = true;
