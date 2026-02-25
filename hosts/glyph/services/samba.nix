@@ -21,7 +21,7 @@
     shares = {
       Archive = mkShare "/mnt/archive" "mu" "users";
       Backup = mkShare "/mnt/backup" "mu" "users" // {"fruit:time machine" = "yes";};
-      Media = mkShare "/mnt/media" config.services.plex.user config.services.plex.group;
+      Media = mkShare "/mnt/media" config.services.jellyfin.user config.services.jellyfin.group;
       Torrents = mkShare "/mnt/torrents" config.services.transmission.user config.services.transmission.group;
       Unsorted = mkShare "/mnt/unsorted" "mu" "users";
     };
@@ -58,13 +58,13 @@
       Type = "oneshot";
       ExecStart = let
         defaultUsrGrp = "mu:users";
-        plexUsrGrp = with config.services.plex; "${user}:${group}";
+        jellyfinUsrGrp = with config.services.jellyfin; "${user}:${group}";
         transmissionUsrGrp = with config.services.transmission; "${user}:${group}";
       in [
         "${pkgs.coreutils}/bin/chown -R ${defaultUsrGrp} archive"
         "${pkgs.coreutils}/bin/chown -R ${defaultUsrGrp} backup"
-        # N.B.: /mnt/media/Music is used by Roon, not Plex
-        "${pkgs.coreutils}/bin/chown -R ${plexUsrGrp} media/Movies media/TV media/Video"
+        # N.B.: /mnt/media/Music is used by Roon, not Jellyfin
+        "${pkgs.coreutils}/bin/chown -R ${jellyfinUsrGrp} media/Movies media/TV media/Video"
         "${pkgs.coreutils}/bin/chown -R ${defaultUsrGrp} media/Music"
         "${pkgs.coreutils}/bin/chown -R ${transmissionUsrGrp} torrents"
         "${pkgs.coreutils}/bin/chown -R ${defaultUsrGrp} unsorted"
