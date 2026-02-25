@@ -4,7 +4,6 @@
   ...
 }: {
   environment.systemPackages = with pkgs; [
-    cinny-desktop
     github-desktop
     m-cli
     mas
