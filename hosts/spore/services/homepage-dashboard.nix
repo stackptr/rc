@@ -98,14 +98,21 @@
             };
           }
           {
-            "Plex" = {
+            "Jellyfin" = {
               description = "TV & movie streaming";
-              href = "https://app.plex.tv";
-              icon = "plex";
+              href = "https://jellyfin.zx.dev";
+              icon = "jellyfin";
               widget = {
-                type = "plex";
-                url = "https://glyph.rove-duck.ts.net:32400";
-                key = "{{HOMEPAGE_VAR_PLEX_KEY}}";
+                type = "jellyfin";
+                url = "http://glyph.rove-duck.ts.net:8096";
+                key = "{{HOMEPAGE_VAR_JELLYFIN_KEY}}";
+                version = 1;
+                enableBlocks = true;
+                enableNowPlaying = true;
+                enableUser = true;
+                enableMediaControl = true;
+                showEpisodeNumber = true;
+                expandOneStreamToTwoRows = true;
               };
             };
           }
