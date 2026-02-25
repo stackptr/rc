@@ -18,10 +18,6 @@
 
   services.cockpit.enable = true;
   services.openssh.enable = true;
-  services.plex = {
-    enable = true;
-    openFirewall = true;
-  };
   services.roon-server = {
     enable = true;
     openFirewall = true;
