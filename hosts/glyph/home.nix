@@ -1,8 +1,13 @@
-{pkgs, ...}: {
+{
+  pkgs,
+  pkgs-stable,
+  ...
+}: {
   home.packages = [pkgs.mktorrent];
 
   programs.beets = {
     enable = true;
+    package = pkgs-stable.beets;
     settings = {
       directory = "/mnt/media/Music";
       # TODO: Backup ~/.config/beets/library.db
