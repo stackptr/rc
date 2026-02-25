@@ -112,7 +112,7 @@
                 enableUser = true;
                 enableMediaControl = true;
                 showEpisodeNumber = true;
-                expandOneStreamToTwoRows = false;
+                expandOneStreamToTwoRows = true;
               };
             };
           }
