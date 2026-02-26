@@ -10,6 +10,13 @@
     group = "grafana";
   };
 
+  age.secrets.grafana-secret-key = {
+    file = ./../secrets/grafana-secret-key.age;
+    mode = "440";
+    owner = "grafana";
+    group = "grafana";
+  };
+
   services.grafana = {
     enable = true;
     settings = {
@@ -39,6 +46,7 @@
       security = {
         admin_user = "corey@zx.dev";
         admin_email = "corey@zx.dev";
+        secret_key = "$__file{${config.age.secrets.grafana-secret-key.path}}";
       };
     };
     provision = {
