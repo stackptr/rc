@@ -4,6 +4,7 @@ in {
   "hosts/spore/secrets/cloudflare-dns.age".publicKeys = keys;
   "hosts/spore/secrets/homepage-env.age".publicKeys = keys;
   "hosts/spore/secrets/grafana-client-secret.age".publicKeys = keys;
+  "hosts/spore/secrets/grafana-secret-key.age".publicKeys = keys;
   "hosts/spore/secrets/mastodon-s3-env.age".publicKeys = keys;
   "hosts/spore/secrets/mastodon-secret-key-base.age".publicKeys = keys;
   "hosts/spore/secrets/mastodon-vapid-public-key.age".publicKeys = keys;
