@@ -7,7 +7,6 @@
 }:
 with lib; let
   cfg = config.programs.fastscripts;
-  # TODO: This seems bad?
   text = import "${nixDarwin}/modules/lib/write-text.nix" {
     inherit lib;
     mkTextDerivation = pkgs.writeText;

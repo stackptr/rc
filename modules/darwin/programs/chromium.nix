@@ -24,7 +24,6 @@ in {
       description = "Configuration directory for Chromium";
     };
 
-    # TODO: This does not seem to work with ungoogled-chromium
     extensions = mkOption {
       type = types.listOf types.str;
       default = [];

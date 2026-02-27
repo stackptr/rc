@@ -10,7 +10,6 @@
     package = pkgs-stable.beets;
     settings = {
       directory = "/mnt/media/Music";
-      # TODO: Backup ~/.config/beets/library.db
       import = {
         copy = true;
         move = false;

@@ -1,4 +1,3 @@
-# TODO: Upstream to NixOS/nixpkgs
 {
   lib,
   buildNpmPackage,

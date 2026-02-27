@@ -19,7 +19,7 @@
 
   networking = {
     hostName = "spore";
-    enableIPv6 = false; # TODO: Avoid IPs auto added to interface after boot
+    enableIPv6 = false;
     interfaces.eth0 = {
       useDHCP = false;
       ipv4.addresses = [

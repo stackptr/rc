@@ -1,4 +1,3 @@
-# TODO: Build from source and upstream
 {
   lib,
   stdenvNoCC,
