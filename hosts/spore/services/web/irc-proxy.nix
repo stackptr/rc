@@ -21,9 +21,6 @@ in {
         ssl_certificate ${certs.${certName}.directory}/fullchain.pem;
         ssl_certificate_key ${certs.${certName}.directory}/key.pem;
 
-        # TODO: security.dhparams.enable
-        #ssl_dhparam config.security.dhparams.path;
-
         # intermediate configuration
         ssl_protocols ${config.services.nginx.sslProtocols};
         ssl_ciphers ${config.services.nginx.sslCiphers};

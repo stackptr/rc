@@ -4,7 +4,7 @@
   lib,
   ...
 }: let
-  enable = false; # TODO: Move Mastodon to different host
+  enable = false;
 in {
   age.secrets = lib.mkIf enable {
     mastodon-s3-env = {
@@ -94,7 +94,7 @@ in {
     ensureDatabases = ["mastodon"];
   };
   services.postgresqlBackup = {
-    #inherit enable; TODO
+    #inherit enable;
     databases = ["mastodon"];
   };
   services.redis.servers.mastodon = {

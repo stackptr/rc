@@ -7,7 +7,6 @@
 
   cfg = config.rc.web.auth;
 
-  # TODO: Source from web-servers/nginx/vhost-options.nix
   useACMEHost = mkOption {
     type = lib.types.nullOr lib.types.str;
     default = null;

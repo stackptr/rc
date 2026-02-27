@@ -60,7 +60,6 @@ in {
         NSAutomaticSpellingCorrectionEnabled = false;
         "com.apple.springing.enabled" = true;
         "com.apple.springing.delay" = 0.5;
-        # "com.apple.trackpad.forceClick" = 1; # TODO
         "com.apple.trackpad.scaling" = 1.0;
 
         # Always use expanded save panel
@@ -71,9 +70,7 @@ in {
         InitialKeyRepeat = 15;
         KeyRepeat = 2;
       };
-      # TODO:
-      # showAppExposeGestureEnabled = 1;
-      # showMissionControlGestureEnabled = 1;
+
       dock = {
         appswitcher-all-displays = false;
         autohide = false;

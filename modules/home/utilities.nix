@@ -94,7 +94,6 @@ in {
           pkgs.nix-your-shell
         ]
         ++ [
-          # TODO: Expose these to Zed editor specifically
           pkgs.alejandra
           pkgs.nil
         ];
