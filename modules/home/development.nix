@@ -28,6 +28,38 @@ in {
     (mkIf cfg.ai.enable {
       programs.claude-code = {
         enable = true;
+        settings = {
+          model = "opus";
+          permissions = {
+            allow = [
+              "Bash(grep *)"
+              "Bash(rg *)"
+              "Bash(head *)"
+              "Bash(tail *)"
+              "Bash(cat *)"
+              "Bash(ls *)"
+              "Bash(wc *)"
+              "Bash(which *)"
+              "Bash(nix *)"
+              "Bash(git log *)"
+              "Bash(git diff *)"
+              "Bash(git status)"
+              "Bash(git show *)"
+              "Bash(git branch *)"
+              "Bash(* --version)"
+              "Bash(* --help *)"
+            ];
+            deny = [
+              "Bash(git push *)"
+              "Bash(git reset *)"
+              "Bash(git checkout *)"
+              "Bash(rm *)"
+              "Bash(sudo *)"
+              "Bash(nixos-rebuild *)"
+              "Bash(darwin-rebuild *)"
+            ];
+          };
+        };
       };
     })
 
