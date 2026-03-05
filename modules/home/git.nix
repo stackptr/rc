@@ -17,6 +17,7 @@ in {
         default = {};
         description = "Settings for ~/.config/graphite/user_config.";
         type = lib.types.attrs;
+        apply = s: {updateAutomatically = false;} // s;
       };
     };
 
