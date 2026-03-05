@@ -7,8 +7,19 @@
   inherit (lib) mkIf mkOption;
 
   cfg = config.rc.git;
+  graphiteCfg = config.rc.graphite;
 in {
   options = {
+    rc.graphite = {
+      enable = lib.mkEnableOption "Graphite CLI";
+
+      settings = mkOption {
+        default = {};
+        description = "Settings for ~/.config/graphite/user_config.";
+        type = lib.types.attrs;
+      };
+    };
+
     rc.git = {
       enable = lib.mkEnableOption "Git-related configuration";
 
@@ -104,6 +115,13 @@ in {
         enable = true;
         enableJujutsuIntegration = true;
       };
+    })
+
+    (mkIf graphiteCfg.enable {
+      home.packages = [pkgs.graphite-cli];
+
+      home.file.".config/graphite/user_config".text =
+        builtins.toJSON graphiteCfg.settings;
     })
   ];
 }
