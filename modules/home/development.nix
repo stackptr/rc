@@ -30,6 +30,8 @@ in {
         enable = true;
         settings = {
           model = "opus";
+          enableAllProjectMcpServers = true;
+          enabledMcpjsonServers = ["linear"];
           permissions = {
             allow = [
               "Bash(find *)"
@@ -50,6 +52,15 @@ in {
               "Bash(git branch *)"
               "Bash(* --version)"
               "Bash(* --help *)"
+              "mcp__linear__get_project"
+              "mcp__linear__list_issues"
+              "mcp__linear__get_issue"
+              "mcp__linear__list_comments"
+              "mcp__linear__extract_images"
+              "mcp__linear__get_document"
+              "mcp__figma__get_design_context"
+              "mcp__figma__get_metadata"
+              "mcp__figma__get_screenshot"
             ];
             deny = [
               "Bash(git push *)"
