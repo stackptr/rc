@@ -6,21 +6,11 @@
 }: let
   inherit (lib) mkIf mkOption;
 
-  cfg = config.rc.git;
+  gitCfg = config.rc.git;
   graphiteCfg = config.rc.graphite;
+  jjCfg = config.rc.jujutsu;
 in {
   options = {
-    rc.graphite = {
-      enable = lib.mkEnableOption "Graphite CLI";
-
-      settings = mkOption {
-        default = {};
-        description = "Settings for ~/.config/graphite/user_config.";
-        type = lib.types.attrs;
-        apply = s: {updateAutomatically = false;} // s;
-      };
-    };
-
     rc.git = {
       enable = lib.mkEnableOption "Git-related configuration";
 
@@ -37,18 +27,26 @@ in {
         description = "Whether to enable interactive rebase.";
         type = lib.types.bool;
       };
+    };
 
-      enableJujutsu = mkOption {
-        default = false;
-        example = true;
-        description = "Whether to enable jujutsu.";
-        type = lib.types.bool;
+    rc.graphite = {
+      enable = lib.mkEnableOption "Graphite CLI";
+
+      settings = mkOption {
+        default = {};
+        description = "Settings for ~/.config/graphite/user_config.";
+        type = lib.types.attrs;
+        apply = s: {updateAutomatically = false;} // s;
       };
+    };
+
+    rc.jujutsu = {
+      enable = lib.mkEnableOption "Jujutsu version control";
     };
   };
 
   config = lib.mkMerge [
-    (mkIf cfg.enable {
+    (mkIf gitCfg.enable {
       home.packages = [
         pkgs.onefetch
       ];
@@ -90,7 +88,7 @@ in {
       };
     })
 
-    (mkIf cfg.enableHubWrapper {
+    (mkIf gitCfg.enableHubWrapper {
       home.packages = [pkgs.hub];
 
       programs.zsh.shellAliases = {
@@ -98,13 +96,20 @@ in {
       };
     })
 
-    (mkIf cfg.enableInteractiveRebase {
+    (mkIf gitCfg.enableInteractiveRebase {
       home.packages = [pkgs.git-interactive-rebase-tool];
 
       programs.git.settings.sequence.editor = "interactive-rebase-tool";
     })
 
-    (mkIf cfg.enableJujutsu {
+    (mkIf graphiteCfg.enable {
+      home.packages = [pkgs.graphite-cli];
+
+      home.file.".config/graphite/user_config".text =
+        builtins.toJSON graphiteCfg.settings;
+    })
+
+    (mkIf jjCfg.enable {
       programs.jujutsu = {
         enable = true;
       };
@@ -116,13 +121,6 @@ in {
         enable = true;
         enableJujutsuIntegration = true;
       };
-    })
-
-    (mkIf graphiteCfg.enable {
-      home.packages = [pkgs.graphite-cli];
-
-      home.file.".config/graphite/user_config".text =
-        builtins.toJSON graphiteCfg.settings;
     })
   ];
 }
