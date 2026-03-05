@@ -5,6 +5,7 @@
 }: {
   imports = [
     ./avahi.nix
+    ./basic-memory.nix
     ./dns.nix
     ./filebrowser.nix
     ./jellyfin.nix
