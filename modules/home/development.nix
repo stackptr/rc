@@ -32,6 +32,8 @@ in {
           model = "opus";
           permissions = {
             allow = [
+              "Bash(find *)"
+              "Bash(echo *)"
               "Bash(grep *)"
               "Bash(rg *)"
               "Bash(head *)"
