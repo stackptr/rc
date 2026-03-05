@@ -28,6 +28,51 @@ in {
     (mkIf cfg.ai.enable {
       programs.claude-code = {
         enable = true;
+        settings = {
+          model = "opus";
+          enableAllProjectMcpServers = true;
+          enabledMcpjsonServers = ["linear"];
+          permissions = {
+            allow = [
+              "Bash(find *)"
+              "Bash(echo *)"
+              "Bash(grep *)"
+              "Bash(rg *)"
+              "Bash(head *)"
+              "Bash(tail *)"
+              "Bash(cat *)"
+              "Bash(ls *)"
+              "Bash(wc *)"
+              "Bash(which *)"
+              "Bash(nix *)"
+              "Bash(git log *)"
+              "Bash(git diff *)"
+              "Bash(git status)"
+              "Bash(git show *)"
+              "Bash(git branch *)"
+              "Bash(* --version)"
+              "Bash(* --help *)"
+              "mcp__linear__get_project"
+              "mcp__linear__list_issues"
+              "mcp__linear__get_issue"
+              "mcp__linear__list_comments"
+              "mcp__linear__extract_images"
+              "mcp__linear__get_document"
+              "mcp__figma__get_design_context"
+              "mcp__figma__get_metadata"
+              "mcp__figma__get_screenshot"
+            ];
+            deny = [
+              "Bash(git push *)"
+              "Bash(git reset *)"
+              "Bash(git checkout *)"
+              "Bash(rm *)"
+              "Bash(sudo *)"
+              "Bash(nixos-rebuild *)"
+              "Bash(darwin-rebuild *)"
+            ];
+          };
+        };
       };
     })
 
