@@ -8,6 +8,7 @@
     ./dns.nix
     ./filebrowser.nix
     ./jellyfin.nix
+    ./mcpjungle.nix
     ./nfs.nix
     ./prometheus.nix
     ./samba.nix

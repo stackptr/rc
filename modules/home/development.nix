@@ -56,6 +56,7 @@ in {
               "Bash(git show *)"
               "Bash(git add *)"
               "Bash(git branch *)"
+              "Bash(gh api:*)"
               "Bash(mkdir *)"
               "Bash(* --version)"
               "Bash(* --help *)"
