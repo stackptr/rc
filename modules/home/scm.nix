@@ -98,13 +98,23 @@ in {
     (mkIf graphiteCfg.enable {
       home.packages = [pkgs.graphite-cli];
 
-      home.file.".config/graphite/user_config".text = builtins.toJSON {
-        branchPrefix = "corey/";
-        branchDate = false;
-        branchReplacement = "-";
-        skipApplyingPrefixToNonGeneratedBranchNames = true;
-        updateAutomatically = false;
-      };
+      home.activation.graphiteConfig = lib.hm.dag.entryAfter ["writeBoundary"] ''
+        config_dir="$HOME/.config/graphite"
+        config_file="$config_dir/user_config"
+        run mkdir -p "$config_dir"
+        if [ ! -f "$config_file" ]; then
+          run cp ${
+          pkgs.writeText "graphite-user-config" (builtins.toJSON {
+            branchPrefix = "corey/";
+            branchDate = false;
+            branchReplacement = "-";
+            skipApplyingPrefixToNonGeneratedBranchNames = true;
+            updateAutomatically = false;
+          })
+        } "$config_file"
+          run chmod u+w "$config_file"
+        fi
+      '';
     })
 
     (mkIf jjCfg.enable {
