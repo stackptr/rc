@@ -8,7 +8,6 @@
     ./dns.nix
     ./filebrowser.nix
     ./jellyfin.nix
-    ./mcpjungle.nix
     ./nfs.nix
     ./prometheus.nix
     ./samba.nix
@@ -60,4 +59,6 @@
     enable = true;
     extraUpFlags = ["--ssh"];
   };
+
+  services.mcpjungle.enable = true;
 }
