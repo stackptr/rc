@@ -118,14 +118,24 @@
         pkgs,
         inputs',
         config,
+        system,
         ...
       }: {
+        _module.args.pkgs = import inputs.nixpkgs {
+          inherit system;
+          config.allowUnfreePredicate = pkg:
+            builtins.elem (inputs.nixpkgs.lib.getName pkg) [
+              "graphite-cli"
+            ];
+        };
+
         devShells = {
           default = pkgs.mkShell {
             packages =
               [
                 inputs'.agenix.packages.default
                 pkgs.cachix
+                pkgs.graphite-cli
                 pkgs.just
               ]
               ++ config.pre-commit.settings.enabledPackages;
