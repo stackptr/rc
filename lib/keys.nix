@@ -14,3 +14,6 @@ let
     ];
 in
   builtins.listToAttrs hostKeyPairs
+  // {
+    home = firstLine (builtins.readFile ./../home/key.pub);
+  }
