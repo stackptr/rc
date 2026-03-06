@@ -10,6 +10,7 @@
       "claude-code"
       "daisydisk"
       "fastscripts"
+      "graphite-cli"
       "mochi"
       "plexmediaserver"
       "roon-server"
