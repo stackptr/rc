@@ -1,8 +1,4 @@
 {config, ...}: {
-  age.identityPaths = [
-    "${config.home.homeDirectory}/.ssh/id_ed25519_agenix"
-  ];
-
   age.secrets.aichat-env = {
     file = ../secrets/aichat-env.age;
   };
