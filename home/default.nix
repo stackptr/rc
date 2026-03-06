@@ -21,7 +21,7 @@
       };
     }
 
-    (lib.mkIf (hostname != "spore") {
+    (lib.mkIf (hostname != "spore" && hostname != "zeta") {
       development = {
         ai.enable = true;
         containers.enable = true;
