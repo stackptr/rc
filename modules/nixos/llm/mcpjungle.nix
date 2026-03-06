@@ -82,12 +82,33 @@ in {
         Type = "oneshot";
         RemainAfterExit = true;
       };
+      path = [pkgs.curl];
       script = let
         registry = "http://127.0.0.1:${toString cfg.port}";
         bin = lib.getExe cfg.package;
         registrations = lib.concatStringsSep "\n" (lib.mapAttrsToList (name: server: ''
-            if ! ${bin} list servers --registry ${registry} 2>/dev/null | grep -q '${name}'; then
+            if ${bin} list servers --registry ${registry} 2>/dev/null | grep -q '${name}'; then
+              echo "${name} already registered, skipping."
+            else
+
+            # Wait for server to be reachable before registering
+            ready=false
+            for i in $(seq 1 30); do
+              http_code=$(curl -s -o /dev/null -w '%{http_code}' "${server.url}" 2>/dev/null)
+              if [ "$http_code" != "000" ]; then
+                ready=true
+                break
+              fi
+              echo "Waiting for ${name} at ${server.url} (attempt $i/30)..."
+              sleep 2
+            done
+
+            if [ "$ready" = true ]; then
               ${bin} register --name '${name}' --description '${server.description}' --url '${server.url}' --registry ${registry}
+            else
+              echo "WARNING: ${name} at ${server.url} not reachable after 60s, skipping registration."
+            fi
+
             fi
           '')
           cfg.servers);
