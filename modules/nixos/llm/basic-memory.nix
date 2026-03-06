@@ -69,6 +69,8 @@ in {
       };
     };
 
+    programs.nix-ld.enable = true;
+
     networking.firewall.allowedTCPPorts = lib.mkIf cfg.openFirewall [cfg.port];
   };
 }
