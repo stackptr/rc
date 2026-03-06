@@ -5,7 +5,6 @@
 }: {
   imports = [
     ./avahi.nix
-    ./basic-memory.nix
     ./dns.nix
     ./filebrowser.nix
     ./jellyfin.nix
@@ -61,5 +60,6 @@
     extraUpFlags = ["--ssh"];
   };
 
+  services.basic-memory.enable = true;
   services.mcpjungle.enable = true;
 }
