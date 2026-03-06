@@ -31,13 +31,6 @@ in {
 
     rc.graphite = {
       enable = lib.mkEnableOption "Graphite CLI";
-
-      settings = mkOption {
-        default = {};
-        description = "Settings for ~/.config/graphite/user_config.";
-        type = lib.types.attrs;
-        apply = s: {updateAutomatically = false;} // s;
-      };
     };
 
     rc.jujutsu = {
@@ -105,8 +98,13 @@ in {
     (mkIf graphiteCfg.enable {
       home.packages = [pkgs.graphite-cli];
 
-      home.file.".config/graphite/user_config".text =
-        builtins.toJSON graphiteCfg.settings;
+      home.file.".config/graphite/user_config".text = builtins.toJSON {
+        branchPrefix = "corey/";
+        branchDate = false;
+        branchReplacement = "-";
+        skipApplyingPrefixToNonGeneratedBranchNames = true;
+        updateAutomatically = false;
+      };
     })
 
     (mkIf jjCfg.enable {
