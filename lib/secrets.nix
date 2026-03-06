@@ -5,8 +5,10 @@ let
   glyphSecrets = import ./secrets/glyph.nix;
   sporeSecrets = import ./secrets/spore.nix;
   zetaSecrets = import ./secrets/zeta.nix;
+  homeSecrets = import ./secrets/home.nix;
 in
   globalSecrets
   // glyphSecrets
   // sporeSecrets
   // zetaSecrets
+  // homeSecrets

@@ -34,6 +34,7 @@ inputs @ {
     home-manager.users.${username} = {...}: {
       imports =
         [
+          agenix.homeManagerModules.default
           ./../modules/home
           ./../home
         ]
