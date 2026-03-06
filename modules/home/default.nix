@@ -4,7 +4,7 @@
     ./programs
     ./development.nix
     ./editor.nix
-    ./git.nix
+    ./scm.nix
     ./ssh.nix
     ./utilities.nix
   ];
