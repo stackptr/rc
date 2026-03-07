@@ -75,7 +75,10 @@
   services.basic-memory.enable = true;
   rc.backup = {
     enable = true;
-    paths = ["/var/lib/basic-memory"];
+    paths = [
+      "/var/lib/basic-memory"
+      "/var/lib/roon-server/backup"
+    ];
   };
   services.mcp-nixos.enable = true;
   services.kagi-mcp = {
