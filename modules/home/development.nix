@@ -72,15 +72,7 @@ in {
               "mcp__figma__get_metadata"
               "mcp__figma__get_screenshot"
             ];
-            deny = [
-              "Bash(git push *)"
-              "Bash(git reset *)"
-              "Bash(git checkout *)"
-              "Bash(rm *)"
-              "Bash(sudo *)"
-              "Bash(nixos-rebuild *)"
-              "Bash(darwin-rebuild *)"
-            ];
+            deny = [];
           };
         };
       };
