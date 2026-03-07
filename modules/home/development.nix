@@ -90,6 +90,8 @@ in {
               "mcp__glyph__basic-memory__search_by_metadata"
               "mcp__glyph__basic-memory__search_notes"
               "mcp__glyph__basic-memory__view_note"
+              "mcp__glyph__context7__resolve-library-id"
+              "mcp__glyph__context7__get-library-docs"
             ];
             deny = [];
           };

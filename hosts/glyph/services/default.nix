@@ -67,6 +67,11 @@
     group = "kagi-mcp";
   };
 
+  age.secrets.context7-api-key = {
+    file = ./../secrets/context7-api-key.age;
+    mode = "440";
+  };
+
   services.basic-memory.enable = true;
   services.mcp-nixos.enable = true;
   services.kagi-mcp = {
@@ -86,6 +91,12 @@
     servers.kagi = {
       url = "http://127.0.0.1:8093/mcp";
       description = "Kagi web search and page summarization";
+    };
+    servers.context7 = {
+      url = "https://mcp.context7.com/mcp";
+      description = "Up-to-date library documentation and code examples";
+      headers.CONTEXT7_API_KEY = "$CONTEXT7_API_KEY";
+      environmentFile = config.age.secrets.context7-api-key.path;
     };
   };
 }
