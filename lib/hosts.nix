@@ -8,6 +8,7 @@ inputs @ {
   nix-homebrew,
   homebrew-core,
   homebrew-cask,
+  llm-profile,
   zx-dev,
   disko,
   golink,
@@ -41,7 +42,7 @@ inputs @ {
         ++ nixpkgs.lib.optionals (hostHomeConfig != null) [hostHomeConfig];
     };
     home-manager.extraSpecialArgs = {
-      inherit hostname pkgs-stable showBatteryStatus;
+      inherit hostname llm-profile pkgs-stable showBatteryStatus;
     };
   };
 

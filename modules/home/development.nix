@@ -1,6 +1,7 @@
 {
   config,
   lib,
+  llm-profile,
   pkgs,
   ...
 }: let
@@ -28,6 +29,7 @@ in {
     (mkIf cfg.ai.enable {
       programs.claude-code = {
         enable = true;
+        memory.source = "${llm-profile}/README.md";
         mcpServers = {
           glyph = {
             type = "http";
@@ -36,6 +38,8 @@ in {
         };
         settings = {
           model = "opus";
+          # Disabled in favor of Basic Memory MCP for cross-device access
+          autoMemoryEnabled = false;
           enabledMcpjsonServers = ["linear" "figma"];
           permissions = {
             allow = [
