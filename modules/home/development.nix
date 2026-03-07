@@ -62,6 +62,8 @@ in {
               "Bash(git add *)"
               "Bash(git branch *)"
               "Bash(gh api:*)"
+              "Bash(gh search:*)"
+              "Bash(gh issue view*)"
               "Bash(mkdir *)"
               "Bash(journalctl:*)"
               "Bash(systemctl list-jobs:*)"
