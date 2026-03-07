@@ -106,7 +106,7 @@ in {
     })
 
     (mkIf cfg.system.enable {
-      home.packages = [pkgs.neofetch];
+      home.packages = [pkgs.fastfetch];
 
       programs.btop.enable = true;
 
