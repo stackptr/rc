@@ -60,5 +60,12 @@
     extraUpFlags = ["--ssh"];
   };
 
-  services.mcpjungle.enable = true;
+  services.basic-memory.enable = true;
+  services.mcpjungle = {
+    enable = true;
+    servers.basic-memory = {
+      url = "http://127.0.0.1:8091/mcp";
+      description = "Knowledge management with markdown files";
+    };
+  };
 }
