@@ -28,6 +28,12 @@ in {
     (mkIf cfg.ai.enable {
       programs.claude-code = {
         enable = true;
+        mcpServers = {
+          glyph = {
+            type = "http";
+            url = "http://glyph:8090/mcp";
+          };
+        };
         settings = {
           model = "opus";
           enableAllProjectMcpServers = true;
