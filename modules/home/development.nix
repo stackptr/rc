@@ -73,8 +73,6 @@ in {
               "Bash(pwd)"
               "Bash(whoami)"
               # Networking
-              "Bash(curl -s *)"
-              "Bash(curl --silent *)"
               "Bash(dig *)"
               "Bash(nslookup *)"
               "Bash(ping -c *)"
