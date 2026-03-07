@@ -28,10 +28,15 @@ in {
     (mkIf cfg.ai.enable {
       programs.claude-code = {
         enable = true;
+        mcpServers = {
+          glyph = {
+            type = "http";
+            url = "http://glyph:8090/mcp";
+          };
+        };
         settings = {
           model = "opus";
-          enableAllProjectMcpServers = true;
-          enabledMcpjsonServers = ["linear"];
+          enabledMcpjsonServers = ["linear" "figma"];
           permissions = {
             allow = [
               "Bash(find *)"
@@ -49,9 +54,14 @@ in {
               "Bash(git diff *)"
               "Bash(git status)"
               "Bash(git show *)"
+              "Bash(git add *)"
               "Bash(git branch *)"
+              "Bash(mkdir *)"
               "Bash(* --version)"
               "Bash(* --help *)"
+              "WebFetch(domain:raw.githubusercontent.com)"
+              "WebFetch(domain:github.com)"
+              "WebSearch"
               "mcp__linear__get_project"
               "mcp__linear__list_issues"
               "mcp__linear__get_issue"
@@ -62,15 +72,7 @@ in {
               "mcp__figma__get_metadata"
               "mcp__figma__get_screenshot"
             ];
-            deny = [
-              "Bash(git push *)"
-              "Bash(git reset *)"
-              "Bash(git checkout *)"
-              "Bash(rm *)"
-              "Bash(sudo *)"
-              "Bash(nixos-rebuild *)"
-              "Bash(darwin-rebuild *)"
-            ];
+            deny = [];
           };
         };
       };
