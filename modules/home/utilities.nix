@@ -90,8 +90,13 @@ in {
       };
       programs.nix-index-database.comma.enable = true;
 
-      home.packages =
+      home.packages = let
+        nix-eval-flake = pkgs.writeShellScriptBin "nix-eval-flake" ''
+          nix eval ".#$1" "''${@:2}"
+        '';
+      in
         [
+          nix-eval-flake
           pkgs.manix
           pkgs.nix-du
           pkgs.nix-tree
