@@ -1,9 +1,4 @@
-{
-  config,
-  lib,
-  pkgs,
-  ...
-}: {
+{...}: {
   imports = [
     ./hardware.nix
     ./services
@@ -55,6 +50,9 @@
 
   time.timeZone = "America/Los_Angeles";
   i18n.defaultLocale = "en_US.UTF-8";
+
+  # Beets library database (beets configured in home-manager)
+  rc.backup.paths = ["/home/mu/.config/beets/library.db"];
 
   system.stateVersion = "24.05";
 }
