@@ -104,7 +104,7 @@ in {
             done
 
             if [ "$ready" = true ]; then
-              ${bin} register --name '${name}' --description '${server.description}' --url '${server.url}' --registry ${registry}
+              ${bin} register --name '${name}' --description '${server.description}' --url '${server.url}' --registry ${registry} || echo "ERROR: failed to register ${name}"
             else
               echo "WARNING: ${name} at ${server.url} not reachable after 60s, skipping registration."
             fi

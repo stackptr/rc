@@ -60,8 +60,19 @@
     extraUpFlags = ["--ssh"];
   };
 
+  age.secrets.kagi-api-key = {
+    file = ./../secrets/kagi-api-key.age;
+    mode = "440";
+    owner = "kagi-mcp";
+    group = "kagi-mcp";
+  };
+
   services.basic-memory.enable = true;
   services.mcp-nixos.enable = true;
+  services.kagi-mcp = {
+    enable = true;
+    environmentFile = config.age.secrets.kagi-api-key.path;
+  };
   services.mcpjungle = {
     enable = true;
     servers.basic-memory = {
@@ -71,6 +82,10 @@
     servers.mcp-nixos = {
       url = "http://127.0.0.1:8092/mcp";
       description = "NixOS options, packages, and Home Manager search";
+    };
+    servers.kagi = {
+      url = "http://127.0.0.1:8093/mcp";
+      description = "Kagi web search and page summarization";
     };
   };
 }
