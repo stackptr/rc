@@ -3,9 +3,9 @@
   lib,
   ...
 }: let
-  cfg = config.services.restic-backup;
+  cfg = config.rc.backup;
 in {
-  options.services.restic-backup = {
+  options.rc.backup = {
     enable = lib.mkEnableOption "restic backup to Cloudflare R2";
 
     paths = lib.mkOption {

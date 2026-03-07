@@ -73,7 +73,7 @@
   };
 
   services.basic-memory.enable = true;
-  services.restic-backup = {
+  rc.backup = {
     enable = true;
     paths = ["/var/lib/basic-memory"];
   };

@@ -1,5 +1,5 @@
 {config, ...}: {
-  services.restic-backup = {
+  rc.backup = {
     enable = true;
     paths = [
       config.services.postgresqlBackup.location
