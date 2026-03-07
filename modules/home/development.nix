@@ -75,6 +75,17 @@ in {
               "mcp__figma__get_design_context"
               "mcp__figma__get_metadata"
               "mcp__figma__get_screenshot"
+              "mcp__glyph__basic-memory__build_context"
+              "mcp__glyph__basic-memory__fetch"
+              "mcp__glyph__basic-memory__list_directory"
+              "mcp__glyph__basic-memory__list_memory_projects"
+              "mcp__glyph__basic-memory__read_content"
+              "mcp__glyph__basic-memory__read_note"
+              "mcp__glyph__basic-memory__recent_activity"
+              "mcp__glyph__basic-memory__search"
+              "mcp__glyph__basic-memory__search_by_metadata"
+              "mcp__glyph__basic-memory__search_notes"
+              "mcp__glyph__basic-memory__view_note"
             ];
             deny = [];
           };
