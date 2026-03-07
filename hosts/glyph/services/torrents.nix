@@ -50,6 +50,11 @@
           --form-string "url_title=View torrents" \
           https://api.pushover.net/1/messages.json
       '';
+      cache-size-mb = 256;
+      download-queue-enabled = true;
+      download-queue-size = 5;
+      queue-stalled-enabled = true;
+      queue-stalled-minutes = 30;
       utp-enabled = false;
       watch-dir = "/mnt/torrents/watch";
       watch-dir-enabled = true;
