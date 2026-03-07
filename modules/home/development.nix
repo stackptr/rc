@@ -36,7 +36,7 @@ in {
         };
         settings = {
           model = "opus";
-          enableAllProjectMcpServers = true;
+          enabledMcpjsonServers = ["linear" "figma"];
           permissions = {
             allow = [
               "Bash(find *)"
