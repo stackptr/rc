@@ -42,6 +42,8 @@
   time.timeZone = "America/Los_Angeles";
   i18n.defaultLocale = "en_US.UTF-8";
 
+  boot.kernel.sysctl."vm.swappiness" = 1;
+
   swapDevices = [
     {
       device = "/swapfile";
