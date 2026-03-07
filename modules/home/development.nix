@@ -54,6 +54,7 @@ in {
               "Bash(wc *)"
               "Bash(which *)"
               "Bash(nix *)"
+              "Bash(nix-eval-flake *)"
               "Bash(git log *)"
               "Bash(git diff *)"
               "Bash(git status)"
