@@ -59,4 +59,6 @@
     enable = true;
     extraUpFlags = ["--ssh"];
   };
+
+  services.mcpjungle.enable = true;
 }

@@ -13,6 +13,9 @@ self: super: {
   # FileBrowser quantum fork
   filebrowser-quantum = super.callPackage ./../packages/filebrowser-quantum/package.nix {};
 
+  # MCP Gateway
+  mcpjungle = super.callPackage ./../packages/mcpjungle/package.nix {};
+
   # Mochi spaced repetition software
   mochi = super.callPackage ./../packages/mochi/package.nix {};
 
