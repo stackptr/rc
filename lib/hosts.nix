@@ -9,6 +9,7 @@ inputs @ {
   homebrew-core,
   homebrew-cask,
   llm-profile,
+  nix-index-database,
   zx-dev,
   disko,
   golink,
@@ -35,6 +36,7 @@ inputs @ {
     home-manager.users.${username} = {...}: {
       imports =
         [
+          nix-index-database.hmModules.nix-index
           agenix.homeManagerModules.default
           ./../modules/home
           ./../home

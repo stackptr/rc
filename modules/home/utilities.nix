@@ -85,9 +85,13 @@ in {
     })
 
     (mkIf cfg.nix.enable {
+      programs.nix-index = {
+        enable = true;
+      };
+      programs.nix-index-database.comma.enable = true;
+
       home.packages =
         [
-          pkgs.comma
           pkgs.manix
           pkgs.nix-du
           pkgs.nix-tree
