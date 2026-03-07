@@ -3,6 +3,7 @@
   imports = [
     ./llm
     ./web
+    ./boot.nix
     ./filebrowser-quantum.nix
     ./restic-backup.nix
     ./users.nix

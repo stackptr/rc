@@ -1,10 +1,9 @@
-# Nix store garbage collection and boot entry limits
+# Nix store garbage collection
 {
   lib,
   pkgs,
   ...
-}:
-{
+}: {
   nix.gc =
     {
       automatic = true;
@@ -16,7 +15,4 @@
     // lib.optionalAttrs pkgs.stdenv.isDarwin {
       interval = {Weekday = 0;};
     };
-}
-// lib.optionalAttrs pkgs.stdenv.isLinux {
-  boot.loader.systemd-boot.configurationLimit = 10;
 }
