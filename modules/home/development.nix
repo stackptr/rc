@@ -37,7 +37,6 @@ in {
         settings = {
           model = "opus";
           enableAllProjectMcpServers = true;
-          enabledMcpjsonServers = ["linear"];
           permissions = {
             allow = [
               "Bash(find *)"
