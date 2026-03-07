@@ -61,6 +61,10 @@
       url = "github:homebrew/homebrew-cask";
       flake = false;
     };
+    llm-profile = {
+      url = "github:stackptr/llm-profile";
+      flake = false;
+    };
   };
 
   outputs = inputs @ {flake-parts, ...}:

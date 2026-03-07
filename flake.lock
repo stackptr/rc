@@ -236,6 +236,22 @@
         "type": "github"
       }
     },
+    "llm-profile": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1772851397,
+        "narHash": "sha256-/FNGF3lit4c8bHzTVw5PjVb1tNpM/vI/WMNUkFwfhIw=",
+        "owner": "stackptr",
+        "repo": "llm-profile",
+        "rev": "2810e05cd0513cc9a0105549c7cd571a8e5361bf",
+        "type": "github"
+      },
+      "original": {
+        "owner": "stackptr",
+        "repo": "llm-profile",
+        "type": "github"
+      }
+    },
     "nix-darwin": {
       "inputs": {
         "nixpkgs": [
@@ -331,6 +347,7 @@
         "home-manager": "home-manager",
         "homebrew-cask": "homebrew-cask",
         "homebrew-core": "homebrew-core",
+        "llm-profile": "llm-profile",
         "nix-darwin": "nix-darwin",
         "nix-homebrew": "nix-homebrew",
         "nixos-hardware": "nixos-hardware",
