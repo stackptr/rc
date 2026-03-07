@@ -73,6 +73,10 @@
   };
 
   services.basic-memory.enable = true;
+  services.restic-backup = {
+    enable = true;
+    paths = ["/var/lib/basic-memory"];
+  };
   services.mcp-nixos.enable = true;
   services.kagi-mcp = {
     enable = true;
