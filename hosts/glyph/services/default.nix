@@ -78,6 +78,7 @@
     enable = true;
     paths = [
       "/var/lib/basic-memory"
+      "/var/lib/open-webui"
       "/var/lib/roon-server/backup"
     ];
   };
