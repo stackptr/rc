@@ -9,6 +9,7 @@
     ./filebrowser.nix
     ./jellyfin.nix
     ./nfs.nix
+    ./open-webui.nix
     ./prometheus.nix
     ./samba.nix
     ./torrents.nix

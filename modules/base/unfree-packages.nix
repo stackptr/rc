@@ -12,6 +12,7 @@
       "fastscripts"
       "graphite-cli"
       "mochi"
+      "open-webui"
       "plexmediaserver"
       "roon-server"
       "slack"
