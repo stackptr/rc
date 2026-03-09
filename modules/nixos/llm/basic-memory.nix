@@ -39,6 +39,12 @@ in {
       wants = ["network-online.target"];
       wantedBy = ["multi-user.target"];
 
+      path = with pkgs; [
+        gcc
+        rustc
+        cargo
+      ];
+
       environment = {
         HOME = dataDir;
         BASIC_MEMORY_CONFIG_DIR = dataDir;
