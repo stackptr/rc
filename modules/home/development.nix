@@ -31,6 +31,10 @@ in {
         enable = true;
         memory.source = "${llm-profile}/README.md";
         mcpServers = {
+          graphite = {
+            command = "gt";
+            args = ["mcp"];
+          };
           glyph = {
             type = "http";
             url = "http://glyph:8090/mcp";
