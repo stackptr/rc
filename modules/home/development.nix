@@ -90,7 +90,7 @@ in {
               "Bash(nix show-derivation *)"
               "Bash(nix store *)"
               "Bash(nix why-depends *)"
-              "Bash(nix-eval-flake *)"
+              "Bash(nix-flake *)"
               # Git
               "Bash(git add *)"
               "Bash(git blame *)"
