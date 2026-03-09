@@ -23,6 +23,13 @@
             targets = [
               "localhost:${toString config.services.prometheus.exporters.node.port}"
             ];
+            labels.instance = "glyph";
+          }
+          {
+            targets = [
+              "spore.rove-duck.ts.net:9100"
+            ];
+            labels.instance = "spore";
           }
         ];
       }
