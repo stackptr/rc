@@ -9,6 +9,7 @@
     ./filebrowser.nix
     ./jellyfin.nix
     ./nfs.nix
+    ./open-webui.nix
     ./prometheus.nix
     ./samba.nix
     ./torrents.nix
@@ -77,6 +78,7 @@
     enable = true;
     paths = [
       "/var/lib/basic-memory"
+      "/var/lib/open-webui"
       "/var/lib/roon-server/backup"
     ];
   };

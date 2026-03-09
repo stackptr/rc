@@ -1,0 +1,32 @@
+{config, ...}: {
+  age.secrets.open-webui-env.file = ./../secrets/open-webui-env.age;
+
+  services.open-webui = {
+    enable = true;
+    port = 8888;
+    host = "0.0.0.0";
+    environmentFile = config.age.secrets.open-webui-env.path;
+    environment = {
+      ENABLE_OLLAMA_API = "False";
+      ENABLE_SIGNUP = "False";
+      ENABLE_PERSISTENT_CONFIG = "False";
+      WEBUI_URL = "https://chat.zx.dev";
+      WEBUI_SESSION_COOKIE_SECURE = "True";
+      CORS_ALLOW_ORIGIN = "https://chat.zx.dev";
+
+      # OIDC via Pocket ID
+      ENABLE_OAUTH_SIGNUP = "true";
+      OAUTH_PROVIDER_NAME = "Pocket ID";
+      OPENID_PROVIDER_URL = "https://id.zx.dev/.well-known/openid-configuration";
+      OAUTH_MERGE_ACCOUNTS_BY_EMAIL = "true";
+      OAUTH_SCOPES = "openid email profile groups";
+      ENABLE_OAUTH_ROLE_MANAGEMENT = "true";
+      ENABLE_OAUTH_GROUP_MANAGEMENT = "true";
+      ENABLE_OAUTH_GROUP_CREATION = "true";
+      OAUTH_ROLES_CLAIM = "groups";
+      OAUTH_ALLOWED_ROLES = "users, admins";
+      OAUTH_ADMIN_ROLES = "admins";
+      ENABLE_LOGIN_FORM = "false";
+    };
+  };
+}
