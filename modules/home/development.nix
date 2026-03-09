@@ -154,6 +154,7 @@ in {
               "mcp__glyph__basic-memory__view_note"
               "mcp__glyph__context7__resolve-library-id"
               "mcp__glyph__context7__get-library-docs"
+              "mcp__glyph__graphite__learn_gt"
             ];
             deny = [];
           };
