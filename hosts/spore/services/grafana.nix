@@ -51,6 +51,13 @@
     };
     provision = {
       enable = true;
+      dashboards.settings.providers = [
+        {
+          name = "system";
+          options.path = ./dashboards;
+          disableDeletion = true;
+        }
+      ];
       datasources.settings.datasources = [
         {
           name = "Prometheus";
