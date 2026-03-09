@@ -132,7 +132,7 @@ in {
           # Wait for server to be reachable before registering
           ready=false
           for i in $(seq 1 30); do
-            http_code=$(curl -s -o /dev/null -w '%{http_code}' "${server.url}" 2>/dev/null)
+            http_code=$(curl -s -o /dev/null -w '%{http_code}' "${server.url}" 2>/dev/null || true)
             if [ "$http_code" != "000" ]; then
               ready=true
               break
