@@ -98,6 +98,13 @@
             };
           }
           {
+            "Open WebUI" = {
+              description = "AI chat interface";
+              href = "https://chat.zx.dev";
+              icon = "open-webui";
+            };
+          }
+          {
             "Jellyfin" = {
               description = "TV & movie streaming";
               href = "https://jellyfin.zx.dev";
