@@ -73,6 +73,13 @@
     mode = "440";
   };
 
+  age.secrets.graphite-auth-token = {
+    file = ./../secrets/graphite-auth-token.age;
+    mode = "440";
+    owner = "graphite-mcp";
+    group = "graphite-mcp";
+  };
+
   services.basic-memory.enable = true;
   rc.backup = {
     enable = true;
@@ -87,6 +94,10 @@
     enable = true;
     environmentFile = config.age.secrets.kagi-api-key.path;
   };
+  services.graphite-mcp = {
+    enable = true;
+    authTokenFile = config.age.secrets.graphite-auth-token.path;
+  };
   services.mcpjungle = {
     enable = true;
     servers.basic-memory = {
@@ -100,6 +111,10 @@
     servers.kagi = {
       url = "http://127.0.0.1:8093/mcp";
       description = "Kagi web search and page summarization";
+    };
+    servers.graphite = {
+      url = "http://127.0.0.1:8094/mcp";
+      description = "Graphite CLI for stacked PRs and code review";
     };
     servers.context7 = {
       url = "https://mcp.context7.com/mcp";
