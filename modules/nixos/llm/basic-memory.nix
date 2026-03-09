@@ -42,6 +42,7 @@ in {
       environment = {
         HOME = dataDir;
         BASIC_MEMORY_CONFIG_DIR = dataDir;
+        BASIC_MEMORY_MCP_PROJECT = "main";
         UV_CACHE_DIR = "${dataDir}/.cache/uv";
       };
 
