@@ -18,6 +18,12 @@
     inherit (config.services.golink) group;
   };
 
+  services.prometheus.exporters.node = {
+    enable = true;
+    port = 9100;
+    enabledCollectors = ["systemd"];
+  };
+
   services.glances = {
     inherit (config.services.homepage-dashboard) enable;
   };
