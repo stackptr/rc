@@ -17,6 +17,7 @@
   rc = lib.mkMerge [
     {
       development.ai.enable = true;
+      development.shell.enable = true;
       editor.enable = true;
       git.enable = true;
       ssh.enable = true;
