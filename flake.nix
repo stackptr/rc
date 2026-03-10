@@ -43,6 +43,10 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.systems.follows = "systems";
     };
+    attic = {
+      url = "github:zhaofengli/attic";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     zx-dev = {
       url = "github:stackptr/zx.dev";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -115,6 +119,7 @@
         nixConfig = {
           experimental-features = ["nix-command" "flakes"];
           extra-substituters = [
+            "https://cache.zx.dev"
             "https://stackptr.cachix.org"
           ];
           extra-trusted-public-keys = [
