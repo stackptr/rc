@@ -42,6 +42,15 @@
         unset STARSHIP_CONFIG
       }
 
+      _prompt_auto_width () {
+        if [[ $COLUMNS -lt 100 ]]; then
+          export STARSHIP_CONFIG=''${XDG_CONFIG_HOME:-$HOME/.config}/starship-minimal.toml
+        else
+          unset STARSHIP_CONFIG
+        fi
+      }
+      precmd_functions+=(_prompt_auto_width)
+
       if command -v nix-your-shell > /dev/null; then
         nix-your-shell zsh | source /dev/stdin
       fi
