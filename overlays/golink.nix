@@ -1,8 +1,8 @@
-# Fix vendorHash for apoxy-dev golink fork
+# Rebuild golink from apoxy-dev fork source with correct vendorHash
 final: prev: {
-  golink = prev.golink.overrideAttrs (old: {
-    goModules = old.goModules.overrideAttrs {
-      outputHash = "sha256-M3Qm25KF6gWtp3K1SigLucgrIJ+5KokMq+Bp7XXaE+o=";
-    };
-  });
+  golink = prev.buildGo125Module {
+    pname = "golink";
+    inherit (prev.golink) version src ldflags;
+    vendorHash = "sha256-M3Qm25KF6gWtp3K1SigLucgrIJ+5KokMq+Bp7XXaE+o=";
+  };
 }
