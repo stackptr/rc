@@ -1,0 +1,7 @@
+builds:
+  include:
+    - "nixosConfigurations.*"
+    - "darwinConfigurations.*"
+    - "devShells.*.*"
+    - "checks.*.*"
+  exclude: []

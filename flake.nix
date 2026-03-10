@@ -115,9 +115,11 @@
         nixConfig = {
           experimental-features = ["nix-command" "flakes"];
           extra-substituters = [
+            "https://cache.garnix.io"
             "https://stackptr.cachix.org"
           ];
           extra-trusted-public-keys = [
+            "cache.garnix.io:CTFPyKSLcx5RMJKfLo5EEPUObbA78b0YQ2DTCJXqr9g="
             "stackptr.cachix.org-1:5e2q7OxdRdAtvRmHTeogpgJKzQhbvFqNMmCMw71opZA="
           ];
         };
