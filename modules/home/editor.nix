@@ -19,7 +19,7 @@ in {
       enable = true;
       defaultEditor = true;
       plugins = with pkgs.vimPlugins; [catppuccin-nvim lualine-nvim];
-      extraLuaConfig = ''
+      initLua = ''
         require("catppuccin").setup {
           flavour = "mocha",
           color_overrides = {
