@@ -1,6 +1,14 @@
-{zed-nova-theme, ...}: {
+{
+  pkgs,
+  zed-nova-theme,
+  ...
+}: {
   programs.zed-editor = {
     enable = true;
+    extraPackages = [
+      pkgs.alejandra
+      pkgs.nil
+    ];
     mutableUserSettings = false;
     themes = {
       nova = builtins.fromJSON (builtins.readFile "${zed-nova-theme}/theme.json");
