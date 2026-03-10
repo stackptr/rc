@@ -171,15 +171,16 @@
         ]
       },
       "locked": {
-        "lastModified": 1772034702,
-        "narHash": "sha256-8Q5UF0PQzMcY/zaJVssZCaXXizSBEHrecBk3qaw1al0=",
-        "owner": "tailscale",
+        "lastModified": 1765523342,
+        "narHash": "sha256-x1KyVQHnHNSBeuLYtRGUqjVtwv4AZMd2RPhtTPXrR4I=",
+        "owner": "apoxy-dev",
         "repo": "golink",
-        "rev": "4036fc3a9694944dfd48586ea939212360391b22",
+        "rev": "17e583241673aa51935ca9e0d559f91a63144d48",
         "type": "github"
       },
       "original": {
-        "owner": "tailscale",
+        "owner": "apoxy-dev",
+        "ref": "dilyevsky/tsnet-1.90-upgrade",
         "repo": "golink",
         "type": "github"
       }
