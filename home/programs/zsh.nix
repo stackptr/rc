@@ -34,6 +34,14 @@
         unset HISTFILE
       }
 
+      prompt_minimal () {
+        export STARSHIP_CONFIG=''${XDG_CONFIG_HOME:-$HOME/.config}/starship-minimal.toml
+      }
+
+      prompt_full () {
+        unset STARSHIP_CONFIG
+      }
+
       if command -v nix-your-shell > /dev/null; then
         nix-your-shell zsh | source /dev/stdin
       fi
