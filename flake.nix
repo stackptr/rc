@@ -123,6 +123,7 @@
             "https://stackptr.cachix.org"
           ];
           extra-trusted-public-keys = [
+            "main:sbkS1Xz6P4g66iyttRGj/o8aPODE6bVG9oKT98/ULKI="
             "stackptr.cachix.org-1:5e2q7OxdRdAtvRmHTeogpgJKzQhbvFqNMmCMw71opZA="
           ];
         };
