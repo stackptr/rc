@@ -10,6 +10,7 @@ inputs @ {
   homebrew-cask,
   llm-profile,
   nix-index-database,
+  zed-nova-theme,
   zx-dev,
   disko,
   golink,
@@ -45,7 +46,7 @@ inputs @ {
         ++ nixpkgs.lib.optionals (hostHomeConfig != null) [hostHomeConfig];
     };
     home-manager.extraSpecialArgs = {
-      inherit hostname lightweight llm-profile pkgs-stable showBatteryStatus;
+      inherit hostname lightweight llm-profile pkgs-stable showBatteryStatus zed-nova-theme;
     };
   };
 

@@ -1,7 +1,10 @@
-{pkgs, ...}: {
+{zed-nova-theme, ...}: {
   programs.zed-editor = {
     enable = true;
     mutableUserSettings = false;
+    themes = {
+      nova = builtins.fromJSON (builtins.readFile "${zed-nova-theme}/theme.json");
+    };
     userSettings = {
       auto_update = false;
       theme = {
