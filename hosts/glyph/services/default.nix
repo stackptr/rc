@@ -4,6 +4,7 @@
   ...
 }: {
   imports = [
+    ./atuin.nix
     ./avahi.nix
     ./dns.nix
     ./filebrowser.nix
@@ -84,6 +85,7 @@
   rc.backup = {
     enable = true;
     paths = [
+      "/var/lib/atuin"
       "/var/lib/basic-memory"
       "/var/lib/open-webui"
       "/var/lib/roon-server/backup"
