@@ -2,7 +2,7 @@
   config,
   pkgs,
   lib,
-  hostname,
+  lightweight,
   ...
 }: {
   imports = [
@@ -16,6 +16,7 @@
 
   rc = lib.mkMerge [
     {
+      development.ai.enable = true;
       editor.enable = true;
       git.enable = true;
       ssh.enable = true;
@@ -26,9 +27,8 @@
       };
     }
 
-    (lib.mkIf (hostname != "spore" && hostname != "zeta") {
+    (lib.mkIf (!lightweight) {
       development = {
-        ai.enable = true;
         containers.enable = true;
         javascript.enable = true;
       };
