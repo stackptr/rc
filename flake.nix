@@ -4,10 +4,6 @@
     nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-25.11";
 
     # General
-    systems = {
-      url = "path:./flake.systems.nix";
-      flake = false;
-    };
     flake-parts = {
       url = "github:hercules-ci/flake-parts";
       inputs.nixpkgs-lib.follows = "nixpkgs";
@@ -17,7 +13,6 @@
       inputs.darwin.follows = "nix-darwin";
       inputs.home-manager.follows = "home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
-      inputs.systems.follows = "systems";
     };
     home-manager = {
       url = "github:nix-community/home-manager";
@@ -41,7 +36,6 @@
     golink = {
       url = "github:apoxy-dev/golink/dilyevsky/tsnet-1.90-upgrade";
       inputs.nixpkgs.follows = "nixpkgs";
-      inputs.systems.follows = "systems";
     };
     zx-dev = {
       url = "github:stackptr/zx.dev";
@@ -125,7 +119,11 @@
         };
       };
 
-      systems = import inputs.systems;
+      systems = [
+        "aarch64-darwin"
+        "aarch64-linux"
+        "x86_64-linux"
+      ];
       perSystem = {
         pkgs,
         inputs',
