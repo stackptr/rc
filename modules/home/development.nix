@@ -22,6 +22,10 @@ in {
       javascript = {
         enable = lib.mkEnableOption "JavaScript development tooling";
       };
+
+      shell = {
+        enable = lib.mkEnableOption "shell development tooling";
+      };
     };
   };
 
@@ -172,6 +176,24 @@ in {
       programs.ssh.includes = [
         "~/.colima/ssh_config"
       ];
+    })
+
+    (mkIf cfg.shell.enable {
+      age.secrets.atuin-key.file = ../../home/secrets/atuin-key.age;
+
+      programs.atuin = {
+        enable = true;
+        enableZshIntegration = true;
+        flags = ["--disable-up-arrow"];
+        settings = {
+          auto_sync = true;
+          sync_address = "http://glyph:8889";
+          key_path = config.age.secrets.atuin-key.path;
+          update_check = false;
+          style = "compact";
+          inline_height = 20;
+        };
+      };
     })
 
     (mkIf cfg.javascript.enable {
