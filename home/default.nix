@@ -16,6 +16,7 @@
 
   rc = lib.mkMerge [
     {
+      development.ai.enable = true;
       editor.enable = true;
       git.enable = true;
       ssh.enable = true;
@@ -28,7 +29,6 @@
 
     (lib.mkIf (!lightweight) {
       development = {
-        ai.enable = true;
         containers.enable = true;
         javascript.enable = true;
       };
