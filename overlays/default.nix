@@ -5,7 +5,4 @@
 
   # Fix Daisydisk ahead of upstream
   (import ./daisydisk.nix)
-
-  # Fix vendorHash for apoxy-dev golink fork
-  (import ./golink.nix)
 ]

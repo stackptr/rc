@@ -31,6 +31,11 @@
   services.golink = {
     enable = true;
     tailscaleAuthKeyFile = config.age.secrets.tailscale-auth-key.path;
+    package = pkgs.buildGo125Module {
+      pname = "golink";
+      inherit (pkgs.golink) version src ldflags;
+      vendorHash = "sha256-M3Qm25KF6gWtp3K1SigLucgrIJ+5KokMq+Bp7XXaE+o=";
+    };
   };
 
   services.openssh.enable = true;
