@@ -6,7 +6,7 @@
   age.secrets.homepage-env.file = ./../secrets/homepage-env.age;
   services.homepage-dashboard = {
     enable = true;
-    environmentFile = config.age.secrets.homepage-env.path;
+    environmentFiles = [config.age.secrets.homepage-env.path];
     allowedHosts = "localhost:8082,127.0.0.1:8082,home.zx.dev";
     settings = {
       color = "sky";
