@@ -39,7 +39,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     golink = {
-      url = "github:tailscale/golink";
+      url = "github:apoxy-dev/golink/dilyevsky/tsnet-1.90-upgrade";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.systems.follows = "systems";
     };
