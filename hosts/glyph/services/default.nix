@@ -122,5 +122,21 @@
       headers.CONTEXT7_API_KEY = "$CONTEXT7_API_KEY";
       environmentFile = config.age.secrets.context7-api-key.path;
     };
+    servers.deepwiki = {
+      url = "https://mcp.deepwiki.com/mcp";
+      description = "AI-powered documentation and Q&A for GitHub repositories";
+    };
+    servers.aws-knowledge = {
+      url = "https://knowledge-mcp.global.api.aws";
+      description = "AWS documentation and development reference";
+    };
+    servers.cloudflare-docs = {
+      url = "https://docs.mcp.cloudflare.com/sse";
+      description = "Cloudflare documentation and API reference";
+    };
+    servers.semgrep = {
+      url = "https://mcp.semgrep.ai/mcp";
+      description = "Code security scanning for vulnerabilities, supply chain, and secrets";
+    };
   };
 }
