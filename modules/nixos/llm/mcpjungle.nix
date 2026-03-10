@@ -87,14 +87,24 @@ in {
       };
     };
 
+    systemd.timers.mcpjungle-register = lib.mkIf (cfg.servers != {}) {
+      description = "Trigger MCP server registration";
+      wantedBy = ["timers.target"];
+      # Re-trigger when server configuration changes
+      restartTriggers = [(builtins.hashString "sha256" (builtins.toJSON cfg.servers))];
+      timerConfig = {
+        OnActiveSec = "5s";
+      };
+    };
+
     systemd.services.mcpjungle-register = lib.mkIf (cfg.servers != {}) {
       description = "Register MCP servers with MCPJungle";
       after = ["mcpjungle.service"];
       requires = ["mcpjungle.service"];
-      wantedBy = ["multi-user.target"];
+      # Prevent NixOS activation from blocking on this oneshot
+      restartIfChanged = false;
       serviceConfig = {
         Type = "oneshot";
-        RemainAfterExit = true;
       };
       path = [pkgs.curl pkgs.envsubst];
       script = let
