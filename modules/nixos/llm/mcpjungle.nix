@@ -104,7 +104,7 @@ in {
       # Prevent NixOS activation from blocking on this oneshot
       restartIfChanged = false;
       serviceConfig = {
-        Type = "oneshot";
+        Type = "simple";
       };
       path = [pkgs.curl pkgs.envsubst];
       script = let
