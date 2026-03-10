@@ -90,6 +90,7 @@
             hostname = "zeta";
             system = "aarch64-linux";
             username = "mu";
+            lightweight = true;
           };
           glyph = mkNixosHost {
             hostname = "glyph";
@@ -100,6 +101,7 @@
             hostname = "spore";
             system = "x86_64-linux";
             username = "mu";
+            lightweight = true;
           };
         };
 

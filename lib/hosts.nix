@@ -23,6 +23,7 @@ inputs @ {
     hostname,
     system,
     showBatteryStatus,
+    lightweight ? false,
   }: let
     pkgs-stable = import nixpkgs-stable {inherit system;};
     hostHomePath = ./../hosts/${hostname}/home.nix;
@@ -44,7 +45,7 @@ inputs @ {
         ++ nixpkgs.lib.optionals (hostHomeConfig != null) [hostHomeConfig];
     };
     home-manager.extraSpecialArgs = {
-      inherit hostname llm-profile pkgs-stable showBatteryStatus;
+      inherit hostname lightweight llm-profile pkgs-stable showBatteryStatus;
     };
   };
 
@@ -52,6 +53,7 @@ inputs @ {
     hostname,
     system,
     username,
+    lightweight ? false,
   }:
     nixpkgs.lib.nixosSystem {
       inherit system;
@@ -68,7 +70,7 @@ inputs @ {
         agenix.nixosModules.default
         home-manager.nixosModules.home-manager
         (mkHomeManager {
-          inherit username hostname system;
+          inherit username hostname system lightweight;
           showBatteryStatus = false;
         })
         {
@@ -82,6 +84,7 @@ inputs @ {
   mkDarwinHost = {
     hostname,
     username,
+    lightweight ? false,
   }: let
     system = "aarch64-darwin";
   in
@@ -99,7 +102,7 @@ inputs @ {
         ./../hosts/${hostname}
         home-manager.darwinModules.home-manager
         (mkHomeManager {
-          inherit username hostname system;
+          inherit username hostname system lightweight;
           showBatteryStatus = true;
         })
         {

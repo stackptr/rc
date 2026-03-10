@@ -2,7 +2,7 @@
   config,
   pkgs,
   lib,
-  hostname,
+  lightweight,
   ...
 }: {
   imports = [
@@ -26,7 +26,7 @@
       };
     }
 
-    (lib.mkIf (hostname != "spore" && hostname != "zeta") {
+    (lib.mkIf (!lightweight) {
       development = {
         ai.enable = true;
         containers.enable = true;
