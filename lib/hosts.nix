@@ -11,6 +11,7 @@ inputs @ {
   llm-profile,
   nix-index-database,
   zx-dev,
+  attic,
   disko,
   golink,
   ...
@@ -76,6 +77,7 @@ inputs @ {
         {
           nixpkgs.overlays = overlays;
         }
+        attic.nixosModules.atticd
         golink.nixosModules.default
         zx-dev.nixosModules.default
       ];

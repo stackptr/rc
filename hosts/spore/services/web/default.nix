@@ -86,6 +86,17 @@
           proxyWebsockets = true;
         };
       };
+      "cache.zx.dev" = {
+        forceSSL = true;
+        useACMEHost = "zx.dev";
+        locations."/" = {
+          proxyPass = "http://glyph.rove-duck.ts.net:8199";
+          extraConfig = ''
+            client_max_body_size 0;
+            proxy_read_timeout 300;
+          '';
+        };
+      };
       "jellyfin.zx.dev" = {
         forceSSL = true;
         useACMEHost = "zx.dev";

@@ -29,15 +29,19 @@ jobs:
     - uses: cachix/install-nix-action@v31
       with:
         github_access_token: ${{ secrets.GITHUB_TOKEN }}
-    - uses: cachix/cachix-action@v16
-      with:
-        name: stackptr
-        authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+    - name: Configure Attic cache
+      run: |
+        nix profile install github:zhaofengli/attic#attic-client
+        attic login rc https://cache.zx.dev ${{ secrets.ATTIC_TOKEN }}
+        attic use rc:main
     - run: nix flake check
-    - name: Build NixOS system
+    - name: Build system configuration
       run: |
         if [ "${{ matrix.system }}" = "aarch64-darwin" ]; then
           nix build .#darwinConfigurations.${{ matrix.host }}.system
         else
           nix build .#nixosConfigurations.${{ matrix.host }}.config.system.build.toplevel
         fi
+    - name: Push to Attic
+      if: github.ref == 'refs/heads/main'
+      run: attic push rc:main ./result
