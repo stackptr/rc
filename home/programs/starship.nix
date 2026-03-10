@@ -1,4 +1,9 @@
 {lib, ...}: {
+  xdg.configFile."starship-minimal.toml".text = ''
+    format = "$character"
+    add_newline = false
+  '';
+
   programs.starship = {
     enable = true;
     enableZshIntegration = true;
