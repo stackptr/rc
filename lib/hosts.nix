@@ -71,10 +71,10 @@ inputs @ {
           inherit username hostname system;
           showBatteryStatus = false;
         })
+        golink.nixosModules.default
         {
           nixpkgs.overlays = overlays;
         }
-        golink.nixosModules.default
         zx-dev.nixosModules.default
       ];
     };
