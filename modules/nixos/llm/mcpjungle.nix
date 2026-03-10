@@ -150,9 +150,16 @@ in {
           fi
         '';
 
-        registrations = lib.concatStringsSep "\n" (lib.mapAttrsToList mkRegistration cfg.servers);
+        mkBackgroundRegistration = name: server: ''
+          (
+            ${mkRegistration name server}
+          ) &
+        '';
+
+        registrations = lib.concatStringsSep "\n" (lib.mapAttrsToList mkBackgroundRegistration cfg.servers);
       in ''
         ${registrations}
+        wait
       '';
     };
 
