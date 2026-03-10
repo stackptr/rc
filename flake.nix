@@ -69,6 +69,10 @@
       url = "github:stackptr/llm-profile";
       flake = false;
     };
+    zed-nova-theme = {
+      url = "github:stackptr/zed-nova-theme";
+      flake = false;
+    };
   };
 
   outputs = inputs @ {flake-parts, ...}:

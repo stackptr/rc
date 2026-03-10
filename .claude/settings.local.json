@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git commit:*)",
+      "Bash(nix-prefetch-github stackptr zed-nova-theme --rev main)",
+      "Bash(nix hash to-sri --type sha256 0ixh7s7wf334smpkb9nzw3gc9mbr4lq77ahnc6s7jv3cc1dj8rc1)"
+    ]
+  }
+}

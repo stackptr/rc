@@ -95,18 +95,13 @@ in {
         nix-flake = pkgs.writeShellScriptBin "nix-flake" ''
           nix "$1" ".#$2" "''${@:3}"
         '';
-      in
-        [
-          nix-flake
-          pkgs.manix
-          pkgs.nix-du
-          pkgs.nix-tree
-          pkgs.nix-your-shell
-        ]
-        ++ [
-          pkgs.alejandra
-          pkgs.nil
-        ];
+      in [
+        nix-flake
+        pkgs.manix
+        pkgs.nix-du
+        pkgs.nix-tree
+        pkgs.nix-your-shell
+      ];
 
       programs.nh.enable = true;
     })

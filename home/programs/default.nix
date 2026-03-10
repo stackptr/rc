@@ -7,6 +7,7 @@
     ./aichat.nix
     ./starship.nix
     ./tmux.nix
+    ./zed.nix
     ./zsh.nix
   ];
 
