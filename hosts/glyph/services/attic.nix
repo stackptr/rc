@@ -6,6 +6,11 @@
     group = "atticd";
   };
 
+  systemd.services.atticd = {
+    after = ["postgresql.service"];
+    requires = ["postgresql.service"];
+  };
+
   services.atticd = {
     enable = true;
     environmentFile = config.age.secrets.attic-credentials.path;
@@ -13,7 +18,7 @@
     settings = {
       listen = "[::]:8199";
 
-      database.url = "sqlite:///var/lib/atticd/server.db?mode=rwc";
+      database.url = "postgresql:///atticd?host=/run/postgresql";
 
       storage = {
         type = "local";
