@@ -15,6 +15,10 @@
         path = "/var/lib/atticd/storage";
       };
 
+      compression = {
+        type = "zstd";
+      };
+
       chunking = {
         nar-size-threshold = 65536;
         min-size = 16384;
