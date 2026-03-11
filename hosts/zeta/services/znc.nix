@@ -1,9 +1,10 @@
 {
   config,
+  lib,
   pkgs,
   ...
 }: {
-  age.secrets.znc-conf = {
+  age.secrets.znc-conf = lib.mkIf config.services.znc.enable {
     file = ./../secrets/znc-conf.age;
     owner = config.services.znc.user;
     inherit (config.services.znc) group;
