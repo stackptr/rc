@@ -54,5 +54,11 @@
   # Beets library database (beets configured in home-manager)
   rc.backup.paths = ["/home/mu/.config/beets/library.db"];
 
+  # Deliberately fail activation to test deploy-rs magic rollback
+  system.activationScripts.test-rollback = ''
+    echo "Testing deploy-rs rollback: this activation will now fail deliberately"
+    exit 1
+  '';
+
   system.stateVersion = "24.05";
 }
