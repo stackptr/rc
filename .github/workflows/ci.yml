@@ -31,7 +31,7 @@ jobs:
         github_access_token: ${{ secrets.GITHUB_TOKEN }}
         extra_nix_config: |
           extra-substituters = https://cache.zx.dev/main
-          extra-trusted-public-keys = main:sbkS1Xz6P4g66iyttRGj/o8aPODE6bVG9oKT98/ULKI=
+          extra-trusted-public-keys = main:mu0jkxdJTGWC3djDSEQb3rvZgqlhA8WVMulcTo5IW6c=
     - name: Configure Attic cache
       run: |
         nix profile install --inputs-from . attic#attic-client
