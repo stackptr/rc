@@ -29,9 +29,12 @@ jobs:
     - uses: cachix/install-nix-action@v31
       with:
         github_access_token: ${{ secrets.GITHUB_TOKEN }}
+        extra_nix_config: |
+          extra-substituters = https://cache.zx.dev/main
+          extra-trusted-public-keys = main:sbkS1Xz6P4g66iyttRGj/o8aPODE6bVG9oKT98/ULKI=
     - name: Configure Attic cache
       run: |
-        nix profile install github:zhaofengli/attic#attic-client
+        nix profile install --inputs-from . attic#attic-client
         attic login rc https://cache.zx.dev ${{ secrets.ATTIC_TOKEN }}
         attic use rc:main
     - run: nix flake check
@@ -44,4 +47,6 @@ jobs:
         fi
     - name: Push to Attic
       if: github.ref == 'refs/heads/main'
-      run: attic push rc:main ./result
+      run: |
+        attic push rc:main ./result
+        attic push rc:main $(which attic)
