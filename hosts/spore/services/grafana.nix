@@ -43,6 +43,13 @@
         auto_login = false;
         skip_org_role_sync = true;
       };
+      database = {
+        type = "postgres";
+        host = "glyph.rove-duck.ts.net:5432";
+        name = "grafana";
+        user = "grafana";
+        ssl_mode = "disable";
+      };
       security = {
         admin_user = "corey@zx.dev";
         admin_email = "corey@zx.dev";
