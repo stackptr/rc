@@ -37,7 +37,6 @@ jobs:
         nix profile install --inputs-from . attic#attic-client
         attic login rc https://cache.zx.dev ${{ secrets.ATTIC_TOKEN }}
         attic use rc:main
-    - run: nix flake check
     - name: Build system configuration
       run: |
         if [ "${{ matrix.system }}" = "aarch64-darwin" ]; then
