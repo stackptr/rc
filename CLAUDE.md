@@ -54,7 +54,7 @@ nix flake update --commit-lock-file
 
 **Development shell:**
 ```bash
-nix develop  # Provides agenix, cachix, just
+nix develop  # Provides agenix, graphite-cli, just
 ```
 
 ## Key Configuration Details
@@ -80,6 +80,10 @@ Custom packages and overlays are organized for clarity:
 - `overlays/custom-packages.nix` - Overlay exposing custom packages
 - `overlays/gitify.nix`, `overlays/whatsapp-for-mac.nix` - App-specific version overrides
 - `overlays/default.nix` - Consolidates all overlays for easy management
+
+## Branching
+
+- Branches should be scoped to a single host whenever possible. This keeps deploys independent and reduces risk of cross-host breakage.
 
 ## Code style
 
