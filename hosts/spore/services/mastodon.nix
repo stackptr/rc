@@ -48,7 +48,7 @@ in {
     configureNginx = true;
     database = {
       createLocally = false;
-      host = "127.0.0.1";
+      host = "glyph.rove-duck.ts.net";
       port = 5432;
       user = "mastodon";
       passwordFile = "/dev/null"; # Not needed
@@ -84,19 +84,7 @@ in {
     ];
   };
 
-  services.postgresql = lib.mkIf enable {
-    ensureUsers = [
-      {
-        name = "mastodon";
-        ensureDBOwnership = true;
-      }
-    ];
-    ensureDatabases = ["mastodon"];
-  };
-  services.postgresqlBackup = {
-    #inherit enable;
-    databases = ["mastodon"];
-  };
+  # Database managed on glyph when re-enabled
   services.redis.servers.mastodon = {
     inherit enable;
     port = 31637;

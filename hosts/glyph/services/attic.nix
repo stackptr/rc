@@ -1,10 +1,5 @@
 {config, ...}: {
-  age.secrets.attic-credentials = {
-    file = ./../secrets/attic-credentials.age;
-    mode = "440";
-    owner = "atticd";
-    group = "atticd";
-  };
+  age.secrets.attic-credentials.file = ./../secrets/attic-credentials.age;
 
   services.atticd = {
     enable = true;
@@ -13,7 +8,7 @@
     settings = {
       listen = "[::]:8199";
 
-      database.url = "sqlite:///var/lib/atticd/server.db?mode=rwc";
+      database.url = "postgresql:///atticd?host=/run/postgresql";
 
       storage = {
         type = "local";

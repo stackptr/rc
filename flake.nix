@@ -122,7 +122,7 @@
             "https://cache.zx.dev/main"
           ];
           extra-trusted-public-keys = [
-            "main:sbkS1Xz6P4g66iyttRGj/o8aPODE6bVG9oKT98/ULKI="
+            "main:mu0jkxdJTGWC3djDSEQb3rvZgqlhA8WVMulcTo5IW6c="
           ];
         };
       };

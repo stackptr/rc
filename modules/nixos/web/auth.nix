@@ -30,6 +30,25 @@ in {
           example = "id.example.org";
         };
 
+        databaseURL = lib.mkOption {
+          type = lib.types.str;
+          default = "postgres://pocketid@/pocketid?host=/run/postgresql";
+          description = ''
+            PostgreSQL connection string for pocket-id.
+          '';
+          example = "postgres://pocketid@glyph.rove-duck.ts.net/pocketid";
+        };
+
+        localDatabase = lib.mkOption {
+          type = lib.types.bool;
+          default = true;
+          description = ''
+            Whether the database is managed locally. When true, PostgreSQL
+            is configured with the pocketid database and user, and pocket-id
+            depends on postgresql.service.
+          '';
+        };
+
         encryptionKeyFile = lib.mkOption {
           type = lib.types.nullOr lib.types.path;
           default = null;
@@ -122,29 +141,17 @@ in {
         settings = {
           APP_URL = "https://${cfg.issuer.host}";
           TRUST_PROXY = true;
-          DB_CONNECTION_STRING = "postgres://pocketid@/pocketid?host=/run/postgresql";
+          DB_CONNECTION_STRING = cfg.issuer.databaseURL;
           ENCRYPTION_KEY_FILE = cfg.issuer.encryptionKeyFile;
         };
       };
 
-      services.postgresql = {
-        ensureDatabases = ["pocketid"];
-        ensureUsers = [
-          {
-            name = "pocketid";
-            ensureDBOwnership = true;
-          }
-        ];
-      };
-      services.postgresqlBackup = {
-        enable = lib.mkDefault true;
-        databases = ["pocketid"];
-      };
-
       systemd.services.pocket-id = {
         wants = ["network-online.target"];
-        after = ["postgresql.service" "network-online.target"];
-        requires = ["postgresql.service"];
+        after =
+          ["network-online.target"]
+          ++ lib.optionals cfg.issuer.localDatabase ["postgresql.service"];
+        requires = lib.optionals cfg.issuer.localDatabase ["postgresql.service"];
       };
 
       services.oauth2-proxy = {
@@ -203,6 +210,21 @@ in {
             '';
           };
         };
+      };
+    })
+    (mkIf (cfg.enable && cfg.issuer.localDatabase) {
+      services.postgresql = {
+        ensureDatabases = ["pocketid"];
+        ensureUsers = [
+          {
+            name = "pocketid";
+            ensureDBOwnership = true;
+          }
+        ];
+      };
+      services.postgresqlBackup = {
+        enable = lib.mkDefault true;
+        databases = ["pocketid"];
       };
     })
     (let
