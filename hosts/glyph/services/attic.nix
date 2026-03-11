@@ -1,10 +1,5 @@
 {config, ...}: {
-  age.secrets.attic-credentials = {
-    file = ./../secrets/attic-credentials.age;
-    mode = "440";
-    owner = "atticd";
-    group = "atticd";
-  };
+  age.secrets.attic-credentials.file = ./../secrets/attic-credentials.age;
 
   systemd.services.atticd = {
     after = ["postgresql.service"];
