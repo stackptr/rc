@@ -12,10 +12,14 @@
       port = 5432;
       max_connections = 150;
     };
-    ensureDatabases = ["atticd" "open-webui" "pocketid"];
+    ensureDatabases = ["atticd" "grafana" "open-webui" "pocketid"];
     ensureUsers = [
       {
         name = "atticd";
+        ensureDBOwnership = true;
+      }
+      {
+        name = "grafana";
         ensureDBOwnership = true;
       }
       {
@@ -31,6 +35,6 @@
 
   services.postgresqlBackup = {
     enable = true;
-    databases = ["atticd" "open-webui" "pocketid"];
+    databases = ["atticd" "grafana" "open-webui" "pocketid"];
   };
 }
