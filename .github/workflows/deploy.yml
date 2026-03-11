@@ -62,6 +62,8 @@ jobs:
           EOF
 
       - name: Deploy to ${{ matrix.host }}
+        env:
+          NIX_SSHOPTS: "-i ~/.ssh/deploy_key -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new"
         run: |
           nix run --inputs-from . deploy-rs -- \
             .#${{ matrix.host }} \
