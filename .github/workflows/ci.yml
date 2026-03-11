@@ -49,3 +49,5 @@ jobs:
       run: |
         attic push rc:main ./result
         attic push rc:main $(which attic)
+        nix build .#devShells.${{ matrix.system }}.default -o ./result-devshell
+        attic push rc:main ./result-devshell
