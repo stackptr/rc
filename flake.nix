@@ -119,12 +119,10 @@
         nixConfig = {
           experimental-features = ["nix-command" "flakes"];
           extra-substituters = [
-            "https://cache.zx.dev"
-            "https://stackptr.cachix.org"
+            "https://cache.zx.dev/main"
           ];
           extra-trusted-public-keys = [
             "main:sbkS1Xz6P4g66iyttRGj/o8aPODE6bVG9oKT98/ULKI="
-            "stackptr.cachix.org-1:5e2q7OxdRdAtvRmHTeogpgJKzQhbvFqNMmCMw71opZA="
           ];
         };
       };
@@ -150,7 +148,6 @@
             packages =
               [
                 inputs'.agenix.packages.default
-                pkgs.cachix
                 pkgs.graphite-cli
                 pkgs.just
               ]
