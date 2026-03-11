@@ -1,6 +1,6 @@
-{_}: {
+{lib, ...}: {
   rc.backup = {
-    enable = true;
+    enable = lib.mkForce true;
     paths = [];
   };
 }
