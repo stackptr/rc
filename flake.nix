@@ -33,6 +33,12 @@
     };
     nixos-hardware.url = "github:NixOS/nixos-hardware";
 
+    # Deployment
+    deploy-rs = {
+      url = "github:serokell/deploy-rs";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     # Linux
     disko = {
       url = "github:nix-community/disko";
@@ -115,6 +121,50 @@
             username = "corey";
           };
         };
+
+        deploy = {
+          remoteBuild = false;
+
+          nodes = {
+            glyph = {
+              hostname = "glyph";
+              sshUser = "root";
+              profiles.system = {
+                user = "root";
+                path =
+                  inputs.deploy-rs.lib.x86_64-linux.activate.nixos
+                  inputs.self.nixosConfigurations.glyph;
+              };
+            };
+
+            spore = {
+              hostname = "spore";
+              sshUser = "root";
+              profiles.system = {
+                user = "root";
+                path =
+                  inputs.deploy-rs.lib.x86_64-linux.activate.nixos
+                  inputs.self.nixosConfigurations.spore;
+              };
+            };
+
+            zeta = {
+              hostname = "zeta";
+              sshUser = "root";
+              profiles.system = {
+                user = "root";
+                path =
+                  inputs.deploy-rs.lib.aarch64-linux.activate.nixos
+                  inputs.self.nixosConfigurations.zeta;
+              };
+            };
+          };
+        };
+
+        checks =
+          builtins.mapAttrs
+          (system: deployLib: deployLib.deployChecks inputs.self.deploy)
+          inputs.deploy-rs.lib;
 
         nixConfig = {
           experimental-features = ["nix-command" "flakes"];
