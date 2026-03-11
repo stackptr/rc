@@ -1,11 +1,6 @@
 {config, ...}: {
   age.secrets.attic-credentials.file = ./../secrets/attic-credentials.age;
 
-  systemd.services.atticd = {
-    after = ["postgresql.service"];
-    requires = ["postgresql.service"];
-  };
-
   services.atticd = {
     enable = true;
     environmentFile = config.age.secrets.attic-credentials.path;
