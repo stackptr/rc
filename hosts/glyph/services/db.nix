@@ -15,6 +15,10 @@
     ensureDatabases = ["atticd" "grafana" "open-webui" "pocketid"];
     ensureUsers = [
       {
+        name = "mu";
+        ensureClauses.superuser = true;
+      }
+      {
         name = "atticd";
         ensureDBOwnership = true;
       }
