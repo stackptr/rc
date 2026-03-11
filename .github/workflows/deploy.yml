@@ -53,7 +53,7 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
-          cat >> ~/.ssh/config <<EOF
+          cat >> ~/.ssh/config <<'EOF'
           Host glyph spore zeta
             User root
             IdentityFile ~/.ssh/deploy_key
