@@ -57,6 +57,7 @@ jobs:
           Host glyph spore zeta
             User root
             IdentityFile ~/.ssh/deploy_key
+            IdentitiesOnly yes
             StrictHostKeyChecking accept-new
           EOF
 
