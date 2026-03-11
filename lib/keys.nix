@@ -16,4 +16,5 @@ in
   builtins.listToAttrs hostKeyPairs
   // {
     home = firstLine (builtins.readFile ./../home/key.pub);
+    deploy = firstLine (builtins.readFile ./deploy.pub);
   }
