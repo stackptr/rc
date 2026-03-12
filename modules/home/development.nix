@@ -172,10 +172,23 @@ in {
 
     (mkIf cfg.containers.enable {
       home.packages = with pkgs; [
-        colima
-        docker
         lazydocker
       ];
+
+      services.colima = {
+        enable = true;
+        profiles.default = {
+          isActive = true;
+          isService = true;
+          settings = {
+            cpu = 4;
+            disk = 60;
+            memory = 8;
+            arch = "aarch64";
+            mountInotify = true;
+          };
+        };
+      };
 
       programs.ssh.includes = [
         "~/.colima/ssh_config"
