@@ -1,8 +1,15 @@
-{config, ...}: {
+{
+  config,
+  pkgs,
+  ...
+}: {
   age.secrets.open-webui-env.file = ./../secrets/open-webui-env.age;
 
   services.open-webui = {
     enable = true;
+    package = pkgs.open-webui.overridePythonAttrs (old: {
+      dependencies = old.dependencies ++ old.optional-dependencies.postgres;
+    });
     port = 8888;
     host = "0.0.0.0";
     environmentFile = config.age.secrets.open-webui-env.path;
