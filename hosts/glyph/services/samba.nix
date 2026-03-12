@@ -52,6 +52,12 @@
       // shares;
   };
 
+  # Ensure Unsorted is group-writable with setgid so Samba (force user jellyfin)
+  # can write and new files inherit the media group
+  systemd.tmpfiles.rules = [
+    "d /mnt/media/Unsorted 2775 ${config.services.jellyfin.user} ${config.services.jellyfin.group} -"
+  ];
+
   systemd.services.ensureSambaPermissions = {
     description = "Ensures correct permissions within Samba shares";
     serviceConfig = {
@@ -64,7 +70,7 @@
         "${pkgs.coreutils}/bin/chown -R ${defaultUsrGrp} archive"
         "${pkgs.coreutils}/bin/chown -R ${defaultUsrGrp} backup"
         # N.B.: /mnt/media/Music is used by Roon, not Jellyfin
-        "${pkgs.coreutils}/bin/chown -R ${jellyfinUsrGrp} media/Movies media/TV media/Video"
+        "${pkgs.coreutils}/bin/chown -R ${jellyfinUsrGrp} media/Movies media/TV media/Unsorted media/Video"
         "${pkgs.coreutils}/bin/chown -R ${defaultUsrGrp} media/Music"
         "${pkgs.coreutils}/bin/chown -R ${transmissionUsrGrp} torrents"
         "${pkgs.coreutils}/bin/chown -R ${defaultUsrGrp} unsorted"

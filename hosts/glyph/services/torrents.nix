@@ -49,6 +49,24 @@
           --form-string "url=https://torrents.zx.dev" \
           --form-string "url_title=View torrents" \
           https://api.pushover.net/1/messages.json
+
+        # Copy .mkv files to Unsorted for Jellyfin
+        UNSORTED="/mnt/media/Unsorted"
+        TORRENT_PATH="$TR_TORRENT_DIR/$TR_TORRENT_NAME"
+
+        if [ -d "$TORRENT_PATH" ]; then
+          # Folder torrent: copy the folder if it contains at least one .mkv
+          if find "$TORRENT_PATH" -name '*.mkv' -print -quit | grep -q .; then
+            cp -r "$TORRENT_PATH" "$UNSORTED/"
+            chgrp -R media "$UNSORTED/$TR_TORRENT_NAME"
+            chmod -R g+rw "$UNSORTED/$TR_TORRENT_NAME"
+          fi
+        elif [[ "$TR_TORRENT_NAME" == *.mkv ]]; then
+          # Single .mkv file
+          cp "$TORRENT_PATH" "$UNSORTED/"
+          chgrp media "$UNSORTED/$TR_TORRENT_NAME"
+          chmod g+rw "$UNSORTED/$TR_TORRENT_NAME"
+        fi
       '';
       cache-size-mb = 256;
       download-queue-enabled = true;
@@ -62,7 +80,7 @@
     webHome = pkgs.transmissionic;
   };
 
-  systemd.services.transmission.path = [pkgs.curl];
+  systemd.services.transmission.path = [pkgs.curl pkgs.findutils];
 
   networking.firewall.allowedTCPPorts = [config.services.transmission.settings.peer-port];
 }
