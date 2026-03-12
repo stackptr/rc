@@ -149,10 +149,17 @@ in {
               "mcp__figma__get_design_context"
               "mcp__figma__get_metadata"
               "mcp__figma__get_screenshot"
+              # MCP: basic-memory
               "mcp__glyph__basic-memory__build_context"
+              "mcp__glyph__basic-memory__canvas"
+              "mcp__glyph__basic-memory__create_memory_project"
+              "mcp__glyph__basic-memory__delete_note"
+              "mcp__glyph__basic-memory__delete_project"
+              "mcp__glyph__basic-memory__edit_note"
               "mcp__glyph__basic-memory__fetch"
               "mcp__glyph__basic-memory__list_directory"
               "mcp__glyph__basic-memory__list_memory_projects"
+              "mcp__glyph__basic-memory__move_note"
               "mcp__glyph__basic-memory__read_content"
               "mcp__glyph__basic-memory__read_note"
               "mcp__glyph__basic-memory__recent_activity"
@@ -160,9 +167,29 @@ in {
               "mcp__glyph__basic-memory__search_by_metadata"
               "mcp__glyph__basic-memory__search_notes"
               "mcp__glyph__basic-memory__view_note"
+              "mcp__glyph__basic-memory__write_note"
+              # MCP: context7
               "mcp__glyph__context7__resolve-library-id"
-              "mcp__glyph__context7__get-library-docs"
+              "mcp__glyph__context7__query-docs"
+              # MCP: graphite
               "mcp__glyph__graphite__learn_gt"
+              "mcp__glyph__graphite__run_gt_cmd"
+              # MCP: mcp-nixos
+              "mcp__glyph__mcp-nixos__nix"
+              "mcp__glyph__mcp-nixos__nix_versions"
+              # MCP: deepwiki
+              "mcp__glyph__deepwiki__ask_question"
+              "mcp__glyph__deepwiki__read_wiki_contents"
+              "mcp__glyph__deepwiki__read_wiki_structure"
+              # MCP: kagi
+              "mcp__glyph__kagi__kagi_search_fetch"
+              "mcp__glyph__kagi__kagi_summarizer"
+              # MCP: aws-knowledge
+              "mcp__glyph__aws-knowledge__aws___get_regional_availability"
+              "mcp__glyph__aws-knowledge__aws___list_regions"
+              "mcp__glyph__aws-knowledge__aws___read_documentation"
+              "mcp__glyph__aws-knowledge__aws___recommend"
+              "mcp__glyph__aws-knowledge__aws___search_documentation"
             ];
             deny = [];
           };
