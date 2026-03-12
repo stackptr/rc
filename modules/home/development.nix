@@ -27,6 +27,14 @@ in {
 
   config = lib.mkMerge [
     (mkIf cfg.ai.enable {
+      age.secrets.claude-code-api-key = {
+        file = ../../home/secrets/claude-code-api-key.age;
+      };
+
+      programs.zsh.initExtra = ''
+        export ANTHROPIC_API_KEY="$(cat ${config.age.secrets.claude-code-api-key.path})"
+      '';
+
       programs.claude-code = {
         enable = true;
         memory.source = "${llm-profile}/README.md";
