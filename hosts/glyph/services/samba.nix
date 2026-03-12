@@ -52,6 +52,12 @@
       // shares;
   };
 
+  # Ensure Unsorted is group-writable with setgid so Samba (force user jellyfin)
+  # can write and new files inherit the media group
+  systemd.tmpfiles.rules = [
+    "d /mnt/media/Unsorted 2775 ${config.services.jellyfin.user} ${config.services.jellyfin.group} -"
+  ];
+
   systemd.services.ensureSambaPermissions = {
     description = "Ensures correct permissions within Samba shares";
     serviceConfig = {
