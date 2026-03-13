@@ -25,6 +25,7 @@
         forceSSL = true;
         useACMEHost = "zx.dev";
         locations."/".return = "302 https://zx.dev";
+        locations."= /resume".return = "302 https://github.com/stackptr/resume/releases/download/latest/resume.pdf";
       };
       "rey.foo" = {
         # forceSSL = true;
