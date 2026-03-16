@@ -20,6 +20,7 @@
       WEBUI_URL = "https://chat.zx.dev";
       WEBUI_SESSION_COOKIE_SECURE = "True";
       CORS_ALLOW_ORIGIN = "https://chat.zx.dev";
+      ENABLE_VERSION_UPDATE_CHECK = "False";
 
       # OIDC via Pocket ID
       ENABLE_OAUTH_SIGNUP = "true";
@@ -35,6 +36,7 @@
       OAUTH_ADMIN_ROLES = "admins";
       ENABLE_LOGIN_FORM = "false";
       ENABLE_API_KEYS = "True";
+      USER_PERMISSIONS_FEATURES_API_KEYS = "True";
       DATABASE_URL = "postgresql:///open-webui?host=/run/postgresql";
     };
   };
