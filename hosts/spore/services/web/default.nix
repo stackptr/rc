@@ -95,6 +95,8 @@
           extraConfig = ''
             client_max_body_size 0;
             proxy_read_timeout 300;
+            proxy_buffering off;
+            proxy_http_version 1.1;
           '';
         };
       };

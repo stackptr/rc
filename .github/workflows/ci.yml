@@ -34,7 +34,7 @@ jobs:
           extra-trusted-public-keys = main:mu0jkxdJTGWC3djDSEQb3rvZgqlhA8WVMulcTo5IW6c=
     - name: Configure Attic cache
       run: |
-        nix profile install --inputs-from . attic#attic-client
+        nix profile install --inputs-from . attic#attic-client --fallback
         attic login rc https://cache.zx.dev ${{ secrets.ATTIC_TOKEN }}
         attic use rc:main
     - name: Build system configuration
