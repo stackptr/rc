@@ -34,6 +34,7 @@
       OAUTH_ALLOWED_ROLES = "users, admins";
       OAUTH_ADMIN_ROLES = "admins";
       ENABLE_LOGIN_FORM = "false";
+      ENABLE_API_KEYS = "True";
       DATABASE_URL = "postgresql:///open-webui?host=/run/postgresql";
     };
   };
