@@ -1,5 +1,6 @@
 {
   config,
+  inputs,
   pkgs,
   ...
 }: {
@@ -40,6 +41,26 @@
       ENABLE_API_KEYS = "True";
       USER_PERMISSIONS_FEATURES_API_KEYS = "True";
       DATABASE_URL = "postgresql:///open-webui?host=/run/postgresql";
+
+      # System prompt sourced from llm-profile flake input (github:stackptr/llm-profile)
+      DEFAULT_SYSTEM_PROMPT = builtins.readFile "${inputs.llm-profile}/README.md";
+
+      # MCP tool server: MCPJungle gateway on glyph (aggregates all registered MCP servers)
+      TOOL_SERVER_CONNECTIONS = builtins.toJSON [
+        {
+          type = "mcp";
+          url = "http://localhost:8090";
+          path = "mcp";
+          auth_type = "none";
+          key = "";
+          config.enable = true;
+          info = {
+            id = "glyph";
+            name = "Glyph";
+            description = "MCP gateway";
+          };
+        }
+      ];
     };
   };
 }
