@@ -10,6 +10,8 @@
       "esphome"
       "met"
       "radio_browser"
+      # Required by ai_task → camera import chain in service descriptions
+      "camera"
     ];
     config = {
       http = {
