@@ -6,6 +6,17 @@ on:
     types: [completed]
     branches: [main]
   workflow_dispatch:
+    inputs:
+      hosts:
+        description: 'Hosts to deploy'
+        required: false
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - glyph
+          - spore
+          - zeta
 
 jobs:
   changes:
@@ -48,8 +59,19 @@ jobs:
             {"host":"zeta","system":"aarch64-linux","runner":"ubuntu-24.04-arm"}
           ]'
 
-          # Deploy all hosts on workflow_dispatch or shared changes
-          if [[ "${{ github.event_name }}" == "workflow_dispatch" || "${{ steps.filter.outputs.shared }}" == "true" ]]; then
+          # workflow_dispatch: use selected host or all
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            host="${{ inputs.hosts }}"
+            if [[ "$host" == "all" ]]; then
+              echo "matrix={\"include\":$all}" >> "$GITHUB_OUTPUT"
+            else
+              echo "matrix={\"include\":$(echo "$all" | jq --arg h "$host" '[.[] | select(.host == $h)]')}" >> "$GITHUB_OUTPUT"
+            fi
+            exit 0
+          fi
+
+          # Shared path changes: deploy all hosts
+          if [[ "${{ steps.filter.outputs.shared }}" == "true" ]]; then
             echo "matrix={\"include\":$all}" >> "$GITHUB_OUTPUT"
             exit 0
           fi
