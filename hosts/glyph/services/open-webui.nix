@@ -42,6 +42,11 @@
       USER_PERMISSIONS_FEATURES_API_KEYS = "True";
       DATABASE_URL = "postgresql:///open-webui?host=/run/postgresql";
 
+      # Web search via Kagi (API key in open-webui-env.age)
+      ENABLE_WEB_SEARCH = "True";
+      ENABLE_SEARCH_QUERY_GENERATION = "True";
+      WEB_SEARCH_ENGINE = "kagi";
+
       # System prompt sourced from llm-profile flake input (github:stackptr/llm-profile)
       DEFAULT_SYSTEM_PROMPT = builtins.readFile "${inputs.llm-profile}/README.md";
 
