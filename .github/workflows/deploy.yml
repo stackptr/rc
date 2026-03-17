@@ -1,4 +1,8 @@
 name: Deploy
+run-name: >-
+  ${{ github.event_name == 'workflow_dispatch'
+    && format('deploy {0}', inputs.hosts)
+    || format('deploy {0}', github.event.workflow_run.display_title) }}
 
 on:
   workflow_run:
@@ -8,9 +12,9 @@ on:
   workflow_dispatch:
     inputs:
       hosts:
-        description: 'Hosts to deploy'
+        description: "Hosts to deploy"
         required: false
-        default: 'all'
+        default: "all"
         type: choice
         options:
           - all
