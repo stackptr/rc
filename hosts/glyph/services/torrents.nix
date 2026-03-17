@@ -81,6 +81,7 @@
   };
 
   systemd.services.transmission.path = [pkgs.curl pkgs.findutils];
+  systemd.services.transmission.serviceConfig.BindPaths = ["/mnt/media/Unsorted"];
 
   networking.firewall.allowedTCPPorts = [config.services.transmission.settings.peer-port];
 }
