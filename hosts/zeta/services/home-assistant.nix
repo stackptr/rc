@@ -12,6 +12,7 @@
       "radio_browser"
       # Required by ai_task → camera import chain in service descriptions
       "camera"
+      "mobile_app"
     ];
     config = {
       http = {
