@@ -13,6 +13,7 @@
       # Required by ai_task → camera import chain in service descriptions
       "camera"
       "mobile_app"
+      "zeroconf"
     ];
     config = {
       http = {
@@ -22,7 +23,12 @@
         ];
       };
       mobile_app = {};
+      zeroconf = {};
     };
   };
   networking.firewall.allowedTCPPorts = [8123];
+  services.avahi = {
+    enable = true;
+    nssmdns4 = true;
+  };
 }
