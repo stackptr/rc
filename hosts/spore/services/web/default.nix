@@ -60,7 +60,10 @@
       "ha.zx.dev" = {
         forceSSL = true;
         useACMEHost = "zx.dev";
-        locations."/".proxyPass = "http://zeta.rove-duck.ts.net:8123";
+        locations."/" = {
+          proxyPass = "http://zeta.rove-duck.ts.net:8123";
+          proxyWebsockets = true;
+        };
       };
       "files.zx.dev" = {
         forceSSL = true;
