@@ -5,6 +5,8 @@
 }: {
   age.secrets.open-webui-env.file = ./../secrets/open-webui-env.age;
 
+  systemd.services.open-webui.restartTriggers = [config.age.secrets.open-webui-env.file];
+
   services.open-webui = {
     enable = true;
     package = pkgs.open-webui.overridePythonAttrs (old: {
