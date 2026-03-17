@@ -8,25 +8,78 @@ on:
   workflow_dispatch:
 
 jobs:
-  deploy:
+  changes:
     if: >-
       github.event_name == 'workflow_dispatch' ||
       github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - uses: dorny/paths-filter@v3
+        id: filter
+        if: github.event_name != 'workflow_dispatch'
+        with:
+          filters: |
+            glyph:
+              - 'hosts/glyph/**'
+            spore:
+              - 'hosts/spore/**'
+            zeta:
+              - 'hosts/zeta/**'
+            shared:
+              - 'modules/**'
+              - 'home/**'
+              - 'lib/**'
+              - 'overlays/**'
+              - 'packages/**'
+              - 'flake.nix'
+              - 'flake.lock'
+
+      - id: set-matrix
+        run: |
+          all='[
+            {"host":"glyph","system":"x86_64-linux","runner":"ubuntu-latest"},
+            {"host":"spore","system":"x86_64-linux","runner":"ubuntu-latest"},
+            {"host":"zeta","system":"aarch64-linux","runner":"ubuntu-24.04-arm"}
+          ]'
+
+          # Deploy all hosts on workflow_dispatch or shared changes
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" || "${{ steps.filter.outputs.shared }}" == "true" ]]; then
+            echo "matrix={\"include\":$all}" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          selected="[]"
+          if [[ "${{ steps.filter.outputs.glyph }}" == "true" ]]; then
+            selected=$(echo "$selected" | jq '. + [{"host":"glyph","system":"x86_64-linux","runner":"ubuntu-latest"}]')
+          fi
+          if [[ "${{ steps.filter.outputs.spore }}" == "true" ]]; then
+            selected=$(echo "$selected" | jq '. + [{"host":"spore","system":"x86_64-linux","runner":"ubuntu-latest"}]')
+          fi
+          if [[ "${{ steps.filter.outputs.zeta }}" == "true" ]]; then
+            selected=$(echo "$selected" | jq '. + [{"host":"zeta","system":"aarch64-linux","runner":"ubuntu-24.04-arm"}]')
+          fi
+
+          # Fallback: deploy all if no specific hosts matched
+          if [[ "$selected" == "[]" ]]; then
+            echo "matrix={\"include\":$all}" >> "$GITHUB_OUTPUT"
+          else
+            echo "matrix={\"include\":$selected}" >> "$GITHUB_OUTPUT"
+          fi
+
+  deploy:
+    needs: changes
     concurrency:
       group: deploy-${{ matrix.host }}
       cancel-in-progress: false
+    environment: ${{ matrix.host }}
     strategy:
-      matrix:
-        include:
-          - host: glyph
-            system: x86_64-linux
-            runner: ubuntu-latest
-          - host: spore
-            system: x86_64-linux
-            runner: ubuntu-latest
-          - host: zeta
-            system: aarch64-linux
-            runner: ubuntu-24.04-arm
+      matrix: ${{ fromJson(needs.changes.outputs.matrix) }}
     runs-on: ${{ matrix.runner }}
     steps:
       - uses: actions/checkout@v4
