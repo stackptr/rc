@@ -53,11 +53,7 @@ jobs:
 
       - id: set-matrix
         run: |
-          all='[
-            {"host":"glyph","system":"x86_64-linux","runner":"ubuntu-latest"},
-            {"host":"spore","system":"x86_64-linux","runner":"ubuntu-latest"},
-            {"host":"zeta","system":"aarch64-linux","runner":"ubuntu-24.04-arm"}
-          ]'
+          all='[{"host":"glyph","system":"x86_64-linux","runner":"ubuntu-latest"},{"host":"spore","system":"x86_64-linux","runner":"ubuntu-latest"},{"host":"zeta","system":"aarch64-linux","runner":"ubuntu-24.04-arm"}]'
 
           # workflow_dispatch: use selected host or all
           if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
