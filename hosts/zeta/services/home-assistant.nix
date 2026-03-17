@@ -21,6 +21,7 @@
           "100.64.0.0/10"
         ];
       };
+      mobile_app = {};
     };
   };
   networking.firewall.allowedTCPPorts = [8123];
