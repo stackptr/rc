@@ -42,14 +42,20 @@ jobs:
           filters: |
             glyph:
               - 'hosts/glyph/**'
+              - 'lib/secrets/glyph.nix'
             spore:
               - 'hosts/spore/**'
+              - 'lib/secrets/spore.nix'
             zeta:
               - 'hosts/zeta/**'
+              - 'lib/secrets/zeta.nix'
             shared:
               - 'modules/**'
               - 'home/**'
               - 'lib/**'
+              - '!lib/secrets/glyph.nix'
+              - '!lib/secrets/spore.nix'
+              - '!lib/secrets/zeta.nix'
               - 'overlays/**'
               - 'packages/**'
               - 'flake.nix'
