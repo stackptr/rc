@@ -1,19 +1,145 @@
 {
   config,
   inputs,
+  lib,
   pkgs,
   ...
-}: {
+}: let
+  port = 8888;
+  baseUrl = "http://127.0.0.1:${toString port}";
+
+  # Shared model defaults
+  defaultCapabilities = {
+    file_context = true;
+    vision = true;
+    file_upload = true;
+    web_search = true;
+    image_generation = true;
+    code_interpreter = true;
+    citations = true;
+    status_updates = true;
+    builtin_tools = true;
+  };
+
+  defaultBuiltinTools = {
+    time = true;
+    memory = true;
+    chats = true;
+    notes = true;
+    knowledge = true;
+    channels = true;
+    web_search = true;
+    image_generation = true;
+    code_interpreter = true;
+  };
+
+  defaultMeta = {
+    capabilities = defaultCapabilities;
+    toolIds = ["server:mcp:glyph"];
+    defaultFeatureIds = ["web_search" "code_interpreter"];
+    builtinTools = defaultBuiltinTools;
+  };
+
+  # Active models — listed models are enabled with full config.
+  # All other models from the API provider are deactivated automatically.
+  models = {
+    "claude-sonnet-4-6" = {};
+    "claude-opus-4-6" = {};
+    "claude-haiku-4-5-20251001" = {};
+  };
+
+  modelIds = builtins.toJSON (builtins.attrNames models);
+in {
   age.secrets.open-webui-env.file = ./../secrets/open-webui-env.age;
+  age.secrets.open-webui-api-key = {
+    file = ./../secrets/open-webui-api-key.age;
+    mode = "440";
+  };
 
   systemd.services.open-webui.restartTriggers = [config.age.secrets.open-webui-env.file];
+
+  # Sync model configuration after open-webui starts
+  systemd.timers.open-webui-model-sync = {
+    description = "Trigger Open WebUI model sync";
+    wantedBy = ["timers.target"];
+    restartTriggers = [(builtins.hashString "sha256" (builtins.toJSON models))];
+    timerConfig.OnActiveSec = "10s";
+  };
+
+  systemd.services.open-webui-model-sync = {
+    description = "Sync model configuration with Open WebUI";
+    after = ["open-webui.service"];
+    requires = ["open-webui.service"];
+    restartIfChanged = false;
+    path = [pkgs.curl pkgs.jq];
+    script = let
+      mkModelForm = id: attrs:
+        builtins.toJSON {
+          inherit id;
+          is_active = true;
+          name = attrs.name or id;
+          meta = defaultMeta // (attrs.meta or {});
+          params = {function_calling = "native";} // (attrs.params or {});
+        };
+
+      mkModelUpdate = id: attrs: let
+        form = mkModelForm id attrs;
+      in ''
+        update_model "${id}" '${form}' &
+      '';
+    in ''
+      API_KEY=$(cat ${config.age.secrets.open-webui-api-key.path})
+      ACTIVE_IDS='${modelIds}'
+
+      update_model() {
+        local id=$1 form=$2
+        echo "Configuring $id..."
+        http_code=$(curl -s -o /dev/null -w '%{http_code}' -X POST \
+          -H "Authorization: Bearer $API_KEY" \
+          -H "Content-Type: application/json" \
+          -d "$form" \
+          "${baseUrl}/api/v1/models/model/update")
+
+        if [ "$http_code" = "200" ]; then
+          echo "$id: updated."
+        else
+          echo "ERROR: failed to update $id (HTTP $http_code)"
+        fi
+      }
+
+      # Wait for open-webui to be ready
+      for i in $(seq 1 30); do
+        if curl -sf "${baseUrl}/api/models" -H "Authorization: Bearer $API_KEY" >/dev/null 2>&1; then
+          break
+        fi
+        echo "Waiting for Open WebUI (attempt $i/30)..."
+        sleep 2
+      done
+
+      # Activate and configure listed models
+      ${lib.concatStringsSep "\n" (lib.mapAttrsToList mkModelUpdate models)}
+      wait
+
+      # Deactivate all unlisted models that are currently active
+      curl -sf -H "Authorization: Bearer $API_KEY" \
+        "${baseUrl}/api/v1/models/list" \
+        | jq -r '.data[] | select(.is_active == true) | .id' \
+        | while read -r id; do
+            if ! echo "$ACTIVE_IDS" | jq -e --arg id "$id" 'index($id)' >/dev/null 2>&1; then
+              curl -sf -X POST -H "Authorization: Bearer $API_KEY" \
+                "${baseUrl}/api/v1/models/model/toggle?id=$id" >/dev/null 2>&1
+              echo "$id: deactivated."
+            fi
+          done
+    '';
+  };
 
   services.open-webui = {
     enable = true;
     package = pkgs.open-webui.overridePythonAttrs (old: {
       dependencies = old.dependencies ++ old.optional-dependencies.postgres;
     });
-    port = 8888;
+    inherit port;
     host = "0.0.0.0";
     environmentFile = config.age.secrets.open-webui-env.path;
     environment = {
