@@ -79,7 +79,7 @@ in {
           is_active = true;
           name = attrs.name or id;
           meta = defaultMeta // (attrs.meta or {});
-          params = attrs.params or {};
+          params = {function_calling = "native";} // (attrs.params or {});
         };
 
       mkModelUpdate = id: attrs: let
