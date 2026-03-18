@@ -198,8 +198,8 @@ in {
       TOOL_SERVER_CONNECTIONS = builtins.toJSON [
         {
           type = "mcp";
-          url = "http://localhost:8090";
-          path = "mcp";
+          url = "http://localhost:8090/mcp";
+          path = "";
           auth_type = "none";
           key = "";
           config.enable = true;
