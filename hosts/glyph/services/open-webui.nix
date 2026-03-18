@@ -94,6 +94,7 @@ in {
       update_model() {
         local id=$1 form=$2
         echo "Configuring $id..."
+        # Try update first; if model has no DB entry yet, create it
         http_code=$(curl -s -o /dev/null -w '%{http_code}' -X POST \
           -H "Authorization: Bearer $API_KEY" \
           -H "Content-Type: application/json" \
@@ -102,6 +103,18 @@ in {
 
         if [ "$http_code" = "200" ]; then
           echo "$id: updated."
+        elif [ "$http_code" = "401" ]; then
+          # Model has no DB entry — create it
+          http_code=$(curl -s -o /dev/null -w '%{http_code}' -X POST \
+            -H "Authorization: Bearer $API_KEY" \
+            -H "Content-Type: application/json" \
+            -d "$form" \
+            "${baseUrl}/api/v1/models/create")
+          if [ "$http_code" = "200" ] || [ "$http_code" = "201" ]; then
+            echo "$id: created."
+          else
+            echo "ERROR: failed to create $id (HTTP $http_code)"
+          fi
         else
           echo "ERROR: failed to update $id (HTTP $http_code)"
         fi
@@ -121,16 +134,21 @@ in {
       wait
 
       # Deactivate all unlisted models that are currently active
-      curl -sf -H "Authorization: Bearer $API_KEY" \
-        "${baseUrl}/api/v1/models/list" \
-        | jq -r '.data[] | select(.is_active == true) | .id' \
-        | while read -r id; do
-            if ! echo "$ACTIVE_IDS" | jq -e --arg id "$id" 'index($id)' >/dev/null 2>&1; then
-              curl -sf -X POST -H "Authorization: Bearer $API_KEY" \
-                "${baseUrl}/api/v1/models/model/toggle?id=$id" >/dev/null 2>&1
-              echo "$id: deactivated."
-            fi
-          done
+      all_models=$(curl -sf -H "Authorization: Bearer $API_KEY" \
+        "${baseUrl}/api/v1/models/list" 2>/dev/null)
+      if [ -n "$all_models" ]; then
+        echo "$all_models" \
+          | jq -r '.data[] | select(.is_active == true) | .id' \
+          | while read -r id; do
+              if ! echo "$ACTIVE_IDS" | jq -e --arg id "$id" 'index($id)' >/dev/null 2>&1; then
+                curl -sf -X POST -H "Authorization: Bearer $API_KEY" \
+                  "${baseUrl}/api/v1/models/model/toggle?id=$id" >/dev/null 2>&1
+                echo "$id: deactivated."
+              fi
+            done
+      else
+        echo "WARNING: could not fetch model list for deactivation"
+      fi
     '';
   };
 
