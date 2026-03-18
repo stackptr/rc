@@ -135,10 +135,10 @@ in {
 
       # Deactivate all unlisted models that are currently active
       all_models=$(curl -sf -H "Authorization: Bearer $API_KEY" \
-        "${baseUrl}/api/v1/models/list" 2>/dev/null)
+        "${baseUrl}/api/models" 2>/dev/null)
       if [ -n "$all_models" ]; then
         echo "$all_models" \
-          | jq -r '.data[] | select(.is_active == true) | .id' \
+          | jq -r '.data[] | select(.info.is_active == true or .info == null) | .id' \
           | while read -r id; do
               if ! echo "$ACTIVE_IDS" | jq -e --arg id "$id" 'index($id)' >/dev/null 2>&1; then
                 curl -sf -X POST -H "Authorization: Bearer $API_KEY" \
