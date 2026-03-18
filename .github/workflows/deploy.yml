@@ -71,7 +71,7 @@ jobs:
             if [[ "$host" == "all" ]]; then
               echo "matrix={\"include\":$all}" >> "$GITHUB_OUTPUT"
             else
-              echo "matrix={\"include\":$(echo "$all" | jq --arg h "$host" '[.[] | select(.host == $h)]')}" >> "$GITHUB_OUTPUT"
+              echo "matrix={\"include\":$(echo "$all" | jq -c --arg h "$host" '[.[] | select(.host == $h)]')}" >> "$GITHUB_OUTPUT"
             fi
             exit 0
           fi
@@ -84,13 +84,13 @@ jobs:
 
           selected="[]"
           if [[ "${{ steps.filter.outputs.glyph }}" == "true" ]]; then
-            selected=$(echo "$selected" | jq '. + [{"host":"glyph","system":"x86_64-linux","runner":"ubuntu-latest"}]')
+            selected=$(echo "$selected" | jq -c '. + [{"host":"glyph","system":"x86_64-linux","runner":"ubuntu-latest"}]')
           fi
           if [[ "${{ steps.filter.outputs.spore }}" == "true" ]]; then
-            selected=$(echo "$selected" | jq '. + [{"host":"spore","system":"x86_64-linux","runner":"ubuntu-latest"}]')
+            selected=$(echo "$selected" | jq -c '. + [{"host":"spore","system":"x86_64-linux","runner":"ubuntu-latest"}]')
           fi
           if [[ "${{ steps.filter.outputs.zeta }}" == "true" ]]; then
-            selected=$(echo "$selected" | jq '. + [{"host":"zeta","system":"aarch64-linux","runner":"ubuntu-24.04-arm"}]')
+            selected=$(echo "$selected" | jq -c '. + [{"host":"zeta","system":"aarch64-linux","runner":"ubuntu-24.04-arm"}]')
           fi
 
           # Fallback: deploy all if no specific hosts matched
