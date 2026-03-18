@@ -52,12 +52,12 @@ jobs:
             shared:
               - 'modules/**'
               - 'home/**'
-              - 'lib/**'
-              - '!lib/secrets/glyph.nix'
-              - '!lib/secrets/spore.nix'
-              - '!lib/secrets/zeta.nix'
+              - 'lib/*'
+              - 'lib/secrets/default.nix'
+              - 'lib/secrets/home.nix'
               - 'overlays/**'
               - 'packages/**'
+              - 'secrets/**'
               - 'flake.nix'
               - 'flake.lock'
 
