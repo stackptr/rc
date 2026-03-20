@@ -10,6 +10,7 @@
     ./dns.nix
     ./filebrowser.nix
     ./jellyfin.nix
+    ./loki.nix
     ./nfs.nix
     ./open-terminal.nix
     ./open-webui.nix
