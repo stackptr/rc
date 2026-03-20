@@ -10,9 +10,20 @@
     enable = true;
     web.enable = true;
     web.extraArgs = ["--port" "8890" "--hostname" "0.0.0.0"];
-    settings.server = {
-      port = 8890;
-      hostname = "0.0.0.0";
+    settings = {
+      model = "anthropic/claude-opus-4-6";
+      small_model = "anthropic/claude-haiku-4-5";
+      enabled_providers = ["anthropic"];
+      autoupdate = false;
+      share = "disabled";
+      server = {
+        port = 8890;
+        hostname = "0.0.0.0";
+      };
+      mcp.glyph = {
+        type = "remote";
+        url = "http://127.0.0.1:8090/mcp";
+      };
     };
   };
 
