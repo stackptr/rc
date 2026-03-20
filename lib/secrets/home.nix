@@ -3,4 +3,5 @@ let
 in {
   "home/secrets/aichat-env.age".publicKeys = keys;
   "home/secrets/claude-code-api-key.age".publicKeys = keys;
+  "home/secrets/opencode-env.age".publicKeys = keys;
 }

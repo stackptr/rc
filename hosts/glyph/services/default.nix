@@ -12,7 +12,6 @@
     ./jellyfin.nix
     ./nfs.nix
     ./open-terminal.nix
-    ./opencode.nix
     ./open-webui.nix
     ./prometheus.nix
     ./samba.nix
