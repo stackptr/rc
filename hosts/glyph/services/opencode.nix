@@ -16,10 +16,13 @@ in {
     wants = ["network-online.target"];
     wantedBy = ["multi-user.target"];
 
+    environment.HOME = "/var/lib/opencode";
+
     serviceConfig = {
       Type = "simple";
       DynamicUser = true;
       StateDirectory = "opencode";
+      CacheDirectory = "opencode";
       WorkingDirectory = "/var/lib/opencode";
       EnvironmentFile = config.age.secrets.opencode-env.path;
       ExecStart = "${pkgs.opencode}/bin/opencode web --port ${toString port} --hostname 0.0.0.0";
