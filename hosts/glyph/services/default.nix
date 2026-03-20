@@ -21,7 +21,6 @@
   users.users.mu.extraGroups = ["media"];
   users.users.${config.services.transmission.user}.extraGroups = ["media"];
 
-  services.cockpit.enable = true;
   services.openssh.enable = true;
   services.roon-server = {
     enable = true;
