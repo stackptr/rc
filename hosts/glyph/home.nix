@@ -1,9 +1,27 @@
 {
+  config,
   pkgs,
   pkgs-stable,
   ...
 }: {
   home.packages = [pkgs.mktorrent];
+
+  programs.opencode = {
+    enable = true;
+    web.enable = true;
+    web.extraArgs = ["--port" "8890" "--hostname" "0.0.0.0"];
+    settings.server = {
+      port = 8890;
+      hostname = "0.0.0.0";
+    };
+  };
+
+  systemd.user.services.opencode-web.Service.EnvironmentFile =
+    config.age.secrets.opencode-env.path;
+
+  age.secrets.opencode-env = {
+    file = ../../home/secrets/opencode-env.age;
+  };
 
   programs.beets = {
     enable = true;
