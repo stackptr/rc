@@ -1,5 +1,6 @@
 {
   config,
+  llm-profile,
   pkgs,
   pkgs-stable,
   ...
@@ -10,6 +11,7 @@
     enable = true;
     web.enable = true;
     web.extraArgs = ["--port" "8890" "--hostname" "0.0.0.0"];
+    rules = builtins.readFile "${llm-profile}/README.md";
     settings = {
       model = "anthropic/claude-opus-4-6";
       small_model = "anthropic/claude-haiku-4-5";
