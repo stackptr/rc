@@ -1,4 +1,4 @@
-{_}: {
+_: {
   services.alloy.enable = true;
 
   environment.etc."alloy/config.alloy".text = ''

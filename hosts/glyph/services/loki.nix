@@ -1,4 +1,4 @@
-{_}: {
+_: {
   services.loki = {
     enable = true;
     configuration = {
