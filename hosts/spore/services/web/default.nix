@@ -90,6 +90,15 @@
           proxyWebsockets = true;
         };
       };
+      "code.zx.dev" = {
+        forceSSL = true;
+        useACMEHost = "zx.dev";
+        requireAuth = true;
+        locations."/" = {
+          proxyPass = "http://glyph.rove-duck.ts.net:8890";
+          proxyWebsockets = true;
+        };
+      };
       "cache.zx.dev" = {
         forceSSL = true;
         useACMEHost = "zx.dev";
