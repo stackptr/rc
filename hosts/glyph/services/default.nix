@@ -4,6 +4,7 @@
   ...
 }: {
   imports = [
+    ./alloy.nix
     ./attic.nix
     ./db.nix
     ./avahi.nix
