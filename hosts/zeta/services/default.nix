@@ -4,6 +4,7 @@
   ...
 }: {
   imports = [
+    ./alloy.nix
     ./home-assistant.nix
     ./homebridge.nix
     ./znc.nix

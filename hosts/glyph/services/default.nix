@@ -4,12 +4,14 @@
   ...
 }: {
   imports = [
+    ./alloy.nix
     ./attic.nix
     ./db.nix
     ./avahi.nix
     ./dns.nix
     ./filebrowser.nix
     ./jellyfin.nix
+    ./loki.nix
     ./nfs.nix
     ./open-terminal.nix
     ./open-webui.nix
@@ -21,7 +23,6 @@
   users.users.mu.extraGroups = ["media"];
   users.users.${config.services.transmission.user}.extraGroups = ["media"];
 
-  services.cockpit.enable = true;
   services.openssh.enable = true;
   services.roon-server = {
     enable = true;

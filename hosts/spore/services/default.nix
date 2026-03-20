@@ -4,6 +4,7 @@
   ...
 }: {
   imports = [
+    ./alloy.nix
     ./grafana.nix
     ./homepage-dashboard.nix
     ./mastodon.nix
