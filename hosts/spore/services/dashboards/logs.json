@@ -180,17 +180,19 @@
   "templating": {
     "list": [
       {
-        "current": {},
+        "current": { "selected": true, "text": "All", "value": "$__all" },
         "hide": 0,
         "includeAll": true,
+        "allValue": ".*",
         "label": "Host",
         "multi": true,
         "name": "host",
         "options": [],
-        "query": "label_values({}, host)",
+        "query": "label_values(host)",
         "refresh": 2,
         "regex": "",
-        "type": "query"
+        "type": "query",
+        "datasource": { "type": "loki", "uid": "${datasource}" }
       },
       {
         "current": { "selected": false, "text": "", "value": "" },
