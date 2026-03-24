@@ -1,5 +1,6 @@
 {
   imports = [
+    ./agent-sandbox.nix
     ./basic-memory.nix
     ./graphite-mcp.nix
     ./kagi.nix
