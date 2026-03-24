@@ -4,6 +4,7 @@
   ...
 }: {
   imports = [
+    ./agentsview.nix
     ./attic.nix
     ./db.nix
     ./avahi.nix
