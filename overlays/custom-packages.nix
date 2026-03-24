@@ -1,6 +1,9 @@
 # Custom package definitions
 # These are packages not available in nixpkgs or requiring customization
 self: super: {
+  # Agentsview session viewer
+  agentsview = super.callPackage ./../packages/agentsview/package.nix {};
+
   # Claude desktop app
   claude-desktop = super.callPackage ./../packages/claude-desktop/package.nix {};
 
