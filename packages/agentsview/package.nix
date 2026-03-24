@@ -1,7 +1,7 @@
 {
   lib,
   stdenv,
-  fetchurl,
+  fetchzip,
   autoPatchelfHook,
 }: let
   version = "0.15.0";
@@ -17,13 +17,11 @@
     };
   };
 
-  src = fetchurl (sources.${stdenv.hostPlatform.system} or (throw "unsupported system: ${stdenv.hostPlatform.system}"));
+  src = fetchzip (sources.${stdenv.hostPlatform.system} or (throw "unsupported system: ${stdenv.hostPlatform.system}"));
 in
   stdenv.mkDerivation {
     pname = "agentsview";
     inherit version src;
-
-    sourceRoot = ".";
 
     nativeBuildInputs = lib.optionals stdenv.hostPlatform.isLinux [autoPatchelfHook];
 
