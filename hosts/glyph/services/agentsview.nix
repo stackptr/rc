@@ -9,6 +9,15 @@
     url = "postgres://agentsview@localhost:5432/agentsview?sslmode=disable"
     machine_name = "glyph"
   '';
+
+  # pg push starts a watcher after syncing; wrap it to exit after sync
+  pgPushScript = pkgs.writeShellScript "agentsview-pg-push" ''
+    ${pkgs.agentsview}/bin/agentsview pg push &
+    PID=$!
+    # Wait for sync to complete, then kill the watcher
+    sleep 15
+    kill $PID 2>/dev/null || true
+  '';
 in {
   # Serve the aggregated team dashboard from PostgreSQL
   systemd.services.agentsview = {
@@ -16,6 +25,10 @@ in {
     after = ["postgresql.service"];
     requires = ["postgresql.service"];
     wantedBy = ["multi-user.target"];
+    preStart = ''
+      mkdir -p /var/lib/agentsview/.agentsview
+      cp ${configFile} /var/lib/agentsview/.agentsview/config.toml
+    '';
     serviceConfig = {
       ExecStart = "${pkgs.agentsview}/bin/agentsview pg serve -host 127.0.0.1 -port ${toString port}";
       DynamicUser = true;
@@ -24,7 +37,6 @@ in {
       StateDirectory = "agentsview";
       RuntimeDirectory = "agentsview";
       Environment = "HOME=/var/lib/agentsview";
-      ExecStartPre = "+${pkgs.coreutils}/bin/install -Dm640 -o agentsview -g agentsview ${configFile} /var/lib/agentsview/.agentsview/config.toml";
       Restart = "on-failure";
       RestartSec = 5;
     };
@@ -47,10 +59,11 @@ in {
     requires = ["postgresql.service"];
     serviceConfig = {
       Type = "oneshot";
-      ExecStart = "${pkgs.agentsview}/bin/agentsview pg push";
+      ExecStart = pgPushScript;
       User = "mu";
       Group = "users";
       Environment = "HOME=/home/mu";
+      TimeoutStartSec = 60;
     };
   };
 }
