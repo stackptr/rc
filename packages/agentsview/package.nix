@@ -9,7 +9,7 @@
   sources = {
     x86_64-linux = {
       url = "https://github.com/wesm/agentsview/releases/download/v${version}/agentsview_${version}_linux_amd64.tar.gz";
-      hash = "sha256-Ycq5fkkUCxQ6SXXdUx5Sel7lOur8E0UieoBEca1R61g=";
+      hash = "sha256-Phrza30+s8ag9AZtWD0jvQ3Q5iwaOgnKr7aYS7AIKGA=";
     };
     aarch64-darwin = {
       url = "https://github.com/wesm/agentsview/releases/download/v${version}/agentsview_${version}_darwin_arm64.tar.gz";
