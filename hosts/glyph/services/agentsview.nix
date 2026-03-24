@@ -25,10 +25,6 @@ in {
     after = ["postgresql.service"];
     requires = ["postgresql.service"];
     wantedBy = ["multi-user.target"];
-    preStart = ''
-      mkdir -p /var/lib/agentsview/.agentsview
-      cp ${configFile} /var/lib/agentsview/.agentsview/config.toml
-    '';
     serviceConfig = {
       ExecStart = "${pkgs.agentsview}/bin/agentsview pg serve -host 127.0.0.1 -port ${toString port}";
       DynamicUser = true;
@@ -37,6 +33,13 @@ in {
       StateDirectory = "agentsview";
       RuntimeDirectory = "agentsview";
       Environment = "HOME=/var/lib/agentsview";
+      ExecStartPre = let
+        script = pkgs.writeShellScript "agentsview-setup" ''
+          mkdir -p /var/lib/agentsview/.agentsview
+          cp ${configFile} /var/lib/agentsview/.agentsview/config.toml
+          chown -R agentsview:agentsview /var/lib/agentsview/.agentsview
+        '';
+      in "+${script}";
       Restart = "on-failure";
       RestartSec = 5;
     };
