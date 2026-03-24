@@ -98,6 +98,13 @@
             };
           }
           {
+            "Agentsview" = {
+              description = "AI agent session viewer";
+              href = "https://agents.zx.dev";
+              icon = "sh-agentsview";
+            };
+          }
+          {
             "Open WebUI" = {
               description = "AI chat interface";
               href = "https://chat.zx.dev";

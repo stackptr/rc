@@ -103,6 +103,12 @@
           '';
         };
       };
+      "agents.zx.dev" = {
+        forceSSL = true;
+        useACMEHost = "zx.dev";
+        requireAuth = true;
+        locations."/".proxyPass = "http://glyph.rove-duck.ts.net:8095";
+      };
       "jellyfin.zx.dev" = {
         forceSSL = true;
         useACMEHost = "zx.dev";
