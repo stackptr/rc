@@ -13,7 +13,7 @@
     };
     aarch64-darwin = {
       url = "https://github.com/wesm/agentsview/releases/download/v${version}/agentsview_${version}_darwin_arm64.tar.gz";
-      hash = "sha256-OCEqzRoozWklgajOHNwATSl+aCeog82xds3U+ElRw2g=";
+      hash = "sha256-YQ15t98gktHEw/OfaOja7/DzTXkgBxxwre+dLLV0pw0=";
     };
   };
 
