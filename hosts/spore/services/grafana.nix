@@ -73,6 +73,12 @@
           isDefault = true;
           editable = false;
         }
+        {
+          name = "Loki";
+          type = "loki";
+          url = "http://glyph.rove-duck.ts.net:3100";
+          editable = false;
+        }
       ];
     };
   };

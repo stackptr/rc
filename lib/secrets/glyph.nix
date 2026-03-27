@@ -9,6 +9,7 @@ in {
   "hosts/glyph/secrets/open-terminal-env.age".publicKeys = keys;
   "hosts/glyph/secrets/open-webui-api-key.age".publicKeys = keys;
   "hosts/glyph/secrets/open-webui-env.age".publicKeys = keys;
+  "hosts/glyph/secrets/grafana-mcp-token.age".publicKeys = keys;
   "hosts/glyph/secrets/graphite-auth-token.age".publicKeys = keys;
   "hosts/glyph/secrets/attic-credentials.age".publicKeys = keys;
 }

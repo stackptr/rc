@@ -4,12 +4,14 @@
   ...
 }: {
   imports = [
+    ./alloy.nix
     ./attic.nix
     ./db.nix
     ./avahi.nix
     ./dns.nix
     ./filebrowser.nix
     ./jellyfin.nix
+    ./loki.nix
     ./nfs.nix
     ./open-terminal.nix
     ./open-webui.nix
@@ -21,7 +23,6 @@
   users.users.mu.extraGroups = ["media"];
   users.users.${config.services.transmission.user}.extraGroups = ["media"];
 
-  services.cockpit.enable = true;
   services.openssh.enable = true;
   services.roon-server = {
     enable = true;
@@ -77,6 +78,13 @@
     mode = "440";
   };
 
+  age.secrets.grafana-mcp-token = {
+    file = ./../secrets/grafana-mcp-token.age;
+    mode = "440";
+    owner = "grafana-mcp";
+    group = "grafana-mcp";
+  };
+
   age.secrets.graphite-auth-token = {
     file = ./../secrets/graphite-auth-token.age;
     mode = "440";
@@ -99,6 +107,11 @@
     enable = true;
     environmentFile = config.age.secrets.kagi-api-key.path;
   };
+  services.grafana-mcp = {
+    enable = true;
+    grafanaUrl = "https://grafana.zx.dev";
+    tokenFile = config.age.secrets.grafana-mcp-token.path;
+  };
   services.graphite-mcp = {
     enable = true;
     authTokenFile = config.age.secrets.graphite-auth-token.path;
@@ -116,6 +129,10 @@
     servers.kagi = {
       url = "http://127.0.0.1:8093/mcp";
       description = "Kagi web search and page summarization";
+    };
+    servers.grafana = {
+      url = "http://127.0.0.1:8095/mcp";
+      description = "Grafana dashboards, Loki logs, and Prometheus metrics";
     };
     servers.graphite = {
       url = "http://127.0.0.1:8094/mcp";
