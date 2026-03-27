@@ -40,7 +40,6 @@ in {
           model = "opus";
           # Disabled in favor of Basic Memory MCP for cross-device access
           autoMemoryEnabled = false;
-          enabledMcpjsonServers = ["linear" "figma"];
           permissions = {
             allow = [
               # File exploration
