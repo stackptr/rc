@@ -117,6 +117,56 @@
         useACMEHost = "zx.dev";
         locations."/".proxyPass = "http://glyph.rove-duck.ts.net:8096";
       };
+      "mcp.zx.dev" = {
+        forceSSL = true;
+        useACMEHost = "zx.dev";
+        locations = {
+          "= /.well-known/oauth-protected-resource" = {
+            extraConfig = ''
+              default_type application/json;
+              add_header Access-Control-Allow-Origin '*' always;
+              add_header Cache-Control 'public, max-age=3600' always;
+              return 200 '${builtins.toJSON {
+                resource = "https://mcp.zx.dev";
+                authorization_servers = ["https://id.zx.dev"];
+                scopes_supported = ["openid" "profile" "email"];
+                bearer_methods_supported = ["header"];
+              }}';
+            '';
+          };
+          "= /oauth2/auth" = {
+            proxyPass = "http://127.0.0.1:4180";
+            extraConfig = ''
+              proxy_set_header X-Original-URI $request_uri;
+              proxy_set_header X-Real-IP $remote_addr;
+              proxy_set_header X-Forwarded-Proto $scheme;
+              proxy_set_header X-Forwarded-Host $host;
+              proxy_set_header Content-Length "";
+              proxy_pass_request_body off;
+            '';
+          };
+          "@mcp_unauthorized" = {
+            extraConfig = ''
+              default_type application/json;
+              add_header WWW-Authenticate 'Bearer resource_metadata="https://mcp.zx.dev/.well-known/oauth-protected-resource"' always;
+              return 401 '{"error":"unauthorized","error_description":"Bearer token required"}';
+            '';
+          };
+          "/" = {
+            proxyPass = "http://glyph.rove-duck.ts.net:8090";
+            extraConfig = ''
+              auth_request /oauth2/auth;
+              error_page 401 = @mcp_unauthorized;
+
+              # Pass auth info to upstream
+              auth_request_set $auth_user $upstream_http_x_auth_request_user;
+              auth_request_set $auth_email $upstream_http_x_auth_request_email;
+              proxy_set_header X-Auth-User $auth_user;
+              proxy_set_header X-Auth-Email $auth_email;
+            '';
+          };
+        };
+      };
     };
   };
 
