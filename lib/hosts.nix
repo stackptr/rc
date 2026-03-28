@@ -1,7 +1,8 @@
 inputs @ {
   self,
   nixpkgs,
-  nixpkgs-stable,
+  nixpkgs-stable-25-11,
+  nixpkgs-stable-24-05,
   agenix,
   home-manager,
   nix-darwin,
@@ -26,7 +27,8 @@ inputs @ {
     showBatteryStatus,
     lightweight ? false,
   }: let
-    pkgs-stable = import nixpkgs-stable {inherit system;};
+    pkgs-stable-25-11 = import nixpkgs-stable-25-11 {inherit system;};
+    pkgs-stable-24-05 = import nixpkgs-stable-24-05 {inherit system;};
     hostHomePath = ./../hosts/${hostname}/home.nix;
     hostHomeConfig =
       if builtins.pathExists hostHomePath
@@ -46,7 +48,7 @@ inputs @ {
         ++ nixpkgs.lib.optionals (hostHomeConfig != null) [hostHomeConfig];
     };
     home-manager.extraSpecialArgs = {
-      inherit hostname lightweight llm-profile pkgs-stable showBatteryStatus;
+      inherit hostname lightweight llm-profile pkgs-stable-25-11 pkgs-stable-24-05 showBatteryStatus;
     };
   };
 
@@ -60,7 +62,8 @@ inputs @ {
       inherit system;
       specialArgs = {
         inherit inputs keys username hostname;
-        pkgs-stable = import nixpkgs-stable {inherit system;};
+        pkgs-stable-25-11 = import nixpkgs-stable-25-11 {inherit system;};
+        pkgs-stable-24-05 = import nixpkgs-stable-24-05 {inherit system;};
       };
       modules = [
         {environment.systemPackages = [agenix.packages.${system}.default];}
@@ -94,7 +97,8 @@ inputs @ {
       inherit system;
       specialArgs = {
         inherit inputs self keys username hostname;
-        pkgs-stable = import nixpkgs-stable {inherit system;};
+        pkgs-stable-25-11 = import nixpkgs-stable-25-11 {inherit system;};
+        pkgs-stable-24-05 = import nixpkgs-stable-24-05 {inherit system;};
         nixDarwin = nix-darwin;
       };
       modules = [

@@ -2,7 +2,7 @@
   config,
   llm-profile,
   pkgs,
-  pkgs-stable,
+  pkgs-stable-25-11,
   ...
 }: {
   home.packages = [pkgs.mktorrent];
@@ -38,7 +38,7 @@
 
   programs.beets = {
     enable = true;
-    package = pkgs-stable.beets;
+    package = pkgs-stable-25-11.beets;
     settings = {
       directory = "/mnt/media/Music";
       import = {

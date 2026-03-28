@@ -2,7 +2,6 @@
   config,
   lib,
   pkgs,
-  pkgs-stable,
   ...
 }: let
   inherit (lib) mkIf mkOption;
@@ -81,7 +80,7 @@ in {
 
       programs.yt-dlp = {
         enable = true;
-        package = pkgs-stable.yt-dlp;
+        package = pkgs.yt-dlp;
       };
     })
 
