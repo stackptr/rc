@@ -34,15 +34,8 @@
     };
   };
 
-  # Allow oauth2-proxy to validate JWT Bearer tokens for MCP proxy.
-  # Register a client in Pocket ID for Claude with redirect URIs:
-  #   - https://claude.ai/api/mcp/auth_callback
-  #   - https://claude.com/api/mcp/auth_callback
-  # Then set the client ID below.
   services.oauth2-proxy.extraConfig = {
     skip-jwt-bearer-tokens = true;
-    # Format: issuer=audience (audience = Pocket ID client ID for Claude MCP)
-    # TODO: Replace placeholder with actual client ID after registering in Pocket ID
     extra-jwt-issuers = "https://id.zx.dev=claude-mcp";
   };
 }
