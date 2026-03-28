@@ -1,7 +1,7 @@
 {
   config,
   pkgs,
-  pkgs-stable,
+  pkgs-stable-24-05,
   ...
 }: {
   age.secrets.pushover-user-token = {
@@ -20,7 +20,7 @@
 
   services.transmission = {
     enable = true;
-    package = pkgs-stable.transmission_4;
+    package = pkgs-stable-24-05.transmission_4;
     settings = {
       download-dir = "/mnt/torrents/complete";
       incomplete-dir = "/mnt/torrents/incomplete";

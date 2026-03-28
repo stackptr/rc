@@ -494,7 +494,7 @@
         "type": "github"
       }
     },
-    "nixpkgs-stable_2": {
+    "nixpkgs-stable-24-05": {
       "locked": {
         "lastModified": 1735563628,
         "narHash": "sha256-OnSAY7XDSx7CtDoqNh8jwVwh4xNL/2HaJxGjryLWzX8=",
@@ -506,6 +506,22 @@
       "original": {
         "owner": "nixos",
         "ref": "nixos-24.05",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "nixpkgs-stable-25-11": {
+      "locked": {
+        "lastModified": 1774388614,
+        "narHash": "sha256-tFwzTI0DdDzovdE9+Ras6CUss0yn8P9XV4Ja6RjA+nU=",
+        "owner": "nixos",
+        "repo": "nixpkgs",
+        "rev": "1073dad219cb244572b74da2b20c7fe39cb3fa9e",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nixos",
+        "ref": "nixos-25.11",
         "repo": "nixpkgs",
         "type": "github"
       }
@@ -528,7 +544,8 @@
         "nix-index-database": "nix-index-database",
         "nixos-hardware": "nixos-hardware",
         "nixpkgs": "nixpkgs",
-        "nixpkgs-stable": "nixpkgs-stable_2",
+        "nixpkgs-stable-24-05": "nixpkgs-stable-24-05",
+        "nixpkgs-stable-25-11": "nixpkgs-stable-25-11",
         "systems": "systems_2",
         "zx-dev": "zx-dev"
       }
