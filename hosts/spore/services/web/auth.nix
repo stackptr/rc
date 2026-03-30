@@ -33,4 +33,9 @@
       keyFile = config.age.secrets.oauth2-proxy-env.path;
     };
   };
+
+  services.oauth2-proxy.extraConfig = {
+    skip-jwt-bearer-tokens = true;
+    extra-jwt-issuers = "https://id.zx.dev=claude-mcp";
+  };
 }
