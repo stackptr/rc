@@ -9,7 +9,6 @@
     mas
     mochi
     the-unarchiver
-    zoom-us
   ];
 
   homebrew = {

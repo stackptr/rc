@@ -16,6 +16,5 @@
       "roon-server"
       "soundsource"
       "the-unarchiver"
-      "zoom"
     ];
 }
