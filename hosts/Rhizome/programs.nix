@@ -8,7 +8,6 @@
     m-cli
     mas
     mochi
-    slack
     the-unarchiver
     zoom-us
   ];
