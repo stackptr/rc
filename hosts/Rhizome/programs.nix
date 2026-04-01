@@ -16,10 +16,6 @@
   homebrew = {
     enable = true;
     casks = [
-      {
-        name = "boltai";
-        greedy = true;
-      }
       "dash"
       "legcord"
       "nook"
