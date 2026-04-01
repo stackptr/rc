@@ -13,7 +13,6 @@
       "graphite-cli"
       "mochi"
       "open-webui"
-      "plexmediaserver"
       "roon-server"
       "soundsource"
       "the-unarchiver"

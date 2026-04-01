@@ -18,7 +18,6 @@
       "dash"
       "legcord"
       "nook"
-      "plex"
       "textual"
     ];
     # N.B.: Removed entries in `masApps` require manual uninstallation
