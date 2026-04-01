@@ -21,7 +21,6 @@
       "nook"
       "plex"
       "textual"
-      "whatsapp"
     ];
     # N.B.: Removed entries in `masApps` require manual uninstallation
     masApps = {
