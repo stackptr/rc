@@ -96,9 +96,4 @@
     enable = true;
     startOnActivation = true;
   };
-
-  programs.tailscale = {
-    enable = true;
-    startOnActivation = true;
-  };
 }
