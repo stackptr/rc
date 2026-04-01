@@ -22,10 +22,6 @@
       "plex"
       "textual"
       "whatsapp"
-
-      # Work apps
-      "linear-linear"
-      "notion"
     ];
     # N.B.: Removed entries in `masApps` require manual uninstallation
     masApps = {
