@@ -11,6 +11,5 @@
     ./roon.nix
     ./scroll-reverser.nix
     ./soundsource.nix
-    ./tailscale.nix
   ];
 }

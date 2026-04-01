@@ -13,11 +13,8 @@
       "graphite-cli"
       "mochi"
       "open-webui"
-      "plexmediaserver"
       "roon-server"
-      "slack"
       "soundsource"
       "the-unarchiver"
-      "zoom"
     ];
 }

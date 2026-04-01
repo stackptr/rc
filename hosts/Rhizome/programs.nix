@@ -8,28 +8,16 @@
     m-cli
     mas
     mochi
-    slack
     the-unarchiver
-    zoom-us
   ];
 
   homebrew = {
     enable = true;
     casks = [
-      {
-        name = "boltai";
-        greedy = true;
-      }
       "dash"
       "legcord"
       "nook"
-      "plex"
       "textual"
-      "whatsapp"
-
-      # Work apps
-      "linear-linear"
-      "notion"
     ];
     # N.B.: Removed entries in `masApps` require manual uninstallation
     masApps = {
@@ -105,11 +93,6 @@
   };
 
   programs.soundsource = {
-    enable = true;
-    startOnActivation = true;
-  };
-
-  programs.tailscale = {
     enable = true;
     startOnActivation = true;
   };

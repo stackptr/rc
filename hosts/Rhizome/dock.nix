@@ -19,7 +19,7 @@
       "/Applications/Things3.app"
       "/Applications/Craft.app"
       "/System/Applications/Messages.app"
-      "${pkgs.slack}/Applications/Slack.app"
+      "/Applications/Slack.app"
     ];
   };
 }
