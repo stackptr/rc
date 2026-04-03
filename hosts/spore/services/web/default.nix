@@ -45,6 +45,14 @@
           "/pgp".return = "302 https://keyoxide.org/hkp/413d1a0152bcb08d2e3ddacaf88c08579051ab48";
         };
       };
+      "n8n.zx.dev" = {
+        forceSSL = true;
+        useACMEHost = "zx.dev";
+        locations."/" = {
+          proxyPass = "http://glyph.rove-duck.ts.net:5678";
+          proxyWebsockets = true;
+        };
+      };
       "torrents.zx.dev" = {
         forceSSL = true;
         useACMEHost = "zx.dev";

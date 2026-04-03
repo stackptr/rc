@@ -12,6 +12,7 @@
       "fastscripts"
       "graphite-cli"
       "mochi"
+      "n8n"
       "open-webui"
       "roon-server"
       "soundsource"

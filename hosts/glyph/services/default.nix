@@ -12,6 +12,7 @@
     ./filebrowser.nix
     ./jellyfin.nix
     ./loki.nix
+    ./n8n.nix
     ./nfs.nix
     ./open-terminal.nix
     ./open-webui.nix
