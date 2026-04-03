@@ -18,6 +18,7 @@
     ./prometheus.nix
     ./samba.nix
     ./torrents.nix
+    ./windmill.nix
   ];
   users.groups.media = {};
   users.users.mu.extraGroups = ["media"];
