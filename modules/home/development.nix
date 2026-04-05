@@ -37,7 +37,7 @@ in {
           };
         };
         settings = {
-          model = "opus";
+          model = "sonnet";
           # Disabled in favor of Basic Memory MCP for cross-device access
           autoMemoryEnabled = false;
           permissions = {
