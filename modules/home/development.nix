@@ -27,15 +27,17 @@ in {
 
   config = lib.mkMerge [
     (mkIf cfg.ai.enable {
+      programs.mcp = {
+        enable = true;
+        servers.glyph = {
+          url = "http://glyph:8090/mcp";
+        };
+      };
+
       programs.claude-code = {
         enable = true;
+        enableMcpIntegration = true;
         memory.source = "${llm-profile}/README.md";
-        mcpServers = {
-          glyph = {
-            type = "http";
-            url = "http://glyph:8090/mcp";
-          };
-        };
         settings = {
           model = "sonnet";
           # Disabled in favor of Basic Memory MCP for cross-device access
