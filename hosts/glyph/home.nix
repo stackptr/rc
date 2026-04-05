@@ -23,6 +23,7 @@
         port = 8890;
         hostname = "0.0.0.0";
       };
+      plugin = ["${pkgs.opencode-claude-auth}"];
     };
   };
 
