@@ -42,6 +42,8 @@ in {
           autoMemoryEnabled = false;
           permissions = {
             allow = [
+              # Nix store (read-only access for inspecting derivations and build outputs)
+              "Read(/nix/store/*)"
               # File exploration
               "Bash(cat *)"
               "Bash(cut *)"
@@ -155,10 +157,19 @@ in {
               "Bash(gt restack*)"
               "Bash(gt sync*)"
               # System
-              "Bash(journalctl:*)"
+              "Bash(journalctl *)"
               "Bash(mkdir *)"
-              "Bash(systemctl list-jobs:*)"
-              "Bash(systemctl status:*)"
+              "Bash(systemctl cat *)"
+              "Bash(systemctl is-active *)"
+              "Bash(systemctl is-enabled *)"
+              "Bash(systemctl is-failed *)"
+              "Bash(systemctl list-jobs*)"
+              "Bash(systemctl list-sockets*)"
+              "Bash(systemctl list-timers*)"
+              "Bash(systemctl list-unit-files*)"
+              "Bash(systemctl list-units*)"
+              "Bash(systemctl show *)"
+              "Bash(systemctl status *)"
               "WebFetch(domain:raw.githubusercontent.com)"
               "WebFetch(domain:github.com)"
               "WebSearch"
