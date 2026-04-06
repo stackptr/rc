@@ -1,6 +1,9 @@
 # Custom package definitions
 # These are packages not available in nixpkgs or requiring customization
 self: super: {
+  # Pace-aware statusline for Claude Code
+  claude-pace = super.callPackage ./../packages/claude-pace/package.nix {};
+
   # Claude desktop app
   claude-desktop = super.callPackage ./../packages/claude-desktop/package.nix {};
 

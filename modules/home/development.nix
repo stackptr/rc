@@ -27,6 +27,11 @@ in {
 
   config = lib.mkMerge [
     (mkIf cfg.ai.enable {
+      programs.zsh.sessionVariables = {
+        # Disable claude-pace API fallback; rate limits come from stdin on CC >= 2.1.80
+        CLAUDE_PACE_API_FALLBACK = "0";
+      };
+
       programs.mcp = {
         enable = true;
         servers.glyph = {
@@ -42,6 +47,10 @@ in {
           model = "sonnet";
           # Disabled in favor of Basic Memory MCP for cross-device access
           autoMemoryEnabled = false;
+          statusLine = {
+            type = "command";
+            command = "${pkgs.claude-pace}/bin/claude-pace";
+          };
           permissions = {
             allow = [
               # Nix store (read-only access for inspecting derivations and build outputs)
