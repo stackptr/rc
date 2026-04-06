@@ -19,7 +19,7 @@
       enabled_providers = ["anthropic"];
       autoupdate = false;
       share = "disabled";
-      plugin = ["${pkgs.opencode-claude-auth}"];
+      plugin = ["${pkgs.opencode-claude-auth}/lib/node_modules/opencode-claude-auth"];
     };
   };
 
