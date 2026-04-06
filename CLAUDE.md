@@ -85,6 +85,18 @@ Custom packages and overlays are organized for clarity:
 
 - Branches should be scoped to a single host whenever possible. This keeps deploys independent and reduces risk of cross-host breakage.
 
+## Nix Commands
+
+Never use `nix <subcommand> .#<output>` — the `#` causes permission prompt failures. Use wrapper scripts instead:
+
+| Instead of | Use |
+|---|---|
+| `nix build .#foo` | `nix-flake build foo` |
+| `nix eval .#foo` | `nix-flake eval foo` |
+| `nix eval nixpkgs#foo` | `nixpkgs-eval foo` |
+| `nix run nixpkgs#foo` | `nixpkgs-run foo` |
+| `nix shell nixpkgs#foo` | `nixpkgs-shell foo` |
+
 ## Code style
 
 - All files should end with a newline.

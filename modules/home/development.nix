@@ -92,6 +92,9 @@ in {
               "Bash(nix store *)"
               "Bash(nix why-depends *)"
               "Bash(nix-flake *)"
+              "Bash(nixpkgs-eval *)"
+              "Bash(nixpkgs-run *)"
+              "Bash(nixpkgs-shell *)"
               # Git
               "Bash(git add *)"
               "Bash(git blame *)"
