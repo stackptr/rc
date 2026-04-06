@@ -9,6 +9,7 @@
 
   programs.opencode = {
     enable = true;
+    enableMcpIntegration = true;
     web.enable = true;
     web.extraArgs = ["--port" "8890" "--hostname" "0.0.0.0"];
     rules = builtins.readFile "${llm-profile}/README.md";
@@ -21,10 +22,6 @@
       server = {
         port = 8890;
         hostname = "0.0.0.0";
-      };
-      mcp.glyph = {
-        type = "remote";
-        url = "http://127.0.0.1:8090/mcp";
       };
     };
   };
