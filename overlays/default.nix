@@ -5,4 +5,7 @@
 
   # Fix Daisydisk ahead of upstream
   (import ./daisydisk.nix)
+
+  # Override opencode ahead of nixpkgs pin
+  (import ./opencode.nix)
 ]
