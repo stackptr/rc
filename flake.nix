@@ -121,6 +121,11 @@
             hostname = "Rhizome";
             username = "corey";
           };
+
+          Stroma = mkDarwinHost {
+            hostname = "Stroma";
+            username = "corey";
+          };
         };
 
         deploy = {
