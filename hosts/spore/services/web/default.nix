@@ -194,4 +194,11 @@
     };
   };
   users.users.nginx.extraGroups = ["acme"];
+
+  # Ensure nginx config reload (triggered during activation) waits for
+  # Tailscale so upstream hostnames resolve during nginx -t.
+  systemd.services.nginx-config-reload = {
+    after = ["tailscaled.service"];
+    wants = ["tailscaled.service"];
+  };
 }
