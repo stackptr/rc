@@ -8,6 +8,6 @@
   };
   system.primaryUser = "corey";
 
-  system.stateVersion = 4;
+  system.stateVersion = 5;
   nixpkgs.hostPlatform = "aarch64-darwin";
 }
