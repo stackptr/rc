@@ -36,11 +36,12 @@
         forceSSL = true;
         useACMEHost = "zx.dev";
         locations = {
-          "/.well-known/webfinger" = {
+          "= /.well-known/webfinger" = {
             extraConfig = ''
-              add_header Access-Control-Allow-Origin '*';
+              default_type application/jrd+json;
+              add_header Access-Control-Allow-Origin '*' always;
+              return 200 '{"subject":"$arg_resource","links":[{"rel":"http://openid.net/specs/connect/1.0/issuer","href":"https://id.zx.dev"}]}';
             '';
-            return = "301 https://pub.zx.dev$request_uri";
           };
           "/pgp".return = "302 https://keyoxide.org/hkp/413d1a0152bcb08d2e3ddacaf88c08579051ab48";
         };
