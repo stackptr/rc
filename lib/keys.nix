@@ -10,6 +10,7 @@ let
       "glyph"
       "Rhizome"
       "spore"
+      "Stroma"
       "zeta"
     ];
 in

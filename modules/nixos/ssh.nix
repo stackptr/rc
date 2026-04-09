@@ -15,6 +15,7 @@
   users.users.mu.openssh.authorizedKeys.keys = [
     keys.Rhizome
     keys.glyph
+    keys.Stroma
   ];
 
   security.pam.sshAgentAuth.authorizedKeysFiles = lib.mkForce ["/etc/ssh/authorized_keys.d/%u"];
