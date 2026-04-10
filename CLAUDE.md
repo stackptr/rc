@@ -47,6 +47,12 @@ nixos-rebuild switch --flake .#hostname        # Linux
 nixos-rebuild switch --flake .#spore --target-host root@spore --build-host localhost
 ```
 
+**Checking changes before committing:**
+```bash
+nix-flake eval nixosConfigurations.hostname.config.system.build.toplevel.drvPath
+```
+Evaluates a host's configuration without building it. Catches option conflicts and type errors fast — run this after editing any NixOS module or host config.
+
 **Flake management:**
 ```bash
 nix flake update --commit-lock-file
