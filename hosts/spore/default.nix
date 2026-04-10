@@ -50,5 +50,16 @@
     }
   ];
 
+  # Stricter GC due to limited disk space (30 GB)
+  nix.gc = {
+    dates = "daily";
+    options = "--delete-older-than 7d";
+  };
+
+  nix.settings = {
+    min-free = 1024 * 1024 * 1024; # 1 GB — trigger GC when free space drops below this
+    max-free = 5 * 1024 * 1024 * 1024; # 5 GB — stop GC once this much space is free
+  };
+
   system.stateVersion = "24.05";
 }
