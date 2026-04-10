@@ -52,8 +52,8 @@
 
   # Stricter GC due to limited disk space (30 GB)
   nix.gc = {
-    dates = "daily";
-    options = "--delete-older-than 7d";
+    dates = lib.mkForce "daily";
+    options = lib.mkForce "--delete-older-than 7d";
   };
 
   nix.settings = {
