@@ -180,13 +180,6 @@ in {
         virtualHosts.${cfg.issuer.host} = {
           forceSSL = true;
           inherit (cfg.issuer) useACMEHost;
-          locations."= /.well-known/webfinger" = {
-            extraConfig = ''
-              default_type application/jrd+json;
-              add_header Access-Control-Allow-Origin '*' always;
-              return 200 '{"subject":"$arg_resource","links":[{"rel":"http://openid.net/specs/connect/1.0/issuer","href":"https://${cfg.issuer.host}"}]}';
-            '';
-          };
           locations."/" = {
             proxyPass = "http://127.0.0.1:1411";
             proxyWebsockets = true;
