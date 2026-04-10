@@ -90,6 +90,15 @@ Custom packages and overlays are organized for clarity:
 ## Branching
 
 - Branches should be scoped to a single host whenever possible. This keeps deploys independent and reduces risk of cross-host breakage.
+- Branch naming: `host/type-short-slug` for host-scoped changes, `type-short-slug` for top-level changes.
+  - `host/` is the hostname (e.g. `glyph/`, `spore/`, `Rhizome/`, `zeta/`)
+  - `type` is one of `feat`, `fix`, `chore`, `refactor`
+  - The slug should be succinct — 2 to 4 words max (e.g. `fix-gc-options`, not `fix-gc-options-from-base-module-conflicting-definitions`)
+  - Examples: `spore/fix-gc-options`, `Rhizome/feat-launchd-service`, `chore-update-flake-inputs`, `feat-add-ci-eval`
+- Always pass the branch name explicitly to `gt create` — if omitted, Graphite auto-generates one from the commit message and may prepend a user prefix:
+  ```bash
+  gt create spore/fix-gc-options --message "fix(spore): ..."
+  ```
 
 ## Nix Commands
 
@@ -102,6 +111,16 @@ Never use `nix <subcommand> .#<output>` — the `#` causes permission prompt fai
 | `nix eval nixpkgs#foo` | `nixpkgs-eval foo` |
 | `nix run nixpkgs#foo` | `nixpkgs-run foo` |
 | `nix shell nixpkgs#foo` | `nixpkgs-shell foo` |
+
+## Common Patterns
+
+**Overriding a shared base module option in a host config:**
+Use `lib.mkForce` when a host needs to diverge from a value set in a shared module (e.g. `modules/base/`). Without it, Nix will error on conflicting definitions.
+```nix
+# modules/base/gc.nix sets nix.gc.dates = "weekly"
+# hosts/spore/default.nix overrides it:
+nix.gc.dates = lib.mkForce "daily";
+```
 
 ## Code style
 
