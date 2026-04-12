@@ -49,7 +49,10 @@ nixos-rebuild switch --flake .#spore --target-host root@spore --build-host local
 
 **Checking changes before committing:**
 ```bash
+# NixOS hosts:
 nix-flake eval nixosConfigurations.hostname.config.system.build.toplevel.drvPath
+# macOS hosts:
+nix-flake eval darwinConfigurations.Rhizome.system.drvPath
 ```
 Evaluates a host's configuration without building it. Catches option conflicts and type errors fast — run this after editing any NixOS module or host config.
 
@@ -79,6 +82,22 @@ Secrets are organized using the principle of least privilege:
 - Each host only has access to its own secrets plus admin keys
 - Global secrets (if any) are defined in `lib/secrets/default.nix`
 
+**agenix workflow:**
+```bash
+# Edit an existing secret (must be on a host with access, or have the deploy key):
+agenix -e hosts/spore/secrets/some-secret.age
+
+# Add a new secret:
+# 1. Add an entry to lib/secrets/<host>.nix with the appropriate publicKeys
+# 2. Run: agenix -e hosts/<host>/secrets/<name>.age
+# 3. Reference it in the host config via age.secrets.<name>.file
+
+# Rekey all secrets after adding a new host key:
+agenix --rekey
+```
+- Keys are defined in `lib/keys.nix` — each host's key is read from `hosts/<host>/key.pub`
+- A new host must have its key added to `lib/keys.nix` and any relevant secrets files before it can decrypt them
+
 ## Package and Overlay Management
 
 Custom packages and overlays are organized for clarity:
@@ -90,6 +109,19 @@ Custom packages and overlays are organized for clarity:
 ## Branching
 
 - Branches should be scoped to a single host whenever possible. This keeps deploys independent and reduces risk of cross-host breakage.
+- Branch naming: `host/type-short-slug` for host-scoped changes, `type-short-slug` for top-level changes.
+  - `host/` is the hostname (e.g. `glyph/`, `spore/`, `Rhizome/`, `zeta/`)
+  - `type` is one of `feat`, `fix`, `chore`, `refactor`
+  - The slug should be succinct — 2 to 4 words max (e.g. `fix-gc-options`, not `fix-gc-options-from-base-module-conflicting-definitions`)
+  - Examples: `spore/fix-gc-options`, `Rhizome/feat-launchd-service`, `chore-update-flake-inputs`, `feat-add-ci-eval`
+- Always pass the branch name explicitly to `gt create` — if omitted, Graphite auto-generates one from the commit message and may prepend a user prefix:
+  ```bash
+  gt create spore/fix-gc-options --message "fix(spore): ..."
+  ```
+
+**Submitting PRs:**
+- Title format: `type: short description` — e.g. `fix: spore gc options`, `chore: update CLAUDE.md`, `feat: add ci eval job`
+- Description should include a brief summary of what changed and what to test/verify
 
 ## Nix Commands
 
@@ -102,6 +134,37 @@ Never use `nix <subcommand> .#<output>` — the `#` causes permission prompt fai
 | `nix eval nixpkgs#foo` | `nixpkgs-eval foo` |
 | `nix run nixpkgs#foo` | `nixpkgs-run foo` |
 | `nix shell nixpkgs#foo` | `nixpkgs-shell foo` |
+
+## Common Patterns
+
+**Amending the current branch:**
+Use `gt modify` instead of `git commit --amend` to keep the Graphite stack consistent:
+```bash
+git add <files>
+gt modify --no-edit        # amend without changing message
+gt modify -m "new message" # amend with new message
+```
+
+**`lib.mkForce` vs `lib.mkDefault`:**
+- `lib.mkForce value` — host wins over any module default. Use when a host must diverge from a shared module.
+- `lib.mkDefault value` — module loses to any host override. Use in shared modules to set a default that hosts can freely override without `mkForce`.
+
+**Overriding a shared base module option in a host config:**
+Use `lib.mkForce` when a host needs to diverge from a value set in a shared module (e.g. `modules/base/`). Without it, Nix will error on conflicting definitions.
+```nix
+# modules/base/gc.nix sets nix.gc.dates = "weekly"
+# hosts/spore/default.nix overrides it:
+nix.gc.dates = lib.mkForce "daily";
+```
+
+## Environment Awareness
+
+- Before running commands like `ssh`, `nixos-rebuild`, or anything that targets a specific host, check which host Claude Code is running on (`hostname`) to avoid targeting the current machine unintentionally.
+- The current host is typically `glyph` (NixOS desktop) or `Rhizome` (macOS laptop).
+
+## Learning and Memory
+
+- After arriving at a working solution through trial and error, proactively ask whether the finding should be recorded in CLAUDE.md (or Basic Memory) for future sessions.
 
 ## Code style
 
