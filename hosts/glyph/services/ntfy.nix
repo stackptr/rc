@@ -59,9 +59,10 @@ in {
 
         NTFY_MESSAGE=$(${pkgs.jq}/bin/jq -r '.message // empty' <<< "$event")
         NTFY_TITLE=$(${pkgs.jq}/bin/jq -r '.title // "Homelab"' <<< "$event")
+        NTFY_TAGS=$(${pkgs.jq}/bin/jq -r '.tags // [] | join(",")' <<< "$event")
         [ -z "$NTFY_MESSAGE" ] && continue
 
-        export NTFY_MESSAGE NTFY_TITLE
+        export NTFY_MESSAGE NTFY_TITLE NTFY_TAGS
         ${ntfyToSlack}
       done
     '';
