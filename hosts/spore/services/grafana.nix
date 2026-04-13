@@ -3,6 +3,13 @@
   pkgs,
   ...
 }: {
+  age.secrets.slack-bot-token = {
+    file = ./../secrets/slack-bot-token.age;
+    mode = "440";
+    owner = "grafana";
+    group = "grafana";
+  };
+
   age.secrets.grafana-client-secret = {
     file = ./../secrets/grafana-client-secret.age;
     mode = "440";
@@ -63,6 +70,26 @@
           name = "system";
           options.path = ./dashboards;
           disableDeletion = true;
+        }
+      ];
+      alerting.contactPoints.settings.contactPoints = [
+        {
+          name = "slack";
+          receivers = [
+            {
+              uid = "slack";
+              type = "slack";
+              settings = {
+                token = "$__file{${config.age.secrets.slack-bot-token.path}}";
+                recipient = "#updates";
+                username = "Grafana";
+                icon_emoji = ":grafana:";
+                title = ''{{ if .Alerts.Firing }}[FIRING] {{ .GroupLabels.alertname }}{{ else }}[RESOLVED] {{ .GroupLabels.alertname }}{{ end }}'';
+                text = ''                  {{ range .Alerts }}• {{ .Labels.alertname }}: {{ .Annotations.summary }}
+                  {{ end }}'';
+              };
+            }
+          ];
         }
       ];
       datasources.settings.datasources = [
