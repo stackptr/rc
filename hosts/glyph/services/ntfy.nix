@@ -49,6 +49,7 @@ in {
       RestartSec = "10s";
     };
     script = ''
+      set -o pipefail
       ${pkgs.curl}/bin/curl -sN "${ntfyUrl}/${ntfyTopic}/json" | \
       while IFS= read -r event; do
         event_type=$(${pkgs.jq}/bin/jq -r '.event // "message"' <<< "$event")
