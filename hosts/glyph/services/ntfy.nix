@@ -35,9 +35,11 @@ in {
     enable = true;
     settings = {
       base-url = "http://glyph:2586";
-      listen-http = "127.0.0.1:2586";
+      listen-http = ":2586";
     };
   };
+
+  networking.firewall.interfaces.tailscale0.allowedTCPPorts = [2586];
 
   systemd.services.ntfy-slack-relay = {
     description = "Forward ntfy notifications to Slack";
