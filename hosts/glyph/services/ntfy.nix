@@ -4,7 +4,7 @@
   ...
 }: let
   ntfyUrl = "http://127.0.0.1:2586";
-  ntfyTopic = "homelab";
+  ntfyTopic = "notifications";
   slackChannel = "#updates";
 
   ntfyToSlack = pkgs.writeShellScript "ntfy-to-slack" ''

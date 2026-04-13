@@ -19,7 +19,7 @@
         curl -s \
           -H "Title: Transmission" \
           -d "$TR_TORRENT_NAME finished downloading." \
-          http://127.0.0.1:2586/homelab
+          http://127.0.0.1:2586/notifications
 
         # Copy .mkv files to Unsorted for Jellyfin
         UNSORTED="/mnt/media/Unsorted"
