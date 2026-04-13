@@ -10,6 +10,7 @@
   ntfyToSlack = pkgs.writeShellScript "ntfy-to-slack" ''
     SLACK_TOKEN=$(cat ${config.age.secrets.slack-bot-token.path})
     TITLE="''${NTFY_TITLE:-Homelab}"
+    ICON=":''${NTFY_TAGS%%,*}:"
 
     ${pkgs.curl}/bin/curl -s -X POST \
       "https://slack.com/api/chat.postMessage" \
@@ -18,8 +19,9 @@
       -d "$(${pkgs.jq}/bin/jq -n \
         --arg channel "${slackChannel}" \
         --arg username "$TITLE" \
+        --arg icon_emoji "$ICON" \
         --arg text "$NTFY_MESSAGE" \
-        '{channel: $channel, username: $username, text: $text}')"
+        '{channel: $channel, username: $username, icon_emoji: $icon_emoji, text: $text}')"
   '';
 in {
   age.secrets.slack-bot-token = {

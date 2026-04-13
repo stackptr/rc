@@ -18,6 +18,7 @@
       script-torrent-done-filename = pkgs.writeShellScript "torrent-done.sh" ''
         curl -s \
           -H "Title: Transmission" \
+          -H "Tags: transmissionic" \
           -d "*$TR_TORRENT_NAME* finished downloading. <https://torrents.zx.dev|View torrents>" \
           http://127.0.0.1:2586/notifications
 
