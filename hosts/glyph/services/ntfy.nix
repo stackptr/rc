@@ -49,9 +49,18 @@ in {
       RestartSec = "10s";
     };
     script = ''
-      exec ${pkgs.ntfy-sh}/bin/ntfy subscribe \
-        ${ntfyUrl}/${ntfyTopic} \
+      ${pkgs.curl}/bin/curl -sN "${ntfyUrl}/${ntfyTopic}/json" | \
+      while IFS= read -r event; do
+        event_type=$(${pkgs.jq}/bin/jq -r '.event // "message"' <<< "$event")
+        [ "$event_type" != "message" ] && continue
+
+        NTFY_MESSAGE=$(${pkgs.jq}/bin/jq -r '.message // empty' <<< "$event")
+        NTFY_TITLE=$(${pkgs.jq}/bin/jq -r '.title // "Homelab"' <<< "$event")
+        [ -z "$NTFY_MESSAGE" ] && continue
+
+        export NTFY_MESSAGE NTFY_TITLE
         ${ntfyToSlack}
+      done
     '';
   };
 }
