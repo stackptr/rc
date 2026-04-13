@@ -5,7 +5,7 @@
 }: let
   ntfyUrl = "http://127.0.0.1:2586";
   ntfyTopic = "homelab";
-  slackChannel = "#homelab";
+  slackChannel = "#updates";
 
   ntfyToSlack = pkgs.writeShellScript "ntfy-to-slack" ''
     SLACK_TOKEN=$(cat ${config.age.secrets.slack-bot-token.path})
