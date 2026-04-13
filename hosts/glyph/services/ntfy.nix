@@ -50,8 +50,7 @@ in {
     };
     script = ''
       exec ${pkgs.ntfy-sh}/bin/ntfy subscribe \
-        --url ${ntfyUrl} \
-        ${ntfyTopic} \
+        ${ntfyUrl}/${ntfyTopic} \
         ${ntfyToSlack}
     '';
   };
