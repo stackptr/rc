@@ -89,7 +89,7 @@
     enable = true;
     settings = {
       connection = {
-        url = "http://glyph.rove-duck.ts.net:9091/transmission/rpc";
+        url = "http://glyph.note-iwato.ts.net:9091/transmission/rpc";
       };
     };
   };

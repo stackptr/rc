@@ -48,7 +48,7 @@ in {
     configureNginx = true;
     database = {
       createLocally = false;
-      host = "glyph.rove-duck.ts.net";
+      host = "glyph.note-iwato.ts.net";
       port = 5432;
       user = "mastodon";
       passwordFile = "/dev/null"; # Not needed
