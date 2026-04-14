@@ -62,6 +62,9 @@
         admin_email = "corey@zx.dev";
         secret_key = "$__file{${config.age.secrets.grafana-secret-key.path}}";
       };
+      unified_alerting = {
+        resolve_timeout = "1m";
+      };
     };
     provision = {
       enable = true;
