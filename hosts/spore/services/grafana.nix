@@ -52,7 +52,7 @@
       };
       database = {
         type = "postgres";
-        host = "glyph.rove-duck.ts.net:5432";
+        host = "glyph.note-iwato.ts.net:5432";
         name = "grafana";
         user = "grafana";
         ssl_mode = "disable";
@@ -99,14 +99,14 @@
         {
           name = "Prometheus";
           type = "prometheus";
-          url = "http://glyph.rove-duck.ts.net:9099";
+          url = "http://glyph.note-iwato.ts.net:9099";
           isDefault = true;
           editable = false;
         }
         {
           name = "Loki";
           type = "loki";
-          url = "http://glyph.rove-duck.ts.net:3100";
+          url = "http://glyph.note-iwato.ts.net:3100";
           editable = false;
         }
       ];

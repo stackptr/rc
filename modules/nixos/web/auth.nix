@@ -36,7 +36,7 @@ in {
           description = ''
             PostgreSQL connection string for pocket-id.
           '';
-          example = "postgres://pocketid@glyph.rove-duck.ts.net/pocketid";
+          example = "postgres://pocketid@glyph.note-iwato.ts.net/pocketid";
         };
 
         localDatabase = lib.mkOption {
