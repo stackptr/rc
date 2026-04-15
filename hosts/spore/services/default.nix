@@ -29,6 +29,8 @@
     tailscaleAuthKeyFile = config.age.secrets.tailscale-auth-key.path;
   };
 
+  systemd.services.golink.environment.TS_ADVERTISE_TAGS = "tag:golink";
+
   services.openssh.enable = true;
   services.tailscale.enable = true;
 }
