@@ -4,6 +4,7 @@
     ./programs
     ./development.nix
     ./editor.nix
+    ./gpg.nix
     ./scm.nix
     ./ssh.nix
     ./utilities.nix
