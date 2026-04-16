@@ -17,6 +17,8 @@ in {
   config = mkIf cfg.enable {
     services.gpg-agent = {
       enable = true;
+      enableScDaemon = true;
+      enableSshSupport = true;
       enableZshIntegration = true;
       defaultCacheTtlSsh = 600;
       maxCacheTtlSsh = 3600;
