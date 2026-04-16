@@ -7,7 +7,6 @@
 }: {
   imports = [
     ./programs
-    ./services.nix
   ];
 
   age.identityPaths = [
