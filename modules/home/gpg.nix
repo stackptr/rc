@@ -18,8 +18,8 @@ in {
     services.gpg-agent = {
       enable = true;
       enableZshIntegration = true;
-      defaultCacheTtl = 86400;
-      maxCacheTtl = 86400;
+      defaultCacheTtlSsh = 600;
+      maxCacheTtlSsh = 3600;
       pinentry.package = with pkgs;
         if stdenv.isDarwin
         then pinentry_mac
