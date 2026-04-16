@@ -22,6 +22,7 @@ in {
       enableZshIntegration = true;
       defaultCacheTtlSsh = 600;
       maxCacheTtlSsh = 3600;
+      noAllowExternalCache = true;
       pinentry.package = with pkgs;
         if stdenv.isDarwin
         then pinentry_mac
