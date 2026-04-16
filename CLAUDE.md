@@ -168,17 +168,17 @@ nix.gc.dates = lib.mkForce "daily";
 
 ## Commit Identity
 
-When making git commits, always use a distinct agent identity and disable GPG signing (which requires an interactive passphrase and will hang):
+When making git commits, always use a distinct agent identity and disable GPG signing (which requires an interactive passphrase and will hang). Use `GIT_CONFIG_COUNT` env vars — note that `-c` and `-m` cannot be used together in git:
 
 ```bash
-git commit \
-  -c commit.gpgsign=false \
-  -c user.name="Claude Code" \
-  -c user.email="claude-code@noreply.anthropic.com" \
-  -m "..."
+GIT_CONFIG_COUNT=3 \
+  GIT_CONFIG_KEY_0=commit.gpgsign GIT_CONFIG_VALUE_0=false \
+  GIT_CONFIG_KEY_1=user.name GIT_CONFIG_VALUE_1="Claude Code" \
+  GIT_CONFIG_KEY_2=user.email GIT_CONFIG_VALUE_2="claude-code@noreply.anthropic.com" \
+  git commit -m "..."
 ```
 
-This applies to all `git commit` invocations, including via `gt modify`. For `gt modify`, pass the `-c` flags via `GIT_CONFIG_COUNT` env vars or use `git commit` directly when amending:
+The same applies to `gt modify`:
 
 ```bash
 GIT_CONFIG_COUNT=3 \
