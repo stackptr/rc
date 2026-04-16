@@ -51,10 +51,6 @@ in {
 
       programs.git = {
         enable = true;
-        signing = {
-          key = "F88C08579051AB48";
-          signByDefault = true;
-        };
         settings = {
           user = {
             name = "✿ corey";
@@ -71,13 +67,6 @@ in {
       programs.delta = {
         enable = true;
         enableGitIntegration = true;
-      };
-
-      programs.gpg = {
-        enable = true;
-        settings = {
-          default-key = "413D1A0152BCB08D2E3DDACAF88C08579051AB48";
-        };
       };
     })
 

@@ -4,7 +4,7 @@
   pkgs,
   ...
 }: let
-  inherit (lib) mkIf mkOption;
+  inherit (lib) mkIf;
 
   cfg = config.rc.gpg;
 in {
@@ -15,6 +15,18 @@ in {
   };
 
   config = mkIf cfg.enable {
+    programs.gpg = {
+      enable = true;
+      settings = {
+        default-key = "413D1A0152BCB08D2E3DDACAF88C08579051AB48";
+      };
+    };
+
+    programs.git.signing = {
+      key = "F88C08579051AB48";
+      signByDefault = true;
+    };
+
     services.gpg-agent = {
       enable = true;
       enableScDaemon = true;
