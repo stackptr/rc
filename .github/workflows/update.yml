@@ -17,14 +17,20 @@ jobs:
           git config --global user.name "github-actions[bot]"
       - name: Update
         run: nix flake update --commit-lock-file
+      - name: Get update details
+        id: update-details
+        run: |
+          body=$(git log -1 --pretty=%B)
+          echo "body<<EOF" >> "$GITHUB_OUTPUT"
+          echo "$body" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
 
       - uses: peter-evans/create-pull-request@v7
         id: create-pr
         with:
           branch: gh/update-flake
-          title: Update flake inputs
-          body: |
-            Automatic update of flake inputs
+          title: "chore: update flake inputs"
+          body: ${{ steps.update-details.outputs.body }}
           # Use a PAT so that Workflows run on the created PR
           token: ${{ secrets.CREATE_PR_TOKEN }}
       - if: ${{ steps.create-pr.outputs.pull-request-number }}
