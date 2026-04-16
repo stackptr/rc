@@ -9,7 +9,7 @@
     config = ''
          ts.zx.dev {
            rewrite stop {
-      name regex (.*)\.ts\.zx\.dev {1}.rove-duck.ts.net
+      name regex (.*)\.ts\.zx\.dev {1}.note-iwato.ts.net
       answer auto
            }
 

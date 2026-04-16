@@ -107,6 +107,7 @@ jobs:
       cancel-in-progress: false
     environment: ${{ matrix.host }}
     strategy:
+      fail-fast: false
       matrix: ${{ fromJson(needs.changes.outputs.matrix) }}
     runs-on: ${{ matrix.runner }}
     steps:

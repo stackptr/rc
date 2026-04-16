@@ -27,7 +27,7 @@
           }
           {
             targets = [
-              "spore.rove-duck.ts.net:9100"
+              "spore.note-iwato.ts.net:9100"
             ];
             labels.instance = "spore";
           }

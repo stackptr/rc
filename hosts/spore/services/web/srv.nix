@@ -5,7 +5,7 @@
   ...
 }: {
   fileSystems."/mnt/srv" = {
-    device = "glyph.rove-duck.ts.net:/";
+    device = "glyph.note-iwato.ts.net:/";
     fsType = "nfs4";
     options = [
       "_netdev"

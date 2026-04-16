@@ -8,7 +8,7 @@ _: {
 
     loki.write "remote" {
       endpoint {
-        url = "http://glyph.rove-duck.ts.net:3100/loki/api/v1/push"
+        url = "http://glyph.note-iwato.ts.net:3100/loki/api/v1/push"
       }
       external_labels = {
         host = "zeta",

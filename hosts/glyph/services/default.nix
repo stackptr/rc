@@ -13,6 +13,7 @@
     ./jellyfin.nix
     ./loki.nix
     ./nfs.nix
+    ./ntfy.nix
     ./open-terminal.nix
     ./open-webui.nix
     ./prometheus.nix

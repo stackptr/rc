@@ -22,7 +22,7 @@
       host = "id.zx.dev";
       useACMEHost = "zx.dev";
       encryptionKeyFile = config.age.secrets.pocket-id-encryption-key.path;
-      databaseURL = "postgres://pocketid@glyph.rove-duck.ts.net/pocketid";
+      databaseURL = "postgres://pocketid@glyph.note-iwato.ts.net/pocketid";
       localDatabase = false;
     };
     authProxy = {

@@ -50,7 +50,7 @@
         forceSSL = true;
         useACMEHost = "zx.dev";
         locations."/" = {
-          proxyPass = "http://glyph.rove-duck.ts.net:8100";
+          proxyPass = "http://glyph.note-iwato.ts.net:8100";
           proxyWebsockets = true;
         };
       };
@@ -58,19 +58,19 @@
         forceSSL = true;
         useACMEHost = "zx.dev";
         requireAuth = true;
-        locations."/".proxyPass = "http://glyph.rove-duck.ts.net:9091";
-        locations."~ (/transmission)?/rpc".proxyPass = "http://glyph.rove-duck.ts.net:9091";
+        locations."/".proxyPass = "http://glyph.note-iwato.ts.net:9091";
+        locations."~ (/transmission)?/rpc".proxyPass = "http://glyph.note-iwato.ts.net:9091";
       };
       "homebridge.zx.dev" = {
         forceSSL = true;
         useACMEHost = "zx.dev";
-        locations."/".proxyPass = "http://zeta.rove-duck.ts.net:8581";
+        locations."/".proxyPass = "http://zeta.note-iwato.ts.net:8581";
       };
       "ha.zx.dev" = {
         forceSSL = true;
         useACMEHost = "zx.dev";
         locations."/" = {
-          proxyPass = "http://zeta.rove-duck.ts.net:8123";
+          proxyPass = "http://zeta.note-iwato.ts.net:8123";
           proxyWebsockets = true;
         };
       };
@@ -78,7 +78,7 @@
         forceSSL = true;
         useACMEHost = "zx.dev";
         requireAuth = true;
-        locations."/".proxyPass = "http://glyph.rove-duck.ts.net:8080";
+        locations."/".proxyPass = "http://glyph.note-iwato.ts.net:8080";
       };
       "home.zx.dev" = {
         forceSSL = true;
@@ -95,7 +95,7 @@
         forceSSL = true;
         useACMEHost = "zx.dev";
         locations."/" = {
-          proxyPass = "http://glyph.rove-duck.ts.net:8888";
+          proxyPass = "http://glyph.note-iwato.ts.net:8888";
           proxyWebsockets = true;
         };
       };
@@ -104,7 +104,7 @@
         useACMEHost = "zx.dev";
         requireAuth = true;
         locations."/" = {
-          proxyPass = "http://glyph.rove-duck.ts.net:8890";
+          proxyPass = "http://glyph.note-iwato.ts.net:8890";
           proxyWebsockets = true;
         };
       };
@@ -112,7 +112,7 @@
         forceSSL = true;
         useACMEHost = "zx.dev";
         locations."/" = {
-          proxyPass = "http://glyph.rove-duck.ts.net:8199";
+          proxyPass = "http://glyph.note-iwato.ts.net:8199";
           extraConfig = ''
             client_max_body_size 0;
             proxy_read_timeout 300;
@@ -124,7 +124,7 @@
       "jellyfin.zx.dev" = {
         forceSSL = true;
         useACMEHost = "zx.dev";
-        locations."/".proxyPass = "http://glyph.rove-duck.ts.net:8096";
+        locations."/".proxyPass = "http://glyph.note-iwato.ts.net:8096";
       };
       "mcp.zx.dev" = {
         forceSSL = true;
@@ -162,7 +162,7 @@
             '';
           };
           "/" = {
-            proxyPass = "http://glyph.rove-duck.ts.net:8090";
+            proxyPass = "http://glyph.note-iwato.ts.net:8090";
             extraConfig = ''
               auth_request /oauth2/auth;
               error_page 401 = @mcp_unauthorized;

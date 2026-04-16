@@ -3,6 +3,13 @@
   pkgs,
   ...
 }: {
+  age.secrets.slack-bot-token = {
+    file = ./../secrets/slack-bot-token.age;
+    mode = "440";
+    owner = "grafana";
+    group = "grafana";
+  };
+
   age.secrets.grafana-client-secret = {
     file = ./../secrets/grafana-client-secret.age;
     mode = "440";
@@ -45,7 +52,7 @@
       };
       database = {
         type = "postgres";
-        host = "glyph.rove-duck.ts.net:5432";
+        host = "glyph.note-iwato.ts.net:5432";
         name = "grafana";
         user = "grafana";
         ssl_mode = "disable";
@@ -54,6 +61,9 @@
         admin_user = "corey@zx.dev";
         admin_email = "corey@zx.dev";
         secret_key = "$__file{${config.age.secrets.grafana-secret-key.path}}";
+      };
+      unified_alerting = {
+        resolve_timeout = "1m";
       };
     };
     provision = {
@@ -65,18 +75,38 @@
           disableDeletion = true;
         }
       ];
+      alerting.contactPoints.settings.contactPoints = [
+        {
+          name = "slack";
+          receivers = [
+            {
+              uid = "slack";
+              type = "slack";
+              settings = {
+                token = "$__file{${config.age.secrets.slack-bot-token.path}}";
+                recipient = "#updates";
+                username = "Grafana";
+                icon_emoji = ":grafana:";
+                title = ''{{ if .Alerts.Firing }}[FIRING] {{ .GroupLabels.alertname }}{{ else }}[RESOLVED] {{ .GroupLabels.alertname }}{{ end }}'';
+                text = ''                  {{ range .Alerts }}• {{ .Labels.alertname }}: {{ .Annotations.summary }}
+                  {{ end }}'';
+              };
+            }
+          ];
+        }
+      ];
       datasources.settings.datasources = [
         {
           name = "Prometheus";
           type = "prometheus";
-          url = "http://glyph.rove-duck.ts.net:9099";
+          url = "http://glyph.note-iwato.ts.net:9099";
           isDefault = true;
           editable = false;
         }
         {
           name = "Loki";
           type = "loki";
-          url = "http://glyph.rove-duck.ts.net:3100";
+          url = "http://glyph.note-iwato.ts.net:3100";
           editable = false;
         }
       ];
