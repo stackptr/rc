@@ -16,6 +16,7 @@
     keys.Rhizome
     keys.glyph
     keys.Stroma
+    keys.lobtop
   ];
 
   security.pam.sshAgentAuth.authorizedKeysFiles = lib.mkForce ["/etc/ssh/authorized_keys.d/%u"];
