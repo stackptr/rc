@@ -11,4 +11,8 @@
     masApps = {
     };
   };
+
+  programs.craft = {
+    enable = true;
+  };
 }
