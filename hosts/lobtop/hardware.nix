@@ -1,6 +1,6 @@
 _: {
-  users.users.corey = {
-    home = "/Users/corey";
+  users.users."corey.johns" = {
+    home = "/Users/corey.johns";
   };
   system.primaryUser = "corey.johns";
 
