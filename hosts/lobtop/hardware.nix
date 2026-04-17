@@ -2,7 +2,7 @@ _: {
   users.users.corey = {
     home = "/Users/corey";
   };
-  system.primaryUser = "corey";
+  system.primaryUser = "corey.johns";
 
   networking.hostName = "LOB-MG2QJH49W7";
 
