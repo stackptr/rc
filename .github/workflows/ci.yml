@@ -15,12 +15,23 @@ jobs:
         github_access_token: ${{ secrets.GITHUB_TOKEN }}
     - name: Check all configurations evaluate
       run: |
-        for host in glyph spore zeta; do
+        eval_host() {
+          local host="$1"
+          local expr="$2"
           echo "Evaluating $host..."
-          nix eval .#nixosConfigurations.$host.config.system.build.toplevel.drvPath
+          stderr=$(nix eval "$expr" 2>&1 >/dev/null)
+          if [ -n "$stderr" ]; then
+            echo "$stderr"
+            if echo "$stderr" | grep -q "evaluation warning:"; then
+              encoded=$(printf '%s' "$stderr" | python3 -c "import sys; print(sys.stdin.read().replace('%','%25').replace('\n','%0A').replace('\r','%0D'))")
+              echo "::warning title=Evaluation warnings ($host)::${encoded}"
+            fi
+          fi
+        }
+        for host in glyph spore zeta; do
+          eval_host "$host" ".#nixosConfigurations.$host.config.system.build.toplevel.drvPath"
         done
-        echo "Evaluating Rhizome..."
-        nix eval .#darwinConfigurations.Rhizome.system.drvPath
+        eval_host "Rhizome" ".#darwinConfigurations.Rhizome.system.drvPath"
 
   build:
     needs: eval
