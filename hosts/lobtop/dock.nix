@@ -11,7 +11,7 @@ _: {
       "/System/Applications/Calendar.app"
       "/System/Applications/Reminders.app"
       "/System/Applications/Notes.app"
-      "/Applications/Things3.app"
+      "/Applications/Things.app"
       "/Applications/Craft.app"
       "/System/Applications/Messages.app"
       "/Applications/Slack.app"
