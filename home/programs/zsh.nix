@@ -43,7 +43,7 @@
       }
 
       _prompt_auto_width () {
-        if [[ $COLUMNS -lt 100 ]]; then
+        if [[ "$TERM" == "linux" || $COLUMNS -lt 100 ]]; then
           export STARSHIP_CONFIG=''${XDG_CONFIG_HOME:-$HOME/.config}/starship-minimal.toml
         else
           unset STARSHIP_CONFIG

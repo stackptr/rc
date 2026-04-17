@@ -1,4 +1,4 @@
-{...}: {
+{config, ...}: {
   imports = [
     ./hardware.nix
     ./services
@@ -53,6 +53,10 @@
 
   # Beets library database (beets configured in home-manager)
   rc.backup.paths = ["/home/mu/.config/beets/library.db"];
+
+  age.secrets.user-password.file = ./secrets/user-password.age;
+
+  users.users.mu.hashedPasswordFile = config.age.secrets.user-password.path;
 
   system.stateVersion = "24.05";
 }
