@@ -1,13 +1,38 @@
 {
+  config,
+  llm-profile,
   pkgs,
-  pkgs-stable,
+  pkgs-stable-25-11,
   ...
 }: {
   home.packages = [pkgs.mktorrent];
 
+  programs.opencode = {
+    enable = true;
+    enableMcpIntegration = true;
+    web.enable = true;
+    web.extraArgs = ["--port" "8890" "--hostname" "0.0.0.0"];
+    rules = builtins.readFile "${llm-profile}/README.md";
+    settings = {
+      model = "anthropic/claude-opus-4-6";
+      small_model = "anthropic/claude-haiku-4-5";
+      enabled_providers = ["anthropic"];
+      autoupdate = false;
+      share = "disabled";
+      plugin = ["${pkgs.opencode-claude-auth}/lib/node_modules/opencode-claude-auth"];
+    };
+  };
+
+  systemd.user.services.opencode-web.Service.EnvironmentFile =
+    config.age.secrets.opencode-env.path;
+
+  age.secrets.opencode-env = {
+    file = ../../home/secrets/opencode-env.age;
+  };
+
   programs.beets = {
     enable = true;
-    package = pkgs-stable.beets;
+    package = pkgs-stable-25-11.beets;
     settings = {
       directory = "/mnt/media/Music";
       import = {
@@ -64,7 +89,7 @@
     enable = true;
     settings = {
       connection = {
-        url = "http://glyph.rove-duck.ts.net:9091/transmission/rpc";
+        url = "http://glyph.note-iwato.ts.net:9091/transmission/rpc";
       };
     };
   };

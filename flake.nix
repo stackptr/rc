@@ -1,7 +1,8 @@
 {
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-25.11";
+    nixpkgs-stable-25-11.url = "github:nixos/nixpkgs/nixos-25.11";
+    nixpkgs-stable-24-05.url = "github:nixos/nixpkgs/nixos-24.05";
 
     # General
     systems = {
@@ -45,7 +46,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     golink = {
-      url = "github:apoxy-dev/golink/dilyevsky/tsnet-1.90-upgrade";
+      url = "github:tailscale/golink";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.systems.follows = "systems";
     };
@@ -118,6 +119,11 @@
         darwinConfigurations = {
           Rhizome = mkDarwinHost {
             hostname = "Rhizome";
+            username = "corey";
+          };
+
+          Stroma = mkDarwinHost {
+            hostname = "Stroma";
             username = "corey";
           };
         };

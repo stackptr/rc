@@ -39,6 +39,6 @@
 
   services.postgresqlBackup = {
     enable = true;
-    databases = ["atticd" "grafana" "open-webui" "pocketid"];
+    databases = ["atticd" "grafana" "open-webui" "pocketid" "windmill"];
   };
 }

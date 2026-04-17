@@ -2,7 +2,6 @@
   config,
   lib,
   pkgs,
-  pkgs-stable,
   ...
 }: let
   inherit (lib) mkIf mkOption;
@@ -81,7 +80,7 @@ in {
 
       programs.yt-dlp = {
         enable = true;
-        package = pkgs-stable.yt-dlp;
+        package = pkgs.yt-dlp;
       };
     })
 
@@ -95,9 +94,21 @@ in {
         nix-flake = pkgs.writeShellScriptBin "nix-flake" ''
           nix "$1" ".#$2" "''${@:3}"
         '';
+        nixpkgs-eval = pkgs.writeShellScriptBin "nixpkgs-eval" ''
+          nix eval "nixpkgs#$*"
+        '';
+        nixpkgs-run = pkgs.writeShellScriptBin "nixpkgs-run" ''
+          nix run "nixpkgs#$1" -- "''${@:2}"
+        '';
+        nixpkgs-shell = pkgs.writeShellScriptBin "nixpkgs-shell" ''
+          nix shell "''${@/#/nixpkgs#}"
+        '';
       in
         [
           nix-flake
+          nixpkgs-eval
+          nixpkgs-run
+          nixpkgs-shell
           pkgs.manix
           pkgs.nix-du
           pkgs.nix-tree

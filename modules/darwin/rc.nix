@@ -25,7 +25,6 @@ in {
     ];
 
     homebrew = mkIf cfg.homebrew {
-      caskArgs.no_quarantine = true;
       onActivation = {
         cleanup = "zap";
         upgrade = true;

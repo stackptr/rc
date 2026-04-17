@@ -27,30 +27,34 @@ in {
 
   config = lib.mkMerge [
     (mkIf cfg.ai.enable {
-      age.secrets.claude-code-api-key = {
-        file = ../../home/secrets/claude-code-api-key.age;
+      programs.zsh.sessionVariables = {
+        # Disable claude-pace API fallback; rate limits come from stdin on CC >= 2.1.80
+        CLAUDE_PACE_API_FALLBACK = "0";
       };
 
-      programs.zsh.initExtra = ''
-        export ANTHROPIC_API_KEY="$(cat ${config.age.secrets.claude-code-api-key.path})"
-      '';
+      programs.mcp = {
+        enable = true;
+        servers.glyph = {
+          url = "http://glyph:8090/mcp";
+        };
+      };
 
       programs.claude-code = {
         enable = true;
+        enableMcpIntegration = true;
         memory.source = "${llm-profile}/README.md";
-        mcpServers = {
-          glyph = {
-            type = "http";
-            url = "http://glyph:8090/mcp";
-          };
-        };
         settings = {
-          model = "opus";
+          model = "sonnet";
           # Disabled in favor of Basic Memory MCP for cross-device access
           autoMemoryEnabled = false;
-          enabledMcpjsonServers = ["linear" "figma"];
+          statusLine = {
+            type = "command";
+            command = "${pkgs.claude-pace}/bin/claude-pace";
+          };
           permissions = {
             allow = [
+              # Nix store (read-only access for inspecting derivations and build outputs)
+              "Read(/nix/store/*)"
               # File exploration
               "Bash(cat *)"
               "Bash(cut *)"
@@ -99,6 +103,9 @@ in {
               "Bash(nix store *)"
               "Bash(nix why-depends *)"
               "Bash(nix-flake *)"
+              "Bash(nixpkgs-eval *)"
+              "Bash(nixpkgs-run *)"
+              "Bash(nixpkgs-shell *)"
               # Git
               "Bash(git add *)"
               "Bash(git blame *)"
@@ -128,15 +135,55 @@ in {
               "Bash(gh run list*)"
               "Bash(gh run view*)"
               "Bash(gh search:*)"
-              # Graphite
+              # Graphite: info
               "Bash(gt log*)"
+              "Bash(gt l*)"
               "Bash(gt ls*)"
               "Bash(gt status*)"
+              "Bash(gt info*)"
+              "Bash(gt children*)"
+              "Bash(gt parent*)"
+              # Graphite: navigation
+              "Bash(gt checkout *)"
+              "Bash(gt co *)"
+              "Bash(gt up*)"
+              "Bash(gt u)"
+              "Bash(gt u *)"
+              "Bash(gt down*)"
+              "Bash(gt d)"
+              "Bash(gt d *)"
+              "Bash(gt top*)"
+              "Bash(gt t)"
+              "Bash(gt t *)"
+              "Bash(gt bottom*)"
+              "Bash(gt b)"
+              "Bash(gt b *)"
+              "Bash(gt trunk*)"
+              # Graphite: workflow
+              "Bash(gt create *)"
+              "Bash(gt c *)"
+              "Bash(gt modify *)"
+              "Bash(gt m *)"
+              "Bash(gt submit*)"
+              "Bash(gt s)"
+              "Bash(gt s *)"
+              "Bash(gt ss*)"
+              "Bash(gt restack*)"
+              "Bash(gt sync*)"
               # System
-              "Bash(journalctl:*)"
+              "Bash(journalctl *)"
               "Bash(mkdir *)"
-              "Bash(systemctl list-jobs:*)"
-              "Bash(systemctl status:*)"
+              "Bash(systemctl cat *)"
+              "Bash(systemctl is-active *)"
+              "Bash(systemctl is-enabled *)"
+              "Bash(systemctl is-failed *)"
+              "Bash(systemctl list-jobs*)"
+              "Bash(systemctl list-sockets*)"
+              "Bash(systemctl list-timers*)"
+              "Bash(systemctl list-unit-files*)"
+              "Bash(systemctl list-units*)"
+              "Bash(systemctl show *)"
+              "Bash(systemctl status *)"
               "WebFetch(domain:raw.githubusercontent.com)"
               "WebFetch(domain:github.com)"
               "WebSearch"
@@ -190,6 +237,57 @@ in {
               "mcp__glyph__aws-knowledge__aws___read_documentation"
               "mcp__glyph__aws-knowledge__aws___recommend"
               "mcp__glyph__aws-knowledge__aws___search_documentation"
+              # MCP: grafana
+              "mcp__glyph__grafana__add_activity_to_incident"
+              "mcp__glyph__grafana__alerting_manage_routing"
+              "mcp__glyph__grafana__alerting_manage_rules"
+              "mcp__glyph__grafana__create_annotation"
+              "mcp__glyph__grafana__create_folder"
+              "mcp__glyph__grafana__create_incident"
+              "mcp__glyph__grafana__fetch_pyroscope_profile"
+              "mcp__glyph__grafana__find_error_pattern_logs"
+              "mcp__glyph__grafana__find_slow_requests"
+              "mcp__glyph__grafana__generate_deeplink"
+              "mcp__glyph__grafana__get_alert_group"
+              "mcp__glyph__grafana__get_annotation_tags"
+              "mcp__glyph__grafana__get_annotations"
+              "mcp__glyph__grafana__get_assertions"
+              "mcp__glyph__grafana__get_current_oncall_users"
+              "mcp__glyph__grafana__get_dashboard_by_uid"
+              "mcp__glyph__grafana__get_dashboard_panel_queries"
+              "mcp__glyph__grafana__get_dashboard_property"
+              "mcp__glyph__grafana__get_dashboard_summary"
+              "mcp__glyph__grafana__get_datasource"
+              "mcp__glyph__grafana__get_incident"
+              "mcp__glyph__grafana__get_oncall_shift"
+              "mcp__glyph__grafana__get_panel_image"
+              "mcp__glyph__grafana__get_sift_analysis"
+              "mcp__glyph__grafana__get_sift_investigation"
+              "mcp__glyph__grafana__list_alert_groups"
+              "mcp__glyph__grafana__list_datasources"
+              "mcp__glyph__grafana__list_incidents"
+              "mcp__glyph__grafana__list_loki_label_names"
+              "mcp__glyph__grafana__list_loki_label_values"
+              "mcp__glyph__grafana__list_oncall_schedules"
+              "mcp__glyph__grafana__list_oncall_teams"
+              "mcp__glyph__grafana__list_oncall_users"
+              "mcp__glyph__grafana__list_prometheus_label_names"
+              "mcp__glyph__grafana__list_prometheus_label_values"
+              "mcp__glyph__grafana__list_prometheus_metric_metadata"
+              "mcp__glyph__grafana__list_prometheus_metric_names"
+              "mcp__glyph__grafana__list_pyroscope_label_names"
+              "mcp__glyph__grafana__list_pyroscope_label_values"
+              "mcp__glyph__grafana__list_pyroscope_profile_types"
+              "mcp__glyph__grafana__list_sift_investigations"
+              "mcp__glyph__grafana__query_loki_logs"
+              "mcp__glyph__grafana__query_loki_patterns"
+              "mcp__glyph__grafana__query_loki_stats"
+              "mcp__glyph__grafana__query_prometheus"
+              "mcp__glyph__grafana__query_prometheus_histogram"
+              "mcp__glyph__grafana__search_dashboards"
+              "mcp__glyph__grafana__search_folders"
+              "mcp__glyph__grafana__update_annotation"
+              "mcp__glyph__grafana__update_dashboard"
             ];
             deny = [];
           };

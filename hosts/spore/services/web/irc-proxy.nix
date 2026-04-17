@@ -12,7 +12,7 @@ in {
     certName = "zx.dev";
   in ''
     upstream znc {
-        server zeta.rove-duck.ts.net:5000;
+        server zeta.note-iwato.ts.net:5000;
     }
 
     server {

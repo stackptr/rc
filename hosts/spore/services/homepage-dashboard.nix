@@ -92,7 +92,7 @@
               icon = "transmission";
               widget = {
                 type = "transmission";
-                url = "http://glyph.rove-duck.ts.net:9091";
+                url = "http://glyph.note-iwato.ts.net:9091";
                 rpcUrl = "/transmission/";
               };
             };
@@ -111,7 +111,7 @@
               icon = "jellyfin";
               widget = {
                 type = "jellyfin";
-                url = "http://glyph.rove-duck.ts.net:8096";
+                url = "http://glyph.note-iwato.ts.net:8096";
                 key = "{{HOMEPAGE_VAR_JELLYFIN_KEY}}";
                 version = 1;
                 enableBlocks = true;

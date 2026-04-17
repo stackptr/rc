@@ -6,7 +6,24 @@ on:
     branches: main
 
 jobs:
+  eval:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: cachix/install-nix-action@v31
+      with:
+        github_access_token: ${{ secrets.GITHUB_TOKEN }}
+    - name: Check all configurations evaluate
+      run: |
+        for host in glyph spore zeta; do
+          echo "Evaluating $host..."
+          nix eval .#nixosConfigurations.$host.config.system.build.toplevel.drvPath
+        done
+        echo "Evaluating Rhizome..."
+        nix eval .#darwinConfigurations.Rhizome.system.drvPath
+
   build:
+    needs: eval
     strategy:
       fail-fast: false
       matrix:
@@ -51,3 +68,69 @@ jobs:
         attic push rc:main $(which attic)
         nix build .#devShells.${{ matrix.system }}.default -o ./result-devshell
         attic push rc:main ./result-devshell
+    - name: Prepare Slack context
+      if: failure()
+      id: slack-context
+      env:
+        EVENT_NAME: ${{ github.event_name }}
+        SHA: ${{ github.sha }}
+        PR_NUMBER: ${{ github.event.pull_request.number }}
+        PR_TITLE: ${{ github.event.pull_request.title }}
+        PR_URL: ${{ github.event.pull_request.html_url }}
+        COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+        COMMIT_URL: ${{ github.event.head_commit.url }}
+      run: |
+        echo "short_sha=${SHA:0:7}" >> $GITHUB_OUTPUT
+        if [ "$EVENT_NAME" = "pull_request" ]; then
+          echo "trigger=PR <${PR_URL}|#${PR_NUMBER}: ${PR_TITLE}>" >> $GITHUB_OUTPUT
+        else
+          FIRST_LINE=$(printf '%s' "$COMMIT_MESSAGE" | head -1)
+          echo "trigger=push <${COMMIT_URL}|${FIRST_LINE}>" >> $GITHUB_OUTPUT
+        fi
+    - name: Notify Slack on failure
+      if: failure()
+      uses: slackapi/slack-github-action@v2
+      with:
+        webhook: ${{ secrets.SLACK_WEBHOOK_UPDATES_CI }}
+        webhook-type: incoming-webhook
+        payload-templating: true
+        payload: |
+          {
+            "attachments": [
+              {
+                "color": "#CC0000",
+                "blocks": [
+                  {
+                    "type": "header",
+                    "text": {
+                      "type": "plain_text",
+                      "text": ":x: CI build failed",
+                      "emoji": true
+                    }
+                  },
+                  {
+                    "type": "section",
+                    "fields": [
+                      {
+                        "type": "mrkdwn",
+                        "text": "*Host*\n${{ matrix.host }}"
+                      },
+                      {
+                        "type": "mrkdwn",
+                        "text": "*Trigger*\n${{ steps.slack-context.outputs.trigger }}"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "context",
+                    "elements": [
+                      {
+                        "type": "mrkdwn",
+                        "text": "<${{ github.server_url }}/${{ github.repository }}|${{ github.repository }}> · <${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}|${{ steps.slack-context.outputs.short_sha }}> · <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View run>"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }

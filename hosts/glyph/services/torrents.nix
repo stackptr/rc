@@ -1,25 +1,12 @@
 {
   config,
   pkgs,
+  pkgs-stable-24-05,
   ...
 }: {
-  age.secrets.pushover-user-token = {
-    file = ./../secrets/pushover-user-token.age;
-    mode = "550";
-    owner = config.services.transmission.user;
-    inherit (config.services.transmission) group;
-  };
-
-  age.secrets.pushover-app-token = {
-    file = ./../secrets/pushover-app-token.age;
-    mode = "550";
-    owner = config.services.transmission.user;
-    inherit (config.services.transmission) group;
-  };
-
   services.transmission = {
     enable = true;
-    package = pkgs.transmission_4;
+    package = pkgs-stable-24-05.transmission_4;
     settings = {
       download-dir = "/mnt/torrents/complete";
       incomplete-dir = "/mnt/torrents/incomplete";
@@ -29,26 +16,11 @@
       rpc-whitelist-enabled = false;
       script-torrent-done-enabled = true;
       script-torrent-done-filename = pkgs.writeShellScript "torrent-done.sh" ''
-        TOKEN_USER=$(cat ${config.age.secrets.pushover-user-token.path});
-        TOKEN_APP=$(cat ${config.age.secrets.pushover-app-token.path});
-        MESSAGE="$TR_TORRENT_NAME finished downloading.";
-
-        PRIORITY=0;
-        SOUND="tugboat";
-        TITLE="Download complete";
-
-        TIMESTAMP=$(date +%s);
-
-        curl -s --form-string "token=$TOKEN_APP" \
-          --form-string "user=$TOKEN_USER" \
-          --form-string "timestamp=$TIMESTAMP" \
-          --form-string "priority=$PRIORITY" \
-          --form-string "sound=$SOUND" \
-          --form-string "title=$TITLE" \
-          --form-string "message=$MESSAGE" \
-          --form-string "url=https://torrents.zx.dev" \
-          --form-string "url_title=View torrents" \
-          https://api.pushover.net/1/messages.json
+        curl -s \
+          -H "Title: Transmission" \
+          -H "Tags: transmissionic" \
+          -d "*$TR_TORRENT_NAME* finished downloading. <https://torrents.zx.dev|View torrents>" \
+          http://127.0.0.1:2586/notifications
 
         # Copy .mkv files to Unsorted for Jellyfin
         UNSORTED="/mnt/media/Unsorted"
