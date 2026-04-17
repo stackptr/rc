@@ -129,7 +129,7 @@
 
           lobtop = mkDarwinHost {
             hostname = "LOB-MG2QJH49W7";
-            username = "corey";
+            username = "corey.johns";
             configDir = "lobtop";
           };
         };
