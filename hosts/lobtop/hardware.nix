@@ -1,8 +1,4 @@
-{
-  config,
-  pkgs,
-  ...
-}: {
+_: {
   users.users.corey = {
     home = "/Users/corey";
   };

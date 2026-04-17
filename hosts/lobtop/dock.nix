@@ -1,8 +1,4 @@
-{
-  config,
-  pkgs,
-  ...
-}: {
+_: {
   system.defaults.dock = {
     tilesize = 42;
     largesize = 86;
