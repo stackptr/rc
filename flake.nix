@@ -126,6 +126,12 @@
             hostname = "Stroma";
             username = "corey";
           };
+
+          lobtop = mkDarwinHost {
+            hostname = "LOB-MG2QJH49W7";
+            username = "corey";
+            configDir = "lobtop";
+          };
         };
 
         deploy = {
