@@ -61,5 +61,10 @@
     max-free = 5 * 1024 * 1024 * 1024; # 5 GB — stop GC once this much space is free
   };
 
+  # Intentional build failure to test CI Slack notification — remove after verifying
+  environment.systemPackages = [
+    (pkgs.runCommand "ci-notification-test" {} "exit 1")
+  ];
+
   system.stateVersion = "24.05";
 }
