@@ -18,6 +18,8 @@ in {
     programs.neovim = {
       enable = true;
       defaultEditor = true;
+      withRuby = false;
+      withPython3 = false;
       plugins = with pkgs.vimPlugins; [catppuccin-nvim lualine-nvim];
       initLua = ''
         require("catppuccin").setup {

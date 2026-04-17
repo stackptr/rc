@@ -25,6 +25,7 @@ in {
     programs.git.signing = {
       key = "F88C08579051AB48";
       signByDefault = true;
+      format = "openpgp";
     };
 
     services.gpg-agent = {

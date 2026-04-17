@@ -51,6 +51,7 @@ in {
 
       programs.git = {
         enable = true;
+        signing.format = lib.mkDefault null;
         settings = {
           user = {
             name = "✿ corey";

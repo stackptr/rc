@@ -42,7 +42,7 @@ in {
       programs.claude-code = {
         enable = true;
         enableMcpIntegration = true;
-        memory.source = "${llm-profile}/README.md";
+        context = "${llm-profile}/README.md";
         settings = {
           model = "sonnet";
           # Disabled in favor of Basic Memory MCP for cross-device access
