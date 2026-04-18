@@ -7,12 +7,14 @@
   ...
 }: {
   users.users.root.openssh.authorizedKeys.keys = [
+    keys.identity
     keys.Rhizome
     keys.glyph
     keys.deploy
   ];
 
   users.users.mu.openssh.authorizedKeys.keys = [
+    keys.identity
     keys.Rhizome
     keys.glyph
     keys.Stroma

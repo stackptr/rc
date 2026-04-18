@@ -16,6 +16,7 @@ let
 in
   builtins.listToAttrs hostKeyPairs
   // {
+    identity = firstLine (builtins.readFile ./auth.pub);
     home = firstLine (builtins.readFile ./../home/key.pub);
     deploy = firstLine (builtins.readFile ./deploy.pub);
   }
