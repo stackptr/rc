@@ -1,7 +1,8 @@
 # Build the system config and switch to it when running `just` with no args
 default: switch
 
-hostname := `hostname | cut -d "." -f 1`
+# Substitute work laptop hostname if necessary
+hostname := `h=$(hostname | cut -d "." -f 1); case "$h" in LOB-*) echo "lobtop";; *) echo "$h";; esac`
 
 [macos]
 switch host=hostname:

@@ -23,13 +23,14 @@ inputs @ {
   mkHomeManager = {
     username,
     hostname,
+    configDir,
     system,
     showBatteryStatus,
     lightweight ? false,
   }: let
     pkgs-stable-25-11 = import nixpkgs-stable-25-11 {inherit system;};
     pkgs-stable-24-05 = import nixpkgs-stable-24-05 {inherit system;};
-    hostHomePath = ./../hosts/${hostname}/home.nix;
+    hostHomePath = ./../hosts/${configDir}/home.nix;
     hostHomeConfig =
       if builtins.pathExists hostHomePath
       then hostHomePath
@@ -57,6 +58,7 @@ inputs @ {
     system,
     username,
     lightweight ? false,
+    configDir ? hostname,
   }:
     nixpkgs.lib.nixosSystem {
       inherit system;
@@ -70,11 +72,11 @@ inputs @ {
         disko.nixosModules.disko
         ./../modules/base
         ./../modules/nixos
-        ./../hosts/${hostname}
+        ./../hosts/${configDir}
         agenix.nixosModules.default
         home-manager.nixosModules.home-manager
         (mkHomeManager {
-          inherit username hostname system lightweight;
+          inherit username hostname system lightweight configDir;
           showBatteryStatus = false;
         })
         {
@@ -90,6 +92,7 @@ inputs @ {
     hostname,
     username,
     lightweight ? false,
+    configDir ? hostname,
   }: let
     system = "aarch64-darwin";
   in
@@ -105,10 +108,10 @@ inputs @ {
         nix-homebrew.darwinModules.nix-homebrew
         ./../modules/base
         ./../modules/darwin
-        ./../hosts/${hostname}
+        ./../hosts/${configDir}
         home-manager.darwinModules.home-manager
         (mkHomeManager {
-          inherit username hostname system lightweight;
+          inherit username hostname system lightweight configDir;
           showBatteryStatus = true;
         })
         {

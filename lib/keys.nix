@@ -8,6 +8,7 @@ let
       value = readKey h;
     }) [
       "glyph"
+      "lobtop"
       "Rhizome"
       "spore"
       "Stroma"

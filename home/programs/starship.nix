@@ -87,6 +87,9 @@
         format = "[@$hostname ]($style)";
         style = "bg:color_orange fg:color_fg0";
         disabled = false;
+        aliases = {
+          "LOB-MG2QJH49W7" = "lobtop";
+        };
       };
       directory = {
         style = "fg:color_fg0 bg:color_yellow";
