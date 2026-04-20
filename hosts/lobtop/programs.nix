@@ -7,6 +7,9 @@
 
   homebrew = {
     enable = true;
+    casks = [
+      "meetingbar"
+    ];
     # N.B.: Removed entries in `masApps` require manual uninstallation
     masApps = {
     };
