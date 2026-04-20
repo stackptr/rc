@@ -22,6 +22,7 @@
       Archive = mkShare "/mnt/archive" "mu" "users";
       Backup = mkShare "/mnt/backup" "mu" "users" // {"fruit:time machine" = "yes";};
       Media = mkShare "/mnt/media" config.services.jellyfin.user config.services.jellyfin.group;
+      Notes = mkShare "/var/lib/basic-memory/basic-memory" "basic-memory" "basic-memory";
       Torrents = mkShare "/mnt/torrents" config.services.transmission.user config.services.transmission.group;
       Unsorted = mkShare "/mnt/unsorted" "mu" "users";
     };
