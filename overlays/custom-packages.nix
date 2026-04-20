@@ -27,4 +27,7 @@ self: super: {
 
   # Ungoogled Chromium with privacy enhancements
   ungoogled-chromium = super.callPackage ./../packages/ungoogled-chromium/package.nix {};
+
+  # CLI for Things 3
+  things3-cli = super.callPackage ./../packages/things3-cli/package.nix {};
 }
