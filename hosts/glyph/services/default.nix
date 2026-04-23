@@ -94,6 +94,16 @@
     group = "graphite-mcp";
   };
 
+  age.secrets.agent-sandbox-api-key = {
+    file = ./../secrets/agent-sandbox-api-key.age;
+    mode = "400";
+  };
+
+  services.agent-sandbox = {
+    enable = true;
+    apiKeyFile = config.age.secrets.agent-sandbox-api-key.path;
+  };
+
   services.basic-memory.enable = true;
   rc.backup = {
     enable = true;
