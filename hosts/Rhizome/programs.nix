@@ -96,4 +96,8 @@
     enable = true;
     startOnActivation = true;
   };
+
+  programs.things3-cli = {
+    enable = true;
+  };
 }
