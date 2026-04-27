@@ -12,4 +12,5 @@ in {
   "hosts/glyph/secrets/graphite-auth-token.age".publicKeys = keys;
   "hosts/glyph/secrets/attic-credentials.age".publicKeys = keys;
   "hosts/glyph/secrets/user-password.age".publicKeys = keys;
+  "hosts/glyph/secrets/obsidian-auth-token.age".publicKeys = keys;
 }

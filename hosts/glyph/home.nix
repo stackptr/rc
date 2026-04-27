@@ -5,7 +5,7 @@
   pkgs-stable-25-11,
   ...
 }: {
-  home.packages = [pkgs.mktorrent];
+  home.packages = [pkgs.mktorrent pkgs.obsidian-headless];
 
   programs.opencode = {
     enable = true;
