@@ -1,5 +1,6 @@
 {
   config,
+  lib,
   pkgs,
   ...
 }: {
@@ -109,12 +110,14 @@
   services.basic-memory.enable = true;
   rc.backup = {
     enable = true;
-    paths = [
-      config.services.postgresqlBackup.location
-      "/var/lib/basic-memory"
-      "/var/lib/open-webui"
-      "/var/lib/roon-server/backup"
-    ];
+    paths =
+      [
+        config.services.postgresqlBackup.location
+        "/var/lib/basic-memory"
+        "/var/lib/open-webui"
+        "/var/lib/roon-server/backup"
+      ]
+      ++ lib.optional config.rc.obsidian-sync.enable config.rc.obsidian-sync.vaultPath;
   };
   services.mcp-nixos.enable = true;
   services.kagi-mcp = {
