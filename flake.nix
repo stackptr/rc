@@ -199,11 +199,15 @@
       }: {
         _module.args.pkgs = import inputs.nixpkgs {
           inherit system;
+          overlays = import ./overlays;
           config.allowUnfreePredicate = pkg:
             builtins.elem (inputs.nixpkgs.lib.getName pkg) [
               "graphite-cli"
+              "obsidian-headless"
             ];
         };
+
+        packages.obsidian-headless = pkgs.obsidian-headless;
 
         devShells = {
           default = pkgs.mkShell {

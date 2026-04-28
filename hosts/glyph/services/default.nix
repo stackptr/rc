@@ -68,6 +68,18 @@
     extraUpFlags = ["--ssh"];
   };
 
+  age.secrets.obsidian-auth-token = {
+    file = ./../secrets/obsidian-auth-token.age;
+    mode = "400";
+    owner = "mu";
+    group = "users";
+  };
+
+  rc.obsidian-sync = {
+    enable = true;
+    authTokenFile = config.age.secrets.obsidian-auth-token.path;
+  };
+
   age.secrets.kagi-api-key = {
     file = ./../secrets/kagi-api-key.age;
     mode = "440";

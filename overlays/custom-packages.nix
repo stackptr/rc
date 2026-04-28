@@ -19,6 +19,9 @@ self: super: {
   # MCP Gateway
   mcpjungle = super.callPackage ./../packages/mcpjungle/package.nix {};
 
+  # Obsidian headless sync client
+  obsidian-headless = super.callPackage ./../packages/obsidian-headless/package.nix {};
+
   # Mochi spaced repetition software
   mochi = super.callPackage ./../packages/mochi/package.nix {};
 
