@@ -72,8 +72,8 @@
   age.secrets.obsidian-auth-token = {
     file = ./../secrets/obsidian-auth-token.age;
     mode = "400";
-    owner = "mu";
-    group = "users";
+    owner = "obsidian";
+    group = "obsidian";
   };
 
   rc.obsidian-sync = {
@@ -133,6 +133,10 @@
     enable = true;
     authTokenFile = config.age.secrets.graphite-auth-token.path;
   };
+  services.obsidian-vault-mcp = {
+    enable = true;
+    inherit (config.rc.obsidian-sync) vaultPath;
+  };
   services.mcpjungle = {
     enable = true;
     servers.basic-memory = {
@@ -154,6 +158,10 @@
     servers.graphite = {
       url = "http://127.0.0.1:8094/mcp";
       description = "Graphite CLI for stacked PRs and code review";
+    };
+    servers.obsidian-vault = {
+      url = "http://127.0.0.1:8097/mcp";
+      description = "Read and write files in the Obsidian vault";
     };
     servers.context7 = {
       url = "https://mcp.context7.com/mcp";

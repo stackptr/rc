@@ -6,5 +6,6 @@
     ./kagi.nix
     ./mcp-nixos.nix
     ./mcpjungle.nix
+    ./obsidian-vault-mcp.nix
   ];
 }

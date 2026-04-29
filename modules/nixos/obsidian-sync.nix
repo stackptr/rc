@@ -2,18 +2,17 @@
   config,
   lib,
   pkgs,
-  username,
   ...
 }: let
   cfg = config.rc.obsidian-sync;
-  homeDir = config.users.users.${username}.home;
+  stateDir = "/var/lib/obsidian";
 in {
   options.rc.obsidian-sync = {
     enable = lib.mkEnableOption "Obsidian headless vault sync";
 
     vaultPath = lib.mkOption {
       type = lib.types.str;
-      default = "${homeDir}/vault";
+      default = "${stateDir}/vault";
       description = "Local path to the vault directory.";
     };
 
@@ -24,9 +23,16 @@ in {
   };
 
   config = lib.mkIf cfg.enable {
+    users.users.obsidian = {
+      isSystemUser = true;
+      group = "obsidian";
+      home = stateDir;
+    };
+    users.groups.obsidian = {};
+
     systemd.tmpfiles.rules = [
-      "d ${cfg.vaultPath} 0755 ${username} users -"
-      "d ${homeDir}/.config/obsidian-headless 0700 ${username} users -"
+      "d ${cfg.vaultPath} 0755 obsidian obsidian -"
+      "d ${stateDir}/.config/obsidian-headless 0700 obsidian obsidian -"
     ];
 
     systemd.services.obsidian-sync = {
@@ -36,9 +42,10 @@ in {
       wants = ["network-online.target"];
 
       serviceConfig = {
-        User = username;
-        Group = "users";
-        WorkingDirectory = homeDir;
+        User = "obsidian";
+        Group = "obsidian";
+        WorkingDirectory = stateDir;
+        StateDirectory = "obsidian";
 
         EnvironmentFile = cfg.authTokenFile;
 
@@ -53,7 +60,7 @@ in {
         NoNewPrivileges = true;
         PrivateTmp = true;
         ProtectSystem = "strict";
-        ReadWritePaths = [cfg.vaultPath "${homeDir}/.config/obsidian-headless"];
+        ReadWritePaths = [cfg.vaultPath "${stateDir}/.config/obsidian-headless"];
       };
     };
   };
