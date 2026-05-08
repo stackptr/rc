@@ -31,7 +31,7 @@
           <service>
             <type>_device-info._tcp</type>
             <port>0</port>
-            <txt-record>model=RackMac3,1</txt-record>
+            <txt-record>model=MacPro7,1-Rack</txt-record>
           </service>
         </service-group>
       '';
