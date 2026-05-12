@@ -55,7 +55,7 @@ in {
         settings = {
           user = {
             name = "✿ corey";
-            email = "corey@x64.co";
+            email = "c@rey.foo";
           };
           pull.rebase = true;
           push.autosetupremote = true;
