@@ -166,6 +166,10 @@ nix.gc.dates = lib.mkForce "daily";
 
 - After arriving at a working solution through trial and error, proactively ask whether the finding should be recorded in CLAUDE.md (or Basic Memory) for future sessions.
 
+## Committing
+
+- Always pass `--no-gpg-sign` when creating commits. Agent-created commits do not need to be signed and GPG signing requires user interaction.
+
 ## Code style
 
 - All files should end with a newline.
