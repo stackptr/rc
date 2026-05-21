@@ -23,7 +23,7 @@ in {
 
         # intermediate configuration
         ssl_protocols ${config.services.nginx.sslProtocols};
-        ssl_ciphers ${config.services.nginx.sslCiphers};
+        ssl_ciphers ${lib.concatStringsSep ":" config.services.nginx.sslCiphers};
         ssl_prefer_server_ciphers off;
 
         # Proxy stream
@@ -32,7 +32,7 @@ in {
         proxy_ssl_certificate ${certs.${certName}.directory}/fullchain.pem;
         proxy_ssl_certificate_key ${certs.${certName}.directory}/key.pem;
         proxy_ssl_protocols ${config.services.nginx.sslProtocols};
-        proxy_ssl_ciphers ${config.services.nginx.sslCiphers};
+        proxy_ssl_ciphers ${lib.concatStringsSep ":" config.services.nginx.sslCiphers};
         proxy_ssl_session_reuse on;
     }
   '';
