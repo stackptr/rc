@@ -2,7 +2,6 @@
   config,
   llm-profile,
   pkgs,
-  pkgs-stable-25-11,
   ...
 }: {
   home.packages = [pkgs.mktorrent pkgs.obsidian-headless];
@@ -32,7 +31,6 @@
 
   programs.beets = {
     enable = true;
-    package = pkgs-stable-25-11.beets;
     settings = {
       directory = "/mnt/media/Music";
       import = {
