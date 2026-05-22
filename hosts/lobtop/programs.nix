@@ -15,10 +15,6 @@
     };
   };
 
-  programs.craft = {
-    enable = true;
-  };
-
   programs.daisydisk = {
     enable = true;
   };
