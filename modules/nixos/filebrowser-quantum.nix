@@ -133,11 +133,14 @@ in {
   config = lib.mkIf cfg.enable {
     systemd = {
       services.filebrowser-quantum = {
-        after = ["network.target"];
+        after = ["network-online.target"];
+        wants = ["network-online.target"];
         description = "FileBrowser Quantum";
         wantedBy = ["multi-user.target"];
         serviceConfig =
           {
+            Restart = "on-failure";
+            RestartSec = "30s";
             ExecStart = let
               args = [
                 (lib.getExe cfg.package)
