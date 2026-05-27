@@ -9,9 +9,7 @@
   startScript = pkgs.writeShellScript "kagi-mcp-start" ''
     exec ${lib.getExe pkgs.uv} run --with kagimcp python -c "
     from kagimcp.server import mcp
-    mcp.settings.host = '${cfg.host}'
-    mcp.settings.port = ${toString cfg.port}
-    mcp.run(transport='streamable-http')
+    mcp.run(transport='streamable-http', host='${cfg.host}', port=${toString cfg.port})
     "
   '';
 in {
