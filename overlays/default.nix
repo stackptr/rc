@@ -8,4 +8,7 @@
 
   # Override opencode ahead of nixpkgs pin
   (import ./opencode.nix)
+
+  # Inject User-Agent into fetchcrate so crates.io doesn't 403
+  (import ./fetchcrate-ua.nix)
 ]
