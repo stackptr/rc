@@ -3,12 +3,14 @@
 let
   globalSecrets = import ./secrets/default.nix;
   glyphSecrets = import ./secrets/glyph.nix;
+  lobtopSecrets = import ./secrets/lobtop.nix;
   sporeSecrets = import ./secrets/spore.nix;
   zetaSecrets = import ./secrets/zeta.nix;
   homeSecrets = import ./secrets/home.nix;
 in
   globalSecrets
   // glyphSecrets
+  // lobtopSecrets
   // sporeSecrets
   // zetaSecrets
   // homeSecrets
