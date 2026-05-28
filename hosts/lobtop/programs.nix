@@ -65,6 +65,7 @@
 
     settings = {
       app.minimalMode = true;
+      notifications.showInMenuBar = false;
       ui.surfaceTabBar.buttons = [
         "cmux.newTerminal"
         "cmux.splitRight"
