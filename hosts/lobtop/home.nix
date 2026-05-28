@@ -24,7 +24,7 @@
     OTEL_METRIC_EXPORT_INTERVAL = "60000";
   };
 
-  programs.zsh.sessionVariables = {
-    OTEL_EXPORTER_OTLP_HEADERS = "Authorization=Bearer $(cat ${config.age.secrets.otel-token.path})";
-  };
+  programs.zsh.initContent = ''
+    export OTEL_EXPORTER_OTLP_HEADERS="Authorization=Bearer $(cat ${config.age.secrets.otel-token.path})"
+  '';
 }
