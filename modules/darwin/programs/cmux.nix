@@ -62,6 +62,7 @@ in {
     (mkIf cfg.enableDefaults {
       programs.cmux.settings = {
         app.minimalMode = mkDefault true;
+        notifications.showInMenuBar = mkDefault false;
         ui.surfaceTabBar.buttons = mkDefault [
           "cmux.newTerminal"
           "cmux.splitRight"

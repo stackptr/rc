@@ -59,6 +59,5 @@
   programs.cmux = {
     enable = true;
     enableDefaults = true;
-    settings.notifications.showInMenuBar = false;
   };
 }
