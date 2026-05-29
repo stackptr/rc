@@ -26,9 +26,7 @@ in {
   options.programs.cmux = {
     enable = mkEnableOption "cmux";
 
-    defaults = {
-      enable = mkEnableOption "cmux and ghostty shared defaults";
-    };
+    enableDefaults = mkEnableOption "cmux and ghostty shared defaults";
 
     settings = mkOption {
       inherit (jsonFormat) type;
@@ -61,7 +59,7 @@ in {
   };
 
   config = mkMerge [
-    (mkIf cfg.defaults.enable {
+    (mkIf cfg.enableDefaults {
       programs.cmux.settings = {
         app.minimalMode = mkDefault true;
         ui.surfaceTabBar.buttons = mkDefault [

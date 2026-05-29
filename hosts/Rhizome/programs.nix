@@ -99,6 +99,6 @@
 
   programs.cmux = {
     enable = true;
-    defaults.enable = true;
+    enableDefaults = true;
   };
 }
