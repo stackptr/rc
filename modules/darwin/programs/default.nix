@@ -6,6 +6,7 @@
     ./daisydisk.nix
     ./fastscripts.nix
     ./iina.nix
+    ./karabiner.nix
     ./little-snitch.nix
     ./popclip.nix
     ./postico.nix
