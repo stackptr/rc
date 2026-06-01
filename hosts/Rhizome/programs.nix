@@ -96,4 +96,9 @@
     enable = true;
     startOnActivation = true;
   };
+
+  programs.cmux = {
+    enable = true;
+    enableDefaults = true;
+  };
 }
