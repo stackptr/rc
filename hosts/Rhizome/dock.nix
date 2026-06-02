@@ -17,7 +17,6 @@
       "/System/Applications/Reminders.app"
       "/Applications/Obsidian.app"
       "/Applications/Things3.app"
-      "/Applications/Craft.app"
       "/System/Applications/Messages.app"
       "/Applications/Slack.app"
     ];
