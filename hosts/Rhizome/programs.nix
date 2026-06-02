@@ -52,10 +52,6 @@
     in [cookiesTxtLocally ublockOrigin reactDevTools];
   };
 
-  programs.craft = {
-    enable = true;
-  };
-
   programs.daisydisk = {
     enable = true;
   };
