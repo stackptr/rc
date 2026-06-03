@@ -213,6 +213,7 @@
             packages =
               [
                 inputs'.agenix.packages.default
+                pkgs.entire
                 pkgs.graphite-cli
                 pkgs.just
               ]
