@@ -64,5 +64,28 @@
   programs.zed = {
     enable = true;
     enableDefaults = true;
+    settings = {
+      language_models = {
+        bedrock = {
+          authentication_method = "named_profile";
+          region = "us-west-2";
+          profile = "bedrock";
+          allow_extended_context = true;
+        };
+      };
+      agent.tool_permissions = {
+        tools = {
+          terminal = {
+            always_allow = [
+              {pattern = "^git\\s+status(\\s|$)";}
+              {pattern = "^git\\b";}
+              {pattern = "^gt\\s+track(\\s|$)";}
+            ];
+          };
+          "mcp:glyph:basic-memory__build_context" = {default = "allow";};
+          "mcp:glyph:basic-memory__search_notes" = {default = "allow";};
+        };
+      };
+    };
   };
 }
