@@ -1,5 +1,6 @@
 {
   config,
+  inputs,
   lib,
   pkgs,
   username,
@@ -23,10 +24,23 @@ in {
         Keys map directly to Zed JSON config fields.
       '';
     };
+
+    themes = mkOption {
+      type = types.attrsOf types.path;
+      default = {};
+      description = ''
+        Extra theme files linked into {file}`~/.config/zed/themes/`.
+        Attribute name is the filename; value is the source path.
+      '';
+    };
   };
 
   config = mkMerge [
     (mkIf cfg.enableDefaults {
+      programs.zed.themes = {
+        "zed-nova-theme.json" = mkDefault (inputs.zed-nova-theme + "/theme.json");
+      };
+
       programs.zed.settings = {
         auto_update = mkDefault false;
         theme = mkDefault {
@@ -276,6 +290,11 @@ in {
         xdg.configFile."zed/settings.json" = {
           source = jsonFormat.generate "zed-settings" cfg.settings;
         };
+
+        xdg.configFile =
+          mapAttrs' (name: src:
+            nameValuePair "zed/themes/${name}" {inherit src;})
+          cfg.themes;
       };
     })
   ];
