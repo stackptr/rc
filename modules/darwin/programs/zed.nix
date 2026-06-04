@@ -234,6 +234,17 @@ in {
               workingDirectory = {mode = "auto";};
             };
           };
+          nil = {
+            settings = {
+              nil = {
+                nix = {
+                  flake = {
+                    autoArchive = true;
+                  };
+                };
+              };
+            };
+          };
         };
 
         agent_servers = mkDefault {
