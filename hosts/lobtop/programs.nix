@@ -60,4 +60,9 @@
     enable = true;
     enableDefaults = true;
   };
+
+  programs.zed = {
+    enable = true;
+    enableDefaults = true;
+  };
 }
