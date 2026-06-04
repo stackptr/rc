@@ -1,0 +1,11 @@
+{
+  "enabled": true,
+  "strategy_options": {
+    "checkpoint_remote": {
+      "provider": "github",
+      "repo": "stackptr/checkpoints"
+    },
+    "push_sessions": true
+  },
+  "sign_checkpoint_commits": false
+}

@@ -217,7 +217,10 @@
                 pkgs.just
               ]
               ++ config.pre-commit.settings.enabledPackages;
-            inherit (config.pre-commit) shellHook;
+            shellHook = ''
+              ${config.pre-commit.shellHook}
+              entire enable -y --agent claude-code 2>/dev/null || true
+            '';
           };
         };
         formatter = let
