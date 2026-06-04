@@ -287,13 +287,12 @@ in {
       homebrew.casks = ["zed"];
 
       home-manager.users.${username} = {
-        xdg.configFile."zed/settings.json" = {
-          source = jsonFormat.generate "zed-settings" cfg.settings;
-        };
-
         xdg.configFile =
-          mapAttrs' (name: src:
-            nameValuePair "zed/themes/${name}" {inherit src;})
+          {
+            "zed/settings.json".source = jsonFormat.generate "zed-settings" cfg.settings;
+          }
+          // mapAttrs' (name: src:
+            nameValuePair "zed/themes/${name}" {source = src;})
           cfg.themes;
       };
     })
