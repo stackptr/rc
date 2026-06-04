@@ -7,6 +7,7 @@
   inherit (lib) mkIf mkOption;
 
   gitCfg = config.rc.git;
+  entireCfg = config.rc.entire;
   graphiteCfg = config.rc.graphite;
   jjCfg = config.rc.jujutsu;
 in {
@@ -31,6 +32,10 @@ in {
 
     rc.graphite = {
       enable = lib.mkEnableOption "Graphite CLI";
+    };
+
+    rc.entire = {
+      enable = lib.mkEnableOption "Entire CLI for AI session checkpointing";
     };
 
     rc.jujutsu = {
@@ -105,6 +110,10 @@ in {
           run chmod u+w "$config_file"
         fi
       '';
+    })
+
+    (mkIf entireCfg.enable {
+      home.packages = [pkgs.entire];
     })
 
     (mkIf jjCfg.enable {

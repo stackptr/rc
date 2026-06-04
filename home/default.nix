@@ -31,6 +31,7 @@
         containers.enable = true;
         javascript.enable = true;
       };
+      entire.enable = true;
       graphite.enable = true;
       jujutsu.enable = true;
       utilities = {
