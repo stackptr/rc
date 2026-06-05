@@ -73,6 +73,11 @@
           allow_extended_context = true;
         };
       };
+      agent.default_model = {
+        provider = "amazon-bedrock";
+        model = "us.anthropic.claude-sonnet-4-6";
+        effort = "max";
+      };
       agent.tool_permissions = {
         tools = {
           terminal = {
