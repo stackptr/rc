@@ -66,11 +66,13 @@ nix flake update --commit-lock-file
 nix develop  # Provides agenix, graphite-cli, just
 ```
 
-Agent conversations in Zed do not run inside the devShell. To invoke devShell tools from within a Claude Code session (e.g. `entire`, `agenix`), prefix commands with `direnv exec . <command>`:
+Claude Code sessions may not run inside the devShell (e.g. when launched from Zed). When invoking devShell tools from within a Claude Code session (e.g. `entire`, `agenix`), prefix commands with `direnv exec . <command>`:
 ```bash
 direnv exec . entire version
 direnv exec . agenix -e hosts/spore/secrets/foo.age
 ```
+
+When giving commands for the **user** to run in their own terminal, omit the `direnv exec .` prefix — their shell will have the devShell active.
 
 ## Key Configuration Details
 
