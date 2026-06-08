@@ -44,8 +44,7 @@
   # All other models from the API provider are deactivated automatically.
   models = {
     "claude-sonnet-4-6".name = "Claude Sonnet 4.6";
-    "claude-opus-4-6".name = "Claude Opus 4.6";
-    "claude-haiku-4-5-20251001".name = "Claude Haiku 4.5";
+    "claude-haiku-4-5".name = "Claude Haiku 4.5";
   };
 
   modelIds = builtins.toJSON (builtins.attrNames models);
@@ -55,7 +54,6 @@ in {
     file = ./../secrets/open-webui-api-key.age;
     mode = "440";
   };
-
   systemd.services.open-webui.restartTriggers = [config.age.secrets.open-webui-env.file];
 
   # Sync model configuration after open-webui starts
