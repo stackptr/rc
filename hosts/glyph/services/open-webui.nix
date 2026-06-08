@@ -45,6 +45,8 @@
   models = {
     "claude-sonnet-4-6".name = "Claude Sonnet 4.6";
     "claude-haiku-4-5".name = "Claude Haiku 4.5";
+    "bedrock/claude-sonnet-4-6".name = "Claude Sonnet 4.6 (Bedrock)";
+    "bedrock/claude-haiku-4-5".name = "Claude Haiku 4.5 (Bedrock)";
   };
 
   modelIds = builtins.toJSON (builtins.attrNames models);
