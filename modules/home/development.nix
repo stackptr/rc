@@ -27,6 +27,45 @@ in {
 
   config = lib.mkMerge [
     (mkIf cfg.ai.enable {
+      home.packages = [pkgs.nono];
+
+      # nono sandbox profile for Claude Code
+      # Extends the built-in profile with Nix-specific read paths
+      xdg.configFile."nono/profiles/claude-code.json".text = builtins.toJSON {
+        meta = {
+          name = "claude-code";
+          version = "1.0.0";
+          description = "Claude Code sandboxed profile for Nix-managed systems";
+        };
+        extends = "claude-code";
+        filesystem = {
+          read = [
+            "/nix/store"
+            "/nix/var/nix/profiles"
+            "/run/current-system/sw"
+            "$HOME/.nix-profile"
+          ];
+        };
+      };
+
+      programs.claude-code.package = pkgs.symlinkJoin {
+        name = "claude-code-nono-wrapped";
+        paths =
+          [
+            (pkgs.writeShellScriptBin "claude" ''
+              exec ${pkgs.nono}/bin/nono run --profile claude-code \
+                -- ${pkgs.claude-code}/bin/claude "$@"
+            '')
+            pkgs.claude-code
+          ]
+          ++ lib.optional pkgs.stdenv.isDarwin
+          (pkgs.writeShellScriptBin "claude-login" ''
+            exec ${pkgs.nono}/bin/nono run --profile claude-code \
+              --allow-launch-services \
+              -- ${pkgs.claude-code}/bin/claude "$@"
+          '');
+      };
+
       programs.zsh.sessionVariables = {
         # Disable claude-pace API fallback; rate limits come from stdin on CC >= 2.1.80
         CLAUDE_PACE_API_FALLBACK = "0";
@@ -47,6 +86,7 @@ in {
           model = "sonnet";
           # Disabled in favor of Basic Memory MCP for cross-device access
           autoMemoryEnabled = false;
+          allowUnsandboxedCommands = false;
           statusLine = {
             type = "command";
             command = "${pkgs.claude-pace}/bin/claude-pace";
