@@ -1,5 +1,6 @@
 {
   imports = [
+    ./agent-sandbox.nix
     ./basic-memory.nix
     ./grafana-mcp.nix
     ./graphite-mcp.nix
