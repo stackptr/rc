@@ -23,13 +23,14 @@
       useDHCP = false;
       ipv4.addresses = [
         {
-          address = "74.48.202.251";
+          # CloudCone reassigned the VPS public IP (was 74.48.202.251/24).
+          address = "182.255.82.149";
           prefixLength = 24;
         }
       ];
     };
     defaultGateway = {
-      address = "74.48.202.1";
+      address = "182.255.82.1";
       interface = "eth0";
     };
     nameservers = ["8.8.8.8"];
