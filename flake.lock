@@ -545,6 +545,7 @@
         "nixpkgs": "nixpkgs_2",
         "nixpkgs-stable-24-05": "nixpkgs-stable-24-05",
         "systems": "systems_2",
+        "zed-nova-theme": "zed-nova-theme",
         "zx-dev": "zx-dev"
       }
     },
@@ -590,6 +591,22 @@
       "original": {
         "owner": "numtide",
         "repo": "flake-utils",
+        "type": "github"
+      }
+    },
+    "zed-nova-theme": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1778631800,
+        "narHash": "sha256-tO7TiyjOyqFLYGaJdoE/eSndyqLEsyLKK0qYSl7vtWg=",
+        "owner": "stackptr",
+        "repo": "zed-nova-theme",
+        "rev": "484ab792b9544a49eb93cdd5e5e5a0c853f8216d",
+        "type": "github"
+      },
+      "original": {
+        "owner": "stackptr",
+        "repo": "zed-nova-theme",
         "type": "github"
       }
     },
