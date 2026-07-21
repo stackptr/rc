@@ -202,6 +202,7 @@
           config.allowUnfreePredicate = pkg:
             builtins.elem (inputs.nixpkgs.lib.getName pkg) [
               "graphite-cli"
+              "graphite-cli-unwrapped"
               "obsidian-headless"
             ];
         };
