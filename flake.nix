@@ -51,7 +51,6 @@
     };
     attic = {
       url = "github:zhaofengli/attic";
-      inputs.nixpkgs.follows = "nixpkgs";
     };
     zx-dev = {
       url = "github:stackptr/zx.dev";
