@@ -7,8 +7,11 @@ final: prev: {
     prev.pythonPackagesExtensions
     ++ [
       (pyFinal: pyPrev: {
+        # Its checks run in installCheckPhase (pyproject-style builder), not
+        # checkPhase, so doCheck alone is a no-op here.
         paho-mqtt = pyPrev.paho-mqtt.overrideAttrs (old: {
           doCheck = false;
+          doInstallCheck = false;
         });
       })
     ];
