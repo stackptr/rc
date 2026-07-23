@@ -51,7 +51,6 @@
     };
     attic = {
       url = "github:zhaofengli/attic";
-      inputs.nixpkgs.follows = "nixpkgs";
     };
     zx-dev = {
       url = "github:stackptr/zx.dev";
@@ -202,6 +201,7 @@
           config.allowUnfreePredicate = pkg:
             builtins.elem (inputs.nixpkgs.lib.getName pkg) [
               "graphite-cli"
+              "graphite-cli-unwrapped"
               "obsidian-headless"
             ];
         };
