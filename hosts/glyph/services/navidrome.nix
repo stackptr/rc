@@ -15,6 +15,7 @@
       Address = "0.0.0.0";
       MusicFolder = "/mnt/media/Music";
       Scanner.Schedule = "@every 1h";
+      RecentlyAddedByModTime = true;
     };
   };
 }
