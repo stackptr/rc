@@ -126,6 +126,11 @@
         useACMEHost = "zx.dev";
         locations."/".proxyPass = "http://glyph.note-iwato.ts.net:8096";
       };
+      "music.zx.dev" = {
+        forceSSL = true;
+        useACMEHost = "zx.dev";
+        locations."/".proxyPass = "http://glyph.note-iwato.ts.net:4533";
+      };
       "mcp.zx.dev" = {
         forceSSL = true;
         useACMEHost = "zx.dev";
