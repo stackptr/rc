@@ -13,6 +13,7 @@
     ./filebrowser.nix
     ./jellyfin.nix
     ./loki.nix
+    ./navidrome.nix
     ./nfs.nix
     ./ntfy.nix
     ./open-terminal.nix
