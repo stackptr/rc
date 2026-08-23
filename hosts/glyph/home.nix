@@ -33,6 +33,15 @@
     enable = true;
     settings = {
       directory = "/mnt/media/Music";
+      # Extend beets' default ignore list to skip playlist files on import
+      ignore = [
+        ".*"
+        "*~"
+        "System Volume Information"
+        "lost+found"
+        "*.m3u"
+        "*.m3u8"
+      ];
       import = {
         copy = true;
         move = false;
