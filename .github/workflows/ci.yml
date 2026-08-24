@@ -67,6 +67,9 @@ jobs:
         nix profile install --inputs-from . attic#attic-client --fallback
         attic login rc https://cache.zx.dev ${{ secrets.ATTIC_TOKEN }}
         attic use rc:main
+    - name: Allow unprivileged user namespaces (needed by bubblewrap-based FHS builds)
+      if: runner.os == 'Linux'
+      run: sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
     - name: Build system configuration
       run: |
         if [ "${{ matrix.system }}" = "aarch64-darwin" ]; then
