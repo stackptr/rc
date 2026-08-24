@@ -131,6 +131,14 @@
         useACMEHost = "zx.dev";
         locations."/".proxyPass = "http://glyph.note-iwato.ts.net:4533";
       };
+      "ma.zx.dev" = {
+        forceSSL = true;
+        useACMEHost = "zx.dev";
+        locations."/" = {
+          proxyPass = "http://glyph.note-iwato.ts.net:8095";
+          proxyWebsockets = true;
+        };
+      };
       "mcp.zx.dev" = {
         forceSSL = true;
         useACMEHost = "zx.dev";
