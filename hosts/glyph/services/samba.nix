@@ -34,7 +34,7 @@
       {
         global = {
           "invalid users" = [];
-          securityType = "user";
+          security = "user";
           "vfs objects" = "catia fruit streams_xattr";
           "fruit:metadata" = "stream";
           "fruit:resource" = "file";
