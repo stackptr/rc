@@ -19,6 +19,10 @@
           client_max_body_size 0;
           autoindex on;
 
+          # Advertise DAV level 2 so macOS WebDAVFS treats the share as writable.
+          # dav_ext_methods sets DAV: 1; this appends level 2.
+          add_header DAV '1, 2' always;
+
           # macOS Finder requires LOCK/UNLOCK to enable write operations.
           # nginx does not implement them; return minimal valid responses.
           if ($request_method = LOCK) {
