@@ -12,6 +12,11 @@
   ];
 
   age.secrets.cloudflare-dns.file = ../../secrets/cloudflare-dns.age;
+  age.secrets.docs-htpasswd = {
+    file = ../../secrets/docs-htpasswd.age;
+    owner = "nginx";
+    mode = "400";
+  };
 
   services.nginx = {
     enable = true;
@@ -125,6 +130,20 @@
         forceSSL = true;
         useACMEHost = "zx.dev";
         locations."/".proxyPass = "http://glyph.note-iwato.ts.net:8096";
+      };
+      "docs.zx.dev" = {
+        forceSSL = true;
+        useACMEHost = "zx.dev";
+        locations."/" = {
+          proxyPass = "http://glyph.note-iwato.ts.net:8185";
+          extraConfig = ''
+            auth_basic "Documents";
+            auth_basic_user_file ${config.age.secrets.docs-htpasswd.path};
+            proxy_set_header Authorization "";
+            client_max_body_size 0;
+            proxy_request_buffering off;
+          '';
+        };
       };
       "music.zx.dev" = {
         forceSSL = true;

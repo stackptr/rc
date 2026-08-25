@@ -20,6 +20,7 @@
     ./open-webui.nix
     ./prometheus.nix
     ./samba.nix
+    ./webdav.nix
     ./torrents.nix
     ./windmill.nix
   ];
