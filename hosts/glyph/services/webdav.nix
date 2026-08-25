@@ -26,6 +26,6 @@
   users.users.nginx.extraGroups = ["users"];
 
   systemd.tmpfiles.rules = [
-    "d /mnt/documents 2775 partner users -"
+    "d /mnt/documents 2775 colleen users -"
   ];
 }

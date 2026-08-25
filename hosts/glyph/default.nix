@@ -34,7 +34,7 @@
     fsType = "zfs";
   };
 
-  users.users.partner = {
+  users.users.colleen = {
     isSystemUser = true;
     group = "users";
     description = "Partner's Samba user";

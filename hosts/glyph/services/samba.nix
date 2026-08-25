@@ -21,7 +21,7 @@
     shares = {
       Archive = mkShare "/mnt/archive" "mu" "users";
       Backup = mkShare "/mnt/backup" "mu" "users" // {"fruit:time machine" = "yes";};
-      Documents = mkShare "/mnt/documents" "partner" "users";
+      Documents = mkShare "/mnt/documents" "colleen" "users";
       Media = mkShare "/mnt/media" config.services.jellyfin.user config.services.jellyfin.group;
       Notes = mkShare "/var/lib/basic-memory/basic-memory" "basic-memory" "basic-memory";
       Torrents = mkShare "/mnt/torrents" config.services.transmission.user config.services.transmission.group;
@@ -66,13 +66,13 @@
       Type = "oneshot";
       ExecStart = let
         defaultUsrGrp = "mu:users";
-        partnerUsrGrp = "partner:users";
+        colleenUsrGrp = "colleen:users";
         jellyfinUsrGrp = with config.services.jellyfin; "${user}:${group}";
         transmissionUsrGrp = with config.services.transmission; "${user}:${group}";
       in [
         "${pkgs.coreutils}/bin/chown -R ${defaultUsrGrp} archive"
         "${pkgs.coreutils}/bin/chown -R ${defaultUsrGrp} backup"
-        "${pkgs.coreutils}/bin/chown -R ${partnerUsrGrp} documents"
+        "${pkgs.coreutils}/bin/chown -R ${colleenUsrGrp} documents"
         # N.B.: /mnt/media/Music is used by Roon, not Jellyfin
         "${pkgs.coreutils}/bin/chown -R ${jellyfinUsrGrp} media/Movies media/TV media/Unsorted media/Video"
         "${pkgs.coreutils}/bin/chown -R ${defaultUsrGrp} media/Music"
