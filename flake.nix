@@ -46,6 +46,7 @@
     };
     golink = {
       # Pinned to last commit compatible with go 1.26.5 (nixpkgs); next commit bumped to 1.26.6
+      # Unpin when nixpkgs reaches go 1.26.6 — tracked in https://github.com/stackptr/rc/issues/536
       url = "github:tailscale/golink/52e1fd108b6362c7269fc834f854146b21a3bfc7";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.systems.follows = "systems";
