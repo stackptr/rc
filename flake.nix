@@ -45,7 +45,8 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     golink = {
-      url = "github:tailscale/golink";
+      # Pinned to last commit compatible with go 1.26.5 (nixpkgs); next commit bumped to 1.26.6
+      url = "github:tailscale/golink/52e1fd108b6362c7269fc834f854146b21a3bfc7";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.systems.follows = "systems";
     };
