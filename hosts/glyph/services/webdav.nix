@@ -25,6 +25,8 @@
 
   users.users.nginx.extraGroups = ["users"];
 
+  systemd.services.nginx.serviceConfig.ReadWritePaths = ["/mnt/documents"];
+
   systemd.tmpfiles.rules = [
     "d /mnt/documents 2775 colleen users -"
   ];
