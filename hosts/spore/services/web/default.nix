@@ -142,6 +142,14 @@
             proxy_set_header Authorization "";
             client_max_body_size 0;
             proxy_request_buffering off;
+
+            # Rewrite WebDAV Destination header for MOVE/COPY: Finder sends
+            # https://docs.zx.dev/... but Apache sees itself as http://docs.zx.dev:8185.
+            set $dav_dest $http_destination;
+            if ($dav_dest ~ "^https://docs\.zx\.dev(/.*)$") {
+              set $dav_dest http://docs.zx.dev:8185$1;
+            }
+            proxy_set_header Destination $dav_dest;
           '';
         };
       };
