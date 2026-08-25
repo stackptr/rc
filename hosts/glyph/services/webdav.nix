@@ -1,4 +1,4 @@
-{_}: {
+{lib, ...}: {
   services.httpd = {
     enable = true;
     adminAddr = "admin@localhost";
