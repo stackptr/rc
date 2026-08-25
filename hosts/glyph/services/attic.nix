@@ -8,7 +8,7 @@
     settings = {
       listen = "[::]:8199";
 
-      database.url = "postgresql:///atticd?host=/run/postgresql";
+      database.url = "postgresql:///atticd?host=/run/postgresql&user=atticd";
 
       storage = {
         type = "local";
