@@ -15,6 +15,15 @@
       enable = true;
       port = 9134;
     };
+    exporters.postgres = {
+      enable = true;
+      port = 9187;
+      dataSourceName = "user=mu database=postgres host=/var/run/postgresql sslmode=disable";
+    };
+    exporters.smartctl = {
+      enable = true;
+      port = 9633;
+    };
     scrapeConfigs = [
       {
         job_name = "node";
@@ -40,6 +49,29 @@
             targets = [
               "localhost:${toString config.services.prometheus.exporters.zfs.port}"
             ];
+            labels.instance = "glyph";
+          }
+        ];
+      }
+      {
+        job_name = "postgres";
+        static_configs = [
+          {
+            targets = [
+              "localhost:${toString config.services.prometheus.exporters.postgres.port}"
+            ];
+            labels.instance = "glyph";
+          }
+        ];
+      }
+      {
+        job_name = "smartctl";
+        static_configs = [
+          {
+            targets = [
+              "localhost:${toString config.services.prometheus.exporters.smartctl.port}"
+            ];
+            labels.instance = "glyph";
           }
         ];
       }
