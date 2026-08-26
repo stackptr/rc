@@ -3,7 +3,24 @@ _: {
 
   environment.etc."alloy/config.alloy".text = ''
     loki.source.journal "systemd" {
+      forward_to = [loki.relabel.journal.receiver]
+    }
+
+    loki.relabel "journal" {
       forward_to = [loki.write.local.receiver]
+
+      rule {
+        source_labels = ["__journal__systemd_unit"]
+        target_label  = "unit"
+      }
+      rule {
+        source_labels = ["__journal__priority"]
+        target_label  = "priority"
+      }
+      rule {
+        source_labels = ["__journal__syslog_identifier"]
+        target_label  = "app"
+      }
     }
 
     loki.write "local" {
