@@ -184,6 +184,8 @@ All logs carry these labels, queryable with `{label="value"}` in LogQL:
 | `priority` | `PRIORITY` | `0`–`7` (0=emerg, 3=err, 4=warn, 6=info, 7=debug) |
 | `app` | `SYSLOG_IDENTIFIER` | `navidrome`, `nginx`, `kernel` |
 
+**Alloy journal label naming:** In `discovery.relabel` rules for `loki.source.journal`, the source label prefix is `__journal_` + the field name lowercased. Fields with a leading underscore (e.g. `_SYSTEMD_UNIT` → `_systemd_unit`) produce a double underscore (`__journal__systemd_unit`). Fields without one (e.g. `PRIORITY`, `SYSLOG_IDENTIFIER`) produce a single underscore (`__journal_priority`, `__journal_syslog_identifier`).
+
 **Common LogQL patterns:**
 ```logql
 # All errors and above from a specific service
