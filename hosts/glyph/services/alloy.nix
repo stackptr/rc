@@ -2,12 +2,8 @@ _: {
   services.alloy.enable = true;
 
   environment.etc."alloy/config.alloy".text = ''
-    loki.source.journal "systemd" {
-      forward_to = [loki.relabel.journal.receiver]
-    }
-
-    loki.relabel "journal" {
-      forward_to = [loki.write.local.receiver]
+    discovery.relabel "journal" {
+      targets = []
 
       rule {
         source_labels = ["__journal__systemd_unit"]
@@ -21,6 +17,11 @@ _: {
         source_labels = ["__journal__syslog_identifier"]
         target_label  = "app"
       }
+    }
+
+    loki.source.journal "systemd" {
+      relabel_rules = discovery.relabel.journal.rules
+      forward_to    = [loki.write.local.receiver]
     }
 
     loki.write "local" {
