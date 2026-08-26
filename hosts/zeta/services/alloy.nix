@@ -10,11 +10,11 @@ _: {
         target_label  = "unit"
       }
       rule {
-        source_labels = ["__journal__priority"]
+        source_labels = ["__journal_priority"]
         target_label  = "priority"
       }
       rule {
-        source_labels = ["__journal__syslog_identifier"]
+        source_labels = ["__journal_syslog_identifier"]
         target_label  = "app"
       }
     }
