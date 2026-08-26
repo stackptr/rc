@@ -75,6 +75,17 @@
           }
         ];
       }
+      {
+        job_name = "navidrome";
+        static_configs = [
+          {
+            targets = [
+              "localhost:4533"
+            ];
+            labels.instance = "glyph";
+          }
+        ];
+      }
     ];
   };
 }
