@@ -76,6 +76,17 @@
         ];
       }
       {
+        job_name = "nginx";
+        static_configs = [
+          {
+            targets = [
+              "spore.note-iwato.ts.net:9113"
+            ];
+            labels.instance = "spore";
+          }
+        ];
+      }
+      {
         job_name = "navidrome";
         static_configs = [
           {

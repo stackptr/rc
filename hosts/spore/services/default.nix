@@ -20,6 +20,12 @@
     enabledCollectors = ["systemd"];
   };
 
+  services.prometheus.exporters.nginx = {
+    enable = true;
+    port = 9113;
+    scrapeUri = "http://127.0.0.1:9080/nginx_status";
+  };
+
   services.glances = {
     inherit (config.services.homepage-dashboard) enable;
   };

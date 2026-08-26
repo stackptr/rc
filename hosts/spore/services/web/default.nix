@@ -211,6 +211,16 @@
     };
   };
 
+  services.nginx.virtualHosts."nginx-metrics" = {
+    listen = [
+      {
+        addr = "127.0.0.1";
+        port = 9080;
+      }
+    ];
+    locations."/nginx_status".extraConfig = "stub_status;";
+  };
+
   services.zx-dev = {
     enable = true;
     domain = "zx.dev";
