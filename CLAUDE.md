@@ -237,6 +237,7 @@ rate(nginx_http_requests_total{instance="spore"}[5m])
 ## Committing
 
 - Always pass `--no-gpg-sign` when creating commits. Agent-created commits do not need to be signed and GPG signing requires user interaction.
+- For rebases, `--no-gpg-sign` is not a valid flag — use `git -c commit.gpgsign=false rebase` (or `git -c commit.gpgsign=false pull --rebase`) instead.
 
 ## Code style
 
