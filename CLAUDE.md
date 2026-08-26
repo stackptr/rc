@@ -163,6 +163,70 @@ Use `lib.mkForce` when a host needs to diverge from a value set in a shared modu
 nix.gc.dates = lib.mkForce "daily";
 ```
 
+## Monitoring Stack
+
+The homelab runs a Grafana LGTM-lite stack for observability. **Use it proactively** when investigating service failures, slow response times, disk issues, or any situation where you'd otherwise reach for `journalctl` or SSH into a host to check a service.
+
+- **Grafana** (`grafana.zx.dev`) — dashboards, Explore, alerting
+- **Loki** (glyph:3100) — log aggregation from glyph, spore, zeta
+- **Prometheus** (glyph:9099) — metrics from all hosts
+
+**MCP access:** The `grafana` MCP server is registered in mcpjungle on glyph at `http://127.0.0.1:8095/mcp`. It exposes tools for LogQL (Loki), PromQL (Prometheus), and dashboard access. Use it instead of `journalctl` for anything beyond a quick one-liner.
+
+### Loki label schema
+
+All logs carry these labels, queryable with `{label="value"}` in LogQL:
+
+| Label | Source journal field | Example values |
+|---|---|---|
+| `host` | Static (Alloy external_labels) | `glyph`, `spore`, `zeta` |
+| `unit` | `_SYSTEMD_UNIT` | `navidrome.service`, `nginx.service` |
+| `priority` | `PRIORITY` | `0`–`7` (0=emerg, 3=err, 4=warn, 6=info, 7=debug) |
+| `app` | `SYSLOG_IDENTIFIER` | `navidrome`, `nginx`, `kernel` |
+
+**Alloy journal label naming:** In `discovery.relabel` rules for `loki.source.journal`, the source label prefix is `__journal_` + the field name lowercased. Fields with a leading underscore (e.g. `_SYSTEMD_UNIT` → `_systemd_unit`) produce a double underscore (`__journal__systemd_unit`). Fields without one (e.g. `PRIORITY`, `SYSLOG_IDENTIFIER`) produce a single underscore (`__journal_priority`, `__journal_syslog_identifier`).
+
+**Common LogQL patterns:**
+```logql
+# All errors and above from a specific service
+{host="glyph", unit="navidrome.service", priority=~"[0-3]"}
+
+# All warnings and above across spore
+{host="spore", priority=~"[0-4]"}
+
+# nginx access and error logs on spore
+{host="spore", app="nginx"}
+
+# Recent errors across all hosts
+{priority=~"[0-3]"} |= "error"
+```
+
+### Prometheus jobs and exporters
+
+| Job | Port | Host | Covers |
+|---|---|---|---|
+| `node` | 9100 | glyph, spore | CPU, memory, disk, network, systemd unit states |
+| `zfs` | 9134 | glyph | Pool health, ARC hit ratio, pool space |
+| `postgres` | 9187 | glyph | Connections, query throughput, vacuum, per-DB stats |
+| `smartctl` | 9633 | glyph | Disk SMART data, temperature, reallocated sectors |
+| `nginx` | 9113 | spore | Request rate, active connections, handled/dropped |
+| `navidrome` | 4533/metrics | glyph | Library size, play counts, scan duration |
+
+**Common PromQL patterns:**
+```promql
+# Disk temperature (watch for > 50°C on NAS drives)
+smartctl_device_temperature{instance="glyph"}
+
+# PostgreSQL active connections per database
+pg_stat_database_numbackends{instance="glyph"}
+
+# nginx request rate over 5 minutes
+rate(nginx_http_requests_total{instance="spore"}[5m])
+
+# Filesystem use % on glyph (watch for > 85%)
+100 - (node_filesystem_avail_bytes{instance="glyph",mountpoint="/"} / node_filesystem_size_bytes{instance="glyph",mountpoint="/"} * 100)
+```
+
 ## Environment Awareness
 
 - Before running commands like `ssh`, `nixos-rebuild`, or anything that targets a specific host, check which host Claude Code is running on (`hostname`) to avoid targeting the current machine unintentionally.
@@ -175,6 +239,7 @@ nix.gc.dates = lib.mkForce "daily";
 ## Committing
 
 - Always pass `--no-gpg-sign` when creating commits. Agent-created commits do not need to be signed and GPG signing requires user interaction.
+- For rebases, `--no-gpg-sign` is not a valid flag — use `git -c commit.gpgsign=false rebase` (or `git -c commit.gpgsign=false pull --rebase`) instead.
 
 ## Code style
 
