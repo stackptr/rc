@@ -13,6 +13,7 @@
     ./filebrowser.nix
     ./jellyfin.nix
     ./loki.nix
+    ./music-assistant.nix
     ./navidrome.nix
     ./nfs.nix
     ./ntfy.nix
@@ -128,6 +129,7 @@
   };
   services.grafana-mcp = {
     enable = true;
+    port = 8096;
     grafanaUrl = "https://grafana.zx.dev";
     tokenFile = config.age.secrets.grafana-mcp-token.path;
   };
@@ -137,6 +139,7 @@
   };
   services.obsidian-vault-mcp = {
     enable = true;
+    port = 8098;
     inherit (config.rc.obsidian-sync) vaultPath;
   };
   services.mcpjungle = {
@@ -154,7 +157,7 @@
       description = "Kagi web search and page summarization";
     };
     servers.grafana = {
-      url = "http://127.0.0.1:8095/mcp";
+      url = "http://127.0.0.1:8096/mcp";
       description = "Grafana dashboards, Loki logs, and Prometheus metrics";
     };
     servers.graphite = {
@@ -162,7 +165,7 @@
       description = "Graphite CLI for stacked PRs and code review";
     };
     servers.obsidian-vault = {
-      url = "http://127.0.0.1:8097/mcp";
+      url = "http://127.0.0.1:8098/mcp";
       description = "Read and write files in the Obsidian vault";
     };
     servers.context7 = {
