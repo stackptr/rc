@@ -3,6 +3,9 @@
   # Custom packages defined in this repository
   (import ./custom-packages.nix)
 
+  # Enable the genresync beets plugin
+  (import ./beets-genresync.nix)
+
   # Fix Daisydisk ahead of upstream
   (import ./daisydisk.nix)
 

@@ -73,7 +73,7 @@
           "Hybrid SACD (SACD layer, 2 channels)"
         ];
       };
-      plugins = "musicbrainz discogs edit fetchart info inline";
+      plugins = "musicbrainz discogs edit fetchart info inline genresync";
       per_disc_numbering = true;
       item_fields = {
         multidisc = "1 if disctotal > 1 else 0";
