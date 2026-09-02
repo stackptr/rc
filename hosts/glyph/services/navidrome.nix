@@ -32,6 +32,7 @@ in {
     environmentFile = config.age.secrets.navidrome-env.path;
     plugins = [
       pkgs.navidromePlugins.apple-music
+      pkgs.navidromePlugins.audiomuseai
       nd-lyrics
     ];
     settings = {
@@ -41,7 +42,7 @@ in {
       Scanner.Schedule = "@every 1h";
       RecentlyAddedByModTime = true;
       Prometheus.Enabled = true;
-      Agents = "apple-music,lastfm,deezer";
+      Agents = "apple-music,lastfm,deezer,audiomuseai";
       LyricsPriority = ".ttml,.yaml,.yml,.elrc,.lrc,.srt,.txt,embedded,nd-lyrics";
     };
   };
