@@ -13,8 +13,9 @@
     CLAUDE_CODE_USE_BEDROCK = "1";
     AWS_REGION = "us-west-2";
     AWS_PROFILE = "bedrock";
-    ANTHROPIC_DEFAULT_SONNET_MODEL = "us.anthropic.claude-sonnet-4-6";
+    ANTHROPIC_DEFAULT_SONNET_MODEL = "us.anthropic.claude-sonnet-5";
     ANTHROPIC_DEFAULT_HAIKU_MODEL = "us.anthropic.claude-haiku-4-5-20251001-v1:0";
+    ANTHROPIC_DEFAULT_OPUS_MODEL = "us.anthropic.claude-opus-5";
     CLAUDE_CODE_ENABLE_TELEMETRY = "1";
     OTEL_RESOURCE_ATTRIBUTES = "user.email=corey.johns@lob.com,user.name=Corey_Johns";
     OTEL_EXPORTER_OTLP_ENDPOINT = "https://lob.getdx.net/api/otel";

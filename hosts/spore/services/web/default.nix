@@ -12,6 +12,11 @@
   ];
 
   age.secrets.cloudflare-dns.file = ../../secrets/cloudflare-dns.age;
+  age.secrets.docs-htpasswd = {
+    file = ../../secrets/docs-htpasswd.age;
+    owner = "nginx";
+    mode = "400";
+  };
 
   services.nginx = {
     enable = true;
@@ -126,6 +131,28 @@
         useACMEHost = "zx.dev";
         locations."/".proxyPass = "http://glyph.note-iwato.ts.net:8096";
       };
+      "docs.zx.dev" = {
+        forceSSL = true;
+        useACMEHost = "zx.dev";
+        locations."/" = {
+          proxyPass = "http://glyph.note-iwato.ts.net:8185";
+          extraConfig = ''
+            auth_basic "Documents";
+            auth_basic_user_file ${config.age.secrets.docs-htpasswd.path};
+            proxy_set_header Authorization "";
+            client_max_body_size 0;
+            proxy_request_buffering off;
+
+            # Rewrite WebDAV Destination header for MOVE/COPY: Finder sends
+            # https://docs.zx.dev/... but Apache sees itself as http://docs.zx.dev:8185.
+            set $dav_dest $http_destination;
+            if ($dav_dest ~ "^https://docs\.zx\.dev(/.*)$") {
+              set $dav_dest http://docs.zx.dev:8185$1;
+            }
+            proxy_set_header Destination $dav_dest;
+          '';
+        };
+      };
       "music.zx.dev" = {
         forceSSL = true;
         useACMEHost = "zx.dev";
@@ -182,6 +209,16 @@
         };
       };
     };
+  };
+
+  services.nginx.virtualHosts."nginx-metrics" = {
+    listen = [
+      {
+        addr = "127.0.0.1";
+        port = 9080;
+      }
+    ];
+    locations."/nginx_status".extraConfig = "stub_status;";
   };
 
   services.zx-dev = {

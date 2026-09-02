@@ -29,6 +29,16 @@
     device = "zdata/backup";
     fsType = "zfs";
   };
+  fileSystems."/mnt/documents" = {
+    device = "zdata/documents";
+    fsType = "zfs";
+  };
+
+  users.users.colleen = {
+    isSystemUser = true;
+    group = "users";
+    description = "Partner's Samba user";
+  };
 
   networking.hostName = "glyph";
   networking.hostId = "e7bdc076"; # Ensure correct ZFS pool imported

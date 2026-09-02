@@ -2,6 +2,7 @@ let
   keys = with (import ../keys.nix); [spore Rhizome];
 in {
   "hosts/spore/secrets/cloudflare-dns.age".publicKeys = keys;
+  "hosts/spore/secrets/docs-htpasswd.age".publicKeys = keys;
   "hosts/spore/secrets/homepage-env.age".publicKeys = keys;
   "hosts/spore/secrets/grafana-client-secret.age".publicKeys = keys;
   "hosts/spore/secrets/grafana-secret-key.age".publicKeys = keys;

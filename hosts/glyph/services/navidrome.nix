@@ -36,9 +36,11 @@ in {
     ];
     settings = {
       Address = "0.0.0.0";
+      Port = 4533;
       MusicFolder = "/mnt/media/Music";
       Scanner.Schedule = "@every 1h";
       RecentlyAddedByModTime = true;
+      Prometheus.Enabled = true;
       Agents = "apple-music,lastfm,deezer";
       LyricsPriority = ".ttml,.yaml,.yml,.elrc,.lrc,.srt,.txt,embedded,nd-lyrics";
     };
