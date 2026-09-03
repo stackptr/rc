@@ -13,8 +13,8 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "stackptr";
     repo = "beets-genresync";
-    rev = "15b98e96eabe856a015a8754965101c6ef88d01a";
-    hash = "sha256-RqvA5JN70qlftr33o++wgYDNwuRNyhw1gU2g0cmtJOA=";
+    rev = "be04cf0f8828028d74d75e9cc81c1e60f2a046fd";
+    hash = "sha256-ipYA3Pyi1VrIjs2Vkji7Xexh3xpwlJ4+PVsDLx5V+sk=";
   };
 
   build-system = [
