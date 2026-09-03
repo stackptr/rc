@@ -3,7 +3,6 @@
   fetchFromGitHub,
   buildPythonPackage,
   setuptools,
-  musicbrainzngs,
   requests,
 }:
 buildPythonPackage rec {
@@ -14,8 +13,8 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "stackptr";
     repo = "beets-genresync";
-    rev = "a12c30fdfde74ca84a34ce999c27126fab0d1923";
-    hash = "sha256-qd9UpFy2Vwf5rJDkUrIy5VlVdmyW5yZ5NBa0apfnuUE=";
+    rev = "15b98e96eabe856a015a8754965101c6ef88d01a";
+    hash = "sha256-RqvA5JN70qlftr33o++wgYDNwuRNyhw1gU2g0cmtJOA=";
   };
 
   build-system = [
@@ -23,7 +22,6 @@ buildPythonPackage rec {
   ];
 
   dependencies = [
-    musicbrainzngs
     requests
   ];
 
