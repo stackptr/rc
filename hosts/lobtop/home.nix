@@ -27,5 +27,8 @@
 
   programs.zsh.initContent = ''
     export OTEL_EXPORTER_OTLP_HEADERS="Authorization=Bearer $(cat ${config.age.secrets.otel-token.path})"
+    if [[ -f "${config.home.homeDirectory}/Development/lob/shell-integration.zsh" ]]; then
+      source ${config.home.homeDirectory}/Development/lob/shell-integration.zsh
+    fi
   '';
 }
