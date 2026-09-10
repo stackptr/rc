@@ -312,6 +312,22 @@
         "type": "github"
       }
     },
+    "homebrew-cassette": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1784728248,
+        "narHash": "sha256-eEYL+IUjQyfDNLjn9MaFrtJPluKdOHr9FzrVFuNY+eo=",
+        "owner": "CassetteLab",
+        "repo": "homebrew-cassette",
+        "rev": "9abf861f330cf82f2ab788d2105c70fb8ff72509",
+        "type": "github"
+      },
+      "original": {
+        "owner": "CassetteLab",
+        "repo": "homebrew-cassette",
+        "type": "github"
+      }
+    },
     "homebrew-core": {
       "flake": false,
       "locked": {
@@ -529,6 +545,7 @@
         "golink": "golink",
         "home-manager": "home-manager",
         "homebrew-cask": "homebrew-cask",
+        "homebrew-cassette": "homebrew-cassette",
         "homebrew-core": "homebrew-core",
         "llm-profile": "llm-profile",
         "nix-darwin": "nix-darwin",

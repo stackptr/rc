@@ -76,6 +76,10 @@
       url = "github:homebrew/homebrew-cask";
       flake = false;
     };
+    homebrew-cassette = {
+      url = "github:CassetteLab/homebrew-cassette";
+      flake = false;
+    };
     llm-profile = {
       url = "github:stackptr/llm-profile";
       flake = false;
@@ -120,6 +124,9 @@
           Rhizome = mkDarwinHost {
             hostname = "Rhizome";
             username = "corey";
+            extraHomebrewTaps = {
+              "CassetteLab/homebrew-cassette" = inputs.homebrew-cassette;
+            };
           };
 
           Stroma = mkDarwinHost {
@@ -131,6 +138,9 @@
             hostname = "LOB-MG2QJH49W7";
             username = "corey.johns";
             configDir = "lobtop";
+            extraHomebrewTaps = {
+              "CassetteLab/homebrew-cassette" = inputs.homebrew-cassette;
+            };
           };
         };
 
