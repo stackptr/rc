@@ -8,6 +8,7 @@ inputs @ {
   nix-homebrew,
   homebrew-core,
   homebrew-cask,
+  homebrew-cassette,
   llm-profile,
   nix-index-database,
   zx-dev,
@@ -90,6 +91,7 @@ inputs @ {
     username,
     lightweight ? false,
     configDir ? hostname,
+    extraHomebrewTaps ? {},
   }: let
     system = "aarch64-darwin";
   in
@@ -115,10 +117,12 @@ inputs @ {
             enable = true;
             enableRosetta = false;
             user = username;
-            taps = {
-              "homebrew/homebrew-core" = homebrew-core;
-              "homebrew/homebrew-cask" = homebrew-cask;
-            };
+            taps =
+              {
+                "homebrew/homebrew-core" = homebrew-core;
+                "homebrew/homebrew-cask" = homebrew-cask;
+              }
+              // extraHomebrewTaps;
             mutableTaps = false;
           };
         }
