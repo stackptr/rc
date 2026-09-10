@@ -32,16 +32,17 @@
     "anemone": {
       "flake": false,
       "locked": {
-        "lastModified": 1753053308,
-        "narHash": "sha256-vyB7gLKzTFLSEPPD4ylc3Uyj3WeKRFFklEnE58jn5JA=",
-        "owner": "Speyll",
+        "lastModified": 1787795794,
+        "narHash": "sha256-PjluJK5TJ6A5MPhrStJO24kknPeMACFRWJl1alBnogU=",
+        "owner": "PinkNoize",
         "repo": "anemone",
-        "rev": "47b2085cb01f0e82fd83221aad79ab0b3d1702e0",
+        "rev": "8c1bae458ae24ac5fe0ff14706a463b51bf429e5",
         "type": "github"
       },
       "original": {
-        "owner": "Speyll",
+        "owner": "PinkNoize",
         "repo": "anemone",
+        "rev": "8c1bae458ae24ac5fe0ff14706a463b51bf429e5",
         "type": "github"
       }
     },
@@ -597,11 +598,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1769146933,
-        "narHash": "sha256-AmU57qvvq4Sza2RxrP0s9RuDbWlj8tcz4CMkFE8JCq4=",
+        "lastModified": 1789078721,
+        "narHash": "sha256-AnfGdp57TigHkyKePPKmuPO0TYSzQ2we05qkDjwwEwU=",
         "owner": "stackptr",
         "repo": "zx.dev",
-        "rev": "82467de6be972044a03b237c9e5862073126ee96",
+        "rev": "fecc8fb4acbc1e8e51ec1f0812576422f2cb0e65",
         "type": "github"
       },
       "original": {
