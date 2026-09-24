@@ -8,7 +8,7 @@
   slackChannel = "#updates";
 
   ntfyToSlack = pkgs.writeShellScript "ntfy-to-slack" ''
-    SLACK_TOKEN=$(cat ${config.age.secrets.slack-bot-token.path})
+    SLACK_TOKEN=$(cat "$CREDENTIALS_DIRECTORY/slack-bot-token")
     TITLE="''${NTFY_TITLE:-Homelab}"
     ICON=":''${NTFY_TAGS%%,*}:"
 
@@ -26,9 +26,7 @@
 in {
   age.secrets.slack-bot-token = {
     file = ./../secrets/slack-bot-token.age;
-    mode = "440";
-    owner = config.services.ntfy-sh.user;
-    inherit (config.services.ntfy-sh) group;
+    mode = "400";
   };
 
   services.ntfy-sh = {
@@ -47,8 +45,8 @@ in {
     requires = ["ntfy-sh.service"];
     wantedBy = ["multi-user.target"];
     serviceConfig = {
-      User = config.services.ntfy-sh.user;
-      Group = config.services.ntfy-sh.group;
+      DynamicUser = true;
+      LoadCredential = "slack-bot-token:${config.age.secrets.slack-bot-token.path}";
       Restart = "on-failure";
       RestartSec = "10s";
     };
