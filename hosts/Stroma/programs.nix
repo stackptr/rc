@@ -11,8 +11,12 @@
 
   homebrew = {
     enable = true;
+    casks = [
+      "legcord"
+    ];
     # N.B.: Removed entries in `masApps` require manual uninstallation
     masApps = {
+      "Copilot" = 1447330651;
       "Folder Quick Look" = 6753110395;
       "GoodLinks" = 1474335294;
       "Hand Mirror" = 1502839586;
@@ -30,8 +34,19 @@
     };
   };
 
-  programs.craft = {
+  programs.chromium = {
     enable = true;
+    package = pkgs.ungoogled-chromium;
+    extensions = let
+      cookiesTxtLocally = "cclelndahbckbenkjhflpdbgdldlbecc";
+      ublockOrigin = "cjpalhdlnbpafiamejdnhcphjbkeiagm";
+      reactDevTools = "fmkadmapgofadopljbjfkapdkoienihi";
+    in [cookiesTxtLocally ublockOrigin reactDevTools];
+  };
+
+  programs.cmux = {
+    enable = true;
+    enableDefaults = true;
   };
 
   programs.daisydisk = {
