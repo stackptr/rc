@@ -8,7 +8,7 @@
   virtualisation.oci-containers.backend = "podman";
   virtualisation.oci-containers.containers.open-terminal = {
     image = "ghcr.io/open-webui/open-terminal:latest";
-    ports = ["8000:8000"];
+    ports = ["8001:8000"];
     volumes = ["open-terminal:/home/user"];
     environmentFiles = [config.age.secrets.open-terminal-env.path];
     environment = {
