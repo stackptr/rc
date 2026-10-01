@@ -14,6 +14,7 @@
   homebrew = {
     enable = true;
     casks = [
+      "cassette"
       "dash"
       "legcord"
       "nook"

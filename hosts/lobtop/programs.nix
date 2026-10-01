@@ -8,6 +8,7 @@
   homebrew = {
     enable = true;
     casks = [
+      "cassette"
       "meetingbar"
     ];
     # N.B.: Removed entries in `masApps` require manual uninstallation
