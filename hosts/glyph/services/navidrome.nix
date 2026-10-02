@@ -31,7 +31,10 @@ in {
     group = "media";
     environmentFile = config.age.secrets.navidrome-env.path;
     plugins = [
-      pkgs.navidromePlugins.apple-music
+      # Plugin is WASM, but nixpkgs restricts meta.platforms to wasm targets
+      (pkgs.navidromePlugins.apple-music.overrideAttrs (old: {
+        meta = old.meta // {platforms = pkgs.lib.platforms.all;};
+      }))
       nd-lyrics
     ];
     settings = {
