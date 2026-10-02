@@ -16,7 +16,6 @@
     casks = [
       "dash"
       "legcord"
-      "nook"
       "textual"
     ];
     # N.B.: Removed entries in `masApps` require manual uninstallation
@@ -35,7 +34,6 @@
       "Parcel" = 375589283;
       "Pixea" = 1507782672;
       "Play" = 1596506190;
-      "Prompt" = 1594420480;
       "Reeder" = 1529448980;
       "Timery" = 1425368544;
       "Things" = 904280696;
