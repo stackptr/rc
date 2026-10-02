@@ -31,10 +31,8 @@ in {
     group = "media";
     environmentFile = config.age.secrets.navidrome-env.path;
     plugins = [
-      # Plugin is WASM, but nixpkgs restricts meta.platforms to wasm targets
-      (pkgs.navidromePlugins.apple-music.overrideAttrs (old: {
-        meta = old.meta // {platforms = pkgs.lib.platforms.all;};
-      }))
+      # Plugins are WASM and must be cross-compiled for wasi
+      pkgs.pkgsCross.wasi32.navidromePlugins.apple-music
       nd-lyrics
     ];
     settings = {
