@@ -19,6 +19,12 @@
     enable = true;
   };
 
+  programs.karabiner = {
+    enable = true;
+    enableDefaults = true;
+    startOnActivation = true;
+  };
+
   programs.fastscripts = {
     enable = true;
     startOnActivation = true;
