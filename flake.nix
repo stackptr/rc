@@ -202,8 +202,6 @@
           overlays = import ./overlays;
           config.allowUnfreePredicate = pkg:
             builtins.elem (inputs.nixpkgs.lib.getName pkg) [
-              "graphite-cli"
-              "graphite-cli-unwrapped"
               "obsidian-headless"
             ];
         };
@@ -215,7 +213,6 @@
             packages =
               [
                 inputs'.agenix.packages.default
-                pkgs.graphite-cli
                 pkgs.just
               ]
               ++ config.pre-commit.settings.enabledPackages;
