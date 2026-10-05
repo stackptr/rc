@@ -184,7 +184,7 @@ in {
       ENABLE_LOGIN_FORM = "false";
       ENABLE_API_KEYS = "True";
       USER_PERMISSIONS_FEATURES_API_KEYS = "True";
-      DATABASE_URL = "postgresql:///open-webui?host=/run/postgresql";
+      DATABASE_URL = "postgresql://open-webui@/open-webui?host=/run/postgresql";
 
       # Web search via Kagi (API key in open-webui-env.age)
       ENABLE_WEB_SEARCH = "True";
