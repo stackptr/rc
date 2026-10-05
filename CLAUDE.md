@@ -63,7 +63,7 @@ nix flake update --commit-lock-file
 
 **Development shell:**
 ```bash
-nix develop  # Provides agenix, graphite-cli, just
+nix develop  # Provides agenix, just
 ```
 
 Agent conversations in Zed do not run inside the devShell. To invoke devShell tools from within a Claude Code session (e.g. `entire`, `agenix`), prefix commands with `direnv exec . <command>`:
@@ -120,10 +120,6 @@ Custom packages and overlays are organized for clarity:
   - `type` is one of `feat`, `fix`, `chore`, `refactor`
   - The slug should be succinct — 2 to 4 words max (e.g. `fix-gc-options`, not `fix-gc-options-from-base-module-conflicting-definitions`)
   - Examples: `spore/fix-gc-options`, `Rhizome/feat-launchd-service`, `chore-update-flake-inputs`, `feat-add-ci-eval`
-- Always pass the branch name explicitly to `gt create` — if omitted, Graphite auto-generates one from the commit message and may prepend a user prefix:
-  ```bash
-  gt create spore/fix-gc-options --message "fix(spore): ..."
-  ```
 
 **Submitting PRs:**
 - Title format: `type: short description` — e.g. `fix: spore gc options`, `chore: update CLAUDE.md`, `feat: add ci eval job`
@@ -142,14 +138,6 @@ Never use `nix <subcommand> .#<output>` — the `#` causes permission prompt fai
 | `nix shell nixpkgs#foo` | `nixpkgs-shell foo` |
 
 ## Common Patterns
-
-**Amending the current branch:**
-Use `gt modify` instead of `git commit --amend` to keep the Graphite stack consistent:
-```bash
-git add <files>
-gt modify --no-edit        # amend without changing message
-gt modify -m "new message" # amend with new message
-```
 
 **`lib.mkForce` vs `lib.mkDefault`:**
 - `lib.mkForce value` — host wins over any module default. Use when a host must diverge from a shared module.
