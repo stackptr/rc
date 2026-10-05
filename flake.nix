@@ -14,10 +14,7 @@
     };
     agenix = {
       url = "github:ryantm/agenix";
-      inputs.darwin.follows = "nix-darwin";
-      inputs.home-manager.follows = "home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
-      inputs.systems.follows = "systems";
     };
     home-manager = {
       url = "github:nix-community/home-manager";
