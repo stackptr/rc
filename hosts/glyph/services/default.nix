@@ -102,13 +102,6 @@
     group = "grafana-mcp";
   };
 
-  age.secrets.graphite-auth-token = {
-    file = ./../secrets/graphite-auth-token.age;
-    mode = "440";
-    owner = "graphite-mcp";
-    group = "graphite-mcp";
-  };
-
   services.basic-memory.enable = true;
   rc.backup = {
     enable = true;
@@ -131,10 +124,6 @@
     grafanaUrl = "https://grafana.zx.dev";
     tokenFile = config.age.secrets.grafana-mcp-token.path;
   };
-  services.graphite-mcp = {
-    enable = true;
-    authTokenFile = config.age.secrets.graphite-auth-token.path;
-  };
   services.obsidian-vault-mcp = {
     enable = true;
     inherit (config.rc.obsidian-sync) vaultPath;
@@ -156,10 +145,6 @@
     servers.grafana = {
       url = "http://127.0.0.1:8095/mcp";
       description = "Grafana dashboards, Loki logs, and Prometheus metrics";
-    };
-    servers.graphite = {
-      url = "http://127.0.0.1:8094/mcp";
-      description = "Graphite CLI for stacked PRs and code review";
     };
     servers.obsidian-vault = {
       url = "http://127.0.0.1:8097/mcp";

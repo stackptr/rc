@@ -218,9 +218,6 @@ in {
               # MCP: context7
               "mcp__glyph__context7__resolve-library-id"
               "mcp__glyph__context7__query-docs"
-              # MCP: graphite
-              "mcp__glyph__graphite__learn_gt"
-              "mcp__glyph__graphite__run_gt_cmd"
               # MCP: mcp-nixos
               "mcp__glyph__mcp-nixos__nix"
               "mcp__glyph__mcp-nixos__nix_versions"
