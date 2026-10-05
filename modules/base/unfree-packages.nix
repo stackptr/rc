@@ -10,8 +10,6 @@
       "claude-code"
       "daisydisk"
       "fastscripts"
-      "graphite-cli"
-      "graphite-cli-unwrapped"
       "mochi"
       "obsidian-headless"
       "open-webui"
