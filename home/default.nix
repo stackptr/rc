@@ -32,7 +32,6 @@
         javascript.enable = true;
       };
       entire.enable = true;
-      graphite.enable = true;
       jujutsu.enable = true;
       utilities = {
         file.enable = true;
