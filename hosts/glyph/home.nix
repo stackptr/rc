@@ -3,7 +3,9 @@
   llm-profile,
   pkgs,
   ...
-}: {
+}: let
+  stromaModel = "qwen3.8-27b-mtplx-optimized-quality";
+in {
   home.packages = [pkgs.mktorrent pkgs.obsidian-headless];
 
   programs.opencode = {
@@ -13,12 +15,17 @@
     web.extraArgs = ["--port" "8890" "--hostname" "0.0.0.0"];
     context = builtins.readFile "${llm-profile}/README.md";
     settings = {
-      model = "anthropic/claude-opus-4-6";
-      small_model = "anthropic/claude-haiku-4-5";
-      enabled_providers = ["anthropic"];
+      model = "stroma/${stromaModel}";
+      small_model = "stroma/${stromaModel}";
+      enabled_providers = ["stroma"];
       autoupdate = false;
       share = "disabled";
-      plugin = ["${pkgs.opencode-claude-auth}/lib/node_modules/opencode-claude-auth"];
+      provider.stroma = {
+        npm = "@ai-sdk/openai-compatible";
+        name = "Stroma";
+        options.baseURL = "https://stroma.note-iwato.ts.net/v1";
+        models.${stromaModel}.name = "Qwen 3.8 27B";
+      };
     };
   };
 

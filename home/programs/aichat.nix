@@ -1,19 +1,18 @@
-{config, ...}: {
-  age.secrets.aichat-env = {
-    file = ../secrets/aichat-env.age;
-  };
-
+_: let
+  model = "qwen3.8-27b-mtplx-optimized-quality";
+in {
   programs.aichat = {
     enable = true;
     settings = {
-      model = "claude:claude-sonnet-4-20250514";
+      model = "stroma:${model}";
       clients = [
-        {type = "claude";}
+        {
+          type = "openai-compatible";
+          name = "stroma";
+          api_base = "https://stroma.note-iwato.ts.net/v1";
+          models = [{name = model;}];
+        }
       ];
     };
-  };
-
-  programs.zsh.sessionVariables = {
-    AICHAT_ENV_FILE = config.age.secrets.aichat-env.path;
   };
 }
