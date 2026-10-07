@@ -15,7 +15,6 @@
       "mochi"
       "obsidian-headless"
       "open-webui"
-      "roon-server"
       "soundsource"
       "the-unarchiver"
     ];
