@@ -1,5 +1,5 @@
 _: let
-  model = "mtplx-qwen38-27b-optimized-quality";
+  model = "qwen3.8-27b-mtplx-optimized-quality";
 in {
   programs.aichat = {
     enable = true;

@@ -4,7 +4,7 @@
   pkgs,
   ...
 }: let
-  stromaModel = "mtplx-qwen38-27b-optimized-quality";
+  stromaModel = "qwen3.8-27b-mtplx-optimized-quality";
 in {
   home.packages = [pkgs.mktorrent pkgs.obsidian-headless];
 
