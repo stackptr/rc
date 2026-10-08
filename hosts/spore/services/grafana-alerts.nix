@@ -165,6 +165,21 @@ _: let
     })
   ];
 
+  # Built from nginx JSON access logs; see services/web/default.nix.
+  webRules = [
+    (mkRule {
+      uid = "nginx-5xx";
+      title = "nginx 5xx responses";
+      datasourceUid = loki;
+      expr = ''sum by (vhost) (count_over_time({host="spore", app="nginx_access"} | json vhost, status | status >= 500 [10m]))'';
+      evaluator = {
+        type = "gt";
+        params = [10];
+      };
+      summary = "{{ $labels.vhost }} returned {{ $values.A.Value }} 5xx responses in 10m";
+    })
+  ];
+
   mkGroup = name: rules: {
     orgId = 1;
     inherit name rules;
@@ -178,6 +193,7 @@ in {
       (mkGroup "hosts" systemRules)
       (mkGroup "storage" storageRules)
       (mkGroup "telemetry" (logRules ++ prometheusRules))
+      (mkGroup "web" webRules)
     ];
   };
 }
