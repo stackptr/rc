@@ -10,6 +10,10 @@
     ./zsh.nix
   ];
 
+  # Replaces direnv's shell hook; runs direnv in a background daemon so slow
+  # devShell loads don't block the prompt
+  programs.direnv-instant.enable = true;
+
   programs.direnv = {
     enable = true;
     nix-direnv.enable = true;

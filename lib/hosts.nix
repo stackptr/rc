@@ -10,6 +10,7 @@ inputs @ {
   homebrew-cask,
   llm-profile,
   nix-index-database,
+  direnv-instant,
   zx-dev,
   attic,
   disko,
@@ -40,6 +41,7 @@ inputs @ {
       imports =
         [
           nix-index-database.homeModules.nix-index
+          direnv-instant.homeModules.direnv-instant
           agenix.homeManagerModules.default
           ./../modules/home
           ./../home
