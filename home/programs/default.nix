@@ -110,10 +110,7 @@
       };
       whitelist = {
         prefix = [
-          "${config.home.homeDirectory}/Development/heave"
           "${config.home.homeDirectory}/Development/rc"
-          "${config.home.homeDirectory}/Development/conductor/workspaces/heave"
-          "${config.home.homeDirectory}/Development/conductor/workspaces/rc"
         ];
       };
     };
