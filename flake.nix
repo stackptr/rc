@@ -215,7 +215,10 @@
               ++ config.pre-commit.settings.enabledPackages;
             shellHook = ''
               ${config.pre-commit.shellHook}
-              entire enable -y --agent claude-code 2>/dev/null || true
+              # Settings are tracked; only (re)install when Entire's git hooks are missing.
+              if ! grep -qs entire "$(git rev-parse --git-path hooks 2>/dev/null)/prepare-commit-msg"; then
+                entire enable -y --agent claude-code >/dev/null 2>&1 || true
+              fi
             '';
           };
         };
