@@ -161,14 +161,18 @@
       "models.zx.dev" = {
         forceSSL = true;
         useACMEHost = "zx.dev";
-        locations."/" = {
-          proxyPass = "http://stroma.note-iwato.ts.net:8000";
-          extraConfig = ''
-            # Stream tokens as they're generated; long generations can idle for a while
-            proxy_buffering off;
-            proxy_read_timeout 600;
-            client_max_body_size 0;
-          '';
+        locations = {
+          # Serve the admin UI at the site root; everything else (API, assets) passes through as-is
+          "= /".proxyPass = "http://stroma.note-iwato.ts.net:8000/admin";
+          "/" = {
+            proxyPass = "http://stroma.note-iwato.ts.net:8000";
+            extraConfig = ''
+              # Stream tokens as they're generated; long generations can idle for a while
+              proxy_buffering off;
+              proxy_read_timeout 600;
+              client_max_body_size 0;
+            '';
+          };
         };
       };
       "mcp.zx.dev" = {
