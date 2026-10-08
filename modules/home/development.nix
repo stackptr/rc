@@ -49,6 +49,12 @@ in {
           model = "sonnet";
           # Disabled in favor of Basic Memory MCP for cross-device access
           autoMemoryEnabled = false;
+          env = {
+            # Skip GPG signing for agent commits (it needs user interaction)
+            GIT_CONFIG_COUNT = "1";
+            GIT_CONFIG_KEY_0 = "commit.gpgsign";
+            GIT_CONFIG_VALUE_0 = "false";
+          };
           statusLine = {
             type = "command";
             command = "${pkgs.claude-pace}/bin/claude-pace";
