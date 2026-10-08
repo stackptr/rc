@@ -3,6 +3,8 @@
   pkgs,
   ...
 }: {
+  imports = [./grafana-alerts.nix];
+
   age.secrets.slack-bot-token = {
     file = ./../secrets/slack-bot-token.age;
     mode = "440";
@@ -98,6 +100,9 @@
       datasources.settings.datasources = [
         {
           name = "Prometheus";
+          # Pinned to the UID Grafana derived from the name, so provisioned
+          # alert rules can reference it.
+          uid = "PBFA97CFB590B2093";
           type = "prometheus";
           url = "http://glyph.note-iwato.ts.net:9099";
           isDefault = true;
@@ -105,6 +110,7 @@
         }
         {
           name = "Loki";
+          uid = "P8E80F9AEF21F6940";
           type = "loki";
           url = "http://glyph.note-iwato.ts.net:3100";
           editable = false;
