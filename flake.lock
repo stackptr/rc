@@ -114,6 +114,30 @@
         "type": "github"
       }
     },
+    "direnv-instant": {
+      "inputs": {
+        "flake-parts": [
+          "flake-parts"
+        ],
+        "nixpkgs": [
+          "nixpkgs"
+        ],
+        "treefmt-nix": "treefmt-nix"
+      },
+      "locked": {
+        "lastModified": 1791443269,
+        "narHash": "sha256-uoIU+hIQni8Z4B9qEI9+ITKVW5nKmAbPTP5uSduaK+8=",
+        "owner": "Mic92",
+        "repo": "direnv-instant",
+        "rev": "0e801532fa718f08f963fc688e78939b2297033d",
+        "type": "github"
+      },
+      "original": {
+        "owner": "Mic92",
+        "repo": "direnv-instant",
+        "type": "github"
+      }
+    },
     "disko": {
       "inputs": {
         "nixpkgs": [
@@ -515,6 +539,7 @@
         "agenix": "agenix",
         "attic": "attic",
         "deploy-rs": "deploy-rs",
+        "direnv-instant": "direnv-instant",
         "disko": "disko",
         "flake-parts": "flake-parts_2",
         "git-hooks-nix": "git-hooks-nix",
@@ -559,6 +584,27 @@
         "type": "path"
       },
       "parent": []
+    },
+    "treefmt-nix": {
+      "inputs": {
+        "nixpkgs": [
+          "direnv-instant",
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1791110613,
+        "narHash": "sha256-O5XhWb2cQqo+OG0fpDhK/RfsPUetdw24aop/22e74tE=",
+        "owner": "numtide",
+        "repo": "treefmt-nix",
+        "rev": "930ae5bbd97d4fc4c33c588bfd417c882d353e71",
+        "type": "github"
+      },
+      "original": {
+        "owner": "numtide",
+        "repo": "treefmt-nix",
+        "type": "github"
+      }
     },
     "utils": {
       "inputs": {
