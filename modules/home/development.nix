@@ -269,7 +269,10 @@ in {
       home.packages = with pkgs; [
         lazydocker
       ];
+    })
 
+    # Colima provides the Docker VM on macOS; on Linux it has no use here
+    (mkIf (cfg.containers.enable && pkgs.stdenv.isDarwin) {
       services.colima = {
         enable = true;
         profiles.default = {
