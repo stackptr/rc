@@ -11,6 +11,7 @@
       --host ${cfg.host} \
       --port ${toString cfg.port} \
       --transport streamablehttp \
+      --pass-environment \
       -- ${lib.getExe pkgs.mcp-grafana}
   '';
 in {
