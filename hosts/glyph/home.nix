@@ -13,7 +13,8 @@ in {
     enableMcpIntegration = true;
     web.enable = true;
     web.extraArgs = ["--port" "8890" "--hostname" "0.0.0.0"];
-    context = builtins.readFile "${llm-profile}/README.md";
+    # A shorter prompt helps a 27B model more than it helps Claude.
+    context = (import ../../lib/llm-profile.nix llm-profile).agent;
     settings = {
       model = "stroma/${stromaModel}";
       small_model = "stroma/${stromaModel}";

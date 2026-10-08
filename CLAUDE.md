@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 This is a Nix flake-based system configuration repository that manages multiple hosts across NixOS and macOS platforms:
 
 - **NixOS hosts**: `zeta` (ARM/Pi4), `glyph` (x86_64 NAS/homelab), `spore` (x86_64 VPS)
-- **macOS hosts**: `Rhizome` (personal laptop)
+- **macOS hosts**: `Rhizome` (personal laptop), `Stroma` (Mac Studio), `lobtop` (work laptop)
 
 The configuration is organized into:
 - `hosts/`: Host-specific configurations
@@ -23,36 +23,19 @@ The configuration is organized into:
 
 ## Common Commands
 
-**Build and switch to configuration:**
+**Build and switch to configuration** (only when asked; see Guardrails):
 ```bash
-just                    # Switch current host
-just switch hostname    # Switch specific host
-```
-
-**Using nh (preferred method):**
-```bash
-nh os switch .#hostname        # Linux
-nh darwin switch .#hostname    # macOS
-```
-
-**Direct rebuild commands:**
-```bash
-sudo darwin-rebuild switch --flake .#hostname  # macOS
-nixos-rebuild switch --flake .#hostname        # Linux
-```
-
-**Cross-compilation for memory-constrained hosts:**
-```bash
-# Build spore config on glyph due to memory constraints
-nixos-rebuild switch --flake .#spore --target-host root@spore --build-host localhost
+just                              # Switch current host
+just switch hostname              # Switch specific host
+just switch-remote spore          # Build on this host, deploy to spore (it's memory-constrained)
 ```
 
 **Checking changes before committing:**
 ```bash
 # NixOS hosts:
 nix-flake eval nixosConfigurations.hostname.config.system.build.toplevel.drvPath
-# macOS hosts:
-nix-flake eval darwinConfigurations.Rhizome.system.drvPath
+# macOS hosts (Rhizome, Stroma, lobtop):
+nix-flake eval darwinConfigurations.hostname.system.drvPath
 ```
 Evaluates a host's configuration without building it. Catches option conflicts and type errors fast — run this after editing any NixOS module or host config.
 
@@ -114,28 +97,16 @@ Custom packages and overlays are organized for clarity:
 
 ## Branching
 
-- Branches should be scoped to a single host whenever possible. This keeps deploys independent and reduces risk of cross-host breakage.
-- Branch naming: `host/type-short-slug` for host-scoped changes, `type-short-slug` for top-level changes.
-  - `host/` is the hostname (e.g. `glyph/`, `spore/`, `Rhizome/`, `zeta/`)
-  - `type` is one of `feat`, `fix`, `chore`, `refactor`
-  - The slug should be succinct — 2 to 4 words max (e.g. `fix-gc-options`, not `fix-gc-options-from-base-module-conflicting-definitions`)
-  - Examples: `spore/fix-gc-options`, `Rhizome/feat-launchd-service`, `chore-update-flake-inputs`, `feat-add-ci-eval`
+- Scope branches to a single host whenever possible. This keeps deploys independent and reduces the risk of cross-host breakage.
+- Branch naming: `scope/type-short-slug`, where scope is the hostname (`glyph`, `spore`, `zeta`, `Rhizome`, `Stroma`, `lobtop`) or `home` for shared home-manager changes. Top-level or cross-cutting changes drop the scope: `type-short-slug`.
+  - `type` is one of `feat`, `fix`, `chore`, `refactor`; the slug is 2 to 4 words.
+  - Examples: `spore/fix-gc-options`, `home/feat-claude-memory`, `chore-update-flake-inputs`.
+- PR title: `type(scope): short description`, with the scope omitted for top-level changes, e.g. `fix(spore): gc options`, `chore: update flake inputs`. PRs are squash-merged, so the title becomes the commit message.
+- PR description: a brief summary of what changed and what to test or verify.
 
-**Submitting PRs:**
-- Title format: `type: short description` — e.g. `fix: spore gc options`, `chore: update CLAUDE.md`, `feat: add ci eval job`
-- Description should include a brief summary of what changed and what to test/verify
+## Sandboxed sessions
 
-## Nix Commands
-
-Never use `nix <subcommand> .#<output>` — the `#` causes permission prompt failures. Use wrapper scripts instead:
-
-| Instead of | Use |
-|---|---|
-| `nix build .#foo` | `nix-flake build foo` |
-| `nix eval .#foo` | `nix-flake eval foo` |
-| `nix eval nixpkgs#foo` | `nixpkgs-eval foo` |
-| `nix run nixpkgs#foo` | `nixpkgs-run foo` |
-| `nix shell nixpkgs#foo` | `nixpkgs-shell foo` |
+If `nix-flake` isn't on PATH, you're in a sandboxed session without my tooling, and Nix may not be installed. Don't try to evaluate or build. Make the change, push the branch, and open a PR: CI evaluates and builds glyph, spore, zeta, and Rhizome. CI doesn't cover Stroma or lobtop, so say when a change touches them and needs a local `nix-flake eval`.
 
 ## Common Patterns
 
@@ -153,7 +124,7 @@ nix.gc.dates = lib.mkForce "daily";
 
 ## Monitoring Stack
 
-The homelab runs a Grafana LGTM-lite stack for observability. **Use it proactively** when investigating service failures, slow response times, disk issues, or any situation where you'd otherwise reach for `journalctl` or SSH into a host to check a service.
+The homelab runs a Grafana LGTM-lite stack for observability. Use it first when investigating service failures, slow response times, disk issues, or any situation where you'd otherwise reach for `journalctl` or SSH into a host to check a service.
 
 - **Grafana** (`grafana.zx.dev`) — dashboards, Explore, alerting
 - **Loki** (glyph:3100) — log aggregation from glyph, spore, zeta
@@ -215,19 +186,17 @@ rate(nginx_http_requests_total{instance="spore"}[5m])
 100 - (node_filesystem_avail_bytes{instance="glyph",mountpoint="/"} / node_filesystem_size_bytes{instance="glyph",mountpoint="/"} * 100)
 ```
 
-## Environment Awareness
+## Guardrails
 
-- Before running commands like `ssh`, `nixos-rebuild`, or anything that targets a specific host, check which host Claude Code is running on (`hostname`) to avoid targeting the current machine unintentionally.
-- The current host is typically `glyph` (NixOS desktop) or `Rhizome` (macOS laptop).
-
-## Learning and Memory
-
-- After arriving at a working solution through trial and error, proactively ask whether the finding should be recorded in CLAUDE.md (or Basic Memory) for future sessions.
+- Merging doesn't deploy: deploys are manual, via `just switch` or the Deploy workflow. Don't switch a host, merge a PR, or run the Deploy workflow unless asked.
 
 ## Committing
 
-- Always pass `--no-gpg-sign` when creating commits. Agent-created commits do not need to be signed and GPG signing requires user interaction.
-- For rebases, `--no-gpg-sign` is not a valid flag — use `git -c commit.gpgsign=false rebase` (or `git -c commit.gpgsign=false pull --rebase`) instead.
+- My git config requires signing, which you can't do (it needs an interactive GPG unlock). For commands that create commits, use `git -c commit.gpgsign=false …`, and never change git config to disable signing. Add a `Co-Authored-By:` trailer identifying yourself.
+
+## Updating this file
+
+- When a working solution reached through trial and error would help future sessions in this repo, add it to this file in the PR you're preparing and call it out in the PR description.
 
 ## Code style
 

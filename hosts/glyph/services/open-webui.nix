@@ -189,8 +189,8 @@ in {
       ENABLE_SEARCH_QUERY_GENERATION = "True";
       WEB_SEARCH_ENGINE = "kagi";
 
-      # System prompt sourced from llm-profile flake input (github:stackptr/llm-profile)
-      DEFAULT_SYSTEM_PROMPT = builtins.readFile "${inputs.llm-profile}/README.md";
+      # System prompt: chat bundle (core.md + chat.md) from the llm-profile flake input (github:stackptr/llm-profile)
+      DEFAULT_SYSTEM_PROMPT = (import ../../../lib/llm-profile.nix inputs.llm-profile).chat;
 
       # MCP tool server: MCPJungle gateway on glyph (aggregates all registered MCP servers)
       TOOL_SERVER_CONNECTIONS = builtins.toJSON [

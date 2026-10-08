@@ -8,6 +8,7 @@
   inherit (lib) mkIf mkOption;
 
   cfg = config.rc.development;
+  profile = import ../../lib/llm-profile.nix llm-profile;
 in {
   options = {
     rc.development = {
@@ -42,7 +43,8 @@ in {
       programs.claude-code = {
         enable = true;
         enableMcpIntegration = true;
-        context = "${llm-profile}/README.md";
+        context = profile.agent;
+        skills.propose-rule = "${profile.skills}/propose-rule";
         settings = {
           model = "sonnet";
           # Disabled in favor of Basic Memory MCP for cross-device access
