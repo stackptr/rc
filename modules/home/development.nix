@@ -44,7 +44,7 @@ in {
         enable = true;
         enableMcpIntegration = true;
         context = profile.agent;
-        skills.propose-rule = "${profile.skills}/propose-rule";
+        inherit (profile) skills;
         settings = {
           model = "sonnet";
           # Disabled in favor of Basic Memory MCP for cross-device access
