@@ -40,6 +40,12 @@
             ];
             labels.instance = "spore";
           }
+          {
+            targets = [
+              "zeta.note-iwato.ts.net:9100"
+            ];
+            labels.instance = "zeta";
+          }
         ];
       }
       {
@@ -92,6 +98,28 @@
           {
             targets = [
               "localhost:4533"
+            ];
+            labels.instance = "glyph";
+          }
+        ];
+      }
+      {
+        job_name = "prometheus";
+        static_configs = [
+          {
+            targets = [
+              "localhost:${toString config.services.prometheus.port}"
+            ];
+            labels.instance = "glyph";
+          }
+        ];
+      }
+      {
+        job_name = "loki";
+        static_configs = [
+          {
+            targets = [
+              "localhost:${toString config.services.loki.configuration.server.http_listen_port}"
             ];
             labels.instance = "glyph";
           }

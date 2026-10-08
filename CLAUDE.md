@@ -128,7 +128,8 @@ The homelab runs a Grafana LGTM-lite stack for observability. Use it first when 
 
 - **Grafana** (`grafana.zx.dev`) — dashboards, Explore, alerting
 - **Loki** (glyph:3100) — log aggregation from glyph, spore, zeta
-- **Prometheus** (glyph:9099) — metrics from all hosts
+- **Prometheus** (glyph:9099) — metrics from glyph, spore, zeta
+- **Alert rules** — provisioned from `hosts/spore/services/grafana-alerts.nix` (folder "Alerts", routed to Slack). Add rules there, not in the UI.
 
 **MCP access:** The `grafana` MCP server is registered in mcpjungle on glyph at `http://127.0.0.1:8095/mcp`. It exposes tools for LogQL (Loki), PromQL (Prometheus), and dashboard access. Use it instead of `journalctl` for anything beyond a quick one-liner.
 
@@ -153,7 +154,7 @@ All logs carry these labels, queryable with `{label="value"}` in LogQL:
 # All warnings and above across spore
 {host="spore", priority=~"[0-4]"}
 
-# nginx access and error logs on spore
+# nginx error log on spore (access logs go to /var/log/nginx, not Loki)
 {host="spore", app="nginx"}
 
 # Recent errors across all hosts
@@ -164,12 +165,14 @@ All logs carry these labels, queryable with `{label="value"}` in LogQL:
 
 | Job | Port | Host | Covers |
 |---|---|---|---|
-| `node` | 9100 | glyph, spore | CPU, memory, disk, network, systemd unit states |
+| `node` | 9100 | glyph, spore, zeta | CPU, memory, disk, network, systemd unit states, timer last-trigger |
 | `zfs` | 9134 | glyph | Pool health, ARC hit ratio, pool space |
 | `postgres` | 9187 | glyph | Connections, query throughput, vacuum, per-DB stats |
 | `smartctl` | 9633 | glyph | Disk SMART data, temperature, reallocated sectors |
 | `nginx` | 9113 | spore | Request rate, active connections, handled/dropped |
-| `navidrome` | 4533/metrics | glyph | Library size, play counts, scan duration |
+| `navidrome` | 4533/metrics | glyph | `db_model_totals` (library size), `media_scan_last`, HTTP request count/latency |
+| `prometheus` | 9099 | glyph | Prometheus self-metrics (TSDB, scrape health) |
+| `loki` | 3100 | glyph | Loki ingestion and query metrics |
 
 **Common PromQL patterns:**
 ```promql
@@ -185,6 +188,14 @@ rate(nginx_http_requests_total{instance="spore"}[5m])
 # Filesystem use % on glyph (watch for > 85%)
 100 - (node_filesystem_avail_bytes{instance="glyph",mountpoint="/"} / node_filesystem_size_bytes{instance="glyph",mountpoint="/"} * 100)
 ```
+
+### Blind spots
+
+Know these before concluding "no data means no problem":
+- Grafana's database is PostgreSQL on glyph. If glyph is down, Grafana (on spore) and all alerting go down with it.
+- No HTTP status or latency per vhost: nginx metrics come from `stub_status` (connection counts only), and access logs aren't shipped.
+- No metrics for Alloy, Grafana, or individual app internals (Jellyfin, Home Assistant, Windmill, etc.). Use `node_systemd_unit_state` and Loki.
+- glyph's NVMe root disk isn't covered by the smartctl exporter (only `sda`–`sdd`).
 
 ## Guardrails
 
