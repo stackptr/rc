@@ -21,9 +21,9 @@
     url,
     conditions,
     description,
+    interval ? "1m",
   }: {
-    inherit name group url conditions;
-    interval = "1m";
+    inherit name group url conditions interval;
     alerts = [(alert description)];
   };
 in {
@@ -112,6 +112,17 @@ in {
             "[BODY].database == ok"
           ];
           description = "Grafana is down or cannot reach its database; Grafana alerts will not fire";
+        })
+        (mkEndpoint {
+          name = "certificate";
+          group = "spore";
+          # *.zx.dev, zx.dev and cjohns.com share one ACME cert on spore.
+          # NixOS renews at 30 days left, so under 21 means renewal has
+          # been failing for over a week.
+          url = "https://zx.dev";
+          interval = "1h";
+          conditions = ["[CERTIFICATE_EXPIRATION] > 504h"];
+          description = "The zx.dev certificate expires in under 21 days; check acme-zx.dev.service on spore";
         })
       ];
     };
