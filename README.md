@@ -29,12 +29,9 @@ nixos-rebuild switch --flake .#spore --target-host root@spore --build-host local
 
 <summary>CI and deployments</summary>
 
-CI builds all host configurations on every push and PR. On pushes to `main`, the deploy workflow runs automatically after CI succeeds, deploying only the hosts affected by the change:
+CI evaluates every host and builds glyph, spore, zeta, and Rhizome on every push and PR. Deploys are manual.
 
-- Changes under `hosts/{name}/` deploy only that host
-- Changes to shared paths (`modules/`, `home/`, `lib/`, `overlays/`, `packages/`, `flake.nix`, `flake.lock`) deploy all hosts
-
-Deploy all hosts manually:
+Deploy all hosts:
 ```shell
 gh workflow run Deploy
 ```
