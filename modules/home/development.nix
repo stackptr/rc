@@ -1,5 +1,6 @@
 {
   config,
+  hostname,
   lib,
   llm-profile,
   pkgs,
@@ -22,6 +23,17 @@ in {
             Whether this host can reach the MCP gateway on glyph. Disable on
             hosts where MCP servers are managed elsewhere (e.g. by an
             employer) and glyph isn't reachable.
+          '';
+          type = lib.types.bool;
+        };
+
+        telemetry.enable = mkOption {
+          default = cfg.ai.gateway.enable;
+          defaultText = lib.literalExpression "config.rc.development.ai.gateway.enable";
+          example = false;
+          description = ''
+            Whether Claude Code sends OpenTelemetry metrics to Prometheus and
+            events to Loki on glyph. Prompt and response text stay redacted.
           '';
           type = lib.types.bool;
         };
@@ -63,12 +75,27 @@ in {
           model = "sonnet";
           # Disabled in favor of Basic Memory MCP for cross-device access
           autoMemoryEnabled = false;
-          env = {
-            # Skip GPG signing for agent commits (it needs user interaction)
-            GIT_CONFIG_COUNT = "1";
-            GIT_CONFIG_KEY_0 = "commit.gpgsign";
-            GIT_CONFIG_VALUE_0 = "false";
-          };
+          env =
+            {
+              # Skip GPG signing for agent commits (it needs user interaction)
+              GIT_CONFIG_COUNT = "1";
+              GIT_CONFIG_KEY_0 = "commit.gpgsign";
+              GIT_CONFIG_VALUE_0 = "false";
+            }
+            // lib.optionalAttrs cfg.ai.telemetry.enable {
+              CLAUDE_CODE_ENABLE_TELEMETRY = "1";
+              OTEL_METRICS_EXPORTER = "otlp";
+              OTEL_LOGS_EXPORTER = "otlp";
+              OTEL_EXPORTER_OTLP_PROTOCOL = "http/protobuf";
+              OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = "http://glyph.note-iwato.ts.net:9099/api/v1/otlp/v1/metrics";
+              OTEL_EXPORTER_OTLP_LOGS_ENDPOINT = "http://glyph.note-iwato.ts.net:3100/otlp/v1/logs";
+              # Prometheus's OTLP receiver rejects delta temporality, Claude
+              # Code's default.
+              OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE = "cumulative";
+              # Becomes a host label on metrics and an indexed label in Loki,
+              # matching the other hosts' {host="..."}.
+              OTEL_RESOURCE_ATTRIBUTES = "host=${lib.toLower hostname}";
+            };
           statusLine = {
             type = "command";
             command = "${pkgs.claude-pace}/bin/claude-pace";
