@@ -194,7 +194,7 @@ rate(nginx_http_requests_total{instance="spore"}[5m])
 Know these before concluding "no data means no problem":
 - Grafana's database is PostgreSQL on glyph. If glyph is down, Grafana (on spore) and all alerting go down with it.
 - No HTTP status or latency per vhost: nginx metrics come from `stub_status` (connection counts only), and access logs aren't shipped.
-- No metrics for Alloy, Grafana, or individual app internals (Jellyfin, Home Assistant, Windmill, etc.). Use `node_systemd_unit_state` and Loki.
+- No metrics for Alloy, Grafana, or individual app internals (Jellyfin, Home Assistant, etc.). Use `node_systemd_unit_state` and Loki.
 - glyph's NVMe root disk isn't covered by the smartctl exporter (only `sda`–`sdd`).
 
 ## Guardrails
