@@ -35,7 +35,8 @@ in {
       base-url = "http://glyph:2586";
       listen-http = ":2586";
       enable-metrics = true;
-      metrics-listen-http = "127.0.0.1:9091";
+      # Next to ntfy's own port; 9091 is Transmission's (undeclared) RPC default.
+      metrics-listen-http = "127.0.0.1:2587";
     };
   };
 

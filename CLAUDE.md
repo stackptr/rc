@@ -183,8 +183,10 @@ quantile_over_time(0.95, {host="spore", app="nginx_access"} | json | unwrap requ
 | `prometheus` | 9099 | glyph | Prometheus self-metrics (TSDB, scrape health) |
 | `loki` | 3100 | glyph | Loki ingestion and query metrics |
 | `coredns` | 9153 | glyph | DNS queries, responses by rcode, forward latency (`ts.zx.dev` zone) |
-| `ntfy` | 9091 | glyph | Messages published, subscribers, HTTP requests |
+| `ntfy` | 2587 | glyph | Messages published, subscribers, HTTP requests |
 | `open-webui` | push (OTLP) | glyph | `http_server_requests_total`, `http_server_duration_*`, `webui_users_*`; pushed to Prometheus's OTLP receiver, not scraped, so no `up` series |
+
+**Picking a port on glyph:** grep the repo, and also check service defaults that aren't declared in Nix. Transmission's RPC listens on 9091 by default (`torrents.zx.dev` proxies to it), so a new exporter on 9091 fails with "address already in use".
 
 **Common PromQL patterns:**
 ```promql
