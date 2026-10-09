@@ -134,6 +134,8 @@ jobs:
           oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
           tags: tag:ci
 
+      # Host keys come from hosts/<host>/key.pub (the same keys agenix uses),
+      # so the runner never trusts a key it sees for the first time.
       - name: Configure SSH
         env:
           DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
@@ -141,18 +143,20 @@ jobs:
           mkdir -p ~/.ssh
           printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
+          for h in glyph spore zeta; do
+            echo "$h $(head -1 "hosts/$h/key.pub")"
+          done > ~/.ssh/known_hosts
           cat >> ~/.ssh/config <<'EOF'
           Host glyph spore zeta
             User root
             IdentityFile ~/.ssh/deploy_key
             IdentitiesOnly yes
-            StrictHostKeyChecking accept-new
+            StrictHostKeyChecking yes
+            ConnectTimeout 10
           EOF
 
       - name: Deploy to ${{ matrix.host }}
         id: deploy
-        env:
-          NIX_SSHOPTS: "-i ~/.ssh/deploy_key -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new"
         run: |
           set -o pipefail
           nix run --inputs-from . deploy-rs -- \
