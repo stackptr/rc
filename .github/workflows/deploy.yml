@@ -143,9 +143,34 @@ jobs:
           EOF
 
       - name: Deploy to ${{ matrix.host }}
+        id: deploy
         env:
           NIX_SSHOPTS: "-i ~/.ssh/deploy_key -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new"
         run: |
+          set -o pipefail
           nix run --inputs-from . deploy-rs -- \
             .#${{ matrix.host }} \
-            --skip-checks
+            --skip-checks 2>&1 | tee deploy.log
+
+      # Write the deploy-rs output into the target's journal, where Alloy
+      # ships it to Loki as {host="<host>", app="deploy-rs"}. Done after the
+      # deploy, not streamed, so a dropped SSH session during activation
+      # can't break the deploy. The summary line is err on failure, so
+      # failed deploys match {priority=~"[0-3]"}.
+      - name: Ship deploy log to Loki
+        if: always() && steps.deploy.outcome != 'skipped'
+        continue-on-error: true
+        env:
+          HOST: ${{ matrix.host }}
+          OUTCOME: ${{ steps.deploy.outcome }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          REVISION: ${{ github.sha }}
+          ACTOR: ${{ github.actor }}
+        run: |
+          priority=info
+          [[ "$OUTCOME" == success ]] || priority=err
+          if [[ -s deploy.log ]]; then
+            sed 's/\x1b\[[0-9;]*m//g' deploy.log | ssh "$HOST" systemd-cat -t deploy-rs -p info
+          fi
+          echo "deploy ${OUTCOME}: revision=${REVISION} actor=${ACTOR} run=${RUN_URL}" \
+            | ssh "$HOST" systemd-cat -t deploy-rs -p "$priority"

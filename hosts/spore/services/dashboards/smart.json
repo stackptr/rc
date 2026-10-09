@@ -12,6 +12,23 @@
         "iconColor": "rgba(0, 211, 255, 1)",
         "name": "Annotations & Alerts",
         "type": "dashboard"
+      },
+      {
+        "datasource": {
+          "type": "loki",
+          "uid": "P8E80F9AEF21F6940"
+        },
+        "enable": true,
+        "iconColor": "purple",
+        "name": "Deploys",
+        "expr": "{app=~\"nixos-deploy|deploy-rs\", priority=~\"[0-5]\"}",
+        "target": {
+          "refId": "Anno",
+          "expr": "{app=~\"nixos-deploy|deploy-rs\", priority=~\"[0-5]\"}"
+        },
+        "tagKeys": "host,app",
+        "titleFormat": "Deploy: {{host}}",
+        "textFormat": ""
       }
     ]
   },

@@ -6,13 +6,26 @@
 }: let
   cfg = config.services.grafana-mcp;
 
+  # Read-only: alert rules and dashboards are provisioned from the flake, so
+  # agents only need to query. The other categories need Grafana Cloud
+  # products (OnCall, Incident, Sift, Asserts) or a Pyroscope datasource
+  # that doesn't exist here.
+  grafanaArgs = [
+    "--disable-write"
+    "--disable-oncall"
+    "--disable-incident"
+    "--disable-sift"
+    "--disable-asserts"
+    "--disable-pyroscope"
+  ];
+
   startScript = pkgs.writeShellScript "grafana-mcp-start" ''
     exec ${lib.getExe pkgs.mcp-proxy} \
       --host ${cfg.host} \
       --port ${toString cfg.port} \
       --transport streamablehttp \
       --pass-environment \
-      -- ${lib.getExe pkgs.mcp-grafana}
+      -- ${lib.getExe pkgs.mcp-grafana} ${lib.escapeShellArgs grafanaArgs}
   '';
 in {
   options.services.grafana-mcp = {

@@ -2,10 +2,28 @@
   config,
   pkgs,
   ...
-}: {
+}: let
+  # Copy instance into host, so metrics and Loki logs for the same machine
+  # share a label name ({host="glyph"} works in both PromQL and LogQL).
+  withHostLabel = job:
+    job
+    // {
+      relabel_configs =
+        (job.relabel_configs or [])
+        ++ [
+          {
+            source_labels = ["instance"];
+            target_label = "host";
+          }
+        ];
+    };
+in {
   services.prometheus = {
     enable = true;
     port = 9099;
+    # Default is 15d. The TSDB is well under 1 GB, and longer history lets
+    # agents compare against last month when looking for regressions.
+    retentionTime = "90d";
     # Accepts OTLP metrics pushes at /api/v1/otlp/v1/metrics (Open WebUI).
     extraFlags = ["--web.enable-otlp-receiver"];
     exporters.node = {
@@ -26,7 +44,7 @@
       enable = true;
       port = 9633;
     };
-    scrapeConfigs = [
+    scrapeConfigs = map withHostLabel [
       {
         job_name = "node";
         static_configs = [
