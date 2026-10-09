@@ -239,7 +239,7 @@ Know these before concluding "no data means no problem":
 - Per-vhost HTTP status and latency exist only as LogQL over `app="nginx_access"`, not as Prometheus metrics. The `nginx` job is `stub_status` connection counts.
 - Local `just switch` prints switch-to-configuration output (units restarted, failed units) to the terminal only. Loki gets the `nixos-deploy` line, and systemd logs each unit start, stop and failure as usual.
 - Deploy workflow output is written to the journal after the deploy finishes, so its lines are timestamped at the end of the run. It leaves out the `copying path` lines and store path lists. If the host is unreachable, the output exists only in GitHub Actions.
-- No metrics for Alloy, Grafana, or individual app internals (Jellyfin, Home Assistant, Windmill, etc.). Use `node_systemd_unit_state` and Loki.
+- No metrics for Alloy, Grafana, or individual app internals (Jellyfin, Home Assistant, etc.). Use `node_systemd_unit_state` and Loki.
 
 ## Guardrails
 
