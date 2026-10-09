@@ -114,6 +114,10 @@
           type = "loki";
           url = "http://glyph.note-iwato.ts.net:3100";
           editable = false;
+          # Loki has no ruler configured; alert rules are Grafana-managed.
+          # Without this, Alerting > Alert rules shows "Cannot load rules
+          # for this datasource".
+          jsonData.manageAlerts = false;
         }
       ];
     };
