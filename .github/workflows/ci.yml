@@ -5,6 +5,10 @@ on:
   push:
     branches: main
 
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   eval:
     runs-on: ubuntu-latest
