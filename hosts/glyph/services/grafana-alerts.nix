@@ -191,6 +191,26 @@ _: let
     })
   logHosts;
 
+  # Health of the pipeline itself, from Alloy's and Grafana's own metrics.
+  pipelineRules = [
+    (mkRule {
+      uid = "alloy-dropping-logs";
+      title = "Alloy dropping log entries";
+      expr = "sum by (instance) (increase(loki_write_dropped_entries_total[15m])) > 0";
+      summary = "Alloy on {{ $labels.instance }} dropped {{ printf \"%.0f\" $values.A.Value }} log entries in 15m; Loki is rejecting or unreachable";
+      for = "0s";
+    })
+    (mkRule {
+      uid = "grafana-rule-eval-failures";
+      title = "Grafana alert rules failing to evaluate";
+      # Rules here use execErrState = OK, so a broken query is otherwise
+      # silent; this catches it.
+      expr = "sum(increase(grafana_alerting_rule_evaluation_failures_total[10m])) > 0";
+      summary = "Grafana had {{ printf \"%.0f\" $values.A.Value }} alert rule evaluation failures in 10m; check Alerting > Alert rules for errors";
+      for = "10m";
+    })
+  ];
+
   # The only rules that alert on query errors: one per datasource, so an
   # outage produces one accurately named alert instead of one per rule.
   datasourceRules = [
@@ -250,7 +270,7 @@ in {
     groups = [
       (mkGroup "hosts" systemRules)
       (mkGroup "storage" storageRules)
-      (mkGroup "telemetry" (logRules ++ datasourceRules))
+      (mkGroup "telemetry" (logRules ++ datasourceRules ++ pipelineRules))
       (mkGroup "web" webRules)
     ];
   };

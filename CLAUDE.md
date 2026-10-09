@@ -213,6 +213,8 @@ Every scraped series carries `instance` and an identical `host` label (`glyph`, 
 | `coredns` | 9153 | glyph | DNS queries, responses by rcode, forward latency (`ts.zx.dev` zone) |
 | `ntfy` | 2587 | glyph | Messages published, subscribers, HTTP requests |
 | `gatus` | 8080 | zeta | `gatus_results_*` per watchdog endpoint: success, duration, certificate expiry |
+| `grafana` | 3000 | glyph | Grafana itself: `grafana_alerting_rule_evaluation_failures_total`, notification and HTTP metrics |
+| `alloy` | 12345 | glyph, spore, zeta | Alloy itself: `loki_write_sent_entries_total`, `loki_write_dropped_entries_total`, journal read counters |
 | `open-webui` | push (OTLP) | glyph | `http_server_requests_total`, `http_server_duration_*`, `webui_users_*`; pushed to Prometheus's OTLP receiver, not scraped, so no `up` series |
 
 **Picking a port on glyph:** grep the repo, and also check service defaults that aren't declared in Nix. Transmission's RPC listens on 9091 by default (`torrents.zx.dev` proxies to it), so a new exporter on 9091 fails with "address already in use".
@@ -241,7 +243,7 @@ Know these before concluding "no data means no problem":
 - Per-vhost HTTP status and latency exist only as LogQL over `app="nginx_access"`, not as Prometheus metrics. The `nginx` job is `stub_status` connection counts.
 - Local `just switch` prints switch-to-configuration output (units restarted, failed units) to the terminal only. Loki gets the `nixos-deploy` line, and systemd logs each unit start, stop and failure as usual.
 - Deploy workflow output is written to the journal after the deploy finishes, so its lines are timestamped at the end of the run. It leaves out the `copying path` lines and store path lists. If the host is unreachable, the output exists only in GitHub Actions.
-- No metrics for Alloy, Grafana, or individual app internals (Jellyfin, Home Assistant, etc.). Use `node_systemd_unit_state` and Loki.
+- No metrics for individual app internals (Jellyfin, Home Assistant, etc.). Use `node_systemd_unit_state` and Loki.
 
 ## Guardrails
 
