@@ -66,6 +66,23 @@ in {
             ];
             labels.instance = "zeta";
           }
+          {
+            # nix-darwin; see hosts/Stroma/monitoring.nix
+            targets = [
+              "stroma.note-iwato.ts.net:9100"
+            ];
+            labels.instance = "stroma";
+          }
+        ];
+      }
+      {
+        # Apple Silicon metrics from mactop on Stroma (hosts/Stroma/monitoring.nix).
+        job_name = "mactop";
+        static_configs = [
+          {
+            targets = ["stroma.note-iwato.ts.net:9101"];
+            labels.instance = "stroma";
+          }
         ];
       }
       {

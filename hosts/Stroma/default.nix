@@ -6,6 +6,7 @@
   imports = [
     ./dock.nix
     ./hardware.nix
+    ./monitoring.nix
     ./programs.nix
   ];
 
