@@ -96,6 +96,14 @@ _: let
       expr = ''time() - node_systemd_timer_last_trigger_seconds{name=~"restic-backups-.+\\.timer"} > 26 * 3600'';
       summary = "{{ $labels.name }} on {{ $labels.instance }} has not triggered in over 26h";
     })
+    (mkRule {
+      uid = "systemd-unit-restarting";
+      title = "Systemd unit restart loop";
+      # Restart= keeps a crash-looping unit out of the failed state, so the
+      # failed-unit rule never sees it.
+      expr = "increase(node_systemd_service_restart_total[15m]) > 3";
+      summary = "{{ $labels.name }} on {{ $labels.instance }} restarted {{ printf \"%.0f\" $values.A.Value }} times in 15m";
+    })
   ];
 
   storageRules = [

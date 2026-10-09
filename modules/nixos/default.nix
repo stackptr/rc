@@ -5,6 +5,7 @@
     ./web
     ./boot.nix
     ./filebrowser-quantum.nix
+    ./node-exporter.nix
     ./obsidian-sync.nix
     ./restic-backup.nix
     ./users.nix
