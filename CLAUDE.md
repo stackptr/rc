@@ -135,7 +135,7 @@ The homelab runs a Grafana LGTM-lite stack for observability. Use it first when 
 
 **Grafana exits at startup with "Using the default [rendering]renderer_token is not allowed":** Grafana 13 rejects the default renderer token (`-`) whenever an image renderer is configured, even one on localhost. `grafana.nix` sets the same `rendererToken` on both sides; keep them in sync.
 
-**MCP access:** The `grafana` MCP server is registered in mcpjungle on glyph at `http://127.0.0.1:8095/mcp`. It exposes tools for LogQL (Loki), PromQL (Prometheus), and dashboard access. Use it instead of `journalctl` for anything beyond a quick one-liner. It runs read-only (`--disable-write` in `modules/nixos/llm/grafana-mcp.nix`), so change alert rules and dashboards in the flake, not through the MCP.
+**MCP access:** The `grafana` MCP server is registered in mcpjungle on glyph at `http://127.0.0.1:8095/mcp`. It exposes tools for LogQL (Loki), PromQL (Prometheus), and dashboard access. Use it instead of `journalctl` for anything beyond a quick one-liner. It runs read-only (`--disable-write` in `modules/nixos/llm/grafana-mcp.nix`), so change alert rules and dashboards in the flake, not through the MCP. MCPJungle serves the tool list it fetched when a server registered. `mcpjungle-register` re-registers every server at boot and when a local MCP server's unit changes (the `restartTriggers` list in `hosts/glyph/services/default.nix`). To refresh by hand: `systemctl restart mcpjungle-register`.
 
 ### Loki label schema
 

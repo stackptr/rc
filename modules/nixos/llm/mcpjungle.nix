@@ -90,7 +90,8 @@ in {
     systemd.timers.mcpjungle-register = lib.mkIf (cfg.servers != {}) {
       description = "Trigger MCP server registration";
       wantedBy = ["timers.target"];
-      # Re-trigger when server configuration changes
+      # Re-trigger when server configuration changes. Hosts can add the units
+      # behind local servers, so a changed binary or flags re-syncs tools.
       restartTriggers = [(builtins.hashString "sha256" (builtins.toJSON cfg.servers))];
       timerConfig = {
         OnActiveSec = "5s";
@@ -135,10 +136,6 @@ in {
               ${bin} register --name '${name}' --description '${server.description}' --url '${server.url}' --registry ${registry} || echo "ERROR: failed to register ${name}"
             '';
         in ''
-          if ${bin} list servers --registry ${registry} 2>/dev/null | grep -q '${name}'; then
-            echo "${name} already registered, skipping."
-          else
-
           # Wait for server to be reachable before registering
           ready=false
           for i in $(seq 1 30); do
@@ -152,11 +149,13 @@ in {
           done
 
           if [ "$ready" = true ]; then
+            # Re-sync rather than skip: MCPJungle keeps the tool list (and
+            # tool annotations) it fetched at registration, so an already
+            # registered server would never pick up changed tools.
+            ${bin} deregister '${name}' --registry ${registry} >/dev/null 2>&1 || true
             ${registerCmd}
           else
             echo "WARNING: ${name} at ${server.url} not reachable after 60s, skipping registration."
-          fi
-
           fi
         '';
 

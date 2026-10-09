@@ -133,6 +133,13 @@
     enable = true;
     sourcePath = "${inputs.self}";
   };
+  # Re-register MCP servers when a local server's unit changes (new binary,
+  # flags or environment), so MCPJungle's copy of its tool list stays
+  # current. rc-source is left out: its unit changes on every commit, but its
+  # tool list doesn't.
+  systemd.timers.mcpjungle-register.restartTriggers =
+    map (name: config.systemd.units."${name}.service".unit)
+    ["basic-memory" "mcp-nixos" "kagi-mcp" "grafana-mcp" "obsidian-vault-mcp"];
   services.mcpjungle = {
     enable = true;
     servers.basic-memory = {
