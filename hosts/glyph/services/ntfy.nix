@@ -55,7 +55,10 @@ in {
     };
     script = ''
       set -o pipefail
-      ${pkgs.curl}/bin/curl -sN "${ntfyUrl}/${ntfyTopic}/json" | \
+      # ntfy-sh is Type=simple, so it may not be listening yet when this
+      # starts alongside it (e.g. during activation); retry instead of failing.
+      ${pkgs.curl}/bin/curl -sN --retry 10 --retry-connrefused --retry-delay 1 \
+        "${ntfyUrl}/${ntfyTopic}/json" | \
       while IFS= read -r event; do
         event_type=$(${pkgs.jq}/bin/jq -r '.event // "message"' <<< "$event")
         [ "$event_type" != "message" ] && continue
