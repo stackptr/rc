@@ -146,6 +146,8 @@ All logs carry these labels, queryable with `{label="value"}` in LogQL:
 
 **Alloy journal label naming:** In `discovery.relabel` rules for `loki.source.journal`, the source label prefix is `__journal_` + the field name lowercased. Fields with a leading underscore (e.g. `_SYSTEMD_UNIT` → `_systemd_unit`) produce a double underscore (`__journal__systemd_unit`). Fields without one (e.g. `PRIORITY`, `SYSLOG_IDENTIFIER`) produce a single underscore (`__journal_priority`, `__journal_syslog_identifier`).
 
+**Alloy reads nothing from the journal:** if a host stops shipping logs while `alloy.service` is active and logs no errors, check `curl -s localhost:12345/metrics | grep loki_source_journal_target_lines_total` on that host. If it stays at 0 while `journalctl` works, alloy's libsystemd can't open the journal files. nixpkgs links alloy against `systemdLibs`, which is built without zstd, and journald writes zstd-compressed files. `overlays/grafana-alloy.nix` relinks it against full systemd. Deleting alloy's saved positions doesn't help.
+
 **Common LogQL patterns:**
 ```logql
 # All errors and above from a specific service
