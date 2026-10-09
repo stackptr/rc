@@ -29,7 +29,7 @@ nixos-rebuild switch --flake .#spore --target-host root@spore --build-host local
 
 <summary>CI and deployments</summary>
 
-CI evaluates every host and builds glyph, spore, zeta, and Rhizome on every push and PR. Deploys are manual: run the Deploy workflow and tick the hosts to deploy, or from the CLI:
+CI evaluates and builds every host on every push and PR. Deploys are manual: run the Deploy workflow and tick the hosts to deploy, or from the CLI:
 ```shell
 gh workflow run Deploy -f glyph=true -f spore=true -f zeta=true
 gh workflow run Deploy -f spore=true

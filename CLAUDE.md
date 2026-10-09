@@ -106,7 +106,7 @@ Custom packages and overlays are organized for clarity:
 
 ## Sandboxed sessions
 
-If `nix-flake` isn't on PATH, you're in a sandboxed session without my tooling, and Nix may not be installed. Don't try to evaluate or build. Make the change, push the branch, and open a PR: CI evaluates every host and builds glyph, spore, zeta, and Rhizome. Stroma and lobtop are evaluated but not built, so say when a change to them needs a local build.
+If `nix-flake` isn't on PATH, you're in a sandboxed session without my tooling, and Nix may not be installed. Don't try to evaluate or build. Make the change, push the branch, and open a PR: CI evaluates and builds every host.
 
 ## Common Patterns
 
