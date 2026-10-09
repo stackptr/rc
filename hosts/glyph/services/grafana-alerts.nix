@@ -108,6 +108,15 @@ _: let
       expr = "increase(node_systemd_service_restart_total[15m]) > 3";
       summary = "{{ $labels.name }} on {{ $labels.instance }} restarted {{ printf \"%.0f\" $values.A.Value }} times in 15m";
     })
+    (mkRule {
+      uid = "mac-thermal-pressure";
+      title = "Mac thermal pressure";
+      # mactop on Stroma: 0 Nominal, 1 Fair, 2 Serious, 3 Critical. Serious
+      # and above means macOS is throttling the SoC (e.g. during inference).
+      expr = "mactop_thermal_state >= 2";
+      summary = "{{ $labels.instance }} has been at thermal state {{ $values.A.Value }} (2 Serious, 3 Critical) for 10m and is throttling";
+      for = "10m";
+    })
   ];
 
   storageRules = [
