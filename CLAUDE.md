@@ -172,6 +172,26 @@ quantile_over_time(0.95, {host="spore", app="nginx_access"} | json | unwrap requ
 {priority=~"[0-3]"} |= "error"
 ```
 
+### Deploys
+
+Check deploys first when something regressed. Every activation on glyph, spore or zeta logs one line, whichever path ran it. The Deploy workflow also writes its full deploy-rs output into the target host's journal. Dashboards show both as a purple "Deploys" annotation.
+
+```logql
+# Every activation: action (switch/test), flake revision ("<rev>-dirty" for
+# local uncommitted builds), system store path. `nh os switch` logs action=test.
+{app="nixos-deploy"}
+
+# Deploy workflow output for a host; the last line is the summary with the
+# run URL, at priority err if the deploy failed
+{host="spore", app="deploy-rs"}
+
+# Unit restarts, failures and activation errors from switch-to-configuration
+# (only for `just switch-remote`, which runs it as a systemd-run unit)
+{unit="nixos-rebuild-switch-to-configuration.service"}
+```
+
+On the host, `nixos-version --configuration-revision` gives the deployed revision.
+
 ### Prometheus jobs and exporters
 
 Every scraped series carries `instance` and an identical `host` label (`glyph`, `spore`, `zeta`), so `{host="glyph"}` selects the same machine in PromQL and LogQL. OTLP-pushed series (Open WebUI) have `instance` only.
@@ -215,6 +235,8 @@ rate(nginx_http_requests_total{instance="spore"}[5m])
 Know these before concluding "no data means no problem":
 - Grafana's database is PostgreSQL on glyph. If glyph is down, Grafana (on spore) and all Grafana alerting go down with it; Gatus on zeta still alerts.
 - Per-vhost HTTP status and latency exist only as LogQL over `app="nginx_access"`, not as Prometheus metrics. The `nginx` job is `stub_status` connection counts.
+- Local `just switch` prints switch-to-configuration output (units restarted, failed units) to the terminal only. Loki gets the `nixos-deploy` line, and systemd logs each unit start, stop and failure as usual.
+- Deploy workflow output is written to the journal after the deploy finishes, so its lines are timestamped at the end of the run. If the host is unreachable, the output exists only in GitHub Actions.
 - No metrics for Alloy, Grafana, or individual app internals (Jellyfin, Home Assistant, Windmill, etc.). Use `node_systemd_unit_state` and Loki.
 
 ## Guardrails
