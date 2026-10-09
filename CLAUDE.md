@@ -127,8 +127,8 @@ nix.gc.dates = lib.mkForce "daily";
 The homelab runs a Grafana LGTM-lite stack for observability. Use it first when investigating service failures, slow response times, disk issues, or any situation where you'd otherwise reach for `journalctl` or SSH into a host to check a service.
 
 - **Grafana** (`grafana.zx.dev`) — dashboards, Explore, alerting
-- **Loki** (glyph:3100) — log aggregation from glyph, spore, zeta
-- **Prometheus** (glyph:9099) — metrics from glyph, spore, zeta
+- **Loki** (glyph:3100) — log aggregation from glyph, spore, zeta; 30 days retained
+- **Prometheus** (glyph:9099) — metrics from glyph, spore, zeta; 90 days retained
 - **Alert rules** — provisioned from `hosts/spore/services/grafana-alerts.nix` (folder "Alerts", routed to Slack). Add rules there, not in the UI.
 - **Gatus** (zeta:8080, `status.zx.dev` behind Pocket ID) — out-of-band watchdog in `hosts/zeta/services/gatus.nix`. Every minute it checks glyph (reachability, Postgres, Prometheus freshness, Loki ingestion) and spore (reachability, Grafana health), plus the `zx.dev` cert hourly, and posts to Slack itself, so it still alerts when glyph or Grafana is down.
 - **Dashboards** — provisioned JSON in `hosts/spore/services/dashboards/`: Node, ZFS, Log Explorer, PostgreSQL, Disk Health (SMART), Systemd Units, nginx.
@@ -173,6 +173,8 @@ quantile_over_time(0.95, {host="spore", app="nginx_access"} | json | unwrap requ
 ```
 
 ### Prometheus jobs and exporters
+
+Every scraped series carries `instance` and an identical `host` label (`glyph`, `spore`, `zeta`), so `{host="glyph"}` selects the same machine in PromQL and LogQL. OTLP-pushed series (Open WebUI) have `instance` only.
 
 | Job | Port | Host | Covers |
 |---|---|---|---|
