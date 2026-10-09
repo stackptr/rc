@@ -183,7 +183,12 @@ Check deploys first when something regressed. Every activation on glyph, spore o
 ```logql
 # Every activation: action (switch/test), flake revision ("<rev>-dirty" for
 # local uncommitted builds), system store path. `nh os switch` logs action=test.
-{app="nixos-deploy"}
+{app="nixos-deploy", priority="5"}
+
+# Package changes in each activation (nvd diff against the previous system):
+# "[U.] #3 grafana 12.1.0 -> 12.2.0", added/removed packages, closure size.
+# Lines follow their activation's marker line.
+{host="glyph", app="nixos-deploy", priority="6"}
 
 # Deploy workflow output for a host; the last line is the summary with the
 # run URL, at priority err if the deploy failed
