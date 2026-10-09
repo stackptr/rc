@@ -58,6 +58,12 @@ jobs:
           - host: Rhizome
             system: aarch64-darwin
             runner: macos-latest
+          - host: Stroma
+            system: aarch64-darwin
+            runner: macos-latest
+          - host: lobtop
+            system: aarch64-darwin
+            runner: macos-latest
           - host: spore
             system: x86_64-linux
             runner: ubuntu-latest
