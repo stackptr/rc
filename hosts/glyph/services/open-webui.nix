@@ -153,7 +153,12 @@ in {
   services.open-webui = {
     enable = true;
     package = pkgs.open-webui.overridePythonAttrs (old: {
-      dependencies = old.dependencies ++ old.optional-dependencies.postgres;
+      dependencies =
+        old.dependencies
+        ++ old.optional-dependencies.postgres
+        # ENABLE_OTEL imports opentelemetry.instrumentation.system_metrics,
+        # which nixpkgs leaves out of the package's dependencies.
+        ++ [pkgs.python3Packages.opentelemetry-instrumentation-system-metrics];
     });
     inherit port;
     host = "0.0.0.0";
@@ -166,6 +171,16 @@ in {
       WEBUI_SESSION_COOKIE_SECURE = "True";
       CORS_ALLOW_ORIGIN = "https://chat.zx.dev";
       ENABLE_VERSION_UPDATE_CHECK = "False";
+
+      # Push OpenTelemetry metrics straight to Prometheus's OTLP receiver
+      # (no collector). Traces and logs stay off; logs reach Loki via journald.
+      ENABLE_OTEL = "true";
+      ENABLE_OTEL_METRICS = "true";
+      OTEL_METRICS_OTLP_SPAN_EXPORTER = "http";
+      OTEL_METRICS_EXPORTER_OTLP_ENDPOINT = "http://127.0.0.1:${toString config.services.prometheus.port}/api/v1/otlp/v1/metrics";
+      OTEL_METRICS_EXPORT_INTERVAL_MILLIS = "60000";
+      # Becomes the `instance` label, matching the scrape jobs.
+      OTEL_RESOURCE_ATTRIBUTES = "service.instance.id=glyph";
 
       # OIDC via Pocket ID
       ENABLE_OAUTH_SIGNUP = "true";

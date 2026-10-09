@@ -96,6 +96,14 @@ _: let
       expr = ''time() - node_systemd_timer_last_trigger_seconds{name=~"restic-backups-.+\\.timer"} > 26 * 3600'';
       summary = "{{ $labels.name }} on {{ $labels.instance }} has not triggered in over 26h";
     })
+    (mkRule {
+      uid = "systemd-unit-restarting";
+      title = "Systemd unit restart loop";
+      # Restart= keeps a crash-looping unit out of the failed state, so the
+      # failed-unit rule never sees it.
+      expr = "increase(node_systemd_service_restart_total[15m]) > 3";
+      summary = "{{ $labels.name }} on {{ $labels.instance }} restarted {{ printf \"%.0f\" $values.A.Value }} times in 15m";
+    })
   ];
 
   storageRules = [
@@ -165,6 +173,21 @@ _: let
     })
   ];
 
+  # Built from nginx JSON access logs; see services/web/default.nix.
+  webRules = [
+    (mkRule {
+      uid = "nginx-5xx";
+      title = "nginx 5xx responses";
+      datasourceUid = loki;
+      expr = ''sum by (vhost) (count_over_time({host="spore", app="nginx_access"} | json vhost, status | status >= 500 [10m]))'';
+      evaluator = {
+        type = "gt";
+        params = [10];
+      };
+      summary = "{{ $labels.vhost }} returned {{ $values.A.Value }} 5xx responses in 10m";
+    })
+  ];
+
   mkGroup = name: rules: {
     orgId = 1;
     inherit name rules;
@@ -178,6 +201,7 @@ in {
       (mkGroup "hosts" systemRules)
       (mkGroup "storage" storageRules)
       (mkGroup "telemetry" (logRules ++ prometheusRules))
+      (mkGroup "web" webRules)
     ];
   };
 }

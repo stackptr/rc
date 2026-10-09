@@ -23,6 +23,26 @@
     recommendedProxySettings = true;
     recommendedTlsSettings = true;
     recommendedGzipSettings = true;
+    # Access logs go to journald as JSON so Alloy ships them to Loki as
+    # {app="nginx_access"}. `vhost` avoids clashing with Loki's `host` label.
+    # Writing to the journal socket directly keeps them out of /var/log/nginx.
+    commonHttpConfig = ''
+      log_format json_access escape=json '{'
+        '"vhost":"$host",'
+        '"method":"$request_method",'
+        '"uri":"$request_uri",'
+        '"status":$status,'
+        '"bytes":$body_bytes_sent,'
+        '"request_time":$request_time,'
+        '"upstream_time":"$upstream_response_time",'
+        '"upstream_status":"$upstream_status",'
+        '"remote_addr":"$remote_addr",'
+        '"referer":"$http_referer",'
+        '"user_agent":"$http_user_agent",'
+        '"protocol":"$server_protocol"'
+      '}';
+      access_log syslog:server=unix:/run/systemd/journal/dev-log,tag=nginx_access,nohostname json_access;
+    '';
     additionalModules = [pkgs.nginxModules.develkit pkgs.nginxModules.set-misc];
 
     virtualHosts = {
@@ -210,6 +230,8 @@
         port = 9080;
       }
     ];
+    # Scraped every 15s by the exporter; not worth logging.
+    extraConfig = "access_log off;";
     locations."/nginx_status".extraConfig = "stub_status;";
   };
 
