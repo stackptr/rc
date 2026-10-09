@@ -181,6 +181,37 @@ in {
         ];
       }
       {
+        # Grafana's own metrics: alert rule evaluations, notifications, HTTP.
+        # /metrics is served before enforce_domain's host check, so
+        # localhost works.
+        job_name = "grafana";
+        static_configs = [
+          {
+            targets = ["localhost:${toString config.services.grafana.settings.server.http_port}"];
+            labels.instance = "glyph";
+          }
+        ];
+      }
+      {
+        # Alloy's own metrics (journal read and Loki push counters). spore
+        # and zeta listen on 0.0.0.0:12345 for this; see their alloy.nix.
+        job_name = "alloy";
+        static_configs = [
+          {
+            targets = ["localhost:12345"];
+            labels.instance = "glyph";
+          }
+          {
+            targets = ["spore.note-iwato.ts.net:12345"];
+            labels.instance = "spore";
+          }
+          {
+            targets = ["zeta.note-iwato.ts.net:12345"];
+            labels.instance = "zeta";
+          }
+        ];
+      }
+      {
         # Gatus watchdog on zeta (hosts/zeta/services/gatus.nix).
         job_name = "gatus";
         static_configs = [

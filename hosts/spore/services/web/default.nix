@@ -114,6 +114,9 @@
         useACMEHost = "zx.dev";
         # Grafana runs on glyph, next to its database, Prometheus and Loki.
         locations."/".proxyPass = "http://glyph.note-iwato.ts.net:3000";
+        # Grafana serves /metrics without auth; Prometheus scrapes it on
+        # glyph directly, so don't publish it.
+        locations."= /metrics".return = "404";
       };
       "chat.zx.dev" = {
         forceSSL = true;
