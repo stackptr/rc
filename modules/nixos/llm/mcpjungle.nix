@@ -64,6 +64,10 @@ in {
       after = ["network.target"];
       wantedBy = ["multi-user.target"];
 
+      # Serves Prometheus metrics at /metrics on the gateway port, including
+      # mcpjungle_tool_calls_ratio_total{mcp_server_name,tool_name,outcome}.
+      environment.OTEL_ENABLED = "true";
+
       serviceConfig = {
         ExecStart = "${lib.getExe cfg.package} start --port ${toString cfg.port}";
         User = "mcpjungle";

@@ -267,6 +267,24 @@ _: let
     })
   ];
 
+  # MCPJungle counts a call as an error when it can't reach or talk to the
+  # upstream server (unregistered, auth failure, connection error), not when
+  # a tool returns an error result.
+  mcpRules = [
+    (mkRule {
+      uid = "mcp-tool-call-errors";
+      title = "MCP tool calls failing";
+      # The OTel unit "1" makes the exporter name the counter *_ratio_total.
+      expr = ''sum by (mcp_server_name) (increase(mcpjungle_tool_calls_ratio_total{outcome="error"}[30m]))'';
+      evaluator = {
+        type = "gt";
+        params = [2];
+      };
+      summary = "{{ $labels.mcp_server_name }} failed {{ printf \"%.0f\" $values.A.Value }} tool calls through MCPJungle in 30m; check {unit=\"mcpjungle.service\"} and {unit=\"mcpjungle-register.service\"} in Loki";
+      for = "0s";
+    })
+  ];
+
   mkGroup = name: rules: {
     orgId = 1;
     inherit name rules;
@@ -281,6 +299,7 @@ in {
       (mkGroup "storage" storageRules)
       (mkGroup "telemetry" (logRules ++ datasourceRules ++ pipelineRules))
       (mkGroup "web" webRules)
+      (mkGroup "mcp" mcpRules)
     ];
   };
 }
