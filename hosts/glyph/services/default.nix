@@ -152,7 +152,11 @@
     };
     servers.kagi = {
       url = "http://127.0.0.1:8093/mcp";
-      description = "Kagi web search and page summarization";
+      description = "Kagi web search and page extraction";
+      # kagimcp 1.x rejects HTTP requests without a bearer token and passes
+      # it to Kagi as the API key.
+      headers.Authorization = "Bearer $KAGI_API_KEY";
+      environmentFile = config.age.secrets.kagi-api-key.path;
     };
     servers.grafana = {
       url = "http://127.0.0.1:8095/mcp";
@@ -183,10 +187,6 @@
     servers.cloudflare-docs = {
       url = "https://docs.mcp.cloudflare.com/sse";
       description = "Cloudflare documentation and API reference";
-    };
-    servers.semgrep = {
-      url = "https://mcp.semgrep.ai/mcp";
-      description = "Code security scanning for vulnerabilities, supply chain, and secrets";
     };
   };
 }
