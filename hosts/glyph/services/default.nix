@@ -12,6 +12,7 @@
     ./avahi.nix
     ./dns.nix
     ./filebrowser.nix
+    ./grafana.nix
     ./jellyfin.nix
     ./loki.nix
     ./navidrome.nix

@@ -112,7 +112,8 @@
       "grafana.zx.dev" = {
         forceSSL = true;
         useACMEHost = "zx.dev";
-        locations."/".proxyPass = "http://127.0.0.1:${toString config.services.grafana.settings.server.http_port}";
+        # Grafana runs on glyph, next to its database, Prometheus and Loki.
+        locations."/".proxyPass = "http://glyph.note-iwato.ts.net:3000";
       };
       "chat.zx.dev" = {
         forceSSL = true;
