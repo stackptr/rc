@@ -111,6 +111,13 @@
         requireAuth = true;
         locations."/".proxyPass = "http://127.0.0.1:8082";
       };
+      # Gatus watchdog status page (hosts/zeta/services/gatus.nix).
+      "status.zx.dev" = {
+        forceSSL = true;
+        useACMEHost = "zx.dev";
+        requireAuth = true;
+        locations."/".proxyPass = "http://zeta.note-iwato.ts.net:8080";
+      };
       "grafana.zx.dev" = {
         forceSSL = true;
         useACMEHost = "zx.dev";
