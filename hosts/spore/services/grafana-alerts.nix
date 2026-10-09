@@ -137,8 +137,39 @@ _: let
     (mkRule {
       uid = "disk-hot";
       title = "Disk temperature high";
-      expr = ''smartctl_device_temperature{temperature_type="current"} > 50'';
+      # SATA drives; NVMe runs hotter and has its own threshold below.
+      expr = ''smartctl_device_temperature{temperature_type="current", device!~"nvme.*"} > 50'';
       summary = "Disk {{ $labels.device }} on {{ $labels.instance }} is at {{ $values.A.Value }}°C";
+      for = "15m";
+    })
+    # NVMe drives report no smart_status; health comes from these instead.
+    (mkRule {
+      uid = "nvme-critical-warning";
+      title = "NVMe critical warning";
+      expr = "smartctl_device_critical_warning != 0";
+      summary = "NVMe {{ $labels.device }} on {{ $labels.instance }} reports critical warning bits {{ $values.A.Value }}";
+      severity = "critical";
+      for = "1m";
+    })
+    (mkRule {
+      uid = "nvme-media-errors";
+      title = "NVMe media errors";
+      expr = "increase(smartctl_device_media_errors[1h]) > 0";
+      summary = "NVMe {{ $labels.device }} on {{ $labels.instance }} logged new unrecovered media errors in the last hour";
+      for = "0s";
+    })
+    (mkRule {
+      uid = "nvme-wear";
+      title = "NVMe wear high";
+      expr = "smartctl_device_percentage_used > 80";
+      summary = "NVMe {{ $labels.device }} on {{ $labels.instance }} has used {{ $values.A.Value }}% of its rated endurance";
+      for = "1h";
+    })
+    (mkRule {
+      uid = "nvme-hot";
+      title = "NVMe temperature high";
+      expr = ''smartctl_device_temperature{temperature_type="current", device=~"nvme.*"} > 70'';
+      summary = "NVMe {{ $labels.device }} on {{ $labels.instance }} is at {{ $values.A.Value }}°C";
       for = "15m";
     })
   ];

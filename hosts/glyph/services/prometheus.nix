@@ -145,6 +145,16 @@
           }
         ];
       }
+      {
+        # Gatus watchdog on zeta (hosts/zeta/services/gatus.nix).
+        job_name = "gatus";
+        static_configs = [
+          {
+            targets = ["zeta.note-iwato.ts.net:8080"];
+            labels.instance = "zeta";
+          }
+        ];
+      }
     ];
   };
 }
