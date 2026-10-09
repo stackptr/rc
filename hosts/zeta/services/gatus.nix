@@ -1,6 +1,6 @@
-# Out-of-band watchdog for the monitoring stack. Grafana (spore) keeps its
-# database on glyph, and Prometheus and Loki run on glyph, so an outage there
-# silences every Grafana alert. Gatus probes them from zeta and posts to
+# Out-of-band watchdog for the monitoring stack. Grafana, its database,
+# Prometheus and Loki all run on glyph, so an outage there silences every
+# Grafana alert. Gatus probes them from zeta and posts to
 # Slack directly. Grafana in turn alerts if zeta's node exporter goes away.
 {config, ...}: let
   glyph = "glyph.note-iwato.ts.net";
@@ -101,11 +101,12 @@ in {
           group = "spore";
           url = "tcp://${spore}:22";
           conditions = ["[CONNECTED] == true"];
-          description = "spore is unreachable over the tailnet; Grafana alerting is down with it";
+          description = "spore is unreachable over the tailnet; *.zx.dev, including grafana.zx.dev, is down with it";
         })
         (mkEndpoint {
           name = "grafana";
-          group = "spore";
+          group = "glyph";
+          # Through spore's nginx, so this also fails when the proxy does.
           url = "https://grafana.zx.dev/api/health";
           conditions = [
             "[STATUS] == 200"
