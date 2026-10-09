@@ -5,12 +5,19 @@ on:
   push:
     branches: main
 
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   eval:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    - uses: cachix/install-nix-action@v31
+    - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+    - uses: cachix/install-nix-action@13d8dd58da0234aa297dedd986986ccb8e7f3e24 # v31.11.1
       with:
         github_access_token: ${{ secrets.GITHUB_TOKEN }}
     - name: Check all configurations evaluate
@@ -30,10 +37,14 @@ jobs:
           fi
           return $rc
         }
+        failed=0
         for host in glyph spore zeta; do
-          eval_host "$host" ".#nixosConfigurations.$host.config.system.build.toplevel.drvPath"
+          eval_host "$host" ".#nixosConfigurations.$host.config.system.build.toplevel.drvPath" || failed=1
         done
-        eval_host "Rhizome" ".#darwinConfigurations.Rhizome.system.drvPath"
+        for host in Rhizome Stroma lobtop; do
+          eval_host "$host" ".#darwinConfigurations.$host.system.drvPath" || failed=1
+        done
+        exit $failed
 
   build:
     needs: eval
@@ -55,17 +66,19 @@ jobs:
             runner: ubuntu-24.04-arm
     runs-on: ${{ matrix.runner }}
     steps:
-    - uses: actions/checkout@v4
-    - uses: cachix/install-nix-action@v31
+    - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+    - uses: cachix/install-nix-action@13d8dd58da0234aa297dedd986986ccb8e7f3e24 # v31.11.1
       with:
         github_access_token: ${{ secrets.GITHUB_TOKEN }}
         extra_nix_config: |
           extra-substituters = https://cache.zx.dev/main
           extra-trusted-public-keys = main:mu0jkxdJTGWC3djDSEQb3rvZgqlhA8WVMulcTo5IW6c=
     - name: Configure Attic cache
+      env:
+        ATTIC_TOKEN: ${{ secrets.ATTIC_TOKEN }}
       run: |
         nix profile install --inputs-from . attic#attic-client --fallback
-        attic login rc https://cache.zx.dev ${{ secrets.ATTIC_TOKEN }}
+        attic login rc https://cache.zx.dev "$ATTIC_TOKEN"
         attic use rc:main
     - name: Allow unprivileged user namespaces (needed by bubblewrap-based FHS builds)
       if: runner.os == 'Linux'
@@ -105,7 +118,7 @@ jobs:
         fi
     - name: Notify Slack on failure
       if: failure()
-      uses: slackapi/slack-github-action@v2
+      uses: slackapi/slack-github-action@91efab103c0de0a537f72a35f6b8cda0ee76bf0a # v2.1.1
       with:
         webhook: ${{ secrets.SLACK_WEBHOOK_UPDATES_CI }}
         webhook-type: incoming-webhook

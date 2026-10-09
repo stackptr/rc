@@ -1,115 +1,61 @@
 name: Deploy
 run-name: >-
-  ${{ github.event_name == 'workflow_dispatch'
-    && format('deploy {0}', inputs.hosts)
-    || format('deploy {0}', github.event.workflow_run.display_title) }}
+  deploy${{ inputs.glyph && ' glyph' || '' }}${{ inputs.spore && ' spore' || '' }}${{ inputs.zeta && ' zeta' || '' }}
 
 on:
   workflow_dispatch:
     inputs:
-      hosts:
-        description: "Hosts to deploy"
-        required: false
-        default: "all"
-        type: choice
-        options:
-          - all
-          - glyph
-          - spore
-          - zeta
+      glyph:
+        description: glyph
+        type: boolean
+        default: false
+      spore:
+        description: spore
+        type: boolean
+        default: false
+      zeta:
+        description: zeta
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
 
 jobs:
-  changes:
-    if: >-
-      github.event_name == 'workflow_dispatch' ||
-      github.event.workflow_run.conclusion == 'success'
+  plan:
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 2
-
-      - uses: dorny/paths-filter@v3
-        id: filter
-        if: github.event_name != 'workflow_dispatch'
-        with:
-          filters: |
-            glyph:
-              - 'hosts/glyph/**'
-              - 'lib/secrets/glyph.nix'
-            spore:
-              - 'hosts/spore/**'
-              - 'lib/secrets/spore.nix'
-            zeta:
-              - 'hosts/zeta/**'
-              - 'lib/secrets/zeta.nix'
-            shared:
-              - 'modules/**'
-              - 'home/**'
-              - 'lib/*'
-              - 'lib/secrets/default.nix'
-              - 'lib/secrets/home.nix'
-              - 'overlays/**'
-              - 'packages/**'
-              - 'secrets/**'
-              - 'flake.nix'
-              - 'flake.lock'
-
       - id: set-matrix
+        env:
+          SELECTED: ${{ toJSON(inputs) }}
         run: |
-          all='[{"host":"glyph","system":"x86_64-linux","runner":"ubuntu-latest"},{"host":"spore","system":"x86_64-linux","runner":"ubuntu-latest"},{"host":"zeta","system":"aarch64-linux","runner":"ubuntu-24.04-arm"}]'
-
-          # workflow_dispatch: use selected host or all
-          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-            host="${{ inputs.hosts }}"
-            if [[ "$host" == "all" ]]; then
-              echo "matrix={\"include\":$all}" >> "$GITHUB_OUTPUT"
-            else
-              echo "matrix={\"include\":$(echo "$all" | jq -c --arg h "$host" '[.[] | select(.host == $h)]')}" >> "$GITHUB_OUTPUT"
-            fi
-            exit 0
+          include=$(jq -nc --argjson sel "$SELECTED" '
+            [ {host: "glyph", runner: "ubuntu-latest"},
+              {host: "spore", runner: "ubuntu-latest"},
+              {host: "zeta", runner: "ubuntu-24.04-arm"} ]
+            | map(select($sel[.host] == true))')
+          if [[ "$include" == "[]" ]]; then
+            echo "::error::Select at least one host to deploy"
+            exit 1
           fi
-
-          # Shared path changes: deploy all hosts
-          if [[ "${{ steps.filter.outputs.shared }}" == "true" ]]; then
-            echo "matrix={\"include\":$all}" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-
-          selected="[]"
-          if [[ "${{ steps.filter.outputs.glyph }}" == "true" ]]; then
-            selected=$(echo "$selected" | jq -c '. + [{"host":"glyph","system":"x86_64-linux","runner":"ubuntu-latest"}]')
-          fi
-          if [[ "${{ steps.filter.outputs.spore }}" == "true" ]]; then
-            selected=$(echo "$selected" | jq -c '. + [{"host":"spore","system":"x86_64-linux","runner":"ubuntu-latest"}]')
-          fi
-          if [[ "${{ steps.filter.outputs.zeta }}" == "true" ]]; then
-            selected=$(echo "$selected" | jq -c '. + [{"host":"zeta","system":"aarch64-linux","runner":"ubuntu-24.04-arm"}]')
-          fi
-
-          # Fallback: deploy all if no specific hosts matched
-          if [[ "$selected" == "[]" ]]; then
-            echo "matrix={\"include\":$all}" >> "$GITHUB_OUTPUT"
-          else
-            echo "matrix={\"include\":$selected}" >> "$GITHUB_OUTPUT"
-          fi
+          echo "matrix={\"include\":$include}" >> "$GITHUB_OUTPUT"
 
   deploy:
-    needs: changes
+    needs: plan
     concurrency:
       group: deploy-${{ matrix.host }}
       cancel-in-progress: false
     environment: ${{ matrix.host }}
     strategy:
       fail-fast: false
-      matrix: ${{ fromJson(needs.changes.outputs.matrix) }}
+      matrix: ${{ fromJson(needs.plan.outputs.matrix) }}
     runs-on: ${{ matrix.runner }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
-      - uses: cachix/install-nix-action@v31
+      - uses: cachix/install-nix-action@13d8dd58da0234aa297dedd986986ccb8e7f3e24 # v31.11.1
         with:
           github_access_token: ${{ secrets.GITHUB_TOKEN }}
           extra_nix_config: |
@@ -117,35 +63,43 @@ jobs:
             extra-trusted-public-keys = main:mu0jkxdJTGWC3djDSEQb3rvZgqlhA8WVMulcTo5IW6c=
 
       - name: Configure Attic cache
+        env:
+          ATTIC_TOKEN: ${{ secrets.ATTIC_TOKEN }}
         run: |
           nix profile install --inputs-from . attic#attic-client --fallback
-          attic login rc https://cache.zx.dev ${{ secrets.ATTIC_TOKEN }}
+          attic login rc https://cache.zx.dev "$ATTIC_TOKEN"
           attic use rc:main
 
       - name: Connect to Tailscale
-        uses: tailscale/github-action@v3
+        uses: tailscale/github-action@6cae46e2d796f265265cfcf628b72a32b4d7cade # v3.3.0
         with:
           oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
           oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
           tags: tag:ci
 
+      # Host keys come from hosts/<host>/key.pub (the same keys agenix uses),
+      # so the runner never trusts a key it sees for the first time.
       - name: Configure SSH
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/deploy_key
+          printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
+          for h in glyph spore zeta; do
+            echo "$h $(head -1 "hosts/$h/key.pub")"
+          done > ~/.ssh/known_hosts
           cat >> ~/.ssh/config <<'EOF'
           Host glyph spore zeta
             User root
             IdentityFile ~/.ssh/deploy_key
             IdentitiesOnly yes
-            StrictHostKeyChecking accept-new
+            StrictHostKeyChecking yes
+            ConnectTimeout 10
           EOF
 
       - name: Deploy to ${{ matrix.host }}
         id: deploy
-        env:
-          NIX_SSHOPTS: "-i ~/.ssh/deploy_key -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new"
         run: |
           set -o pipefail
           nix run --inputs-from . deploy-rs -- \
