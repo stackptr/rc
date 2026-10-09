@@ -42,9 +42,9 @@ in {
         "Mapper" = 1589391989;
         "Mela" = 1568924476;
         "Noir" = 1592917505;
-        "Numbers" = 409203825;
+        "Numbers" = 361304891;
         "Obsidian Web Clipper" = 6720708363;
-        "Pages" = 409201541;
+        "Pages" = 361309726;
         "Paku" = 1534130193;
         "Parcel" = 375589283;
         "Pixea" = 1507782672;
