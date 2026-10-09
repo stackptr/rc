@@ -5,6 +5,10 @@
 }: {
   rc.gpg.enable = true;
 
+  # MCP servers on a work machine are managed by my employer, and lobtop
+  # can't reach the gateway on glyph anyway.
+  rc.development.ai.gateway.enable = false;
+
   age.secrets.otel-token = {
     file = ./secrets/otel-token.age;
   };

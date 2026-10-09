@@ -14,6 +14,17 @@ in {
     rc.development = {
       ai = {
         enable = lib.mkEnableOption "tools using LLMs";
+
+        gateway.enable = mkOption {
+          default = true;
+          example = false;
+          description = ''
+            Whether this host can reach the MCP gateway on glyph. Disable on
+            hosts where MCP servers are managed elsewhere (e.g. by an
+            employer) and glyph isn't reachable.
+          '';
+          type = lib.types.bool;
+        };
       };
 
       containers = {
@@ -33,18 +44,21 @@ in {
         CLAUDE_PACE_API_FALLBACK = "0";
       };
 
-      programs.mcp = {
-        enable = true;
-        servers.glyph = {
-          url = "http://glyph:8090/mcp";
-        };
-      };
-
       programs.claude-code = {
         enable = true;
         enableMcpIntegration = true;
-        context = profile.agent;
-        inherit (profile) skills;
+        context =
+          if cfg.ai.gateway.enable
+          then profile.agent
+          else profile."agent-standalone";
+        # propose-rule is currently the only skill. Its fallback (leaving a
+        # note in Basic Memory for a later session) needs the gateway, and
+        # on a work machine, proposed rule changes shouldn't go to a public
+        # repo anyway — so skip skills entirely when the gateway is disabled.
+        skills =
+          if cfg.ai.gateway.enable
+          then profile.skills
+          else {};
         settings = {
           model = "sonnet";
           # Disabled in favor of Basic Memory MCP for cross-device access
@@ -265,11 +279,23 @@ in {
       };
     })
 
+    (mkIf (cfg.ai.enable && cfg.ai.gateway.enable) {
+      programs.mcp = {
+        enable = true;
+        servers.glyph = {
+          url = "http://glyph:8090/mcp";
+        };
+      };
+    })
+
     (mkIf cfg.containers.enable {
       home.packages = with pkgs; [
         lazydocker
       ];
+    })
 
+    # Colima provides the Docker VM on macOS; on Linux it has no use here
+    (mkIf (cfg.containers.enable && pkgs.stdenv.isDarwin) {
       services.colima = {
         enable = true;
         profiles.default = {
