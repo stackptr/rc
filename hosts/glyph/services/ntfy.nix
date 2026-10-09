@@ -34,6 +34,8 @@ in {
     settings = {
       base-url = "http://glyph:2586";
       listen-http = ":2586";
+      enable-metrics = true;
+      metrics-listen-http = "127.0.0.1:9091";
     };
   };
 
