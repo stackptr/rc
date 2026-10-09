@@ -30,6 +30,15 @@ in {
         upgrade = true;
       };
       taps = builtins.attrNames config.nix-homebrew.taps; # See: zhaofengli/nix-homebrew#5
+      # N.B.: With any `masApps` entry, cleanup uninstalls every App Store app
+      # not listed here or in the host's `masApps` (Homebrew/brew#22450)
+      masApps = {
+        "Kagi for Safari" = 1622835804;
+        "Litterbox" = 6805719216;
+        "Obsidian Web Clipper" = 6720708363;
+        "Tot" = 1491071483;
+        "wBlock" = 6746388723;
+      };
     };
 
     programs.fastscripts = mkIf cfg.fastscripts {

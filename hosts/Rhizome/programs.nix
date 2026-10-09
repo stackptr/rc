@@ -18,7 +18,8 @@
       "legcord"
       "textual"
     ];
-    # N.B.: Removed entries in `masApps` require manual uninstallation
+    # N.B.: App Store apps not in `masApps` here or in modules/darwin/rc.nix are
+    # uninstalled on activation
     masApps = {
       "Copilot" = 1447330651;
       "Folder Quick Look" = 6753110395;
