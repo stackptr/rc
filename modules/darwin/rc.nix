@@ -30,12 +30,28 @@ in {
         upgrade = true;
       };
       taps = builtins.attrNames config.nix-homebrew.taps; # See: zhaofengli/nix-homebrew#5
-      # N.B.: With any `masApps` entry, cleanup uninstalls every App Store app
-      # not listed here or in the host's `masApps` (Homebrew/brew#22450)
+      # N.B.: Cleanup uninstalls every App Store app not listed here, however it
+      # was installed (Homebrew/brew#22450)
       masApps = {
+        "Copilot" = 1447330651;
+        "Folder Quick Look" = 6753110395;
+        "GoodLinks" = 1474335294;
+        "Hand Mirror" = 1502839586;
         "Kagi for Safari" = 1622835804;
         "Litterbox" = 6805719216;
+        "Mapper" = 1589391989;
+        "Mela" = 1568924476;
+        "Noir" = 1592917505;
+        "Numbers" = 409203825;
         "Obsidian Web Clipper" = 6720708363;
+        "Pages" = 409201541;
+        "Paku" = 1534130193;
+        "Parcel" = 375589283;
+        "Pixea" = 1507782672;
+        "Play" = 1596506190;
+        "Reeder" = 1529448980;
+        "Things" = 904280696;
+        "Timery" = 1425368544;
         "Tot" = 1491071483;
         "wBlock" = 6746388723;
       };

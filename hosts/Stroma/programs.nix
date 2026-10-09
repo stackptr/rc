@@ -14,25 +14,6 @@
     casks = [
       "legcord"
     ];
-    # N.B.: App Store apps not in `masApps` here or in modules/darwin/rc.nix are
-    # uninstalled on activation
-    masApps = {
-      "Copilot" = 1447330651;
-      "Folder Quick Look" = 6753110395;
-      "GoodLinks" = 1474335294;
-      "Hand Mirror" = 1502839586;
-      "Infuse" = 1136220934;
-      "Mapper" = 1589391989;
-      "Mela" = 1568924476;
-      "Noir" = 1592917505;
-      "Paku" = 1534130193;
-      "Parcel" = 375589283;
-      "Pixea" = 1507782672;
-      "Play" = 1596506190;
-      "Reeder" = 1529448980;
-      "Timery" = 1425368544;
-      "Things" = 904280696;
-    };
   };
 
   programs.chromium = {

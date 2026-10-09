@@ -10,10 +10,6 @@
     casks = [
       "meetingbar"
     ];
-    # N.B.: App Store apps not in `masApps` here or in modules/darwin/rc.nix are
-    # uninstalled on activation
-    masApps = {
-    };
   };
 
   programs.daisydisk = {
