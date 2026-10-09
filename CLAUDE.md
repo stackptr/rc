@@ -165,7 +165,7 @@ All logs carry these labels, queryable with `{label="value"}` in LogQL:
 
 | Job | Port | Host | Covers |
 |---|---|---|---|
-| `node` | 9100 | glyph, spore, zeta | CPU, memory, disk, network, systemd unit states, timer last-trigger |
+| `node` | 9100 | glyph, spore, zeta | CPU, memory, disk, network, systemd unit states, restarts (`node_systemd_service_restart_total`), start times, timer last-trigger |
 | `zfs` | 9134 | glyph | Pool health, ARC hit ratio, pool space |
 | `postgres` | 9187 | glyph | Connections, query throughput, vacuum, per-DB stats |
 | `smartctl` | 9633 | glyph | Disk SMART data, temperature, reallocated sectors |
