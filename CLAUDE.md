@@ -128,10 +128,10 @@ The homelab runs a Grafana LGTM-lite stack for observability. Use it first when 
 
 - **Grafana** (glyph:3000, `grafana.zx.dev` via spore) — dashboards, Explore, alerting; config in `hosts/glyph/services/grafana.nix`. The image renderer (headless Chromium, localhost:8081) backs `get_panel_image`.
 - **Loki** (glyph:3100) — log aggregation from glyph, spore, zeta; 30 days retained
-- **Prometheus** (glyph:9099) — metrics from glyph, spore, zeta; 90 days retained
+- **Prometheus** (glyph:9099) — metrics from glyph, spore, zeta, plus Stroma (nix-darwin: node_exporter and mactop, `hosts/Stroma/monitoring.nix`); 90 days retained
 - **Alert rules** — provisioned from `hosts/glyph/services/grafana-alerts.nix` (folder "Alerts", routed to Slack). Add rules there, not in the UI.
 - **Gatus** (zeta:8080, `status.zx.dev` behind Pocket ID) — out-of-band watchdog in `hosts/zeta/services/gatus.nix`. Every minute it checks glyph (reachability, Postgres, Prometheus freshness, Loki ingestion, and Grafana health through spore's proxy) and spore (reachability), public sites (Jellyfin, Navidrome, Open WebUI, Pocket ID) through their `*.zx.dev` URLs, plus the `zx.dev` cert hourly, and posts to Slack itself, so it still alerts when glyph or Grafana is down.
-- **Dashboards** — provisioned JSON in `hosts/glyph/services/dashboards/`: Node, ZFS, Log Explorer, PostgreSQL, Disk Health (SMART), Systemd Units, nginx.
+- **Dashboards** — provisioned JSON in `hosts/glyph/services/dashboards/`: Node, ZFS, Log Explorer, PostgreSQL, Disk Health (SMART), Systemd Units, nginx, Apple Silicon (Stroma).
 
 **Grafana exits at startup with "Using the default [rendering]renderer_token is not allowed":** Grafana 13 rejects the default renderer token (`-`) whenever an image renderer is configured, even one on localhost. `grafana.nix` sets the same `rendererToken` on both sides; keep them in sync.
 
@@ -202,7 +202,8 @@ Every scraped series carries `instance` and an identical `host` label (`glyph`, 
 
 | Job | Port | Host | Covers |
 |---|---|---|---|
-| `node` | 9100 | glyph, spore, zeta | CPU, memory, disk, network, systemd unit states, restarts (`node_systemd_service_restart_total`), start times, timer last-trigger |
+| `node` | 9100 | glyph, spore, zeta, stroma | CPU, memory, disk, network, systemd unit states, restarts (`node_systemd_service_restart_total`), start times, timer last-trigger. Stroma is macOS: no systemd series and no `node_memory_MemAvailable_bytes` |
+| `mactop` | 9101 | stroma | Apple Silicon: `mactop_cpu_usage_percent` (and E/P-core), `mactop_gpu_usage_percent`, `mactop_power_watts{component}` (cpu, gpu, ane, dram, total), `mactop_dram_bandwidth_gbs`, `mactop_soc_temp_celsius`, `mactop_thermal_state` (0–3), `mactop_memory_gb{type}`, fans |
 | `zfs` | 9134 | glyph | Pool health, ARC hit ratio, pool space |
 | `postgres` | 9187 | glyph | Connections, query throughput, vacuum, per-DB stats |
 | `smartctl` | 9633 | glyph | SMART status, temperature, sector errors (sda–sdd); NVMe wear, spare, media errors, critical warning (nvme0) |
