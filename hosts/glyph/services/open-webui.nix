@@ -153,7 +153,12 @@ in {
   services.open-webui = {
     enable = true;
     package = pkgs.open-webui.overridePythonAttrs (old: {
-      dependencies = old.dependencies ++ old.optional-dependencies.postgres;
+      dependencies =
+        old.dependencies
+        ++ old.optional-dependencies.postgres
+        # ENABLE_OTEL imports opentelemetry.instrumentation.system_metrics,
+        # which nixpkgs leaves out of the package's dependencies.
+        ++ [pkgs.python3Packages.opentelemetry-instrumentation-system-metrics];
     });
     inherit port;
     host = "0.0.0.0";
