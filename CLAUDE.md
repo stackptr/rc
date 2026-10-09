@@ -203,7 +203,7 @@ Every scraped series carries `instance` and an identical `host` label (`glyph`, 
 | Job | Port | Host | Covers |
 |---|---|---|---|
 | `node` | 9100 | glyph, spore, zeta, stroma | CPU, memory, disk, network, systemd unit states, restarts (`node_systemd_service_restart_total`), start times, timer last-trigger. Stroma is macOS: no systemd series and no `node_memory_MemAvailable_bytes` |
-| `mactop` | 9101 | stroma | Apple Silicon: `mactop_cpu_usage_percent` (and `mactop_{e,p,s}core_usage_percent`; M5 has P- and S-cores, no E-cores), `mactop_gpu_usage_percent`, `mactop_power_watts{component}` (cpu, gpu, ane, dram, system, total; on M5 these need mactop 2.1.6+, see `overlays/mactop.nix`, or all but gpu read 0), `mactop_dram_bandwidth_gbs`, `mactop_soc_temp_celsius`, `mactop_thermal_state` (0–3), `mactop_memory_gb{type}`, fans |
+| `mactop` | 9101 | stroma | Apple Silicon: `mactop_cpu_usage_percent` (and `mactop_{e,p,s}core_usage_percent`; M5 has P- and S-cores, no E-cores), `mactop_gpu_usage_percent`, `mactop_power_watts{component}` (cpu, gpu, ane, dram, gpu_sram, system, total: total is whole-machine power and system is the remainder, so the others sum to total; on M5 these need mactop 2.1.6+, see `overlays/mactop.nix`), `mactop_dram_bandwidth_gbs` (0 on M5 Ultra), `mactop_soc_temp_celsius`, `mactop_thermal_state` (0–3), `mactop_memory_gb{type}`, fans |
 | `zfs` | 9134 | glyph | Pool health, ARC hit ratio, pool space |
 | `postgres` | 9187 | glyph | Connections, query throughput, vacuum, per-DB stats |
 | `smartctl` | 9633 | glyph | SMART status, temperature, sector errors (sda–sdd); NVMe wear, spare, media errors, critical warning (nvme0) |
