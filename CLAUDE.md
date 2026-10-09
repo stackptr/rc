@@ -154,8 +154,15 @@ All logs carry these labels, queryable with `{label="value"}` in LogQL:
 # All warnings and above across spore
 {host="spore", priority=~"[0-4]"}
 
-# nginx error log on spore (access logs go to /var/log/nginx, not Loki)
+# nginx error log on spore
 {host="spore", app="nginx"}
+
+# nginx access logs on spore (JSON: vhost, method, uri, status, bytes,
+# request_time, upstream_time, upstream_status, remote_addr, user_agent)
+{host="spore", app="nginx_access"} | json | status >= 500
+
+# p95 latency per vhost over 5m
+quantile_over_time(0.95, {host="spore", app="nginx_access"} | json | unwrap request_time [5m]) by (vhost)
 
 # Recent errors across all hosts
 {priority=~"[0-3]"} |= "error"
@@ -193,7 +200,7 @@ rate(nginx_http_requests_total{instance="spore"}[5m])
 
 Know these before concluding "no data means no problem":
 - Grafana's database is PostgreSQL on glyph. If glyph is down, Grafana (on spore) and all alerting go down with it.
-- No HTTP status or latency per vhost: nginx metrics come from `stub_status` (connection counts only), and access logs aren't shipped.
+- Per-vhost HTTP status and latency exist only as LogQL over `app="nginx_access"`, not as Prometheus metrics. The `nginx` job is `stub_status` connection counts.
 - No metrics for Alloy, Grafana, or individual app internals (Jellyfin, Home Assistant, Windmill, etc.). Use `node_systemd_unit_state` and Loki.
 - glyph's NVMe root disk isn't covered by the smartctl exporter (only `sda`–`sdd`).
 
