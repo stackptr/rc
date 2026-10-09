@@ -1,19 +1,22 @@
 name: Deploy
-run-name: deploy ${{ inputs.hosts }}
+run-name: >-
+  deploy${{ inputs.glyph && ' glyph' || '' }}${{ inputs.spore && ' spore' || '' }}${{ inputs.zeta && ' zeta' || '' }}
 
 on:
   workflow_dispatch:
     inputs:
-      hosts:
-        description: "Hosts to deploy"
-        required: false
-        default: "all"
-        type: choice
-        options:
-          - all
-          - glyph
-          - spore
-          - zeta
+      glyph:
+        description: glyph
+        type: boolean
+        default: false
+      spore:
+        description: spore
+        type: boolean
+        default: false
+      zeta:
+        description: zeta
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -26,13 +29,17 @@ jobs:
     steps:
       - id: set-matrix
         env:
-          HOST: ${{ inputs.hosts }}
+          SELECTED: ${{ toJSON(inputs) }}
         run: |
-          include=$(jq -nc --arg h "$HOST" '
+          include=$(jq -nc --argjson sel "$SELECTED" '
             [ {host: "glyph", runner: "ubuntu-latest"},
               {host: "spore", runner: "ubuntu-latest"},
               {host: "zeta", runner: "ubuntu-24.04-arm"} ]
-            | map(select($h == "all" or .host == $h))')
+            | map(select($sel[.host] == true))')
+          if [[ "$include" == "[]" ]]; then
+            echo "::error::Select at least one host to deploy"
+            exit 1
+          fi
           echo "matrix={\"include\":$include}" >> "$GITHUB_OUTPUT"
 
   deploy:
