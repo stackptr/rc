@@ -30,10 +30,14 @@ jobs:
           fi
           return $rc
         }
+        failed=0
         for host in glyph spore zeta; do
-          eval_host "$host" ".#nixosConfigurations.$host.config.system.build.toplevel.drvPath"
+          eval_host "$host" ".#nixosConfigurations.$host.config.system.build.toplevel.drvPath" || failed=1
         done
-        eval_host "Rhizome" ".#darwinConfigurations.Rhizome.system.drvPath"
+        for host in Rhizome Stroma lobtop; do
+          eval_host "$host" ".#darwinConfigurations.$host.system.drvPath" || failed=1
+        done
+        exit $failed
 
   build:
     needs: eval
