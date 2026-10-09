@@ -129,6 +129,7 @@ The homelab runs a Grafana LGTM-lite stack for observability. Use it first when 
 - **Grafana** (glyph:3000, `grafana.zx.dev` via spore) — dashboards, Explore, alerting; config in `hosts/glyph/services/grafana.nix`. The image renderer (headless Chromium, localhost:8081) backs `get_panel_image`.
 - **Loki** (glyph:3100) — log aggregation from glyph, spore, zeta; 30 days retained
 - **Prometheus** (glyph:9099) — metrics from glyph, spore, zeta, plus Stroma (nix-darwin: node_exporter and mactop, `hosts/Stroma/monitoring.nix`); 90 days retained
+- **Claude Code telemetry** — every host with `rc.development.ai.telemetry.enable` (default: hosts that reach the gateway, so not lobtop) pushes OTLP metrics to Prometheus and events to Loki; see "Claude Code telemetry" below
 - **Alert rules** — provisioned from `hosts/glyph/services/grafana-alerts.nix` (folder "Alerts", routed to Slack). Add rules there, not in the UI.
 - **Gatus** (zeta:8080, `status.zx.dev` behind Pocket ID) — out-of-band watchdog in `hosts/zeta/services/gatus.nix`. Every minute it checks glyph (reachability, Postgres, Prometheus freshness, Loki ingestion, and Grafana health through spore's proxy) and spore (reachability), public sites (Jellyfin, Navidrome, Open WebUI, Pocket ID) through their `*.zx.dev` URLs, plus the `zx.dev` cert hourly, and posts to Slack itself, so it still alerts when glyph or Grafana is down.
 - **Dashboards** — provisioned JSON in `hosts/glyph/services/dashboards/`: Node, ZFS, Log Explorer, PostgreSQL, Disk Health (SMART), Systemd Units, nginx, Apple Silicon (Stroma).
@@ -196,9 +197,28 @@ Check deploys first when something regressed. Every activation on glyph, spore o
 
 On the host, `nixos-version --configuration-revision` gives the deployed revision.
 
+### Claude Code telemetry
+
+Claude Code on each host pushes OTLP over the tailnet (env in `modules/home/development.nix`). Prompt, response and tool-input text are redacted at the source. Labels on both sides include `host` (lowercase hostname), `session_id`, `model` and `user_email`.
+
+```promql
+# Spend and tokens per host and model over the last day
+sum by (host, model) (increase(claude_code_cost_usage_USD_total[1d]))
+sum by (type) (increase(claude_code_token_usage_tokens_total[1d]))
+```
+Also: `claude_code_session_count_total`, `claude_code_active_time_seconds_total`, `claude_code_lines_of_code_count_total`, `claude_code_commit_count_total`, `claude_code_pull_request_count_total`. Series appear once the event first happens.
+
+```logql
+# Events: one line per event ("claude_code.api_request"); fields are
+# structured metadata (event_name, tool_name, success, duration_ms,
+# cost_usd, ttft_ms, input_tokens, ...)
+{service_name="claude-code", host="rhizome"} | event_name="api_error"
+{service_name="claude-code"} | event_name="tool_result" | success="false"
+```
+
 ### Prometheus jobs and exporters
 
-Every scraped series carries `instance` and an identical `host` label (`glyph`, `spore`, `zeta`), so `{host="glyph"}` selects the same machine in PromQL and LogQL. OTLP-pushed series (Open WebUI) have `instance` only.
+Every scraped series carries `instance` and an identical `host` label (`glyph`, `spore`, `zeta`), so `{host="glyph"}` selects the same machine in PromQL and LogQL. OTLP-pushed series have no scrape labels: Open WebUI's carry `instance` only, Claude Code's carry `job="claude-code"` and `host`.
 
 | Job | Port | Host | Covers |
 |---|---|---|---|

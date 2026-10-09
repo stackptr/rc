@@ -35,6 +35,15 @@ _: {
         retention_period = "30d";
         ingestion_burst_size_mb = 16;
         ingestion_rate_mb = 8;
+        # OTLP pushes (Claude Code events): index the host resource attribute
+        # so {host="..."} works as it does for journald streams. Other
+        # attributes land in structured metadata.
+        otlp_config.resource_attributes.attributes_config = [
+          {
+            action = "index_label";
+            attributes = ["host"];
+          }
+        ];
       };
 
       compactor = {
