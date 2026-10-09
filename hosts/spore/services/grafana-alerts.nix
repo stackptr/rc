@@ -21,11 +21,15 @@ _: let
     },
     for ? "5m",
     noDataState ? "OK",
+    # A query error (datasource down) is not this rule's condition. Leaving
+    # it at "Error" makes every rule raise a label-less DatasourceError named
+    # after itself ("ZFS pool [no value] is not ONLINE"). Datasource outages
+    # are covered by the *-unreachable rules below and by Gatus on zeta.
+    execErrState ? "OK",
     severity ? "warning",
   }: {
-    inherit uid title for noDataState;
+    inherit uid title for noDataState execErrState;
     condition = "C";
-    execErrState = "Error";
     isPaused = false;
     labels.severity = severity;
     annotations.summary = summary;
@@ -133,8 +137,39 @@ _: let
     (mkRule {
       uid = "disk-hot";
       title = "Disk temperature high";
-      expr = ''smartctl_device_temperature{temperature_type="current"} > 50'';
+      # SATA drives; NVMe runs hotter and has its own threshold below.
+      expr = ''smartctl_device_temperature{temperature_type="current", device!~"nvme.*"} > 50'';
       summary = "Disk {{ $labels.device }} on {{ $labels.instance }} is at {{ $values.A.Value }}°C";
+      for = "15m";
+    })
+    # NVMe drives report no smart_status; health comes from these instead.
+    (mkRule {
+      uid = "nvme-critical-warning";
+      title = "NVMe critical warning";
+      expr = "smartctl_device_critical_warning != 0";
+      summary = "NVMe {{ $labels.device }} on {{ $labels.instance }} reports critical warning bits {{ $values.A.Value }}";
+      severity = "critical";
+      for = "1m";
+    })
+    (mkRule {
+      uid = "nvme-media-errors";
+      title = "NVMe media errors";
+      expr = "increase(smartctl_device_media_errors[1h]) > 0";
+      summary = "NVMe {{ $labels.device }} on {{ $labels.instance }} logged new unrecovered media errors in the last hour";
+      for = "0s";
+    })
+    (mkRule {
+      uid = "nvme-wear";
+      title = "NVMe wear high";
+      expr = "smartctl_device_percentage_used > 80";
+      summary = "NVMe {{ $labels.device }} on {{ $labels.instance }} has used {{ $values.A.Value }}% of its rated endurance";
+      for = "1h";
+    })
+    (mkRule {
+      uid = "nvme-hot";
+      title = "NVMe temperature high";
+      expr = ''smartctl_device_temperature{temperature_type="current", device=~"nvme.*"} > 70'';
+      summary = "NVMe {{ $labels.device }} on {{ $labels.instance }} is at {{ $values.A.Value }}°C";
       for = "15m";
     })
   ];
@@ -156,19 +191,34 @@ _: let
     })
   logHosts;
 
-  # Fires when the Prometheus datasource returns nothing, e.g. the TSDB
-  # stopped ingesting. An unreachable Prometheus surfaces as DatasourceError.
-  prometheusRules = [
+  # The only rules that alert on query errors: one per datasource, so an
+  # outage produces one accurately named alert instead of one per rule.
+  datasourceRules = [
     (mkRule {
       uid = "prometheus-empty";
-      title = "Prometheus has no scrape data";
+      title = "Prometheus unreachable or empty";
       expr = "count(up)";
       evaluator = {
         type = "lt";
         params = [1];
       };
-      summary = "Prometheus on glyph returned no up series";
+      summary = "Prometheus on glyph is unreachable or has no up series; other Prometheus-based alerts can't fire";
       noDataState = "Alerting";
+      execErrState = "Alerting";
+      severity = "critical";
+    })
+    (mkRule {
+      uid = "loki-unreachable";
+      title = "Loki unreachable or empty";
+      datasourceUid = loki;
+      expr = ''sum(count_over_time({host=~".+"}[10m])) or vector(0)'';
+      evaluator = {
+        type = "lt";
+        params = [1];
+      };
+      summary = "Loki on glyph is unreachable or has received no logs from any host in 10m; log-based alerts can't fire";
+      noDataState = "Alerting";
+      execErrState = "Alerting";
       severity = "critical";
     })
   ];
@@ -200,7 +250,7 @@ in {
     groups = [
       (mkGroup "hosts" systemRules)
       (mkGroup "storage" storageRules)
-      (mkGroup "telemetry" (logRules ++ prometheusRules))
+      (mkGroup "telemetry" (logRules ++ datasourceRules))
       (mkGroup "web" webRules)
     ];
   };

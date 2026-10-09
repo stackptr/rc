@@ -130,6 +130,8 @@ The homelab runs a Grafana LGTM-lite stack for observability. Use it first when 
 - **Loki** (glyph:3100) — log aggregation from glyph, spore, zeta
 - **Prometheus** (glyph:9099) — metrics from glyph, spore, zeta
 - **Alert rules** — provisioned from `hosts/spore/services/grafana-alerts.nix` (folder "Alerts", routed to Slack). Add rules there, not in the UI.
+- **Gatus** (zeta:8080, `status.zx.dev` behind Pocket ID) — out-of-band watchdog in `hosts/zeta/services/gatus.nix`. Every minute it checks glyph (reachability, Postgres, Prometheus freshness, Loki ingestion) and spore (reachability, Grafana health), plus the `zx.dev` cert hourly, and posts to Slack itself, so it still alerts when glyph or Grafana is down.
+- **Dashboards** — provisioned JSON in `hosts/spore/services/dashboards/`: Node, ZFS, Log Explorer, PostgreSQL, Disk Health (SMART), Systemd Units, nginx.
 
 **MCP access:** The `grafana` MCP server is registered in mcpjungle on glyph at `http://127.0.0.1:8095/mcp`. It exposes tools for LogQL (Loki), PromQL (Prometheus), and dashboard access. Use it instead of `journalctl` for anything beyond a quick one-liner.
 
@@ -177,16 +179,19 @@ quantile_over_time(0.95, {host="spore", app="nginx_access"} | json | unwrap requ
 | `node` | 9100 | glyph, spore, zeta | CPU, memory, disk, network, systemd unit states, restarts (`node_systemd_service_restart_total`), start times, timer last-trigger |
 | `zfs` | 9134 | glyph | Pool health, ARC hit ratio, pool space |
 | `postgres` | 9187 | glyph | Connections, query throughput, vacuum, per-DB stats |
-| `smartctl` | 9633 | glyph | Disk SMART data, temperature, reallocated sectors |
+| `smartctl` | 9633 | glyph | SMART status, temperature, sector errors (sda–sdd); NVMe wear, spare, media errors, critical warning (nvme0) |
 | `nginx` | 9113 | spore | Request rate, active connections, handled/dropped |
 | `navidrome` | 4533/metrics | glyph | `db_model_totals` (library size), `media_scan_last`, HTTP request count/latency |
 | `prometheus` | 9099 | glyph | Prometheus self-metrics (TSDB, scrape health) |
 | `loki` | 3100 | glyph | Loki ingestion and query metrics |
 | `coredns` | 9153 | glyph | DNS queries, responses by rcode, forward latency (`ts.zx.dev` zone) |
 | `ntfy` | 2587 | glyph | Messages published, subscribers, HTTP requests |
+| `gatus` | 8080 | zeta | `gatus_results_*` per watchdog endpoint: success, duration, certificate expiry |
 | `open-webui` | push (OTLP) | glyph | `http_server_requests_total`, `http_server_duration_*`, `webui_users_*`; pushed to Prometheus's OTLP receiver, not scraped, so no `up` series |
 
 **Picking a port on glyph:** grep the repo, and also check service defaults that aren't declared in Nix. Transmission's RPC listens on 9091 by default (`torrents.zx.dev` proxies to it), so a new exporter on 9091 fails with "address already in use".
+
+**smartctl exporter and late devices:** v0.14.0 registers its metric list at startup from whatever disks it can read then. If a disk becomes readable later (NVMe ACL applied after start, a drive waking from standby), every scrape fails with `collected metric ... with unregistered descriptor` until `systemctl restart prometheus-smartctl-exporter`. Fixed upstream in v0.15.0 (prometheus-community/smartctl_exporter#329).
 
 **Common PromQL patterns:**
 ```promql
@@ -206,10 +211,9 @@ rate(nginx_http_requests_total{instance="spore"}[5m])
 ### Blind spots
 
 Know these before concluding "no data means no problem":
-- Grafana's database is PostgreSQL on glyph. If glyph is down, Grafana (on spore) and all alerting go down with it.
+- Grafana's database is PostgreSQL on glyph. If glyph is down, Grafana (on spore) and all Grafana alerting go down with it; Gatus on zeta still alerts.
 - Per-vhost HTTP status and latency exist only as LogQL over `app="nginx_access"`, not as Prometheus metrics. The `nginx` job is `stub_status` connection counts.
 - No metrics for Alloy, Grafana, or individual app internals (Jellyfin, Home Assistant, etc.). Use `node_systemd_unit_state` and Loki.
-- glyph's NVMe root disk isn't covered by the smartctl exporter (only `sda`–`sdd`).
 
 ## Guardrails
 
