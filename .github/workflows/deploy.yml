@@ -18,6 +18,9 @@ on:
           - spore
           - zeta
 
+permissions:
+  contents: read
+
 jobs:
   changes:
     if: >-
