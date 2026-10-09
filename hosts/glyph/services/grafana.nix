@@ -2,7 +2,13 @@
   config,
   lib,
   ...
-}: {
+}: let
+  # Grafana refuses to start with the default renderer token ("-") once a
+  # renderer is configured. The renderer only listens on localhost, so this
+  # token keeps Grafana's check happy rather than guarding anything; it's in
+  # the Nix store, so don't treat it as a secret.
+  rendererToken = "glyph-local-renderer";
+in {
   imports = [./grafana-alerts.nix];
 
   # Kept apart from ./ntfy.nix's root-only slack-bot-token: Grafana reads
@@ -74,7 +80,10 @@
       # provisionGrafana below points the renderer's browser at http_addr,
       # which is 0.0.0.0 here, and a Host other than grafana.zx.dev fails
       # enforce_domain. Load pages through the public URL instead.
-      rendering.callback_url = lib.mkForce "https://grafana.zx.dev/";
+      rendering = {
+        callback_url = lib.mkForce "https://grafana.zx.dev/";
+        renderer_token = rendererToken;
+      };
     };
     provision = {
       enable = true;
@@ -136,5 +145,6 @@
   services.grafana-image-renderer = {
     enable = true;
     provisionGrafana = true;
+    settings.server.auth-token = rendererToken;
   };
 }

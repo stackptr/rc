@@ -133,6 +133,8 @@ The homelab runs a Grafana LGTM-lite stack for observability. Use it first when 
 - **Gatus** (zeta:8080, `status.zx.dev` behind Pocket ID) — out-of-band watchdog in `hosts/zeta/services/gatus.nix`. Every minute it checks glyph (reachability, Postgres, Prometheus freshness, Loki ingestion, and Grafana health through spore's proxy) and spore (reachability), plus the `zx.dev` cert hourly, and posts to Slack itself, so it still alerts when glyph or Grafana is down.
 - **Dashboards** — provisioned JSON in `hosts/glyph/services/dashboards/`: Node, ZFS, Log Explorer, PostgreSQL, Disk Health (SMART), Systemd Units, nginx.
 
+**Grafana exits at startup with "Using the default [rendering]renderer_token is not allowed":** Grafana 13 rejects the default renderer token (`-`) whenever an image renderer is configured, even one on localhost. `grafana.nix` sets the same `rendererToken` on both sides; keep them in sync.
+
 **MCP access:** The `grafana` MCP server is registered in mcpjungle on glyph at `http://127.0.0.1:8095/mcp`. It exposes tools for LogQL (Loki), PromQL (Prometheus), and dashboard access. Use it instead of `journalctl` for anything beyond a quick one-liner. It runs read-only (`--disable-write` in `modules/nixos/llm/grafana-mcp.nix`), so change alert rules and dashboards in the flake, not through the MCP.
 
 ### Loki label schema
