@@ -4,4 +4,5 @@ in {
   "hosts/zeta/secrets/wireless.age".publicKeys = keys;
   "hosts/zeta/secrets/dd-agent.age".publicKeys = keys;
   "hosts/zeta/secrets/znc-conf.age".publicKeys = keys;
+  "hosts/zeta/secrets/gatus-env.age".publicKeys = keys;
 }
