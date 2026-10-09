@@ -182,6 +182,9 @@ quantile_over_time(0.95, {host="spore", app="nginx_access"} | json | unwrap requ
 | `navidrome` | 4533/metrics | glyph | `db_model_totals` (library size), `media_scan_last`, HTTP request count/latency |
 | `prometheus` | 9099 | glyph | Prometheus self-metrics (TSDB, scrape health) |
 | `loki` | 3100 | glyph | Loki ingestion and query metrics |
+| `coredns` | 9153 | glyph | DNS queries, responses by rcode, forward latency (`ts.zx.dev` zone) |
+| `ntfy` | 9091 | glyph | Messages published, subscribers, HTTP requests |
+| `open-webui` | push (OTLP) | glyph | `http_server_requests_total`, `http_server_duration_*`, `webui_users_*`; pushed to Prometheus's OTLP receiver, not scraped, so no `up` series |
 
 **Common PromQL patterns:**
 ```promql
