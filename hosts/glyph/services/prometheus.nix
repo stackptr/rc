@@ -212,6 +212,17 @@ in {
         ];
       }
       {
+        # MCPJungle gateway: tool calls per server and tool, with outcome and
+        # latency. OTEL_ENABLED is set in modules/nixos/llm/mcpjungle.nix.
+        job_name = "mcpjungle";
+        static_configs = [
+          {
+            targets = ["localhost:${toString config.services.mcpjungle.port}"];
+            labels.instance = "glyph";
+          }
+        ];
+      }
+      {
         # Gatus watchdog on zeta (hosts/zeta/services/gatus.nix).
         job_name = "gatus";
         static_configs = [
