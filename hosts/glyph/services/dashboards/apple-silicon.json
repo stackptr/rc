@@ -460,7 +460,7 @@
       },
       "title": "CPU usage by core type",
       "type": "timeseries",
-      "description": "",
+      "description": "M5 chips have P-cores and S-cores instead of E-cores; on them E-cores reads 0.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -516,6 +516,11 @@
           "expr": "mactop_pcore_usage_percent{instance=~\"$instance\"}",
           "legendFormat": "P-cores",
           "refId": "C"
+        },
+        {
+          "expr": "mactop_score_usage_percent{instance=~\"$instance\"}",
+          "legendFormat": "S-cores",
+          "refId": "D"
         }
       ],
       "id": 9,

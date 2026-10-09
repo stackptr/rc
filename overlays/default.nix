@@ -14,4 +14,7 @@
 
   # Link alloy against full systemd so it can read zstd journals
   (import ./grafana-alloy.nix)
+
+  # mactop 2.1.6 for M5 Ultra power readings, ahead of nixpkgs
+  (import ./mactop.nix)
 ]
