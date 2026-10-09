@@ -146,6 +146,8 @@ All logs carry these labels, queryable with `{label="value"}` in LogQL:
 
 **Alloy journal label naming:** In `discovery.relabel` rules for `loki.source.journal`, the source label prefix is `__journal_` + the field name lowercased. Fields with a leading underscore (e.g. `_SYSTEMD_UNIT` → `_systemd_unit`) produce a double underscore (`__journal__systemd_unit`). Fields without one (e.g. `PRIORITY`, `SYSLOG_IDENTIFIER`) produce a single underscore (`__journal_priority`, `__journal_syslog_identifier`).
 
+**Alloy reads nothing from the journal:** if a host stops shipping logs while `alloy.service` is active and logs no errors, check `curl -s localhost:12345/metrics | grep loki_source_journal_target_lines_total` on that host. If it stays at 0 while `journalctl` works, alloy's libsystemd can't open the journal files. nixpkgs links alloy against `systemdLibs`, which is built without zstd, and journald writes zstd-compressed files. `overlays/grafana-alloy.nix` relinks it against full systemd. Deleting alloy's saved positions doesn't help.
+
 **Common LogQL patterns:**
 ```logql
 # All errors and above from a specific service
@@ -154,8 +156,15 @@ All logs carry these labels, queryable with `{label="value"}` in LogQL:
 # All warnings and above across spore
 {host="spore", priority=~"[0-4]"}
 
-# nginx error log on spore (access logs go to /var/log/nginx, not Loki)
+# nginx error log on spore
 {host="spore", app="nginx"}
+
+# nginx access logs on spore (JSON: vhost, method, uri, status, bytes,
+# request_time, upstream_time, upstream_status, remote_addr, user_agent)
+{host="spore", app="nginx_access"} | json | status >= 500
+
+# p95 latency per vhost over 5m
+quantile_over_time(0.95, {host="spore", app="nginx_access"} | json | unwrap request_time [5m]) by (vhost)
 
 # Recent errors across all hosts
 {priority=~"[0-3]"} |= "error"
@@ -173,6 +182,11 @@ All logs carry these labels, queryable with `{label="value"}` in LogQL:
 | `navidrome` | 4533/metrics | glyph | `db_model_totals` (library size), `media_scan_last`, HTTP request count/latency |
 | `prometheus` | 9099 | glyph | Prometheus self-metrics (TSDB, scrape health) |
 | `loki` | 3100 | glyph | Loki ingestion and query metrics |
+| `coredns` | 9153 | glyph | DNS queries, responses by rcode, forward latency (`ts.zx.dev` zone) |
+| `ntfy` | 2587 | glyph | Messages published, subscribers, HTTP requests |
+| `open-webui` | push (OTLP) | glyph | `http_server_requests_total`, `http_server_duration_*`, `webui_users_*`; pushed to Prometheus's OTLP receiver, not scraped, so no `up` series |
+
+**Picking a port on glyph:** grep the repo, and also check service defaults that aren't declared in Nix. Transmission's RPC listens on 9091 by default (`torrents.zx.dev` proxies to it), so a new exporter on 9091 fails with "address already in use".
 
 **Common PromQL patterns:**
 ```promql
@@ -193,7 +207,7 @@ rate(nginx_http_requests_total{instance="spore"}[5m])
 
 Know these before concluding "no data means no problem":
 - Grafana's database is PostgreSQL on glyph. If glyph is down, Grafana (on spore) and all alerting go down with it.
-- No HTTP status or latency per vhost: nginx metrics come from `stub_status` (connection counts only), and access logs aren't shipped.
+- Per-vhost HTTP status and latency exist only as LogQL over `app="nginx_access"`, not as Prometheus metrics. The `nginx` job is `stub_status` connection counts.
 - No metrics for Alloy, Grafana, or individual app internals (Jellyfin, Home Assistant, Windmill, etc.). Use `node_systemd_unit_state` and Loki.
 - glyph's NVMe root disk isn't covered by the smartctl exporter (only `sda`–`sdd`).
 

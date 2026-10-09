@@ -6,5 +6,6 @@
     ./mcp-nixos.nix
     ./mcpjungle.nix
     ./obsidian-vault-mcp.nix
+    ./rc-source-mcp.nix
   ];
 }

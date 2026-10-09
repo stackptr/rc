@@ -6,6 +6,8 @@
   services.prometheus = {
     enable = true;
     port = 9099;
+    # Accepts OTLP metrics pushes at /api/v1/otlp/v1/metrics (Open WebUI).
+    extraFlags = ["--web.enable-otlp-receiver"];
     exporters.node = {
       enable = true;
       port = 9100;
@@ -121,6 +123,24 @@
             targets = [
               "localhost:${toString config.services.loki.configuration.server.http_listen_port}"
             ];
+            labels.instance = "glyph";
+          }
+        ];
+      }
+      {
+        job_name = "coredns";
+        static_configs = [
+          {
+            targets = ["localhost:9153"];
+            labels.instance = "glyph";
+          }
+        ];
+      }
+      {
+        job_name = "ntfy";
+        static_configs = [
+          {
+            targets = [config.services.ntfy-sh.settings.metrics-listen-http];
             labels.instance = "glyph";
           }
         ];

@@ -167,6 +167,16 @@ in {
       CORS_ALLOW_ORIGIN = "https://chat.zx.dev";
       ENABLE_VERSION_UPDATE_CHECK = "False";
 
+      # Push OpenTelemetry metrics straight to Prometheus's OTLP receiver
+      # (no collector). Traces and logs stay off; logs reach Loki via journald.
+      ENABLE_OTEL = "true";
+      ENABLE_OTEL_METRICS = "true";
+      OTEL_METRICS_OTLP_SPAN_EXPORTER = "http";
+      OTEL_METRICS_EXPORTER_OTLP_ENDPOINT = "http://127.0.0.1:${toString config.services.prometheus.port}/api/v1/otlp/v1/metrics";
+      OTEL_METRICS_EXPORT_INTERVAL_MILLIS = "60000";
+      # Becomes the `instance` label, matching the scrape jobs.
+      OTEL_RESOURCE_ATTRIBUTES = "service.instance.id=glyph";
+
       # OIDC via Pocket ID
       ENABLE_OAUTH_SIGNUP = "true";
       OAUTH_PROVIDER_NAME = "Pocket ID";
