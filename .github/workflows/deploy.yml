@@ -156,7 +156,9 @@ jobs:
       # ships it to Loki as {host="<host>", app="deploy-rs"}. Done after the
       # deploy, not streamed, so a dropped SSH session during activation
       # can't break the deploy. The summary line is err on failure, so
-      # failed deploys match {priority=~"[0-3]"}.
+      # failed deploys match {priority=~"[0-3]"}. Substitution noise
+      # ("copying path ..." and the indented store path lists, over 95% of
+      # the output) stays in the Actions log only.
       - name: Ship deploy log to Loki
         if: always() && steps.deploy.outcome != 'skipped'
         continue-on-error: true
@@ -170,7 +172,8 @@ jobs:
           priority=info
           [[ "$OUTCOME" == success ]] || priority=err
           if [[ -s deploy.log ]]; then
-            sed 's/\x1b\[[0-9;]*m//g' deploy.log | ssh "$HOST" systemd-cat -t deploy-rs -p info
+            sed -e 's/\x1b\[[0-9;]*m//g' -e '/^copying path /d' -e '/^  \/nix\/store\//d' deploy.log \
+              | ssh "$HOST" systemd-cat -t deploy-rs -p info
           fi
           echo "deploy ${OUTCOME}: revision=${REVISION} actor=${ACTOR} run=${RUN_URL}" \
             | ssh "$HOST" systemd-cat -t deploy-rs -p "$priority"

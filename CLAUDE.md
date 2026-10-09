@@ -172,6 +172,8 @@ quantile_over_time(0.95, {host="spore", app="nginx_access"} | json | unwrap requ
 {priority=~"[0-3]"} |= "error"
 ```
 
+To summarise a noisy stream, use grafana-mcp's `query_loki_patterns` with a stream selector such as `{host="glyph", unit="jellyfin.service"}`. It groups similar lines and counts each group. Patterns are held in Loki's memory, so they only cover logs since Loki last restarted.
+
 ### Deploys
 
 Check deploys first when something regressed. Every activation on glyph, spore or zeta logs one line, whichever path ran it. The Deploy workflow also writes its full deploy-rs output into the target host's journal. Dashboards show both as a purple "Deploys" annotation.
@@ -236,7 +238,7 @@ Know these before concluding "no data means no problem":
 - Grafana's database is PostgreSQL on glyph. If glyph is down, Grafana (on spore) and all Grafana alerting go down with it; Gatus on zeta still alerts.
 - Per-vhost HTTP status and latency exist only as LogQL over `app="nginx_access"`, not as Prometheus metrics. The `nginx` job is `stub_status` connection counts.
 - Local `just switch` prints switch-to-configuration output (units restarted, failed units) to the terminal only. Loki gets the `nixos-deploy` line, and systemd logs each unit start, stop and failure as usual.
-- Deploy workflow output is written to the journal after the deploy finishes, so its lines are timestamped at the end of the run. If the host is unreachable, the output exists only in GitHub Actions.
+- Deploy workflow output is written to the journal after the deploy finishes, so its lines are timestamped at the end of the run. It leaves out the `copying path` lines and store path lists. If the host is unreachable, the output exists only in GitHub Actions.
 - No metrics for Alloy, Grafana, or individual app internals (Jellyfin, Home Assistant, Windmill, etc.). Use `node_systemd_unit_state` and Loki.
 
 ## Guardrails

@@ -26,6 +26,11 @@ _: {
 
       storage_config.filesystem.directory = "/var/lib/loki/chunks";
 
+      # Backs /loki/api/v1/patterns (grafana-mcp's query_loki_patterns and
+      # Logs Drilldown). Patterns are held in memory, so they cover recent
+      # logs only and reset when Loki restarts. Uses the common in-memory ring.
+      pattern_ingester.enabled = true;
+
       limits_config = {
         retention_period = "30d";
         ingestion_burst_size_mb = 16;
