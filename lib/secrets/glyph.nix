@@ -3,6 +3,9 @@ let
 in {
   "hosts/glyph/secrets/filebrowser-env.age".publicKeys = keys;
   "hosts/glyph/secrets/slack-bot-token.age".publicKeys = keys;
+  "hosts/glyph/secrets/grafana-client-secret.age".publicKeys = keys;
+  "hosts/glyph/secrets/grafana-secret-key.age".publicKeys = keys;
+  "hosts/glyph/secrets/grafana-slack-bot-token.age".publicKeys = keys;
   "hosts/glyph/secrets/kagi-api-key.age".publicKeys = keys;
   "hosts/glyph/secrets/context7-api-key.age".publicKeys = keys;
   "hosts/glyph/secrets/open-terminal-env.age".publicKeys = keys;

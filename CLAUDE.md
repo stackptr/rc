@@ -126,12 +126,12 @@ nix.gc.dates = lib.mkForce "daily";
 
 The homelab runs a Grafana LGTM-lite stack for observability. Use it first when investigating service failures, slow response times, disk issues, or any situation where you'd otherwise reach for `journalctl` or SSH into a host to check a service.
 
-- **Grafana** (`grafana.zx.dev`) — dashboards, Explore, alerting
+- **Grafana** (glyph:3000, `grafana.zx.dev` via spore) — dashboards, Explore, alerting; config in `hosts/glyph/services/grafana.nix`. The image renderer (headless Chromium, localhost:8081) backs `get_panel_image`.
 - **Loki** (glyph:3100) — log aggregation from glyph, spore, zeta; 30 days retained
 - **Prometheus** (glyph:9099) — metrics from glyph, spore, zeta; 90 days retained
-- **Alert rules** — provisioned from `hosts/spore/services/grafana-alerts.nix` (folder "Alerts", routed to Slack). Add rules there, not in the UI.
-- **Gatus** (zeta:8080, `status.zx.dev` behind Pocket ID) — out-of-band watchdog in `hosts/zeta/services/gatus.nix`. Every minute it checks glyph (reachability, Postgres, Prometheus freshness, Loki ingestion) and spore (reachability, Grafana health), plus the `zx.dev` cert hourly, and posts to Slack itself, so it still alerts when glyph or Grafana is down.
-- **Dashboards** — provisioned JSON in `hosts/spore/services/dashboards/`: Node, ZFS, Log Explorer, PostgreSQL, Disk Health (SMART), Systemd Units, nginx.
+- **Alert rules** — provisioned from `hosts/glyph/services/grafana-alerts.nix` (folder "Alerts", routed to Slack). Add rules there, not in the UI.
+- **Gatus** (zeta:8080, `status.zx.dev` behind Pocket ID) — out-of-band watchdog in `hosts/zeta/services/gatus.nix`. Every minute it checks glyph (reachability, Postgres, Prometheus freshness, Loki ingestion, and Grafana health through spore's proxy) and spore (reachability), plus the `zx.dev` cert hourly, and posts to Slack itself, so it still alerts when glyph or Grafana is down.
+- **Dashboards** — provisioned JSON in `hosts/glyph/services/dashboards/`: Node, ZFS, Log Explorer, PostgreSQL, Disk Health (SMART), Systemd Units, nginx.
 
 **MCP access:** The `grafana` MCP server is registered in mcpjungle on glyph at `http://127.0.0.1:8095/mcp`. It exposes tools for LogQL (Loki), PromQL (Prometheus), and dashboard access. Use it instead of `journalctl` for anything beyond a quick one-liner. It runs read-only (`--disable-write` in `modules/nixos/llm/grafana-mcp.nix`), so change alert rules and dashboards in the flake, not through the MCP.
 
@@ -233,7 +233,7 @@ rate(nginx_http_requests_total{instance="spore"}[5m])
 ### Blind spots
 
 Know these before concluding "no data means no problem":
-- Grafana's database is PostgreSQL on glyph. If glyph is down, Grafana (on spore) and all Grafana alerting go down with it; Gatus on zeta still alerts.
+- Grafana and its PostgreSQL database run on glyph. If glyph is down, Grafana and all Grafana alerting go down with it; Gatus on zeta still alerts. If spore is down, `grafana.zx.dev` is unreachable but alerting keeps running.
 - Per-vhost HTTP status and latency exist only as LogQL over `app="nginx_access"`, not as Prometheus metrics. The `nginx` job is `stub_status` connection counts.
 - Local `just switch` prints switch-to-configuration output (units restarted, failed units) to the terminal only. Loki gets the `nixos-deploy` line, and systemd logs each unit start, stop and failure as usual.
 - Deploy workflow output is written to the journal after the deploy finishes, so its lines are timestamped at the end of the run. If the host is unreachable, the output exists only in GitHub Actions.
