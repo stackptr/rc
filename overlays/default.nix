@@ -11,4 +11,7 @@
 
   # Skip paho-mqtt's flaky test suite (nixpkgs#542586)
   (import ./paho-mqtt.nix)
+
+  # Link alloy against full systemd so it can read zstd journals
+  (import ./grafana-alloy.nix)
 ]
