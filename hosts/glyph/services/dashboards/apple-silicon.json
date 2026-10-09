@@ -167,9 +167,9 @@
         "type": "prometheus",
         "uid": "${datasource}"
       },
-      "title": "Package power",
+      "title": "Total power",
       "type": "stat",
-      "description": "CPU + GPU + ANE + DRAM, as reported by IOReport.",
+      "description": "Whole-machine power where the Mac reports it (DC-in rail on Mac Studio), otherwise the CPU + GPU + ANE + DRAM sum.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -742,7 +742,7 @@
       },
       "title": "Power by component",
       "type": "timeseries",
-      "description": "Stacked; the top of the stack is roughly package power.",
+      "description": "Stacked; the top of the stack is total power. system is everything outside the SoC components (total minus the others).",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -785,7 +785,7 @@
       },
       "targets": [
         {
-          "expr": "mactop_power_watts{instance=~\"$instance\",component=~\"cpu|gpu|ane|dram|gpu_sram\"}",
+          "expr": "mactop_power_watts{instance=~\"$instance\",component=~\"cpu|gpu|ane|dram|gpu_sram|system\"}",
           "legendFormat": "{{component}}",
           "refId": "A"
         }
@@ -803,9 +803,9 @@
         "type": "prometheus",
         "uid": "${datasource}"
       },
-      "title": "Package and system power",
+      "title": "Total and rest-of-system power",
       "type": "timeseries",
-      "description": "total is the SoC package; system is whole-machine power where the Mac reports it.",
+      "description": "total is whole-machine power where reported; system is the part not attributed to CPU, GPU, ANE or DRAM.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1142,7 +1142,7 @@
       },
       "title": "DRAM bandwidth",
       "type": "timeseries",
-      "description": "Token generation is usually bound by this.",
+      "description": "Token generation is usually bound by this. Reads 0 on M5 Ultra with mactop 2.1.6.",
       "fieldConfig": {
         "defaults": {
           "color": {
