@@ -125,6 +125,47 @@ in {
           conditions = ["[CERTIFICATE_EXPIRATION] > 504h"];
           description = "The zx.dev certificate expires in under 21 days; check acme-zx.dev.service on spore";
         })
+
+        # Public sites, checked through their public URLs, so a failure can
+        # be DNS, the certificate, spore's nginx or the backend on glyph.
+        (mkEndpoint {
+          name = "jellyfin";
+          group = "sites";
+          url = "https://jellyfin.zx.dev/health";
+          conditions = [
+            "[STATUS] == 200"
+            "[BODY] == Healthy"
+          ];
+          description = "jellyfin.zx.dev is down or unhealthy; check jellyfin.service on glyph";
+        })
+        (mkEndpoint {
+          name = "navidrome";
+          group = "sites";
+          url = "https://music.zx.dev/ping";
+          conditions = ["[STATUS] == 200"];
+          description = "music.zx.dev (Navidrome) is down; check navidrome.service on glyph";
+        })
+        (mkEndpoint {
+          name = "open-webui";
+          group = "sites";
+          url = "https://chat.zx.dev/health";
+          conditions = [
+            "[STATUS] == 200"
+            "[BODY].status == true"
+          ];
+          description = "chat.zx.dev (Open WebUI) is down; check open-webui.service on glyph";
+        })
+        (mkEndpoint {
+          name = "pocket-id";
+          group = "sites";
+          # Every requireAuth site and Grafana's login depend on this.
+          url = "https://id.zx.dev/.well-known/openid-configuration";
+          conditions = [
+            "[STATUS] == 200"
+            "[BODY].issuer == https://id.zx.dev"
+          ];
+          description = "id.zx.dev (Pocket ID) is down; logins to Grafana and every auth-protected site fail. Check pocket-id.service on spore and its database on glyph";
+        })
       ];
     };
   };
