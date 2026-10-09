@@ -87,8 +87,6 @@
   age.secrets.kagi-api-key = {
     file = ./../secrets/kagi-api-key.age;
     mode = "440";
-    owner = "kagi-mcp";
-    group = "kagi-mcp";
   };
 
   age.secrets.context7-api-key = {
@@ -116,10 +114,6 @@
       ++ lib.optional config.rc.obsidian-sync.enable config.rc.obsidian-sync.vaultPath;
   };
   services.mcp-nixos.enable = true;
-  services.kagi-mcp = {
-    enable = true;
-    environmentFile = config.age.secrets.kagi-api-key.path;
-  };
   services.grafana-mcp = {
     enable = true;
     grafanaUrl = "https://grafana.zx.dev";
@@ -139,7 +133,7 @@
   # tool list doesn't.
   systemd.timers.mcpjungle-register.restartTriggers =
     map (name: config.systemd.units."${name}.service".unit)
-    ["basic-memory" "mcp-nixos" "kagi-mcp" "grafana-mcp" "obsidian-vault-mcp"];
+    ["basic-memory" "mcp-nixos" "grafana-mcp" "obsidian-vault-mcp"];
   services.mcpjungle = {
     enable = true;
     servers.basic-memory = {
@@ -151,8 +145,11 @@
       description = "NixOS options, packages, and Home Manager search";
     };
     servers.kagi = {
-      url = "http://127.0.0.1:8093/mcp";
-      description = "Kagi web search and page summarization";
+      # Kagi's hosted server; it takes the API key as a bearer token.
+      url = "https://mcp.kagi.com/mcp";
+      description = "Kagi web search and page extraction";
+      headers.Authorization = "Bearer $KAGI_API_KEY";
+      environmentFile = config.age.secrets.kagi-api-key.path;
     };
     servers.grafana = {
       url = "http://127.0.0.1:8095/mcp";
@@ -183,10 +180,6 @@
     servers.cloudflare-docs = {
       url = "https://docs.mcp.cloudflare.com/sse";
       description = "Cloudflare documentation and API reference";
-    };
-    servers.semgrep = {
-      url = "https://mcp.semgrep.ai/mcp";
-      description = "Code security scanning for vulnerabilities, supply chain, and secrets";
     };
   };
 }

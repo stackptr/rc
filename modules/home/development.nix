@@ -214,7 +214,7 @@ in {
               "mcp__glyph__deepwiki__read_wiki_structure"
               # MCP: kagi
               "mcp__glyph__kagi__kagi_search_fetch"
-              "mcp__glyph__kagi__kagi_summarizer"
+              "mcp__glyph__kagi__kagi_extract"
               # MCP: aws-knowledge
               "mcp__glyph__aws-knowledge__aws___get_regional_availability"
               "mcp__glyph__aws-knowledge__aws___list_regions"
