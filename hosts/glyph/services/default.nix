@@ -1,5 +1,6 @@
 {
   config,
+  inputs,
   lib,
   pkgs,
   ...
@@ -128,6 +129,10 @@
     enable = true;
     inherit (config.rc.obsidian-sync) vaultPath;
   };
+  services.rc-source-mcp = {
+    enable = true;
+    sourcePath = "${inputs.self}";
+  };
   services.mcpjungle = {
     enable = true;
     servers.basic-memory = {
@@ -149,6 +154,10 @@
     servers.obsidian-vault = {
       url = "http://127.0.0.1:8097/mcp";
       description = "Read and write files in the Obsidian vault";
+    };
+    servers.rc-source = {
+      url = "http://127.0.0.1:8098/mcp";
+      description = "Read-only source of my NixOS and nix-darwin configuration (github.com/stackptr/rc), as last deployed on glyph. Use it for questions about how my machines and services are set up.";
     };
     servers.context7 = {
       url = "https://mcp.context7.com/mcp";
