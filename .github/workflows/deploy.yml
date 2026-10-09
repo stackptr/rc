@@ -120,9 +120,11 @@ jobs:
             extra-trusted-public-keys = main:mu0jkxdJTGWC3djDSEQb3rvZgqlhA8WVMulcTo5IW6c=
 
       - name: Configure Attic cache
+        env:
+          ATTIC_TOKEN: ${{ secrets.ATTIC_TOKEN }}
         run: |
           nix profile install --inputs-from . attic#attic-client --fallback
-          attic login rc https://cache.zx.dev ${{ secrets.ATTIC_TOKEN }}
+          attic login rc https://cache.zx.dev "$ATTIC_TOKEN"
           attic use rc:main
 
       - name: Connect to Tailscale
@@ -133,9 +135,11 @@ jobs:
           tags: tag:ci
 
       - name: Configure SSH
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/deploy_key
+          printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
           cat >> ~/.ssh/config <<'EOF'
           Host glyph spore zeta
