@@ -12,6 +12,7 @@
     ./avahi.nix
     ./dns.nix
     ./filebrowser.nix
+    ./freshrss.nix
     ./grafana.nix
     ./jellyfin.nix
     ./loki.nix
@@ -107,6 +108,7 @@
     paths =
       [
         config.services.postgresqlBackup.location
+        config.services.freshrss.dataDir
         "/var/lib/basic-memory"
         "/var/lib/open-webui"
         "/var/lib/roon-server/backup"
