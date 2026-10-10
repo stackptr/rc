@@ -344,6 +344,22 @@
         "type": "github"
       }
     },
+    "homebrew-omlx": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1791555666,
+        "narHash": "sha256-fNXmX9nek0JmfKWCbjyt46cOSSXK27cHfeEqPnKDD+k=",
+        "owner": "jundot",
+        "repo": "omlx",
+        "rev": "c0b1056b41ebde9422af316cf5038a423eb8f24c",
+        "type": "github"
+      },
+      "original": {
+        "owner": "jundot",
+        "repo": "omlx",
+        "type": "github"
+      }
+    },
     "llm-profile": {
       "flake": false,
       "locked": {
@@ -547,6 +563,7 @@
         "home-manager": "home-manager",
         "homebrew-cask": "homebrew-cask",
         "homebrew-core": "homebrew-core",
+        "homebrew-omlx": "homebrew-omlx",
         "llm-profile": "llm-profile",
         "nix-darwin": "nix-darwin",
         "nix-homebrew": "nix-homebrew",

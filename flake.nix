@@ -78,6 +78,11 @@
       url = "github:homebrew/homebrew-cask";
       flake = false;
     };
+    # oMLX's own tap (the repo root holds Formula/omlx.rb); Stroma only
+    homebrew-omlx = {
+      url = "github:jundot/omlx";
+      flake = false;
+    };
     llm-profile = {
       url = "github:stackptr/llm-profile";
       flake = false;
