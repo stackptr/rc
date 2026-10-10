@@ -194,11 +194,12 @@
           '';
         };
         # Reeder authenticates the Google Reader API with FreshRSS's own API
-        # password and can't do the OIDC redirect, so skip SSO here.
+        # password and can't do the OIDC redirect, so skip SSO for it alone;
+        # the rest of /api/ (Fever, extensions) stays behind Pocket ID.
         # requireAuth only guards locations."/", and nginx picks the longest
         # matching prefix. No SSO means a client could send its own
         # Remote-User, so drop it.
-        locations."/api/" = {
+        locations."/api/greader.php" = {
           proxyPass = "http://glyph.note-iwato.ts.net:8084";
           extraConfig = ''
             proxy_set_header Remote-User "";
