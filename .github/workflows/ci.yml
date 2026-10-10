@@ -13,6 +13,22 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+    - uses: cachix/install-nix-action@13d8dd58da0234aa297dedd986986ccb8e7f3e24 # v31.11.1
+      with:
+        github_access_token: ${{ secrets.GITHUB_TOKEN }}
+    # The flake's formatter runs every pre-commit hook (alejandra, statix,
+    # nil) on all files, and fails if a hook fails or rewrites a file.
+    - name: Check formatting and lints
+      run: |
+        if ! nix fmt; then
+          git --no-pager diff
+          exit 1
+        fi
+
   eval:
     runs-on: ubuntu-latest
     steps:
