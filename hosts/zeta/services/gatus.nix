@@ -22,8 +22,9 @@
     conditions,
     description,
     interval ? "1m",
+    headers ? {},
   }: {
-    inherit name group url conditions interval;
+    inherit name group url conditions interval headers;
     alerts = [(alert description)];
   };
 in {
@@ -154,6 +155,22 @@ in {
             "[BODY].status == true"
           ];
           description = "chat.zx.dev (Open WebUI) is down; check open-webui.service on glyph";
+        })
+        (mkEndpoint {
+          name = "freshrss";
+          group = "sites";
+          # Unauthenticated self-test of the Google Reader API that Reeder
+          # syncs through. It answers FAIL unless it can read an Authorization
+          # header, so this also catches a proxy that drops it. FreshRSS logs
+          # a warning per call, hence the longer interval.
+          url = "https://rss.zx.dev/api/greader.php/check/compatibility";
+          headers.Authorization = "GoogleLogin auth=test/1";
+          interval = "5m";
+          conditions = [
+            "[STATUS] == 200"
+            "[BODY] == PASS"
+          ];
+          description = "rss.zx.dev (FreshRSS) API is down or failing its self-test; Reeder can't sync. Check phpfpm-freshrss.service and nginx on glyph";
         })
         (mkEndpoint {
           name = "pocket-id";
