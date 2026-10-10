@@ -1,4 +1,8 @@
-{config, ...}: let
+{
+  config,
+  pkgs,
+  ...
+}: let
   port = 8084;
 in {
   services.freshrss = {
@@ -12,6 +16,14 @@ in {
     # Reeder uses the Google Reader API with a per-user API password set in
     # FreshRSS's profile settings, not the login password.
     api.enable = true;
+    # Stretches each feed's refresh interval toward how often it posts (up
+    # to 24h), never below the default TTL. That makes it cheap to lower the
+    # default TTL for fresher busy feeds without polling quiet ones as often.
+    # Installing doesn't enable it: turn it on once under Settings →
+    # Extensions. FreshRSS keeps that in users/corey/config.php under
+    # dataDir, not in Postgres, so a move to another host needs dataDir
+    # restored from restic.
+    extensions = [pkgs.freshrss-extensions.auto-ttl];
     database = {
       type = "pgsql";
       host = "/run/postgresql"; # socket; port stays null
