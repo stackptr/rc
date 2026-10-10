@@ -58,10 +58,6 @@
     enable = true;
   };
 
-  programs.roon = {
-    enable = true;
-  };
-
   programs.scroll-reverser = {
     enable = true;
     startOnActivation = true;
