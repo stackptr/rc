@@ -28,7 +28,10 @@ in {
   # logged in, and an agent only starts at login.
   launchd.daemons.omlx.serviceConfig = {
     ProgramArguments = [
-      "${brewBin}/omlx"
+      # The keg's opt/ link, as the formula's own service uses: bin/omlx
+      # can be taken by something else (the menubar app installs its CLI
+      # there), and then `brew link` fails and bin/omlx isn't Homebrew's.
+      "${config.homebrew.prefix}/opt/omlx/bin/omlx"
       "serve"
       # Explicit, so it doesn't depend on the menubar app's base-path file
       "--base-path"
