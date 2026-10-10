@@ -86,6 +86,23 @@ in {
         ];
       }
       {
+        # oMLX (LLM server on Stroma) through json_exporter, which fetches
+        # oMLX's /api/status on each scrape (hosts/Stroma/monitoring.nix).
+        # oMLX down fails the scrape, so "Scrape target down" covers it.
+        job_name = "omlx";
+        metrics_path = "/probe";
+        params = {
+          module = ["omlx"];
+          target = ["http://127.0.0.1:8000/api/status"];
+        };
+        static_configs = [
+          {
+            targets = ["stroma.note-iwato.ts.net:7979"];
+            labels.instance = "stroma";
+          }
+        ];
+      }
+      {
         job_name = "zfs";
         static_configs = [
           {
@@ -193,8 +210,8 @@ in {
         ];
       }
       {
-        # Alloy's own metrics (journal read and Loki push counters). spore
-        # and zeta listen on 0.0.0.0:12345 for this; see their alloy.nix.
+        # Alloy's own metrics (log read and Loki push counters). spore, zeta
+        # and Stroma listen on 0.0.0.0:12345 for this.
         job_name = "alloy";
         static_configs = [
           {
@@ -208,6 +225,11 @@ in {
           {
             targets = ["zeta.note-iwato.ts.net:12345"];
             labels.instance = "zeta";
+          }
+          {
+            # Ships oMLX's log (hosts/Stroma/monitoring.nix)
+            targets = ["stroma.note-iwato.ts.net:12345"];
+            labels.instance = "stroma";
           }
         ];
       }
