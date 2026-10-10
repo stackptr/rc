@@ -180,6 +180,17 @@
         useACMEHost = "zx.dev";
         locations."/".proxyPass = "http://glyph.note-iwato.ts.net:4533";
       };
+      "rss.zx.dev" = {
+        forceSSL = true;
+        useACMEHost = "zx.dev";
+        requireAuth = true;
+        locations."/".proxyPass = "http://glyph.note-iwato.ts.net:8084";
+        # Reeder authenticates the Google Reader API with FreshRSS's own API
+        # password and can't do the OIDC redirect, so skip SSO here.
+        # requireAuth only guards locations."/", and nginx picks the longest
+        # matching prefix.
+        locations."/api/".proxyPass = "http://glyph.note-iwato.ts.net:8084";
+      };
       "mcp.zx.dev" = {
         forceSSL = true;
         useACMEHost = "zx.dev";
