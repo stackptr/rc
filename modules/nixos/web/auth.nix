@@ -45,7 +45,7 @@ in {
           description = ''
             Whether the database is managed locally. When true, PostgreSQL
             is configured with the pocketid database and user, and pocket-id
-            depends on postgresql.service.
+            depends on postgresql.target.
           '';
         };
 
@@ -148,10 +148,12 @@ in {
 
       systemd.services.pocket-id = {
         wants = ["network-online.target"];
+        # The target, not postgresql.service: ensureDatabases and ensureUsers
+        # run in postgresql-setup.service.
         after =
           ["network-online.target"]
-          ++ lib.optionals cfg.issuer.localDatabase ["postgresql.service"];
-        requires = lib.optionals cfg.issuer.localDatabase ["postgresql.service"];
+          ++ lib.optionals cfg.issuer.localDatabase ["postgresql.target"];
+        requires = lib.optionals cfg.issuer.localDatabase ["postgresql.target"];
       };
 
       services.oauth2-proxy = {
