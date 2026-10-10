@@ -184,12 +184,26 @@
         forceSSL = true;
         useACMEHost = "zx.dev";
         requireAuth = true;
-        locations."/".proxyPass = "http://glyph.note-iwato.ts.net:8084";
+        # FreshRSS uses http_auth and trusts Remote-User from the tailnet, so
+        # pass on the Pocket ID username oauth2-proxy verified.
+        locations."/" = {
+          proxyPass = "http://glyph.note-iwato.ts.net:8084";
+          extraConfig = ''
+            auth_request_set $rss_user $upstream_http_x_auth_request_preferred_username;
+            proxy_set_header Remote-User $rss_user;
+          '';
+        };
         # Reeder authenticates the Google Reader API with FreshRSS's own API
         # password and can't do the OIDC redirect, so skip SSO here.
         # requireAuth only guards locations."/", and nginx picks the longest
-        # matching prefix.
-        locations."/api/".proxyPass = "http://glyph.note-iwato.ts.net:8084";
+        # matching prefix. No SSO means a client could send its own
+        # Remote-User, so drop it.
+        locations."/api/" = {
+          proxyPass = "http://glyph.note-iwato.ts.net:8084";
+          extraConfig = ''
+            proxy_set_header Remote-User "";
+          '';
+        };
       };
       "mcp.zx.dev" = {
         forceSSL = true;
