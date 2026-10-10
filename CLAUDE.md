@@ -289,4 +289,4 @@ Know these before concluding "no data means no problem":
 ## Code style
 
 - All files should end with a newline.
-- After executing large changes, run `nix fmt .`.
+- After executing large changes, run `nix fmt .`. It runs alejandra, statix and nil; CI runs it too and fails if it changes or flags anything.
