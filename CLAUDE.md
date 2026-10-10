@@ -127,8 +127,8 @@ nix.gc.dates = lib.mkForce "daily";
 The homelab runs a Grafana LGTM-lite stack for observability. Use it first when investigating service failures, slow response times, disk issues, or any situation where you'd otherwise reach for `journalctl` or SSH into a host to check a service.
 
 - **Grafana** (glyph:3000, `grafana.zx.dev` via spore) — dashboards, Explore, alerting; config in `hosts/glyph/services/grafana.nix`. The image renderer (headless Chromium, localhost:8081) backs `get_panel_image`.
-- **Loki** (glyph:3100) — log aggregation from glyph, spore, zeta; 30 days retained
-- **Prometheus** (glyph:9099) — metrics from glyph, spore, zeta, plus Stroma (nix-darwin: node_exporter and mactop, `hosts/Stroma/monitoring.nix`); 90 days retained
+- **Loki** (glyph:3100) — log aggregation from glyph, spore, zeta, plus oMLX's log from Stroma; 30 days retained
+- **Prometheus** (glyph:9099) — metrics from glyph, spore, zeta, plus Stroma (nix-darwin: node_exporter, mactop, json_exporter for oMLX, Alloy; `hosts/Stroma/monitoring.nix`); 90 days retained
 - **Claude Code telemetry** — every host with `rc.development.ai.telemetry.enable` (default: hosts that reach the gateway, so not lobtop) pushes OTLP metrics to Prometheus and events to Loki; see "Claude Code telemetry" below
 - **Alert rules** — provisioned from `hosts/glyph/services/grafana-alerts.nix` (folder "Alerts", routed to Slack). Add rules there, not in the UI.
 - **Gatus** (zeta:8080, `status.zx.dev` behind Pocket ID) — out-of-band watchdog in `hosts/zeta/services/gatus.nix`. Every minute it checks glyph (reachability, Postgres, Prometheus freshness, Loki ingestion, and Grafana health through spore's proxy) and spore (reachability), public sites (Jellyfin, Navidrome, Open WebUI, Pocket ID) through their `*.zx.dev` URLs, plus the `zx.dev` cert hourly, and posts to Slack itself, so it still alerts when glyph or Grafana is down.
@@ -173,6 +173,12 @@ quantile_over_time(0.95, {host="spore", app="nginx_access"} | json | unwrap requ
 
 # Recent errors across all hosts
 {priority=~"[0-3]"} |= "error"
+```
+
+**oMLX** (local LLM server on Stroma, `hosts/Stroma/omlx.nix`) logs to `~/.omlx/logs/server.log`, which Alloy on Stroma ships as `{host="stroma", app="omlx"}`. Its Python log levels map to the journald `priority` numbers (ERROR 3, WARNING 4, INFO 6), and tracebacks stay in one entry. Each completed request logs one line, the source for recent per-request speed:
+```logql
+# "Chat completion: model=X, 412 tokens in 6.31s (65.3 tok/s), ..., stream_model_ttft=0.48s"
+avg_over_time({host="stroma", app="omlx"} |~ " tokens in .* tok/s" | regexp `model=(?P<model>[^,]+), \d+ tokens in [\d.]+s \((?P<tps>[\d.]+) tok/s` | unwrap tps [5m]) by (model)
 ```
 
 To summarise a noisy stream, use grafana-mcp's `query_loki_patterns` with a stream selector such as `{host="glyph", unit="jellyfin.service"}`. It groups similar lines and counts each group. Patterns are held in Loki's memory, so they only cover logs since Loki last restarted.
@@ -242,8 +248,9 @@ Every scraped series carries `instance` and an identical `host` label (`glyph`, 
 | `ntfy` | 2587 | glyph | Messages published, subscribers, HTTP requests |
 | `gatus` | 8080 | zeta | `gatus_results_*` per watchdog endpoint: success, duration, certificate expiry |
 | `grafana` | 3000 | glyph | Grafana itself: `grafana_alerting_rule_evaluation_failures_total`, notification and HTTP metrics |
-| `alloy` | 12345 | glyph, spore, zeta | Alloy itself: `loki_write_sent_entries_total`, `loki_write_dropped_entries_total`, journal read counters |
+| `alloy` | 12345 | glyph, spore, zeta, stroma | Alloy itself: `loki_write_sent_entries_total`, `loki_write_dropped_entries_total`, journal read counters |
 | `mcpjungle` | 8090 | glyph | MCP gateway tool calls: `mcpjungle_tool_calls_ratio_total{mcp_server_name, tool_name, outcome}` and `mcpjungle_tool_call_latency_seconds`. `outcome="error"` means the gateway couldn't reach or talk to the upstream server, not a tool's own error result. The `_ratio` comes from the OTel unit `"1"`; series appear after a tool's first call |
+| `omlx` | 7979/probe | stroma | oMLX via json_exporter, which fetches `http://127.0.0.1:8000/api/status` per scrape: `omlx_requests_{active,waiting}`, `omlx_{requests,prompt_tokens,completion_tokens,cached_tokens}_total`, `omlx_models_{loaded,loading,discovered}`, `omlx_loaded_model_info{model}`, `omlx_model_memory_used_bytes`, `omlx_avg_{prefill,generation}_tokens_per_second`, `omlx_cache_efficiency_percent`, `omlx_info{version}`. Counters reset when oMLX restarts and the averages run from its start; `up == 0` means oMLX isn't answering |
 | `open-webui` | push (OTLP) | glyph | `http_server_requests_total`, `http_server_duration_*`, `webui_users_*`; pushed to Prometheus's OTLP receiver, not scraped, so no `up` series |
 
 **Picking a port on glyph:** grep the repo, and also check service defaults that aren't declared in Nix. Transmission's RPC listens on 9091 by default (`torrents.zx.dev` proxies to it), so a new exporter on 9091 fails with "address already in use".
