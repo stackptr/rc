@@ -206,10 +206,12 @@ On the host, `nixos-version --configuration-revision` gives the deployed revisio
 
 Claude Code on each host pushes OTLP over the tailnet (env in `modules/home/development.nix`). Prompt, response and tool-input text are redacted at the source. Labels on both sides include `host` (lowercase hostname), `session_id`, `model` and `user_email`.
 
+Two sources share these settings. The terminal CLI reports `service_name`/`job` `claude-code` with `host`. The Claude desktop app's built-in Claude Code reports `claude-code-desktop` and replaces the resource attributes, so its series and events have no `host`. Match both with `=~"claude-code.*"`. A desktop session's `user_id` (a per-machine install ID) equals that machine's CLI `user_id`, which identifies its host. Metrics are exported every 60s, so a new session's token and cost series show up about a minute after its first request.
+
 ```promql
 # Spend and tokens per host and model over the last day
-sum by (host, model) (increase(claude_code_cost_usage_USD_total[1d]))
-sum by (type) (increase(claude_code_token_usage_tokens_total[1d]))
+sum by (job, host, model) (increase(claude_code_cost_usage_USD_total{job=~"claude-code.*"}[1d]))
+sum by (type) (increase(claude_code_token_usage_tokens_total{job=~"claude-code.*"}[1d]))
 ```
 Also: `claude_code_session_count_total`, `claude_code_active_time_seconds_total`, `claude_code_lines_of_code_count_total`, `claude_code_commit_count_total`, `claude_code_pull_request_count_total`. Series appear once the event first happens.
 
@@ -218,12 +220,12 @@ Also: `claude_code_session_count_total`, `claude_code_active_time_seconds_total`
 # structured metadata (event_name, tool_name, success, duration_ms,
 # cost_usd, ttft_ms, input_tokens, ...)
 {service_name="claude-code", host="rhizome"} | event_name="api_error"
-{service_name="claude-code"} | event_name="tool_result" | success="false"
+{service_name=~"claude-code.*"} | event_name="tool_result" | success="false"
 ```
 
 ### Prometheus jobs and exporters
 
-Every scraped series carries `instance` and an identical `host` label (`glyph`, `spore`, `zeta`), so `{host="glyph"}` selects the same machine in PromQL and LogQL. OTLP-pushed series have no scrape labels: Open WebUI's carry `instance` only, Claude Code's carry `job="claude-code"` and `host`.
+Every scraped series carries `instance` and an identical `host` label (`glyph`, `spore`, `zeta`), so `{host="glyph"}` selects the same machine in PromQL and LogQL. OTLP-pushed series have no scrape labels: Open WebUI's carry `instance` only, Claude Code's carry `job="claude-code"` and `host` (desktop app: `job="claude-code-desktop"`, no `host`).
 
 | Job | Port | Host | Covers |
 |---|---|---|---|
