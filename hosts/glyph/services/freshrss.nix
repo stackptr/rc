@@ -45,5 +45,17 @@ in {
   systemd.services.freshrss-config = {
     after = ["postgresql.target"];
     requires = ["postgresql.target"];
+    # Refresh feeds on every updater run (every 5 minutes) rather than the
+    # default hour; the UI won't go below 20 minutes, the CLI has no floor.
+    # FreshRSS skips a feed while time() <= lastUpdate + ttl; lastUpdate can
+    # land seconds after the run starts, so 300 could skip every other run.
+    # With http_auth the user only exists after the first login.
+    postStart = let
+      inherit (config.services.freshrss) dataDir defaultUser;
+    in ''
+      if [ -d ${dataDir}/users/${defaultUser} ]; then
+        ./cli/update-user.php --user ${defaultUser} --feed-ttl-default 240
+      fi
+    '';
   };
 }
