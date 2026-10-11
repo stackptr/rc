@@ -60,7 +60,9 @@ in {
   systemd.timers.open-webui-model-sync = {
     description = "Trigger Open WebUI model sync";
     wantedBy = ["timers.target"];
-    restartTriggers = [(builtins.hashString "sha256" (builtins.toJSON models))];
+    # Re-run the sync when the model list or the script changes (the
+    # service itself has restartIfChanged = false); the script embeds the list
+    restartTriggers = [config.systemd.services.open-webui-model-sync.script];
     timerConfig.OnActiveSec = "10s";
   };
 
