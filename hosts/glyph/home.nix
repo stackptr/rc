@@ -4,7 +4,7 @@
   pkgs,
   ...
 }: let
-  stromaModel = "qwen3.8-27b-mtplx-optimized-quality";
+  stromaModel = "Qwen3.8-27B-MTPLX-Optimized-Quality";
 in {
   home.packages = [pkgs.mktorrent pkgs.obsidian-headless];
 
@@ -21,10 +21,13 @@ in {
       enabled_providers = ["stroma"];
       autoupdate = false;
       share = "disabled";
+      # oMLX on Stroma (hosts/Stroma/omlx.nix)
       provider.stroma = {
         npm = "@ai-sdk/openai-compatible";
         name = "Stroma";
-        options.baseURL = "https://stroma.note-iwato.ts.net/v1";
+        options.baseURL = "http://stroma.note-iwato.ts.net:8000/v1";
+        # An oMLX sub-key, from opencode-env.age below
+        options.apiKey = "{env:STROMA_API_KEY}";
         models.${stromaModel}.name = "Qwen 3.8 27B";
       };
     };

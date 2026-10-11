@@ -43,7 +43,7 @@
   # Active models — listed models are enabled with full config.
   # All other models from the API provider are deactivated automatically.
   models = {
-    "mtplx-qwen38-27b-optimized-quality".name = "Qwen 3.8 27B";
+    "Qwen3.8-27B-MTPLX-Optimized-Quality".name = "Qwen 3.8 27B";
   };
 
   modelIds = builtins.toJSON (builtins.attrNames models);
@@ -162,6 +162,9 @@ in {
     });
     inherit port;
     host = "0.0.0.0";
+    # Also holds the OpenAI-compatible connections (URLs and keys), oMLX on
+    # Stroma among them: http://stroma.note-iwato.ts.net:8000/v1 with an
+    # oMLX sub-key (hosts/Stroma/omlx.nix).
     environmentFile = config.age.secrets.open-webui-env.path;
     environment = {
       ENABLE_OLLAMA_API = "False";
