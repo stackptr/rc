@@ -139,9 +139,20 @@ in {
           | jq -r '.data[] | select(.info.is_active == true or .info == null) | .id' \
           | while read -r id; do
               if ! echo "$ACTIVE_IDS" | jq -e --arg id "$id" 'index($id)' >/dev/null 2>&1; then
-                curl -sf -X POST -H "Authorization: Bearer $API_KEY" \
-                  "${baseUrl}/api/v1/models/model/toggle?id=$id" >/dev/null 2>&1
-                echo "$id: deactivated."
+                # Toggle needs a DB entry (401 without one, as with update
+                # above), so a model seen for the first time is created
+                # inactive instead
+                if curl -sf -X POST -H "Authorization: Bearer $API_KEY" \
+                  "${baseUrl}/api/v1/models/model/toggle?id=$id" >/dev/null 2>&1 \
+                  || curl -sf -X POST \
+                    -H "Authorization: Bearer $API_KEY" \
+                    -H "Content-Type: application/json" \
+                    -d "$(jq -nc --arg id "$id" '{id: $id, name: $id, meta: {}, params: {}, is_active: false}')" \
+                    "${baseUrl}/api/v1/models/create" >/dev/null 2>&1; then
+                  echo "$id: deactivated."
+                else
+                  echo "ERROR: failed to deactivate $id"
+                fi
               fi
             done
       else
