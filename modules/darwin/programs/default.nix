@@ -8,7 +8,6 @@
     ./little-snitch.nix
     ./popclip.nix
     ./postico.nix
-    ./roon.nix
     ./scroll-reverser.nix
     ./soundsource.nix
   ];
