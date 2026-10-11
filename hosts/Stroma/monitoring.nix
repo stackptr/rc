@@ -16,6 +16,16 @@
   # JSON into metrics. Prometheus passes the target URL on each scrape (see
   # the "omlx" job on glyph). Counters reset when oMLX restarts.
   jsonExporterConfig = (pkgs.formats.yaml {}).generate "json-exporter.yml" {
+    # oMLX wants an API key here too (see ./omlx.nix). Create a sub-key in
+    # its admin dashboard and save it, mode 600, to the file below; it's
+    # read on every scrape, and a missing or wrong key makes the scrape
+    # fail (up == 0). Not an agenix secret: Stroma's secrets are
+    # home-manager's, decrypted only after login, and oMLX keeps its keys
+    # in plain text in settings.json beside it anyway.
+    modules.omlx.http_client_config.authorization = {
+      type = "Bearer";
+      credentials_file = "${omlxBase}/monitoring-key";
+    };
     modules.omlx.metrics = let
       gauge = name: field: help: {
         inherit name help;
@@ -137,8 +147,7 @@ in {
     StandardErrorPath = "/tmp/mactop.log";
   };
 
-  # oMLX's /api/status as metrics. It needs no API key while oMLX listens
-  # only on loopback (./omlx.nix).
+  # oMLX's /api/status as metrics, authenticated with the key above.
   launchd.daemons.json-exporter.serviceConfig = {
     ProgramArguments = [
       "${pkgs.prometheus-json-exporter}/bin/json_exporter"

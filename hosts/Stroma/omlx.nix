@@ -36,10 +36,12 @@ in {
       # Explicit, so it doesn't depend on the menubar app's base-path file
       "--base-path"
       basePath
-      # Loopback only: oMLX then needs no API key, and nothing outside
-      # Stroma can reach it.
+      # All interfaces, so Open WebUI on glyph reaches it over the tailnet
+      # (http://stroma.note-iwato.ts.net:8000/v1). On anything but a
+      # loopback-only bind oMLX requires an API key for every request
+      # except /health, local ones included.
       "--host"
-      "127.0.0.1"
+      "0.0.0.0"
       "--port"
       "8000"
     ];
