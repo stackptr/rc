@@ -43,7 +43,7 @@
   # Active models — listed models are enabled with full config.
   # All other models from the API provider are deactivated automatically.
   models = {
-    "mtplx-qwen38-27b-optimized-quality".name = "Qwen 3.8 27B";
+    "Qwen3.8-27B-MTPLX-Optimized-Quality".name = "Qwen 3.8 27B";
   };
 
   modelIds = builtins.toJSON (builtins.attrNames models);
@@ -60,7 +60,9 @@ in {
   systemd.timers.open-webui-model-sync = {
     description = "Trigger Open WebUI model sync";
     wantedBy = ["timers.target"];
-    restartTriggers = [(builtins.hashString "sha256" (builtins.toJSON models))];
+    # Re-run the sync when the model list or the script changes (the
+    # service itself has restartIfChanged = false); the script embeds the list
+    restartTriggers = [config.systemd.services.open-webui-model-sync.script];
     timerConfig.OnActiveSec = "10s";
   };
 
@@ -139,9 +141,20 @@ in {
           | jq -r '.data[] | select(.info.is_active == true or .info == null) | .id' \
           | while read -r id; do
               if ! echo "$ACTIVE_IDS" | jq -e --arg id "$id" 'index($id)' >/dev/null 2>&1; then
-                curl -sf -X POST -H "Authorization: Bearer $API_KEY" \
-                  "${baseUrl}/api/v1/models/model/toggle?id=$id" >/dev/null 2>&1
-                echo "$id: deactivated."
+                # Toggle needs a DB entry (401 without one, as with update
+                # above), so a model seen for the first time is created
+                # inactive instead
+                if curl -sf -X POST -H "Authorization: Bearer $API_KEY" \
+                  "${baseUrl}/api/v1/models/model/toggle?id=$id" >/dev/null 2>&1 \
+                  || curl -sf -X POST \
+                    -H "Authorization: Bearer $API_KEY" \
+                    -H "Content-Type: application/json" \
+                    -d "$(jq -nc --arg id "$id" '{id: $id, name: $id, meta: {}, params: {}, is_active: false}')" \
+                    "${baseUrl}/api/v1/models/create" >/dev/null 2>&1; then
+                  echo "$id: deactivated."
+                else
+                  echo "ERROR: failed to deactivate $id"
+                fi
               fi
             done
       else
@@ -162,6 +175,9 @@ in {
     });
     inherit port;
     host = "0.0.0.0";
+    # Also holds the OpenAI-compatible connections (URLs and keys), oMLX on
+    # Stroma among them: http://stroma.note-iwato.ts.net:8000/v1 with an
+    # oMLX sub-key (hosts/Stroma/omlx.nix).
     environmentFile = config.age.secrets.open-webui-env.path;
     environment = {
       ENABLE_OLLAMA_API = "False";
