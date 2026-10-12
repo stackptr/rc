@@ -2,9 +2,19 @@
 # Prometheus and Loki all run on glyph, so an outage there silences every
 # Grafana alert. Gatus probes them from zeta and posts to
 # Slack directly. Grafana in turn alerts if zeta's node exporter goes away.
-{config, ...}: let
+{
+  config,
+  pkgs,
+  ...
+}: let
   glyph = "glyph.note-iwato.ts.net";
   spore = "spore.note-iwato.ts.net";
+  port = config.services.gatus.settings.web.port;
+
+  # Tailscale machines that must never expire: logins to the tailnet go
+  # through id.zx.dev, which needs spore and glyph on it, so an expired
+  # server can lock every device out (as on 2026-10-11).
+  servers = ["glyph" "spore" "zeta" "stroma"];
 
   alert = description: {
     type = "custom";
@@ -32,7 +42,11 @@ in {
 
   services.gatus = {
     enable = true;
-    # Holds SLACK_BOT_TOKEN, the same bot Grafana posts with.
+    # Holds SLACK_BOT_TOKEN, the same bot Grafana posts with;
+    # GATUS_EXTERNAL_TOKEN, which tailscale-key-expiry pushes results with;
+    # and TS_API_CLIENT_ID/TS_API_CLIENT_SECRET, a Tailscale OAuth client
+    # with the devices:core:read scope (OAuth clients don't expire; API
+    # keys do).
     environmentFile = config.age.secrets.gatus-env.path;
     settings = {
       web.port = 8080;
@@ -184,6 +198,81 @@ in {
           description = "id.zx.dev (Pocket ID) is down; logins to Grafana and every auth-protected site fail. Check pocket-id.service on spore and its database on glyph";
         })
       ];
+
+      # Results pushed by tailscale-key-expiry below; Gatus conditions can't
+      # compare dates in a response body.
+      external-endpoints = [
+        {
+          name = "key-expiry";
+          group = "tailscale";
+          token = "\${GATUS_EXTERNAL_TOKEN}";
+          # Fails when the hourly push stops arriving
+          heartbeat.interval = "3h";
+          alerts = [
+            ((alert "A Tailscale node key expires within 14 days or has expired, or a server has key expiry enabled; the error on the status page names the machines. Renew or disable expiry at login.tailscale.com while id.zx.dev still works")
+              // {
+                failure-threshold = 1;
+                minimum-reminder-interval = "24h";
+              })
+          ];
+        }
+      ];
+    };
+  };
+
+  # Hourly: every machine whose key expires within 14 days (or has expired),
+  # and any server with expiry enabled at all. Uses the public Tailscale API,
+  # so it works while the tailnet doesn't.
+  systemd.services.tailscale-key-expiry = {
+    description = "Report Tailscale node key expiry to Gatus";
+    wants = ["network-online.target"];
+    after = ["network-online.target" "gatus.service"];
+    path = [pkgs.curl pkgs.jq pkgs.coreutils];
+    serviceConfig = {
+      Type = "oneshot";
+      DynamicUser = true;
+      EnvironmentFile = config.age.secrets.gatus-env.path;
+    };
+    script = ''
+      report() {
+        curl -sf -X POST -H "Authorization: Bearer $GATUS_EXTERNAL_TOKEN" \
+          --url-query "success=$1" --url-query "error=$2" \
+          "http://127.0.0.1:${toString port}/api/v1/endpoints/tailscale_key-expiry/external" >/dev/null
+      }
+
+      if ! token=$(curl -sf https://api.tailscale.com/api/v2/oauth/token \
+          -d "client_id=$TS_API_CLIENT_ID" -d "client_secret=$TS_API_CLIENT_SECRET" \
+          | jq -er .access_token) \
+        || ! devices=$(curl -sf -H "Authorization: Bearer $token" \
+          https://api.tailscale.com/api/v2/tailnet/-/devices); then
+        report false "Tailscale API request failed"
+        exit 1
+      fi
+
+      horizon=$(( $(date +%s) + 14 * 86400 ))
+      problems=$(jq -r --argjson horizon "$horizon" --argjson servers '${builtins.toJSON servers}' '
+        [.devices[]
+         | (.hostname | ascii_downcase) as $host
+         | if .keyExpiryDisabled then empty
+           elif ($servers | index($host)) then "\($host): key expiry enabled"
+           elif (.expires | sub("\\.[0-9]+"; "") | fromdateiso8601) < $horizon
+           then "\($host): key expires \(.expires[:10])"
+           else empty end]
+        | join("; ")' <<<"$devices")
+
+      if [ -n "$problems" ]; then
+        report false "$problems"
+      else
+        report true ""
+      fi
+    '';
+  };
+
+  systemd.timers.tailscale-key-expiry = {
+    wantedBy = ["timers.target"];
+    timerConfig = {
+      OnBootSec = "5m";
+      OnUnitActiveSec = "1h";
     };
   };
 

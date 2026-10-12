@@ -78,7 +78,7 @@ Grafana, Loki and Prometheus on glyph. Use them before `journalctl` or SSH when 
 - **Prometheus** (glyph:9099): scrapes glyph, spore, zeta and Stroma (node_exporter, mactop, json_exporter for oMLX, Alloy; `hosts/Stroma/monitoring.nix`), plus OTLP pushes; 90 days.
 - **Alert rules**: `hosts/glyph/services/grafana-alerts.nix` (folder "Alerts", routed to Slack). Add rules there, not in the UI.
 - **Dashboards**: JSON in `hosts/glyph/services/dashboards/`: Node, ZFS, Log Explorer, PostgreSQL, Disk Health (SMART), Systemd Units, nginx, Apple Silicon (Stroma).
-- **Gatus** (zeta:8080, `status.zx.dev`): out-of-band watchdog in `hosts/zeta/services/gatus.nix` that posts to Slack itself, so it alerts when glyph or Grafana is down. Every minute it checks glyph (reachability, Postgres, Prometheus freshness, Loki ingestion, Grafana through spore), spore, and the public sites through their `*.zx.dev` URLs; the `zx.dev` cert hourly.
+- **Gatus** (zeta:8080, `status.zx.dev`): out-of-band watchdog in `hosts/zeta/services/gatus.nix` that posts to Slack itself, so it alerts when glyph or Grafana is down. Every minute it checks glyph (reachability, Postgres, Prometheus freshness, Loki ingestion, Grafana through spore), spore, and the public sites through their `*.zx.dev` URLs; the `zx.dev` cert hourly. Hourly, `tailscale-key-expiry.service` asks the Tailscale API (OAuth client in `gatus-env.age`) for node keys expiring within 14 days or servers with expiry enabled, and pushes the result to Gatus's `tailscale/key-expiry` endpoint, which also fires if no result arrives for 3h.
 
 **grafana-mcp:** registered in mcpjungle on glyph (`http://127.0.0.1:8095/mcp`) with LogQL, PromQL and dashboard tools. It's read-only (`--disable-write` in `modules/nixos/llm/grafana-mcp.nix`): change alert rules and dashboards in the flake.
 
@@ -194,6 +194,19 @@ Know these before concluding "no data means no problem":
 - Deploy workflow output lands in the journal after the deploy finishes (timestamped at the end, without `copying path` lines), and only in GitHub Actions if the host was unreachable.
 - No metrics for app internals (Jellyfin, Home Assistant, etc.): use `node_systemd_unit_state` and Loki.
 - macOS hosts ship no system logs to Loki, only Claude Code events and (from Stroma) oMLX's log.
+
+### Tailnet lockout
+
+Tailscale logs in through Pocket ID (`id.zx.dev`, on spore), whose database is on glyph over the tailnet. If glyph's or spore's node key expires, `id.zx.dev` returns 502 (and `cache.zx.dev` 504), so no device can log back in. Break the cycle with a reverse SSH tunnel to glyph's Postgres (`pg_hba` trusts loopback) over spore's public IP:
+```bash
+ssh -N -R 127.0.0.1:5432:127.0.0.1:5432 root@<spore-public-ip>    # on glyph, over the LAN; keep it running
+# on spore (runtime only; gone on reboot):
+mkdir -p /run/systemd/system/pocket-id.service.d
+echo 'DB_CONNECTION_STRING=postgres://pocketid@127.0.0.1/pocketid' > /run/pocket-id-override.env
+printf '[Service]\nEnvironment=DB_CONNECTION_STRING=postgres://pocketid@127.0.0.1/pocketid\nEnvironmentFile=/run/pocket-id-override.env\n' > /run/systemd/system/pocket-id.service.d/tunnel.conf
+systemctl daemon-reload && systemctl restart pocket-id    # the stop can take its 90s timeout
+```
+Then log the expired machines back in and disable their key expiry in the admin console, check `tailscale ping glyph && nc -zv glyph.note-iwato.ts.net 5432` on spore, and remove both files (then `daemon-reload` and restart) before closing the tunnel.
 
 ## Guardrails
 
