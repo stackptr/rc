@@ -11,9 +11,9 @@
     ./znc.nix
   ];
   services.openssh.enable = true;
-  services.tailscale = {
+  rc.tailscale.server = {
     enable = true;
-    extraUpFlags = ["--ssh"];
+    ssh = true;
   };
   services.prometheus.exporters.node = {
     enable = true;

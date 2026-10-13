@@ -197,7 +197,7 @@ Know these before concluding "no data means no problem":
 
 ### Tailnet lockout
 
-Tailscale logs in through Pocket ID (`id.zx.dev`, on spore), whose database is on glyph over the tailnet. If glyph's or spore's node key expires, `id.zx.dev` returns 502 (and `cache.zx.dev` 504), so no device can log back in. Break the cycle with a reverse SSH tunnel to glyph's Postgres (`pg_hba` trusts loopback) over spore's public IP:
+glyph, spore and zeta are `tag:server` nodes (`modules/nixos/tailscale-server.nix`): their keys don't expire, and a logged-out server rejoins with the `server-join` OAuth client secret at boot, or on `systemctl restart tailscaled-autoconnect`, without a browser login. Everything else logs in through Pocket ID (`id.zx.dev`, on spore), whose database is on glyph over the tailnet. If glyph or spore drops off the tailnet anyway (say the OAuth client is revoked), `id.zx.dev` returns 502 (and `cache.zx.dev` 504), so no device can log back in. Break the cycle with a reverse SSH tunnel to glyph's Postgres (`pg_hba` trusts loopback) over spore's public IP:
 ```bash
 ssh -N -R 127.0.0.1:5432:127.0.0.1:5432 root@<spore-public-ip>    # on glyph, over the LAN; keep it running
 # on spore (runtime only; gone on reboot):
