@@ -208,6 +208,14 @@ systemctl daemon-reload && systemctl restart pocket-id    # the stop can take it
 ```
 Then log the expired machines back in and disable their key expiry in the admin console, check `tailscale ping glyph && nc -zv glyph.note-iwato.ts.net 5432` on spore, and remove both files (then `daemon-reload` and restart) before closing the tunnel.
 
+## Hermes agent
+
+Hermes Agent (`hosts/glyph/services/hermes.nix`, flake input `hermes-agent` pinned to a release tag; bump it by hand) is a read-only ops agent on glyph: it answers one Slack user in one channel (its own Slack app, not Grafana's bot) and runs cron jobs, on oMLX on Stroma with grafana-mcp as its only tools.
+
+- **State:** `HERMES_HOME` is `/var/lib/hermes/.hermes` (sessions, `state.db`, `cron/jobs.json`, logs); unit `hermes-agent.service`, runs as `hermes`. CLI: `sudo -u hermes -i hermes …` (e.g. `hermes cron list`).
+- **Config:** `services.hermes-agent.settings` renders `config.yaml`, merged into the file on disk at activation (keys Nix doesn't set survive); `hermes config set` is refused. Secrets come from agenix env files (`hermes-omlx-env`, `hermes-slack-env`), concatenated into `.env` at activation; the unit restarts when they change. Cron jobs are runtime state (`/cron` in Slack or the CLI), not Nix.
+- **Lockdown:** it reads untrusted text (nginx access logs, alert text), so it gets MCP tools only and nothing persists between runs. `platform_toolsets` allowlists the MCP server; `agent.disabled_toolsets` (applied last, and capping per-job cron `enabled_toolsets`) lists every built-in toolset; `mcp_servers.<name>.tools.include` filters each server. Memory, user profile, skill nudges, the background review fork and the curator are off. Session toolset lists name their MCP servers; a cron job whose `enabled_toolsets` names none gets every server. A Hermes upgrade can add toolsets the denylist doesn't name: check the tool list after one (Slack: `/tools list`).
+
 ## Guardrails
 
 - Merging doesn't deploy: deploys are manual, via `just switch` or the Deploy workflow. Don't switch a host, merge a PR, or run the Deploy workflow unless asked.
