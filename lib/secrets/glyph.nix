@@ -18,4 +18,5 @@ in {
   "hosts/glyph/secrets/navidrome-env.age".publicKeys = keys;
   "hosts/glyph/secrets/hermes-omlx-env.age".publicKeys = keys;
   "hosts/glyph/secrets/hermes-slack-env.age".publicKeys = keys;
+  "hosts/glyph/secrets/hermes-freshrss-env.age".publicKeys = keys;
 }

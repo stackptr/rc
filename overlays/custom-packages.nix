@@ -16,6 +16,9 @@ self: super: {
   # FileBrowser quantum fork
   filebrowser-quantum = super.callPackage ./../packages/filebrowser-quantum/package.nix {};
 
+  # MCP server for FreshRSS (Hermes on glyph)
+  freshrss-mcp = super.callPackage ./../packages/freshrss-mcp/package.nix {};
+
   # MCP Gateway
   mcpjungle = super.callPackage ./../packages/mcpjungle/package.nix {};
 
