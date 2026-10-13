@@ -185,14 +185,10 @@
           (system: deployLib: deployLib.deployChecks inputs.self.deploy)
           inputs.deploy-rs.lib;
 
+        # The binary cache is set per host in modules/base/nix-config.nix
+        # (glyph reads it locally), and in the CI workflows.
         nixConfig = {
           experimental-features = ["nix-command" "flakes"];
-          extra-substituters = [
-            "https://cache.zx.dev/main"
-          ];
-          extra-trusted-public-keys = [
-            "main:mu0jkxdJTGWC3djDSEQb3rvZgqlhA8WVMulcTo5IW6c="
-          ];
         };
       };
 

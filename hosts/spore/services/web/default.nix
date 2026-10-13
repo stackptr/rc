@@ -142,6 +142,9 @@
           proxyPass = "http://glyph.note-iwato.ts.net:8199";
           extraConfig = ''
             client_max_body_size 0;
+            # Fail fast when glyph is unreachable, so Nix gives up on the
+            # cache instead of waiting out the 60s default on every path.
+            proxy_connect_timeout 5s;
             proxy_read_timeout 300;
             proxy_buffering off;
             proxy_http_version 1.1;
