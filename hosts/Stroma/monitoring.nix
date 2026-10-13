@@ -16,15 +16,12 @@
   # JSON into metrics. Prometheus passes the target URL on each scrape (see
   # the "omlx" job on glyph). Counters reset when oMLX restarts.
   jsonExporterConfig = (pkgs.formats.yaml {}).generate "json-exporter.yml" {
-    # oMLX wants an API key here too (see ./omlx.nix). Create a sub-key in
-    # its admin dashboard and save it, mode 600, to the file below; it's
-    # read on every scrape, and a missing or wrong key makes the scrape
-    # fail (up == 0). Not an agenix secret: Stroma's secrets are
-    # home-manager's, decrypted only after login, and oMLX keeps its keys
-    # in plain text in settings.json beside it anyway.
+    # oMLX wants an API key here too (see ./omlx.nix): a sub-key from its
+    # admin dashboard, in omlx-monitoring-key.age below. It's read on every
+    # scrape, and a missing or wrong key makes the scrape fail (up == 0).
     modules.omlx.http_client_config.authorization = {
       type = "Bearer";
-      credentials_file = "${omlxBase}/monitoring-key";
+      credentials_file = config.age.secrets.omlx-monitoring-key.path;
     };
     modules.omlx.metrics = let
       gauge = name: field: help: {
@@ -119,6 +116,13 @@
     }
   '';
 in {
+  # System agenix, decrypted at boot with sshd's host key, so json_exporter
+  # can read it before anyone logs in (home-manager secrets wait for login).
+  age.secrets.omlx-monitoring-key = {
+    file = ./secrets/omlx-monitoring-key.age;
+    owner = user;
+  };
+
   # Filesystems, load, uptime: the host-level series the shared alert rules
   # and dashboards already use.
   services.prometheus.exporters.node.enable = true;
