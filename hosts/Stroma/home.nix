@@ -1,3 +1,3 @@
-{...}: {
+{
   rc.gpg.enable = true;
 }
