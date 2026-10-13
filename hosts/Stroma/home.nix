@@ -1,0 +1,3 @@
+{...}: {
+  rc.gpg.enable = true;
+}
