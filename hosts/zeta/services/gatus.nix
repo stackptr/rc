@@ -61,15 +61,16 @@ in {
           Authorization = "Bearer \${SLACK_BOT_TOKEN}";
           Content-Type = "application/json; charset=utf-8";
         };
+        # Same shape as Grafana's alerts: the text is the notification
+        # preview, posted as Hypha. "(Gatus)" marks the out-of-band path.
         body = builtins.toJSON {
-          channel = "#updates";
-          username = "Gatus (zeta)";
-          icon_emoji = ":rotating_light:";
-          text = "[ALERT_TRIGGERED_OR_RESOLVED] [ENDPOINT_GROUP]/[ENDPOINT_NAME]: [ALERT_DESCRIPTION]";
+          channel = "#alerts";
+          text = "[ALERT_TRIGGERED_OR_RESOLVED] [ENDPOINT_GROUP]/[ENDPOINT_NAME] (Gatus): [ALERT_DESCRIPTION]";
+          unfurl_links = false;
         };
         placeholders.ALERT_TRIGGERED_OR_RESOLVED = {
-          TRIGGERED = "[FIRING]";
-          RESOLVED = "[RESOLVED]";
+          TRIGGERED = ":x:";
+          RESOLVED = ":white_check_mark:";
         };
       };
 
