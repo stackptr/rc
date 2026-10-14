@@ -64,6 +64,10 @@ in {
       after = ["network.target"];
       wantedBy = ["multi-user.target"];
 
+      # Serves Prometheus metrics at /metrics on the gateway port, including
+      # mcpjungle_tool_calls_ratio_total{mcp_server_name,tool_name,outcome}.
+      environment.OTEL_ENABLED = "true";
+
       serviceConfig = {
         ExecStart = "${lib.getExe cfg.package} start --port ${toString cfg.port}";
         User = "mcpjungle";
@@ -90,7 +94,8 @@ in {
     systemd.timers.mcpjungle-register = lib.mkIf (cfg.servers != {}) {
       description = "Trigger MCP server registration";
       wantedBy = ["timers.target"];
-      # Re-trigger when server configuration changes
+      # Re-trigger when server configuration changes. Hosts can add the units
+      # behind local servers, so a changed binary or flags re-syncs tools.
       restartTriggers = [(builtins.hashString "sha256" (builtins.toJSON cfg.servers))];
       timerConfig = {
         OnActiveSec = "5s";
@@ -116,7 +121,8 @@ in {
           configJson = builtins.toJSON {
             inherit name;
             inherit (server) url description headers;
-            transport = "streamable-http";
+            # MCPJungle 0.3.x rejects "streamable-http" in config files.
+            transport = "streamable_http";
           };
           registerCmd =
             if hasHeaders
@@ -128,17 +134,21 @@ in {
               ''}
               tmpfile=$(mktemp --suffix=.json)
               echo '${configJson}' | envsubst > "$tmpfile"
-              ${bin} register --conf "$tmpfile" --registry ${registry} || echo "ERROR: failed to register ${name}"
+              status=0
+              ${bin} register --conf "$tmpfile" --registry ${registry} || status=$?
               rm -f "$tmpfile"
+              if [ "$status" -ne 0 ]; then
+                echo "ERROR: failed to register ${name}"
+                exit 1
+              fi
             ''
             else ''
-              ${bin} register --name '${name}' --description '${server.description}' --url '${server.url}' --registry ${registry} || echo "ERROR: failed to register ${name}"
+              if ! ${bin} register --name '${name}' --description '${server.description}' --url '${server.url}' --registry ${registry}; then
+                echo "ERROR: failed to register ${name}"
+                exit 1
+              fi
             '';
         in ''
-          if ${bin} list servers --registry ${registry} 2>/dev/null | grep -q '${name}'; then
-            echo "${name} already registered, skipping."
-          else
-
           # Wait for server to be reachable before registering
           ready=false
           for i in $(seq 1 30); do
@@ -152,11 +162,13 @@ in {
           done
 
           if [ "$ready" = true ]; then
+            # Re-sync rather than skip: MCPJungle keeps the tool list (and
+            # tool annotations) it fetched at registration, so an already
+            # registered server would never pick up changed tools.
+            ${bin} deregister '${name}' --registry ${registry} >/dev/null 2>&1 || true
             ${registerCmd}
           else
             echo "WARNING: ${name} at ${server.url} not reachable after 60s, skipping registration."
-          fi
-
           fi
         '';
 
@@ -164,12 +176,21 @@ in {
           (
             ${mkRegistration name server}
           ) &
+          pids+=($!)
         '';
 
         registrations = lib.concatStringsSep "\n" (lib.mapAttrsToList mkBackgroundRegistration cfg.servers);
       in ''
+        pids=()
         ${registrations}
-        wait
+        # Fail the unit if any registration failed. Re-sync deregisters
+        # first, so a failure leaves that server's tools missing; a failed
+        # unit raises the "Systemd unit failed" alert.
+        status=0
+        for pid in "''${pids[@]}"; do
+          wait "$pid" || status=1
+        done
+        exit "$status"
       '';
     };
 

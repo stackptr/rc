@@ -27,6 +27,7 @@
         "$python"
         "[](fg:color_blue bg:color_bg3)"
         "$direnv"
+        "\${env_var.DIRENV_INSTANT_LOADING}"
         "$docker_context"
         "[](fg:color_bg3 bg:color_bg1)"
         "$time"
@@ -170,6 +171,12 @@
         denied_msg = "";
         loaded_msg = "loaded";
         unloaded_msg = "";
+      };
+      # Set by the zsh hook in ./default.nix while direnv-instant is loading
+      env_var.DIRENV_INSTANT_LOADING = {
+        symbol = "󰔟";
+        style = "bg:color_bg3";
+        format = "[[$symbol loading ](fg:color_yellow bg:color_bg3)]($style)";
       };
       docker_context = {
         symbol = "";

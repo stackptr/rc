@@ -123,6 +123,13 @@
               };
             };
           }
+          {
+            "FreshRSS" = {
+              description = "RSS reader";
+              href = "https://rss.zx.dev";
+              icon = "freshrss";
+            };
+          }
         ];
       }
     ];

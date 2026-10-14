@@ -4,166 +4,95 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Architecture Overview
 
-This is a Nix flake-based system configuration repository that manages multiple hosts across NixOS and macOS platforms:
+A Nix flake that configures every host:
 
-- **NixOS hosts**: `zeta` (ARM/Pi4), `glyph` (x86_64 NAS/homelab), `spore` (x86_64 VPS)
-- **macOS hosts**: `Rhizome` (personal laptop)
+- **NixOS**: `zeta` (ARM/Pi4), `glyph` (x86_64 NAS/homelab), `spore` (x86_64 VPS)
+- **macOS (nix-darwin)**: `Rhizome` (personal laptop), `Stroma` (Mac Studio), `lobtop` (work laptop)
 
-The configuration is organized into:
-- `hosts/`: Host-specific configurations
-- `modules/`: Shared modules with focused organization:
-  - `base.nix` - Base configuration (imports nix-config + unfree packages)
-  - `nixos.nix` - NixOS configuration (imports nixos/ submodules)
-  - `nixos/` - NixOS-specific modules (users, ssh, sudo)
-  - `darwin/` - macOS-specific modules
-- `home/`: Home-manager configurations
-- `lib/hosts.nix`: Simplified host builder functions (`mkNixosHost`, `mkDarwinHost`)
-- `overlays/`: Package overlays and customizations (managed via `overlays/default.nix`)
-- `packages/`: Custom package definitions for applications not in nixpkgs
+Layout:
+- `hosts/<host>/`: per-host configuration
+- `modules/`: shared modules: `base/` (all hosts: nix settings, GC, unfree packages), `nixos/`, `darwin/`, `home/` (home-manager modules)
+- `home/`: the home-manager configuration every host imports
+- `lib/hosts.nix`: host builders (`mkNixosHost`, `mkDarwinHost`); `lib/keys.nix`, `lib/secrets/`: SSH keys and agenix recipients
+- `overlays/`: package overrides, listed in `overlays/default.nix` with a comment saying why each exists
+- `packages/<name>/package.nix`: packages not in nixpkgs, exposed by `overlays/custom-packages.nix`
 
 ## Common Commands
 
-**Build and switch to configuration:**
+**Build and switch to configuration** (only when asked; see Guardrails):
 ```bash
-just                    # Switch current host
-just switch hostname    # Switch specific host
+just                              # Switch current host
+just switch hostname              # Switch specific host
+just switch-remote spore          # Build on this host, deploy to spore (it's memory-constrained)
 ```
 
-**Using nh (preferred method):**
+**Check a change before committing** (evaluates without building; catches option conflicts and type errors):
 ```bash
-nh os switch .#hostname        # Linux
-nh darwin switch .#hostname    # macOS
+nix-flake eval nixosConfigurations.<host>.config.system.build.toplevel.drvPath   # NixOS
+nix-flake eval darwinConfigurations.<host>.system.drvPath                       # macOS
 ```
 
-**Direct rebuild commands:**
-```bash
-sudo darwin-rebuild switch --flake .#hostname  # macOS
-nixos-rebuild switch --flake .#hostname        # Linux
-```
+**Flake inputs:** `nix flake update --commit-lock-file`. The Update workflow does this daily and auto-merges once CI passes.
 
-**Cross-compilation for memory-constrained hosts:**
-```bash
-# Build spore config on glyph due to memory constraints
-nixos-rebuild switch --flake .#spore --target-host root@spore --build-host localhost
-```
-
-**Checking changes before committing:**
-```bash
-# NixOS hosts:
-nix-flake eval nixosConfigurations.hostname.config.system.build.toplevel.drvPath
-# macOS hosts:
-nix-flake eval darwinConfigurations.Rhizome.system.drvPath
-```
-Evaluates a host's configuration without building it. Catches option conflicts and type errors fast — run this after editing any NixOS module or host config.
-
-**Flake management:**
-```bash
-nix flake update --commit-lock-file
-```
-
-**Development shell:**
-```bash
-nix develop  # Provides agenix, just
-```
-
-Agent conversations in Zed do not run inside the devShell. To invoke devShell tools from within a Claude Code session (e.g. `entire`, `agenix`), prefix commands with `direnv exec . <command>`:
-```bash
-direnv exec . entire version
-direnv exec . agenix -e hosts/spore/secrets/foo.age
-```
+**Dev shell:** `nix develop` provides agenix and just. Claude Code sessions in Zed don't run inside it; prefix devShell tools with `direnv exec .`, e.g. `direnv exec . agenix -e hosts/spore/secrets/foo.age`.
 
 ## Key Configuration Details
 
-- Linux username: `mu`
-- macOS username: `corey`
-- All hosts use SSH key authentication with keys defined in `lib/keys.nix`
-- Secrets managed via agenix with host-specific access controls
-- Home-manager integrated for user-space configuration
-- macOS hosts use nix-homebrew for Homebrew integration
+- Usernames: `mu` on Linux, `corey` on macOS
+- SSH key authentication everywhere; keys in `lib/keys.nix`, each host's read from `hosts/<host>/key.pub`
+- macOS hosts use nix-homebrew with taps pinned as flake inputs (`mutableTaps = false` in `lib/hosts.nix`)
 
-## Secrets Organization
+## Secrets
 
-Secrets are organized using the principle of least privilege:
-- `lib/secrets/` - Host-specific secrets modules
-- Each host only has access to its own secrets plus admin keys
-- Global secrets (if any) are defined in `lib/secrets/default.nix`
+agenix, least privilege: each host decrypts only its own secrets plus the admin keys. Recipients are listed per host in `lib/secrets/<host>.nix` (shared ones in `lib/secrets/default.nix`).
 
-**agenix workflow:**
 ```bash
-# Edit an existing secret (must be on a host with access, or have the deploy key):
-agenix -e hosts/spore/secrets/some-secret.age
-
-# Add a new secret:
-# 1. Add an entry to lib/secrets/<host>.nix with the appropriate publicKeys
-# 2. Run: agenix -e hosts/<host>/secrets/<name>.age
-# 3. Reference it in the host config via age.secrets.<name>.file
-
-# Rekey all secrets after adding a new host key:
-agenix --rekey
+agenix -e hosts/spore/secrets/some-secret.age   # edit (needs a key that can decrypt it)
+agenix --rekey                                  # after adding a host key
 ```
-- Keys are defined in `lib/keys.nix` — each host's key is read from `hosts/<host>/key.pub`
-- A new host must have its key added to `lib/keys.nix` and any relevant secrets files before it can decrypt them
+macOS hosts get agenix's darwin module too: Stroma's system secrets decrypt at boot with sshd's host key (`/etc/ssh/ssh_host_ed25519_key`, which `hosts/Stroma/key.pub` holds), so its services can read them before login. Home-manager secrets on every host decrypt with the shared `home` key (`~/.ssh/id_ed25519_agenix`) only after login.
 
-## Package and Overlay Management
-
-Custom packages and overlays are organized for clarity:
-- `packages/*/package.nix` - Custom package definitions
-- `overlays/custom-packages.nix` - Overlay exposing custom packages
-- `overlays/gitify.nix`, `overlays/whatsapp-for-mac.nix` - App-specific version overrides
-- `overlays/default.nix` - Consolidates all overlays for easy management
+To add a secret: add its entry to `lib/secrets/<host>.nix`, create it with `agenix -e hosts/<host>/secrets/<name>.age`, and reference it with `age.secrets.<name>.file`. A new host needs its key in `lib/keys.nix` and in the relevant secrets entries before it can decrypt anything.
 
 ## Branching
 
-- Branches should be scoped to a single host whenever possible. This keeps deploys independent and reduces risk of cross-host breakage.
-- Branch naming: `host/type-short-slug` for host-scoped changes, `type-short-slug` for top-level changes.
-  - `host/` is the hostname (e.g. `glyph/`, `spore/`, `Rhizome/`, `zeta/`)
-  - `type` is one of `feat`, `fix`, `chore`, `refactor`
-  - The slug should be succinct — 2 to 4 words max (e.g. `fix-gc-options`, not `fix-gc-options-from-base-module-conflicting-definitions`)
-  - Examples: `spore/fix-gc-options`, `Rhizome/feat-launchd-service`, `chore-update-flake-inputs`, `feat-add-ci-eval`
+- Scope branches to a single host whenever possible. This keeps deploys independent and reduces the risk of cross-host breakage.
+- Branch naming: `scope/type-short-slug`, where scope is the hostname (`glyph`, `spore`, `zeta`, `Rhizome`, `Stroma`, `lobtop`) or `home` for shared home-manager changes. Top-level or cross-cutting changes drop the scope: `type-short-slug`.
+  - `type` is one of `feat`, `fix`, `chore`, `refactor`; the slug is 2 to 4 words.
+  - Examples: `spore/fix-gc-options`, `home/feat-claude-memory`, `chore-update-flake-inputs`.
+- PR title: `type(scope): short description`, with the scope omitted for top-level changes, e.g. `fix(spore): gc options`, `chore: update flake inputs`. PRs are squash-merged, so the title becomes the commit message.
+- PR description: a brief summary of what changed and what to test or verify.
 
-**Submitting PRs:**
-- Title format: `type: short description` — e.g. `fix: spore gc options`, `chore: update CLAUDE.md`, `feat: add ci eval job`
-- Description should include a brief summary of what changed and what to test/verify
+## Sandboxed sessions
 
-## Nix Commands
+If `nix-flake` isn't on PATH, you're in a sandboxed session without my tooling, and Nix may not be installed. Don't try to evaluate or build. Make the change, push the branch, and open a PR: CI evaluates and builds every host.
 
-Never use `nix <subcommand> .#<output>` — the `#` causes permission prompt failures. Use wrapper scripts instead:
-
-| Instead of | Use |
-|---|---|
-| `nix build .#foo` | `nix-flake build foo` |
-| `nix eval .#foo` | `nix-flake eval foo` |
-| `nix eval nixpkgs#foo` | `nixpkgs-eval foo` |
-| `nix run nixpkgs#foo` | `nixpkgs-run foo` |
-| `nix shell nixpkgs#foo` | `nixpkgs-shell foo` |
+If `nix` is installed, run `scripts/fmt-sandboxed` instead of `nix fmt .`. Cloud sessions can't download GitHub tarballs (`github:` inputs fail with HTTP 403) but can `git clone` public repos, so the script overrides the formatter's inputs with shallow git fetches of the locked revs. Shallow matters: a full nixpkgs clone takes far too long. Evaluating hosts would need the same override for most inputs, so leave that to CI.
 
 ## Common Patterns
 
-**`lib.mkForce` vs `lib.mkDefault`:**
-- `lib.mkForce value` — host wins over any module default. Use when a host must diverge from a shared module.
-- `lib.mkDefault value` — module loses to any host override. Use in shared modules to set a default that hosts can freely override without `mkForce`.
-
-**Overriding a shared base module option in a host config:**
-Use `lib.mkForce` when a host needs to diverge from a value set in a shared module (e.g. `modules/base/`). Without it, Nix will error on conflicting definitions.
-```nix
-# modules/base/gc.nix sets nix.gc.dates = "weekly"
-# hosts/spore/default.nix overrides it:
-nix.gc.dates = lib.mkForce "daily";
-```
+**`lib.mkForce` vs `lib.mkDefault`:** a host that must diverge from a value a shared module sets uses `lib.mkForce`; without it Nix errors on the conflicting definitions. A shared module that wants hosts to override freely sets `lib.mkDefault` instead. Example: `modules/base/gc.nix` sets `nix.gc.dates = "weekly"`, and `hosts/spore/default.nix` overrides it with `lib.mkForce "daily"`.
 
 ## Monitoring Stack
 
-The homelab runs a Grafana LGTM-lite stack for observability. **Use it proactively** when investigating service failures, slow response times, disk issues, or any situation where you'd otherwise reach for `journalctl` or SSH into a host to check a service.
+Grafana, Loki and Prometheus on glyph. Use them before `journalctl` or SSH when investigating failures, slowness or disk issues.
 
-- **Grafana** (`grafana.zx.dev`) — dashboards, Explore, alerting
-- **Loki** (glyph:3100) — log aggregation from glyph, spore, zeta
-- **Prometheus** (glyph:9099) — metrics from all hosts
+- **Grafana** (glyph:3000, `grafana.zx.dev` via spore): config in `hosts/glyph/services/grafana.nix`; the image renderer (localhost:8081) backs `get_panel_image`.
+- **Loki** (glyph:3100): journald from glyph, spore and zeta via Alloy, oMLX's log from Stroma, plus Claude Code events over OTLP; 30 days.
+- **Prometheus** (glyph:9099): scrapes glyph, spore, zeta and Stroma (node_exporter, mactop, json_exporter for oMLX, Alloy; `hosts/Stroma/monitoring.nix`), plus OTLP pushes; 90 days.
+- **Alert rules**: `hosts/glyph/services/grafana-alerts.nix` (folder "Alerts", routed to Slack). Add rules there, not in the UI.
+- **Dashboards**: JSON in `hosts/glyph/services/dashboards/`: Node, ZFS, Log Explorer, PostgreSQL, Disk Health (SMART), Systemd Units, nginx, Apple Silicon (Stroma).
+- **Gatus** (zeta:8080, `status.zx.dev`): out-of-band watchdog in `hosts/zeta/services/gatus.nix` that posts to Slack itself, so it alerts when glyph or Grafana is down. Every minute it checks glyph (reachability, Postgres, Prometheus freshness, Loki ingestion, Grafana through spore), spore, and the public sites through their `*.zx.dev` URLs; the `zx.dev` cert hourly. Hourly, `tailscale-key-expiry.service` asks the Tailscale API (OAuth client in `gatus-env.age`) for node keys expiring within 14 days or servers with expiry enabled, and pushes the result to Gatus's `tailscale/key-expiry` endpoint, which also fires if no result arrives for 3h.
 
-**MCP access:** The `grafana` MCP server is registered in mcpjungle on glyph at `http://127.0.0.1:8095/mcp`. It exposes tools for LogQL (Loki), PromQL (Prometheus), and dashboard access. Use it instead of `journalctl` for anything beyond a quick one-liner.
+**grafana-mcp:** registered in mcpjungle on glyph (`http://127.0.0.1:8095/mcp`) with LogQL, PromQL and dashboard tools. It's read-only (`--disable-write` in `modules/nixos/llm/grafana-mcp.nix`): change alert rules and dashboards in the flake.
+
+**MCPJungle** serves the tool list it fetched when each server registered. `mcpjungle-register` re-registers every server at boot and when a local server's unit changes (`restartTriggers` in `hosts/glyph/services/default.nix`); by hand: `systemctl restart mcpjungle-register`. Re-registering deregisters first, so a server that fails loses its tools and the unit exits non-zero (the "Systemd unit failed" alert fires); `{unit="mcpjungle-register.service"} |= "ERROR"` names it. Servers needing auth take `headers` plus an `environmentFile`.
+
+**Grafana exits with "Using the default [rendering]renderer_token is not allowed":** Grafana 13 rejects the default token whenever an image renderer is configured. `grafana.nix` sets the same `rendererToken` on both sides; keep them in sync.
 
 ### Loki label schema
 
-All logs carry these labels, queryable with `{label="value"}` in LogQL:
+Journald streams carry these labels:
 
 | Label | Source journal field | Example values |
 |---|---|---|
@@ -172,64 +101,130 @@ All logs carry these labels, queryable with `{label="value"}` in LogQL:
 | `priority` | `PRIORITY` | `0`–`7` (0=emerg, 3=err, 4=warn, 6=info, 7=debug) |
 | `app` | `SYSLOG_IDENTIFIER` | `navidrome`, `nginx`, `kernel` |
 
-**Alloy journal label naming:** In `discovery.relabel` rules for `loki.source.journal`, the source label prefix is `__journal_` + the field name lowercased. Fields with a leading underscore (e.g. `_SYSTEMD_UNIT` → `_systemd_unit`) produce a double underscore (`__journal__systemd_unit`). Fields without one (e.g. `PRIORITY`, `SYSLOG_IDENTIFIER`) produce a single underscore (`__journal_priority`, `__journal_syslog_identifier`).
+**Alloy journal relabel names:** the source label is `__journal_` plus the lowercased field name, so `_SYSTEMD_UNIT` becomes `__journal__systemd_unit` (double underscore) and `PRIORITY` becomes `__journal_priority`.
 
-**Common LogQL patterns:**
+**Alloy active but shipping nothing:** if `loki_source_journal_target_lines_total` (`curl -s localhost:12345/metrics`) stays at 0 while `journalctl` works, alloy's libsystemd can't read the zstd-compressed journal. nixpkgs links it against `systemdLibs`, built without zstd; `overlays/grafana-alloy.nix` relinks it against full systemd. Deleting alloy's saved positions doesn't help.
+
 ```logql
-# All errors and above from a specific service
-{host="glyph", unit="navidrome.service", priority=~"[0-3]"}
+{host="glyph", unit="navidrome.service", priority=~"[0-3]"}   # errors and above from one service
+{host="spore", app="nginx"}                                    # nginx error log
+# nginx access log is JSON: vhost, method, uri, status, bytes, request_time,
+# upstream_time, upstream_status, remote_addr, user_agent
+{host="spore", app="nginx_access"} | json | status >= 500
+quantile_over_time(0.95, {host="spore", app="nginx_access"} | json | unwrap request_time [5m]) by (vhost)
+```
 
-# All warnings and above across spore
-{host="spore", priority=~"[0-4]"}
+**oMLX** (local LLM server on Stroma, `hosts/Stroma/omlx.nix`) logs to `~/.omlx/logs/server.log`, which Alloy on Stroma ships as `{host="stroma", app="omlx"}`. Its Python log levels map to the journald `priority` numbers (ERROR 3, WARNING 4, INFO 6), and tracebacks stay in one entry. Each completed request logs one line, the source for recent per-request speed:
+```logql
+# "Chat completion: model=X, 412 tokens in 6.31s (65.3 tok/s), ..., stream_model_ttft=0.48s"
+avg_over_time({host="stroma", app="omlx"} |~ " tokens in .* tok/s" | regexp `model=(?P<model>[^,]+), \d+ tokens in [\d.]+s \((?P<tps>[\d.]+) tok/s` | unwrap tps [5m]) by (model)
+```
 
-# nginx access and error logs on spore
-{host="spore", app="nginx"}
 
-# Recent errors across all hosts
-{priority=~"[0-3]"} |= "error"
+To summarise a noisy stream, use grafana-mcp's `query_loki_patterns` (e.g. `{host="glyph", unit="jellyfin.service"}`). Patterns live in Loki's memory, so they only cover logs since Loki last restarted.
+
+### Deploys
+
+Check deploys first when something regressed. Dashboards show them as a purple "Deploys" annotation. On a host, `nixos-version --configuration-revision` gives the deployed revision.
+
+```logql
+# One marker per activation, whichever path ran it: action (switch/test; nh
+# logs test), flake revision ("<rev>-dirty" for local builds), store path
+{app="nixos-deploy", priority="5"}
+# The nvd package diff that follows each marker ("[U.] #3 grafana 12.1.0 -> 12.2.0")
+{host="glyph", app="nixos-deploy", priority="6"}
+# Deploy workflow's deploy-rs output; last line is the summary with the run URL
+# (priority err on failure)
+{host="spore", app="deploy-rs"}
+# switch-to-configuration output, only for `just switch-remote`
+{unit="nixos-rebuild-switch-to-configuration.service"}
+```
+
+### Claude Code telemetry
+
+Hosts with `rc.development.ai.telemetry.enable` (default: those that reach the gateway, so not lobtop) push Claude Code metrics to Prometheus and events to Loki over OTLP (env in `modules/home/development.nix`). Prompt, response and tool-input text are redacted at the source. Labels include `host` (lowercase hostname), `session_id`, `model` and `user_email`. Metrics export every 60s, so a session's series appear about a minute after its first request.
+
+The terminal CLI reports `service_name`/`job` `claude-code` with `host`. The desktop app's built-in Claude Code reports `claude-code-desktop` and drops `host`; match both with `=~"claude-code.*"`. A desktop session's `user_id` (per-machine install ID) equals that machine's CLI `user_id`.
+
+```promql
+# Spend and tokens per host and model over the last day
+sum by (job, host, model) (increase(claude_code_cost_usage_USD_total{job=~"claude-code.*"}[1d]))
+sum by (type) (increase(claude_code_token_usage_tokens_total{job=~"claude-code.*"}[1d]))
+```
+Also `claude_code_{session,lines_of_code,commit,pull_request}_count_total` and `claude_code_active_time_seconds_total`, each once it first happens.
+
+```logql
+# Events: one line per event ("claude_code.api_request"); fields are
+# structured metadata (event_name, tool_name, success, duration_ms,
+# cost_usd, ttft_ms, input_tokens, ...)
+{service_name="claude-code", host="rhizome"} | event_name="api_error"
+{service_name=~"claude-code.*"} | event_name="tool_result" | success="false"
 ```
 
 ### Prometheus jobs and exporters
 
+Scraped series carry `instance` and an identical `host` label, so `{host="glyph"}` selects the same machine in PromQL and LogQL. Pushed (OTLP) series don't: Open WebUI's have `instance` only; Claude Code's are above.
+
 | Job | Port | Host | Covers |
 |---|---|---|---|
-| `node` | 9100 | glyph, spore | CPU, memory, disk, network, systemd unit states |
+| `node` | 9100 | glyph, spore, zeta, stroma | CPU, memory, disk, network, systemd unit states, restarts (`node_systemd_service_restart_total`), start times, timer last-trigger. Stroma is macOS: no systemd series and no `node_memory_MemAvailable_bytes` |
+| `mactop` | 9101 | stroma | Apple Silicon: `mactop_cpu_usage_percent` (and `mactop_{e,p,s}core_usage_percent`; M5 has P- and S-cores, no E-cores), `mactop_gpu_usage_percent`, `mactop_power_watts{component}` (cpu, gpu, ane, dram, gpu_sram, system, total: total is whole-machine power and system is the remainder, so the others sum to total; on M5 these need mactop 2.1.6+, see `overlays/mactop.nix`), `mactop_dram_bandwidth_gbs` (0 on M5 Ultra), `mactop_soc_temp_celsius`, `mactop_thermal_state` (0–3), `mactop_memory_gb{type}`, fans |
 | `zfs` | 9134 | glyph | Pool health, ARC hit ratio, pool space |
 | `postgres` | 9187 | glyph | Connections, query throughput, vacuum, per-DB stats |
-| `smartctl` | 9633 | glyph | Disk SMART data, temperature, reallocated sectors |
+| `smartctl` | 9633 | glyph | SMART status, temperature, sector errors (sda–sdd); NVMe wear, spare, media errors, critical warning (nvme0) |
 | `nginx` | 9113 | spore | Request rate, active connections, handled/dropped |
-| `navidrome` | 4533/metrics | glyph | Library size, play counts, scan duration |
+| `navidrome` | 4533/metrics | glyph | `db_model_totals` (library size), `media_scan_last`, HTTP request count/latency |
+| `prometheus` | 9099 | glyph | Prometheus self-metrics (TSDB, scrape health) |
+| `loki` | 3100 | glyph | Loki ingestion and query metrics |
+| `coredns` | 9153 | glyph | DNS queries, responses by rcode, forward latency (`ts.zx.dev` zone) |
+| `ntfy` | 2587 | glyph | Messages published, subscribers, HTTP requests |
+| `gatus` | 8080 | zeta | `gatus_results_*` per watchdog endpoint: success, duration, certificate expiry |
+| `grafana` | 3000 | glyph | Grafana itself: `grafana_alerting_rule_evaluation_failures_total`, notification and HTTP metrics |
+| `alloy` | 12345 | glyph, spore, zeta, stroma | Alloy itself: `loki_write_sent_entries_total`, `loki_write_dropped_entries_total`, journal read counters |
+| `mcpjungle` | 8090 | glyph | MCP gateway tool calls: `mcpjungle_tool_calls_ratio_total{mcp_server_name, tool_name, outcome}` and `mcpjungle_tool_call_latency_seconds`. `outcome="error"` means the gateway couldn't reach or talk to the upstream server, not a tool's own error result. The `_ratio` comes from the OTel unit `"1"`; series appear after a tool's first call |
+| `omlx` | 7979/probe | stroma | oMLX via json_exporter, which fetches `http://127.0.0.1:8000/api/status` per scrape with the oMLX sub-key from agenix (`omlx-monitoring-key.age`; a missing or rejected key makes `up` 0): `omlx_requests_{active,waiting}`, `omlx_{requests,prompt_tokens,completion_tokens,cached_tokens}_total`, `omlx_models_{loaded,loading,discovered}`, `omlx_loaded_model_info{model}`, `omlx_model_memory_used_bytes`, `omlx_avg_{prefill,generation}_tokens_per_second`, `omlx_cache_efficiency_percent`, `omlx_info{version}`. Counters reset when oMLX restarts and the averages run from its start; `up == 0` means oMLX isn't answering |
+| `open-webui` | push (OTLP) | glyph | `http_server_requests_total`, `http_server_duration_*`, `webui_users_*`; pushed to Prometheus's OTLP receiver, not scraped, so no `up` series |
 
-**Common PromQL patterns:**
-```promql
-# Disk temperature (watch for > 50°C on NAS drives)
-smartctl_device_temperature{instance="glyph"}
+**Picking a port on glyph:** grep the repo and check defaults that aren't declared in Nix. Transmission's RPC takes 9091 (`torrents.zx.dev`), so an exporter there fails with "address already in use".
 
-# PostgreSQL active connections per database
-pg_stat_database_numbackends{instance="glyph"}
+**smartctl exporter fails every scrape with `collected metric ... with unregistered descriptor`:** v0.14.0 registers metrics only for disks readable at startup, so a disk that becomes readable later (NVMe ACL, drive waking) breaks it until `systemctl restart prometheus-smartctl-exporter`. Fixed in v0.15.0 (prometheus-community/smartctl_exporter#329).
 
-# nginx request rate over 5 minutes
-rate(nginx_http_requests_total{instance="spore"}[5m])
+### Blind spots
 
-# Filesystem use % on glyph (watch for > 85%)
-100 - (node_filesystem_avail_bytes{instance="glyph",mountpoint="/"} / node_filesystem_size_bytes{instance="glyph",mountpoint="/"} * 100)
+Know these before concluding "no data means no problem":
+- Grafana and its database run on glyph: if glyph is down, all Grafana alerting is down too (Gatus still alerts). If spore is down, `grafana.zx.dev` is unreachable but alerting keeps running.
+- Per-vhost HTTP status and latency exist only as LogQL over `app="nginx_access"`; the `nginx` job is `stub_status` connection counts.
+- Local `just switch` prints switch-to-configuration output only to the terminal; Loki gets the `nixos-deploy` lines and systemd's own unit logs.
+- Deploy workflow output lands in the journal after the deploy finishes (timestamped at the end, without `copying path` lines), and only in GitHub Actions if the host was unreachable.
+- No metrics for app internals (Jellyfin, Home Assistant, etc.): use `node_systemd_unit_state` and Loki.
+- macOS hosts ship no system logs to Loki, only Claude Code events and (from Stroma) oMLX's log.
+
+### Tailnet lockout
+
+Tailscale logs in through Pocket ID (`id.zx.dev`, on spore), whose database is on glyph over the tailnet. If glyph's or spore's node key expires, `id.zx.dev` returns 502 (and `cache.zx.dev` 504), so no device can log back in. Break the cycle with a reverse SSH tunnel to glyph's Postgres (`pg_hba` trusts loopback) over spore's public IP:
+```bash
+ssh -N -R 127.0.0.1:5432:127.0.0.1:5432 root@<spore-public-ip>    # on glyph, over the LAN; keep it running
+# on spore (runtime only; gone on reboot):
+mkdir -p /run/systemd/system/pocket-id.service.d
+echo 'DB_CONNECTION_STRING=postgres://pocketid@127.0.0.1/pocketid' > /run/pocket-id-override.env
+printf '[Service]\nEnvironment=DB_CONNECTION_STRING=postgres://pocketid@127.0.0.1/pocketid\nEnvironmentFile=/run/pocket-id-override.env\n' > /run/systemd/system/pocket-id.service.d/tunnel.conf
+systemctl daemon-reload && systemctl restart pocket-id    # the stop can take its 90s timeout
 ```
+Then log the expired machines back in and disable their key expiry in the admin console, check `tailscale ping glyph && nc -zv glyph.note-iwato.ts.net 5432` on spore, and remove both files (then `daemon-reload` and restart) before closing the tunnel.
 
-## Environment Awareness
+## Guardrails
 
-- Before running commands like `ssh`, `nixos-rebuild`, or anything that targets a specific host, check which host Claude Code is running on (`hostname`) to avoid targeting the current machine unintentionally.
-- The current host is typically `glyph` (NixOS desktop) or `Rhizome` (macOS laptop).
-
-## Learning and Memory
-
-- After arriving at a working solution through trial and error, proactively ask whether the finding should be recorded in CLAUDE.md (or Basic Memory) for future sessions.
+- Merging doesn't deploy: deploys are manual, via `just switch` or the Deploy workflow. Don't switch a host, merge a PR, or run the Deploy workflow unless asked.
 
 ## Committing
 
-- Always pass `--no-gpg-sign` when creating commits. Agent-created commits do not need to be signed and GPG signing requires user interaction.
-- For rebases, `--no-gpg-sign` is not a valid flag — use `git -c commit.gpgsign=false rebase` (or `git -c commit.gpgsign=false pull --rebase`) instead.
+- My git config requires signing, which you can't do (it needs an interactive GPG unlock). For commands that create commits, use `git -c commit.gpgsign=false …`, and never change git config to disable signing. Add a `Co-Authored-By:` trailer identifying yourself.
+
+## Updating this file
+
+- When a working solution reached through trial and error would help future sessions in this repo, add it to this file in the PR you're preparing and call it out in the PR description.
 
 ## Code style
 
 - All files should end with a newline.
-- After executing large changes, run `nix fmt .`.
+- After executing large changes, run `nix fmt .`. It runs alejandra, statix and nil; CI runs it too and fails if it changes or flags anything.

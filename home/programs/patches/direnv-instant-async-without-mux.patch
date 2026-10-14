@@ -1,0 +1,25 @@
+diff --git a/src/commands/start.rs b/src/commands/start.rs
+index 8f5bd0e..e14d199 100644
+--- a/src/commands/start.rs
++++ b/src/commands/start.rs
+@@ -2,7 +2,6 @@ use crate::daemon::{
+     DaemonContext, detach_daemon, direnv_export_command, get_socket_path, notify_daemon,
+     start_daemon,
+ };
+-use crate::mux::Multiplexer;
+ use crate::nushell;
+ use crate::shell::Shell;
+ use nix::unistd::getppid;
+@@ -49,12 +48,6 @@ pub fn run() {
+         &envrc_dir.display().to_string(),
+     );
+ 
+-    // If not in a multiplexer, just run direnv synchronously
+-    if Multiplexer::detect().is_none() {
+-        run_direnv_sync(direnv, shell, true);
+-        return;
+-    }
+-
+     // Set up daemon context
+     let ctx = match DaemonContext::new(parent_pid, envrc_dir, shell) {
+         Ok(ctx) => ctx,

@@ -1,5 +1,10 @@
 _: {
-  services.alloy.enable = true;
+  services.alloy = {
+    enable = true;
+    # Prometheus on glyph scrapes Alloy's own metrics over the tailnet.
+    extraFlags = ["--server.http.listen-addr=0.0.0.0:12345"];
+  };
+  networking.firewall.interfaces.tailscale0.allowedTCPPorts = [12345];
 
   environment.etc."alloy/config.alloy".text = ''
     discovery.relabel "journal" {

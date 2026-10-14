@@ -10,9 +10,6 @@
     casks = [
       "meetingbar"
     ];
-    # N.B.: Removed entries in `masApps` require manual uninstallation
-    masApps = {
-    };
   };
 
   programs.daisydisk = {

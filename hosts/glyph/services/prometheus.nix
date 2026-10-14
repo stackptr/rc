@@ -2,10 +2,30 @@
   config,
   pkgs,
   ...
-}: {
+}: let
+  # Copy instance into host, so metrics and Loki logs for the same machine
+  # share a label name ({host="glyph"} works in both PromQL and LogQL).
+  withHostLabel = job:
+    job
+    // {
+      relabel_configs =
+        (job.relabel_configs or [])
+        ++ [
+          {
+            source_labels = ["instance"];
+            target_label = "host";
+          }
+        ];
+    };
+in {
   services.prometheus = {
     enable = true;
     port = 9099;
+    # Default is 15d. The TSDB is well under 1 GB, and longer history lets
+    # agents compare against last month when looking for regressions.
+    retentionTime = "90d";
+    # Accepts OTLP metrics pushes at /api/v1/otlp/v1/metrics (Open WebUI).
+    extraFlags = ["--web.enable-otlp-receiver"];
     exporters.node = {
       enable = true;
       port = 9100;
@@ -24,7 +44,7 @@
       enable = true;
       port = 9633;
     };
-    scrapeConfigs = [
+    scrapeConfigs = map withHostLabel [
       {
         job_name = "node";
         static_configs = [
@@ -39,6 +59,46 @@
               "spore.note-iwato.ts.net:9100"
             ];
             labels.instance = "spore";
+          }
+          {
+            targets = [
+              "zeta.note-iwato.ts.net:9100"
+            ];
+            labels.instance = "zeta";
+          }
+          {
+            # nix-darwin; see hosts/Stroma/monitoring.nix
+            targets = [
+              "stroma.note-iwato.ts.net:9100"
+            ];
+            labels.instance = "stroma";
+          }
+        ];
+      }
+      {
+        # Apple Silicon metrics from mactop on Stroma (hosts/Stroma/monitoring.nix).
+        job_name = "mactop";
+        static_configs = [
+          {
+            targets = ["stroma.note-iwato.ts.net:9101"];
+            labels.instance = "stroma";
+          }
+        ];
+      }
+      {
+        # oMLX (LLM server on Stroma) through json_exporter, which fetches
+        # oMLX's /api/status on each scrape (hosts/Stroma/monitoring.nix).
+        # oMLX down fails the scrape, so "Scrape target down" covers it.
+        job_name = "omlx";
+        metrics_path = "/probe";
+        params = {
+          module = ["omlx"];
+          target = ["http://127.0.0.1:8000/api/status"];
+        };
+        static_configs = [
+          {
+            targets = ["stroma.note-iwato.ts.net:7979"];
+            labels.instance = "stroma";
           }
         ];
       }
@@ -94,6 +154,103 @@
               "localhost:4533"
             ];
             labels.instance = "glyph";
+          }
+        ];
+      }
+      {
+        job_name = "prometheus";
+        static_configs = [
+          {
+            targets = [
+              "localhost:${toString config.services.prometheus.port}"
+            ];
+            labels.instance = "glyph";
+          }
+        ];
+      }
+      {
+        job_name = "loki";
+        static_configs = [
+          {
+            targets = [
+              "localhost:${toString config.services.loki.configuration.server.http_listen_port}"
+            ];
+            labels.instance = "glyph";
+          }
+        ];
+      }
+      {
+        job_name = "coredns";
+        static_configs = [
+          {
+            targets = ["localhost:9153"];
+            labels.instance = "glyph";
+          }
+        ];
+      }
+      {
+        job_name = "ntfy";
+        static_configs = [
+          {
+            targets = [config.services.ntfy-sh.settings.metrics-listen-http];
+            labels.instance = "glyph";
+          }
+        ];
+      }
+      {
+        # Grafana's own metrics: alert rule evaluations, notifications, HTTP.
+        # /metrics is served before enforce_domain's host check, so
+        # localhost works.
+        job_name = "grafana";
+        static_configs = [
+          {
+            targets = ["localhost:${toString config.services.grafana.settings.server.http_port}"];
+            labels.instance = "glyph";
+          }
+        ];
+      }
+      {
+        # Alloy's own metrics (log read and Loki push counters). spore, zeta
+        # and Stroma listen on 0.0.0.0:12345 for this.
+        job_name = "alloy";
+        static_configs = [
+          {
+            targets = ["localhost:12345"];
+            labels.instance = "glyph";
+          }
+          {
+            targets = ["spore.note-iwato.ts.net:12345"];
+            labels.instance = "spore";
+          }
+          {
+            targets = ["zeta.note-iwato.ts.net:12345"];
+            labels.instance = "zeta";
+          }
+          {
+            # Ships oMLX's log (hosts/Stroma/monitoring.nix)
+            targets = ["stroma.note-iwato.ts.net:12345"];
+            labels.instance = "stroma";
+          }
+        ];
+      }
+      {
+        # MCPJungle gateway: tool calls per server and tool, with outcome and
+        # latency. OTEL_ENABLED is set in modules/nixos/llm/mcpjungle.nix.
+        job_name = "mcpjungle";
+        static_configs = [
+          {
+            targets = ["localhost:${toString config.services.mcpjungle.port}"];
+            labels.instance = "glyph";
+          }
+        ];
+      }
+      {
+        # Gatus watchdog on zeta (hosts/zeta/services/gatus.nix).
+        job_name = "gatus";
+        static_configs = [
+          {
+            targets = ["zeta.note-iwato.ts.net:8080"];
+            labels.instance = "zeta";
           }
         ];
       }

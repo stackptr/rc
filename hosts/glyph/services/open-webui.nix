@@ -43,7 +43,7 @@
   # Active models — listed models are enabled with full config.
   # All other models from the API provider are deactivated automatically.
   models = {
-    "mtplx-qwen38-27b-optimized-quality".name = "Qwen 3.8 27B";
+    "Qwen3.8-27B-MTPLX-Optimized-Quality".name = "Qwen 3.8 27B";
   };
 
   modelIds = builtins.toJSON (builtins.attrNames models);
@@ -60,7 +60,9 @@ in {
   systemd.timers.open-webui-model-sync = {
     description = "Trigger Open WebUI model sync";
     wantedBy = ["timers.target"];
-    restartTriggers = [(builtins.hashString "sha256" (builtins.toJSON models))];
+    # Re-run the sync when the model list or the script changes (the
+    # service itself has restartIfChanged = false); the script embeds the list
+    restartTriggers = [config.systemd.services.open-webui-model-sync.script];
     timerConfig.OnActiveSec = "10s";
   };
 
@@ -139,9 +141,20 @@ in {
           | jq -r '.data[] | select(.info.is_active == true or .info == null) | .id' \
           | while read -r id; do
               if ! echo "$ACTIVE_IDS" | jq -e --arg id "$id" 'index($id)' >/dev/null 2>&1; then
-                curl -sf -X POST -H "Authorization: Bearer $API_KEY" \
-                  "${baseUrl}/api/v1/models/model/toggle?id=$id" >/dev/null 2>&1
-                echo "$id: deactivated."
+                # Toggle needs a DB entry (401 without one, as with update
+                # above), so a model seen for the first time is created
+                # inactive instead
+                if curl -sf -X POST -H "Authorization: Bearer $API_KEY" \
+                  "${baseUrl}/api/v1/models/model/toggle?id=$id" >/dev/null 2>&1 \
+                  || curl -sf -X POST \
+                    -H "Authorization: Bearer $API_KEY" \
+                    -H "Content-Type: application/json" \
+                    -d "$(jq -nc --arg id "$id" '{id: $id, name: $id, meta: {}, params: {}, is_active: false}')" \
+                    "${baseUrl}/api/v1/models/create" >/dev/null 2>&1; then
+                  echo "$id: deactivated."
+                else
+                  echo "ERROR: failed to deactivate $id"
+                fi
               fi
             done
       else
@@ -153,10 +166,18 @@ in {
   services.open-webui = {
     enable = true;
     package = pkgs.open-webui.overridePythonAttrs (old: {
-      dependencies = old.dependencies ++ old.optional-dependencies.postgres;
+      dependencies =
+        old.dependencies
+        ++ old.optional-dependencies.postgres
+        # ENABLE_OTEL imports opentelemetry.instrumentation.system_metrics,
+        # which nixpkgs leaves out of the package's dependencies.
+        ++ [pkgs.python3Packages.opentelemetry-instrumentation-system-metrics];
     });
     inherit port;
     host = "0.0.0.0";
+    # Also holds the OpenAI-compatible connections (URLs and keys), oMLX on
+    # Stroma among them: http://stroma.note-iwato.ts.net:8000/v1 with an
+    # oMLX sub-key (hosts/Stroma/omlx.nix).
     environmentFile = config.age.secrets.open-webui-env.path;
     environment = {
       ENABLE_OLLAMA_API = "False";
@@ -166,6 +187,16 @@ in {
       WEBUI_SESSION_COOKIE_SECURE = "True";
       CORS_ALLOW_ORIGIN = "https://chat.zx.dev";
       ENABLE_VERSION_UPDATE_CHECK = "False";
+
+      # Push OpenTelemetry metrics straight to Prometheus's OTLP receiver
+      # (no collector). Traces and logs stay off; logs reach Loki via journald.
+      ENABLE_OTEL = "true";
+      ENABLE_OTEL_METRICS = "true";
+      OTEL_METRICS_OTLP_SPAN_EXPORTER = "http";
+      OTEL_METRICS_EXPORTER_OTLP_ENDPOINT = "http://127.0.0.1:${toString config.services.prometheus.port}/api/v1/otlp/v1/metrics";
+      OTEL_METRICS_EXPORT_INTERVAL_MILLIS = "60000";
+      # Becomes the `instance` label, matching the scrape jobs.
+      OTEL_RESOURCE_ATTRIBUTES = "service.instance.id=glyph";
 
       # OIDC via Pocket ID
       ENABLE_OAUTH_SIGNUP = "true";
@@ -189,8 +220,8 @@ in {
       ENABLE_SEARCH_QUERY_GENERATION = "True";
       WEB_SEARCH_ENGINE = "kagi";
 
-      # System prompt sourced from llm-profile flake input (github:stackptr/llm-profile)
-      DEFAULT_SYSTEM_PROMPT = builtins.readFile "${inputs.llm-profile}/README.md";
+      # System prompt: chat bundle (core.md + chat.md) from the llm-profile flake input (github:stackptr/llm-profile)
+      DEFAULT_SYSTEM_PROMPT = (import ../../../lib/llm-profile.nix inputs.llm-profile).chat;
 
       # MCP tool server: MCPJungle gateway on glyph (aggregates all registered MCP servers)
       TOOL_SERVER_CONNECTIONS = builtins.toJSON [

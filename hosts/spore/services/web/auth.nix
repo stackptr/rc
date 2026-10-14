@@ -36,6 +36,7 @@
 
   services.oauth2-proxy.extraConfig = {
     skip-jwt-bearer-tokens = true;
-    extra-jwt-issuers = "https://id.zx.dev=claude-mcp";
+    # Audience is the RFC 8707 resource registered as an API in PocketID, not the OIDC client ID.
+    extra-jwt-issuers = "https://id.zx.dev=https://mcp.zx.dev";
   };
 }

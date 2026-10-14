@@ -29,6 +29,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nixos-hardware.url = "github:NixOS/nixos-hardware";
+    direnv-instant = {
+      url = "github:Mic92/direnv-instant";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-parts.follows = "flake-parts";
+    };
 
     # Deployment
     deploy-rs = {
@@ -71,6 +76,11 @@
     };
     homebrew-cask = {
       url = "github:homebrew/homebrew-cask";
+      flake = false;
+    };
+    # oMLX's own tap (the repo root holds Formula/omlx.rb); Stroma only
+    homebrew-omlx = {
+      url = "github:jundot/omlx";
       flake = false;
     };
     llm-profile = {
@@ -215,7 +225,10 @@
               ++ config.pre-commit.settings.enabledPackages;
             shellHook = ''
               ${config.pre-commit.shellHook}
-              entire enable -y --agent claude-code 2>/dev/null || true
+              # Settings are tracked; only (re)install when Entire's git hooks are missing.
+              if ! grep -qs entire "$(git rev-parse --git-path hooks 2>/dev/null)/prepare-commit-msg"; then
+                entire enable -y --agent claude-code >/dev/null 2>&1 || true
+              fi
             '';
           };
         };
