@@ -15,11 +15,9 @@
   pkgs,
   ...
 }: let
-  # Slack member and channel IDs aren't secret. The channel is a placeholder
-  # until #ops-agent exists: it matches no real channel, so the bot ignores
-  # every channel message until it's replaced.
+  # Slack member and channel IDs aren't secret.
   slackUser = "U0AQQ327U4E";
-  opsChannel = "C00PLACEHOLDER";
+  agentChannel = "C0C8Z3TMGBY"; # #agent
 
   # Read tools only; everything else grafana-mcp offers is never registered.
   grafanaTools = [
@@ -59,8 +57,8 @@ in {
     ];
     environment = {
       SLACK_ALLOWED_USERS = slackUser;
-      SLACK_HOME_CHANNEL = opsChannel; # cron delivery target
-      SLACK_HOME_CHANNEL_NAME = "ops-agent";
+      SLACK_HOME_CHANNEL = agentChannel; # cron delivery target
+      SLACK_HOME_CHANNEL_NAME = "agent";
     };
 
     hermesHomeFiles."SOUL.md" = ''
@@ -169,8 +167,8 @@ in {
       # allowed_channels drops messages and slash commands from anywhere
       # else before mention gating; DMs bypass it, so disable_dms drops them.
       slack = {
-        allowed_channels = [opsChannel];
-        free_response_channels = [opsChannel];
+        allowed_channels = [agentChannel];
+        free_response_channels = [agentChannel];
         disable_dms = true;
         unauthorized_dm_behavior = "ignore";
       };
