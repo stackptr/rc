@@ -111,73 +111,8 @@ jobs:
     permissions:
       actions: read
     steps:
-    - name: Collect failed jobs
-      id: failed
-      env:
-        GH_TOKEN: ${{ github.token }}
-      run: |
-        jobs=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/attempts/$GITHUB_RUN_ATTEMPT/jobs" \
-          --jq '[.jobs[] | select(.conclusion == "failure") | .name | sub("^build \\((?<h>[^,]+),.*"; "\(.h)")] | join(", ")')
-        echo "jobs=${jobs:-unknown}" >> "$GITHUB_OUTPUT"
-    - name: Prepare Slack context
-      id: slack-context
-      env:
-        EVENT_NAME: ${{ github.event_name }}
-        SHA: ${{ github.sha }}
-        PR_NUMBER: ${{ github.event.pull_request.number }}
-        PR_TITLE: ${{ github.event.pull_request.title }}
-        PR_URL: ${{ github.event.pull_request.html_url }}
-        COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
-        COMMIT_URL: ${{ github.event.head_commit.url }}
-      run: |
-        echo "short_sha=${SHA:0:7}" >> $GITHUB_OUTPUT
-        if [ "$EVENT_NAME" = "pull_request" ]; then
-          echo "trigger=PR <${PR_URL}|#${PR_NUMBER}: ${PR_TITLE}>" >> $GITHUB_OUTPUT
-          echo "source=PR #${PR_NUMBER}" >> $GITHUB_OUTPUT
-        else
-          FIRST_LINE=$(printf '%s' "$COMMIT_MESSAGE" | head -1)
-          echo "trigger=push <${COMMIT_URL}|${FIRST_LINE}>" >> $GITHUB_OUTPUT
-          echo "source=${GITHUB_REF_NAME} @ ${SHA:0:7}" >> $GITHUB_OUTPUT
-        fi
-    - name: Notify Slack on failure
-      uses: slackapi/slack-github-action@91efab103c0de0a537f72a35f6b8cda0ee76bf0a # v2.1.1
+    - uses: stackptr/actions/slack-notify@b165abf73542f37725926c8e2ba3ad26942ed1eb # feat-slack-notify-action, re-pin to v1.0.0
       with:
-        webhook: ${{ secrets.SLACK_WEBHOOK_UPDATES_CI }}
-        webhook-type: incoming-webhook
-        payload-templating: true
-        # Top-level text is the notification preview; a message with only
-        # attachments shows "[no preview available]". It also renders as the
-        # headline above the attachment, so there's no header block.
-        payload: |
-          {
-            "text": ":x: CI failed for ${{ steps.failed.outputs.jobs }} (${{ steps.slack-context.outputs.source }})",
-            "attachments": [
-              {
-                "color": "#CC0000",
-                "blocks": [
-                  {
-                    "type": "section",
-                    "fields": [
-                      {
-                        "type": "mrkdwn",
-                        "text": "*Failed*\n${{ steps.failed.outputs.jobs }}"
-                      },
-                      {
-                        "type": "mrkdwn",
-                        "text": "*Trigger*\n${{ steps.slack-context.outputs.trigger }}"
-                      }
-                    ]
-                  },
-                  {
-                    "type": "context",
-                    "elements": [
-                      {
-                        "type": "mrkdwn",
-                        "text": "<${{ github.server_url }}/${{ github.repository }}|${{ github.repository }}> · <${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}|${{ steps.slack-context.outputs.short_sha }}> · <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View run>"
-                      }
-                    ]
-                  }
-                ]
-              }
-            ]
-          }
+        token: ${{ secrets.SLACK_BOT_TOKEN }}
+        status: failure
+        failed-jobs: true
