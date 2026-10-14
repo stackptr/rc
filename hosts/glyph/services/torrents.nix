@@ -16,11 +16,15 @@
       rpc-whitelist-enabled = false;
       script-torrent-done-enabled = true;
       script-torrent-done-filename = pkgs.writeShellScript "torrent-done.sh" ''
-        curl -s \
-          -H "Title: Transmission" \
-          -H "Tags: transmissionic" \
-          -d "*$TR_TORRENT_NAME* finished downloading. <https://torrents.zx.dev|View torrents>" \
-          http://127.0.0.1:2586/notifications
+        # JSON publish, so the torrent name needs no header or mrkdwn
+        # escaping; ntfy-slack-relay (./ntfy.nix) escapes the title.
+        jq -n --arg title "Downloaded $TR_TORRENT_NAME" '{
+          topic: "notifications",
+          title: $title,
+          message: "Transmission on glyph",
+          tags: ["transmissionic"],
+          click: "https://torrents.zx.dev"
+        }' | curl -s -d @- http://127.0.0.1:2586/
 
         # Copy .mkv files to Unsorted for Jellyfin
         UNSORTED="/mnt/media/Unsorted"
@@ -52,7 +56,7 @@
     webHome = pkgs.transmissionic;
   };
 
-  systemd.services.transmission.path = [pkgs.curl pkgs.findutils];
+  systemd.services.transmission.path = [pkgs.curl pkgs.findutils pkgs.jq];
   systemd.services.transmission.serviceConfig.BindPaths = ["/mnt/media/Unsorted"];
 
   networking.firewall.allowedTCPPorts = [config.services.transmission.settings.peer-port];

@@ -103,10 +103,8 @@ in {
               type = "slack";
               settings = {
                 token = "$__file{${config.age.secrets.grafana-slack-bot-token.path}}";
-                recipient = "#updates";
-                username = "Grafana";
-                icon_emoji = ":grafana:";
-                title = ''{{ if .Alerts.Firing }}[FIRING] {{ .GroupLabels.alertname }}{{ else }}[RESOLVED] {{ .GroupLabels.alertname }}{{ end }}'';
+                recipient = "#alerts";
+                title = ''{{ if .Alerts.Firing }}:x: {{ .GroupLabels.alertname }}{{ else }}:white_check_mark: {{ .GroupLabels.alertname }}{{ end }}'';
                 text = ''                  {{ range .Alerts }}• {{ .Labels.alertname }}: {{ .Annotations.summary }}
                   {{ end }}'';
               };

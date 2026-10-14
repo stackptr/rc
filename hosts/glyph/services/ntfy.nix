@@ -5,24 +5,6 @@
 }: let
   ntfyUrl = "http://127.0.0.1:2586";
   ntfyTopic = "notifications";
-  slackChannel = "#updates";
-
-  ntfyToSlack = pkgs.writeShellScript "ntfy-to-slack" ''
-    SLACK_TOKEN=$(cat "$CREDENTIALS_DIRECTORY/slack-bot-token")
-    TITLE="''${NTFY_TITLE:-Homelab}"
-    ICON=":''${NTFY_TAGS%%,*}:"
-
-    ${pkgs.curl}/bin/curl -s -X POST \
-      "https://slack.com/api/chat.postMessage" \
-      -H "Authorization: Bearer $SLACK_TOKEN" \
-      -H "Content-Type: application/json" \
-      -d "$(${pkgs.jq}/bin/jq -n \
-        --arg channel "${slackChannel}" \
-        --arg username "$TITLE" \
-        --arg icon_emoji "$ICON" \
-        --arg text "$NTFY_MESSAGE" \
-        '{channel: $channel, username: $username, icon_emoji: $icon_emoji, text: $text}')"
-  '';
 in {
   age.secrets.slack-bot-token = {
     file = ./../secrets/slack-bot-token.age;
@@ -42,11 +24,16 @@ in {
 
   networking.firewall.interfaces.tailscale0.allowedTCPPorts = [2586];
 
+  # Posts each message on the topic to Slack as Hypha. Publishers set
+  # ntfy's own fields: title (the notification preview), message (Slack
+  # mrkdwn), tags (the first is the emoji), click (a link) and priority
+  # (4 and up go to #alerts, the rest to #updates). See ./ntfy-to-slack.jq.
   systemd.services.ntfy-slack-relay = {
     description = "Forward ntfy notifications to Slack";
     after = ["ntfy-sh.service" "network.target"];
     requires = ["ntfy-sh.service"];
     wantedBy = ["multi-user.target"];
+    path = [pkgs.curl pkgs.jq];
     serviceConfig = {
       DynamicUser = true;
       LoadCredential = "slack-bot-token:${config.age.secrets.slack-bot-token.path}";
@@ -55,21 +42,20 @@ in {
     };
     script = ''
       set -o pipefail
+      token=$(cat "$CREDENTIALS_DIRECTORY/slack-bot-token")
       # ntfy-sh is Type=simple, so it may not be listening yet when this
       # starts alongside it (e.g. during activation); retry instead of failing.
-      ${pkgs.curl}/bin/curl -sN --retry 10 --retry-connrefused --retry-delay 1 \
-        "${ntfyUrl}/${ntfyTopic}/json" | \
+      curl -sN --retry 10 --retry-connrefused --retry-delay 1 \
+        "${ntfyUrl}/${ntfyTopic}/json" |
       while IFS= read -r event; do
-        event_type=$(${pkgs.jq}/bin/jq -r '.event // "message"' <<< "$event")
-        [ "$event_type" != "message" ] && continue
-
-        NTFY_MESSAGE=$(${pkgs.jq}/bin/jq -r '.message // empty' <<< "$event")
-        NTFY_TITLE=$(${pkgs.jq}/bin/jq -r '.title // "Homelab"' <<< "$event")
-        NTFY_TAGS=$(${pkgs.jq}/bin/jq -r '.tags // [] | join(",")' <<< "$event")
-        [ -z "$NTFY_MESSAGE" ] && continue
-
-        export NTFY_MESSAGE NTFY_TITLE NTFY_TAGS
-        ${ntfyToSlack}
+        payload=$(jq -c --arg alerts "#alerts" --arg updates "#updates" \
+          -f ${./ntfy-to-slack.jq} <<< "$event") || continue
+        [ -n "$payload" ] || continue
+        curl -s https://slack.com/api/chat.postMessage \
+          -H "Authorization: Bearer $token" \
+          -H "Content-Type: application/json; charset=utf-8" \
+          -d "$payload" |
+          jq -r 'select(.ok | not) | "Slack rejected message: \(.error)"' >&2 || true
       done
     '';
   };
