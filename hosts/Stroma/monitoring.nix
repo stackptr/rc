@@ -4,6 +4,7 @@
 # bind only the tailnet address.
 {
   config,
+  lib,
   pkgs,
   ...
 }: let
@@ -131,8 +132,14 @@ in {
   # usage and frequency, power per component (CPU, GPU, ANE, DRAM), DRAM
   # bandwidth, SoC/GPU temperatures, thermal state and fans. Uses IOReport
   # and SMC, so no root needed.
-  launchd.daemons.mactop.serviceConfig = {
-    ProgramArguments = [
+  #
+  # These daemons set `command`, not serviceConfig.ProgramArguments:
+  # nix-darwin then starts them through `/bin/wait4path /nix/store`. launchd
+  # starts daemons at boot before the Nix volume is mounted, and a direct
+  # /nix/store path fails to spawn (last exit 78) and isn't retried, even
+  # with KeepAlive. node_exporter's module already does this.
+  launchd.daemons.mactop = {
+    command = lib.escapeShellArgs [
       "${pkgs.mactop}/bin/mactop"
       "--headless"
       "--count"
@@ -143,32 +150,36 @@ in {
       "--prometheus"
       "9101"
     ];
-    UserName = config.system.primaryUser;
-    RunAtLoad = true;
-    KeepAlive = true;
-    # Headless mode also prints every sample as JSON on stdout.
-    StandardOutPath = "/dev/null";
-    StandardErrorPath = "/tmp/mactop.log";
+    serviceConfig = {
+      UserName = config.system.primaryUser;
+      RunAtLoad = true;
+      KeepAlive = true;
+      # Headless mode also prints every sample as JSON on stdout.
+      StandardOutPath = "/dev/null";
+      StandardErrorPath = "/tmp/mactop.log";
+    };
   };
 
   # oMLX's /api/status as metrics, authenticated with the key above.
-  launchd.daemons.json-exporter.serviceConfig = {
-    ProgramArguments = [
+  launchd.daemons.json-exporter = {
+    command = lib.escapeShellArgs [
       "${pkgs.prometheus-json-exporter}/bin/json_exporter"
       "--config.file=${jsonExporterConfig}"
       "--web.listen-address=:7979"
     ];
-    UserName = user;
-    RunAtLoad = true;
-    KeepAlive = true;
-    StandardOutPath = "/tmp/json-exporter.log";
-    StandardErrorPath = "/tmp/json-exporter.log";
+    serviceConfig = {
+      UserName = user;
+      RunAtLoad = true;
+      KeepAlive = true;
+      StandardOutPath = "/tmp/json-exporter.log";
+      StandardErrorPath = "/tmp/json-exporter.log";
+    };
   };
 
   # Ships oMLX's log (per-request tokens, tok/s, TTFT, errors) to Loki as
   # {host="stroma", app="omlx"}. Runs as the user, who owns the log.
-  launchd.daemons.alloy.serviceConfig = {
-    ProgramArguments = [
+  launchd.daemons.alloy = {
+    command = lib.escapeShellArgs [
       "${pkgs.grafana-alloy}/bin/alloy"
       "run"
       # Prometheus on glyph scrapes Alloy's own metrics (job "alloy").
@@ -176,10 +187,12 @@ in {
       "--storage.path=${home}/Library/Application Support/Alloy"
       "${alloyConfig}"
     ];
-    UserName = user;
-    RunAtLoad = true;
-    KeepAlive = true;
-    StandardOutPath = "/tmp/alloy.log";
-    StandardErrorPath = "/tmp/alloy.log";
+    serviceConfig = {
+      UserName = user;
+      RunAtLoad = true;
+      KeepAlive = true;
+      StandardOutPath = "/tmp/alloy.log";
+      StandardErrorPath = "/tmp/alloy.log";
+    };
   };
 }
