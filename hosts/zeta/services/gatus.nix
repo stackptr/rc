@@ -197,6 +197,15 @@ in {
           ];
           description = "id.zx.dev (Pocket ID) is down; logins to Grafana and every auth-protected site fail. Check pocket-id.service on spore and its database on glyph";
         })
+        (mkEndpoint {
+          name = "models";
+          group = "sites";
+          # spore proxies / to oMLX's admin UI on Stroma. The UI loads without
+          # an API key, so this needs no credentials.
+          url = "https://models.zx.dev/";
+          conditions = ["[STATUS] == 200"];
+          description = "models.zx.dev (oMLX) is down; check oMLX on Stroma (it may be asleep or restarting) and the tailnet link from spore";
+        })
       ];
 
       # Results pushed by tailscale-key-expiry below; Gatus conditions can't
