@@ -160,7 +160,12 @@ in {
         project_discovery = false;
         inline_shell = false;
       };
-      auxiliary.background_review.enabled = false;
+      auxiliary = {
+        background_review.enabled = false;
+        # A model call per new session just to title it; on the local model
+        # that's prefill time for a title nobody reads.
+        title_generation.enabled = false;
+      };
       curator.enabled = false;
 
       # Slack: one user (SLACK_ALLOWED_USERS, default deny), one channel.
