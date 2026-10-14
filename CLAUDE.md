@@ -189,6 +189,8 @@ Scraped series carry `instance` and an identical `host` label, so `{host="glyph"
 
 **smartctl exporter fails every scrape with `collected metric ... with unregistered descriptor`:** v0.14.0 registers metrics only for disks readable at startup, so a disk that becomes readable later (NVMe ACL, drive waking) breaks it until `systemctl restart prometheus-smartctl-exporter`. Fixed in v0.15.0 (prometheus-community/smartctl_exporter#329).
 
+**`home.zx.dev` returns "400: Bad Request"** (Home Assistant on zeta): since HA 2026.8 the HTTP server settings live in the UI, not `configuration.yaml`. YAML `http:` is imported once, then ignored, so editing it in Nix does nothing. If the import is rolled back (an admin must confirm the new settings within 5 minutes, impossible while logins are broken), HA falls back to defaults and rejects spore's proxy: `{host="zeta", unit="home-assistant.service"} |= "untrusted proxy"` shows `Received X-Forwarded-For header from an untrusted proxy <spore's tailnet IP>`. Fix: open `http://zeta.note-iwato.ts.net:8123` directly (not through spore), then Settings > System > Network > HTTP server: turn on Trust X-Forwarded-For, add `100.64.0.0/10` to Trusted proxies, save, log back in after the restart and confirm within 5 minutes. The Gatus `sites/home-assistant` check expects 401 from `https://home.zx.dev/api/` and fires on a 400.
+
 ### Blind spots
 
 Know these before concluding "no data means no problem":
