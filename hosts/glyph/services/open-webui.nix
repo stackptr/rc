@@ -223,8 +223,24 @@ in {
       # System prompt: chat bundle (core.md + chat.md) from the llm-profile flake input (github:stackptr/llm-profile)
       DEFAULT_SYSTEM_PROMPT = (import ../../../lib/llm-profile.nix inputs.llm-profile).chat;
 
-      # MCP tool server: MCPJungle gateway on glyph (aggregates all registered MCP servers)
+      # MCP tool servers from the MCPJungle gateway on glyph. Models default
+      # to "glyph", the gateway's chat tool group (services.mcpjungle.groups
+      # in default.nix); "glyph-all" serves every registered tool and can be
+      # turned on per chat.
       TOOL_SERVER_CONNECTIONS = builtins.toJSON [
+        {
+          type = "mcp";
+          url = "http://localhost:8090/v0/groups/chat/mcp";
+          path = "";
+          auth_type = "none";
+          key = "";
+          config.enable = true;
+          info = {
+            id = "glyph";
+            name = "Glyph";
+            description = "MCP gateway (chat tools)";
+          };
+        }
         {
           type = "mcp";
           url = "http://localhost:8090/mcp";
@@ -233,9 +249,9 @@ in {
           key = "";
           config.enable = true;
           info = {
-            id = "glyph";
-            name = "Glyph";
-            description = "MCP gateway";
+            id = "glyph-all";
+            name = "Glyph (all tools)";
+            description = "MCP gateway (every registered tool)";
           };
         }
       ];

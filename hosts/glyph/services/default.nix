@@ -164,6 +164,9 @@
     servers.rc-source = {
       url = "http://127.0.0.1:8098/mcp";
       description = "Read-only source of my NixOS and nix-darwin configuration (github.com/stackptr/rc), as last deployed on glyph. Use it for questions about how my machines and services are set up.";
+      # It serves a store path, so writes always fail; read_file is a
+      # deprecated alias of read_text_file.
+      disabledTools = ["create_directory" "edit_file" "move_file" "write_file" "read_file"];
     };
     servers.context7 = {
       url = "https://mcp.context7.com/mcp";
@@ -180,8 +183,43 @@
       description = "AWS documentation and development reference";
     };
     servers.cloudflare-docs = {
-      url = "https://docs.mcp.cloudflare.com/sse";
+      url = "https://docs.mcp.cloudflare.com/mcp";
       description = "Cloudflare documentation and API reference";
+    };
+    # Open WebUI's local model gets every tool schema in its context on each
+    # turn, so it uses this subset; the full gateway stays available to it as
+    # a second, opt-in tool server.
+    groups.chat = {
+      description = "Tools for Open WebUI";
+      includedServers = ["mcp-nixos" "deepwiki" "context7"];
+      includedTools =
+        map (tool: "grafana__${tool}") [
+          "list_datasources"
+          "query_prometheus"
+          "list_prometheus_metric_names"
+          "list_prometheus_label_values"
+          "query_loki_logs"
+          "query_loki_patterns"
+          "query_loki_stats"
+          "list_loki_label_values"
+          "search_dashboards"
+          "get_dashboard_summary"
+        ]
+        ++ map (tool: "basic-memory__${tool}") [
+          "build_context"
+          "read_note"
+          "recent_activity"
+          "search_notes"
+          "write_note"
+          "edit_note"
+        ]
+        ++ map (tool: "rc-source__${tool}") [
+          "directory_tree"
+          "list_directory"
+          "read_text_file"
+          "read_multiple_files"
+          "search_files"
+        ];
     };
   };
 }

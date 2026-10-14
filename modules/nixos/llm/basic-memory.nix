@@ -6,6 +6,9 @@
 }: let
   cfg = config.services.basic-memory;
   dataDir = "/var/lib/basic-memory";
+  # Not in nixpkgs, so uv fetches it. Pinned so a restart can't pull a release
+  # that renames tools out from under clients' permission rules.
+  version = "0.23.2";
 in {
   options.services.basic-memory = {
     enable = lib.mkEnableOption "Basic Memory MCP server";
@@ -53,7 +56,7 @@ in {
       };
 
       serviceConfig = {
-        ExecStart = "${lib.getExe pkgs.uv} tool run basic-memory mcp --transport streamable-http --port ${toString cfg.port} --host ${cfg.host}";
+        ExecStart = "${lib.getExe pkgs.uv} tool run basic-memory@${version} mcp --transport streamable-http --port ${toString cfg.port} --host ${cfg.host}";
         User = "basic-memory";
         Group = "basic-memory";
         WorkingDirectory = dataDir;
