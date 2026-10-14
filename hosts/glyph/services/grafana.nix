@@ -38,14 +38,14 @@ in {
     enable = true;
     settings = {
       server = {
-        # spore proxies grafana.zx.dev here over the tailnet (tailscale0 is
+        # spore proxies monitoring.zx.dev here over the tailnet (tailscale0 is
         # a trusted interface); other interfaces don't open port 3000.
         http_addr = "0.0.0.0";
         http_port = 3000;
         enforce_domain = true;
         enable_gzip = true;
-        domain = "grafana.zx.dev";
-        root_url = "https://grafana.zx.dev";
+        domain = "monitoring.zx.dev";
+        root_url = "https://monitoring.zx.dev";
       };
       auth = {
         disable_login_form = true;
@@ -78,10 +78,10 @@ in {
         resolve_timeout = "1m";
       };
       # provisionGrafana below points the renderer's browser at http_addr,
-      # which is 0.0.0.0 here, and a Host other than grafana.zx.dev fails
+      # which is 0.0.0.0 here, and a Host other than monitoring.zx.dev fails
       # enforce_domain. Load pages through the public URL instead.
       rendering = {
-        callback_url = lib.mkForce "https://grafana.zx.dev/";
+        callback_url = lib.mkForce "https://monitoring.zx.dev/";
         renderer_token = rendererToken;
       };
     };
