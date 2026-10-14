@@ -73,7 +73,7 @@ in {
       LOCAL_DOMAIN = "zx.dev";
       WEB_DOMAIN = "pub.zx.dev";
       S3_ENABLED = "true";
-      S3_ALIAS_HOST = "media.zx.dev";
+      S3_ALIAS_HOST = "cdn.zx.dev";
       S3_BUCKET = "mastodon";
       S3_ENDPOINT = "https://9c12166db465350c0f02410b390d0cbc.r2.cloudflarestorage.com/";
       S3_PROTOCOL = "https";

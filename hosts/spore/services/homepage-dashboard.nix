@@ -7,11 +7,11 @@
   services.homepage-dashboard = {
     enable = true;
     environmentFiles = [config.age.secrets.homepage-env.path];
-    allowedHosts = "localhost:8082,127.0.0.1:8082,home.zx.dev";
+    allowedHosts = "localhost:8082,127.0.0.1:8082,dash.zx.dev";
     settings = {
       color = "sky";
       target = "_self";
-      title = "home.zx.dev";
+      title = "dash.zx.dev";
     };
     bookmarks = [];
     widgets = [
@@ -107,7 +107,7 @@
           {
             "Jellyfin" = {
               description = "TV & movie streaming";
-              href = "https://jellyfin.zx.dev";
+              href = "https://media.zx.dev";
               icon = "jellyfin";
               widget = {
                 type = "jellyfin";
