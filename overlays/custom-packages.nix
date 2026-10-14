@@ -13,6 +13,9 @@ self: super: {
   # FastScripts automation tool for macOS
   fastscripts = super.callPackage ./../packages/fastscripts/package.nix {};
 
+  # MCP server for the GoodLinks API
+  goodlinks-mcp = super.callPackage ./../packages/goodlinks-mcp/package.nix {};
+
   # FileBrowser quantum fork
   filebrowser-quantum = super.callPackage ./../packages/filebrowser-quantum/package.nix {};
 

@@ -16,4 +16,5 @@ in {
   "hosts/glyph/secrets/user-password.age".publicKeys = keys;
   "hosts/glyph/secrets/obsidian-auth-token.age".publicKeys = keys;
   "hosts/glyph/secrets/navidrome-env.age".publicKeys = keys;
+  "hosts/glyph/secrets/goodlinks-api-token.age".publicKeys = keys;
 }
