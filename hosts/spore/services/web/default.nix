@@ -304,6 +304,10 @@
       dnsProvider = "cloudflare";
       environmentFile = config.age.secrets.cloudflare-dns.path;
       extraDomainNames = ["zx.dev" "cjohns.com"];
+      # spore has IPv6 disabled, but Tailscale puts its IPv6 MagicDNS address
+      # (fd7a:115c:a1e0::53) in resolv.conf and lego can't dial it, so the
+      # DNS-01 propagation check never succeeds. Query a resolver directly.
+      dnsResolver = "8.8.8.8:53";
     };
   };
   users.users.nginx.extraGroups = ["acme"];
