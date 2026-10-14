@@ -111,7 +111,7 @@ jobs:
     permissions:
       actions: read
     steps:
-    - uses: stackptr/actions/slack-notify@b165abf73542f37725926c8e2ba3ad26942ed1eb # feat-slack-notify-action, re-pin to v1.0.0
+    - uses: stackptr/actions/slack-notify@8f86bf2d6b69d2225bee5726b080fc6ce1066bd9 # v1.0.0
       with:
         token: ${{ secrets.SLACK_BOT_TOKEN }}
         channel: "#alerts"
