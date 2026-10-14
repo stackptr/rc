@@ -15,6 +15,7 @@
     ./freshrss.nix
     ./grafana.nix
     ./hermes.nix
+    ./hermes-cadu.nix
     ./jellyfin.nix
     ./loki.nix
     ./navidrome.nix
