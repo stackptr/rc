@@ -77,7 +77,7 @@ If `nix` is installed, run `scripts/fmt-sandboxed` instead of `nix fmt .`. Cloud
 
 Grafana, Loki and Prometheus on glyph. Use them before `journalctl` or SSH when investigating failures, slowness or disk issues.
 
-- **Grafana** (glyph:3000, `grafana.zx.dev` via spore): config in `hosts/glyph/services/grafana.nix`; the image renderer (localhost:8081) backs `get_panel_image`.
+- **Grafana** (glyph:3000, `monitoring.zx.dev` via spore): config in `hosts/glyph/services/grafana.nix`; the image renderer (localhost:8081) backs `get_panel_image`.
 - **Loki** (glyph:3100): journald from glyph, spore and zeta via Alloy, oMLX's log from Stroma, plus Claude Code events over OTLP; 30 days.
 - **Prometheus** (glyph:9099): scrapes glyph, spore, zeta and Stroma (node_exporter, mactop, json_exporter for oMLX, Alloy; `hosts/Stroma/monitoring.nix`), plus OTLP pushes; 90 days.
 - **Alert rules**: `hosts/glyph/services/grafana-alerts.nix` (folder "Alerts", routed to Slack). Add rules there, not in the UI.
@@ -192,7 +192,7 @@ Scraped series carry `instance` and an identical `host` label, so `{host="glyph"
 ### Blind spots
 
 Know these before concluding "no data means no problem":
-- Grafana and its database run on glyph: if glyph is down, all Grafana alerting is down too (Gatus still alerts). If spore is down, `grafana.zx.dev` is unreachable but alerting keeps running.
+- Grafana and its database run on glyph: if glyph is down, all Grafana alerting is down too (Gatus still alerts). If spore is down, `monitoring.zx.dev` is unreachable but alerting keeps running.
 - Per-vhost HTTP status and latency exist only as LogQL over `app="nginx_access"`; the `nginx` job is `stub_status` connection counts.
 - Local `just switch` prints switch-to-configuration output only to the terminal; Loki gets the `nixos-deploy` lines and systemd's own unit logs.
 - Deploy workflow output lands in the journal after the deploy finishes (timestamped at the end, without `copying path` lines), and only in GitHub Actions if the host was unreachable.

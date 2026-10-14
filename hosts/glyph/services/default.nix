@@ -118,7 +118,7 @@
   services.mcp-nixos.enable = true;
   services.grafana-mcp = {
     enable = true;
-    grafanaUrl = "https://grafana.zx.dev";
+    grafanaUrl = "https://monitoring.zx.dev";
     tokenFile = config.age.secrets.grafana-mcp-token.path;
   };
   services.obsidian-vault-mcp = {
