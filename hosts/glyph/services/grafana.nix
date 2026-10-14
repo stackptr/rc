@@ -11,10 +11,10 @@
 in {
   imports = [./grafana-alerts.nix];
 
-  # Kept apart from ./ntfy.nix's root-only slack-bot-token: Grafana reads
-  # this one itself, as the grafana user.
+  # Hypha's token: the same file as ./ntfy.nix's root-only slack-bot-token,
+  # decrypted a second time so Grafana can read it as the grafana user.
   age.secrets.grafana-slack-bot-token = {
-    file = ./../secrets/grafana-slack-bot-token.age;
+    file = ./../secrets/slack-bot-token.age;
     mode = "440";
     owner = "grafana";
     group = "grafana";
