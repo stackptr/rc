@@ -116,13 +116,13 @@ in {
           group = "spore";
           url = "tcp://${spore}:22";
           conditions = ["[CONNECTED] == true"];
-          description = "spore is unreachable over the tailnet; *.zx.dev, including grafana.zx.dev, is down with it";
+          description = "spore is unreachable over the tailnet; *.zx.dev, including monitoring.zx.dev, is down with it";
         })
         (mkEndpoint {
           name = "grafana";
           group = "glyph";
           # Through spore's nginx, so this also fails when the proxy does.
-          url = "https://grafana.zx.dev/api/health";
+          url = "https://monitoring.zx.dev/api/health";
           conditions = [
             "[STATUS] == 200"
             "[BODY].database == ok"
@@ -146,12 +146,12 @@ in {
         (mkEndpoint {
           name = "jellyfin";
           group = "sites";
-          url = "https://jellyfin.zx.dev/health";
+          url = "https://media.zx.dev/health";
           conditions = [
             "[STATUS] == 200"
             "[BODY] == Healthy"
           ];
-          description = "jellyfin.zx.dev is down or unhealthy; check jellyfin.service on glyph";
+          description = "media.zx.dev is down or unhealthy; check jellyfin.service on glyph";
         })
         (mkEndpoint {
           name = "navidrome";
