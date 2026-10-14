@@ -67,6 +67,8 @@ To add a secret: add its entry to `lib/secrets/<host>.nix`, create it with `agen
 
 If `nix-flake` isn't on PATH, you're in a sandboxed session without my tooling, and Nix may not be installed. Don't try to evaluate or build. Make the change, push the branch, and open a PR: CI evaluates and builds every host.
 
+If `nix` is installed, run `scripts/fmt-sandboxed` instead of `nix fmt .`. Cloud sessions can't download GitHub tarballs (`github:` inputs fail with HTTP 403) but can `git clone` public repos, so the script overrides the formatter's inputs with shallow git fetches of the locked revs. Shallow matters: a full nixpkgs clone takes far too long. Evaluating hosts would need the same override for most inputs, so leave that to CI.
+
 ## Common Patterns
 
 **`lib.mkForce` vs `lib.mkDefault`:** a host that must diverge from a value a shared module sets uses `lib.mkForce`; without it Nix errors on the conflicting definitions. A shared module that wants hosts to override freely sets `lib.mkDefault` instead. Example: `modules/base/gc.nix` sets `nix.gc.dates = "weekly"`, and `hosts/spore/default.nix` overrides it with `lib.mkForce "daily"`.
