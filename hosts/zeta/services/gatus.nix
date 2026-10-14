@@ -198,6 +198,16 @@ in {
           description = "id.zx.dev (Pocket ID) is down; logins to Grafana and every auth-protected site fail. Check pocket-id.service on spore and its database on glyph";
         })
         (mkEndpoint {
+          name = "home-assistant";
+          group = "sites";
+          # Unauthenticated, so a healthy Home Assistant answers 401. A 400
+          # means it rejected spore's proxy (X-Forwarded-For from a proxy
+          # missing from its UI-managed trusted proxies), as on 2026-10-14.
+          url = "https://home.zx.dev/api/";
+          conditions = ["[STATUS] == 401"];
+          description = "home.zx.dev (Home Assistant) is down or rejecting spore's proxy (400 means Trusted proxies in Settings > System > Network no longer includes 100.64.0.0/10); check home-assistant.service on zeta";
+        })
+        (mkEndpoint {
           name = "models";
           group = "sites";
           # spore proxies / to oMLX's admin UI on Stroma. The UI loads without
