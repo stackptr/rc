@@ -185,7 +185,7 @@ Scraped series carry `instance` and an identical `host` label, so `{host="glyph"
 
 **A rule that never fires:** Grafana's threshold step (C) tests each series' value, by default `> 0`, so a PromQL filter that leaves zeros (`up == 0`, `x != 1` on a 0/1 gauge) matches series but stays Normal. Query the raw value and set `evaluator` in `mkRule` instead (`grafana-alerts.nix`).
 
-**nix-darwin daemons down after a reboot (`launchctl list` shows last exit 78):** launchd starts daemons before the Nix volume is mounted, and a daemon whose `serviceConfig.ProgramArguments` points straight into `/nix/store` fails to spawn and isn't retried. Set `launchd.daemons.<name>.command` instead; nix-darwin wraps it in `/bin/wait4path /nix/store`.
+**nix-darwin daemons down after a reboot (`launchctl list` shows last exit 78, `launchctl print` shows `spawn failed`):** launchd won't start a daemon whose `serviceConfig.ProgramArguments` points straight into `/nix/store`, and `kickstart` hangs. Set `launchd.daemons.<name>.command` instead: nix-darwin runs it through `/bin/sh -c "/bin/wait4path /nix/store && exec …"`, so launchd only starts `/bin/sh`.
 
 **Picking a port on glyph:** grep the repo and check defaults that aren't declared in Nix. Transmission's RPC takes 9091 (`torrents.zx.dev`), so an exporter there fails with "address already in use".
 
