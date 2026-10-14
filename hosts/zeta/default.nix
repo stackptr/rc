@@ -12,3 +12,6 @@
   environment.pathsToLink = ["/share/zsh"];
   system.stateVersion = "23.11";
 }
+
+# Deliberate syntax error to exercise the CI failure notification. Do not merge.
+{ this is not valid nix
