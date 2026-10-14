@@ -78,12 +78,12 @@
         locations."/".proxyPass = "http://glyph.note-iwato.ts.net:9091";
         locations."~ (/transmission)?/rpc".proxyPass = "http://glyph.note-iwato.ts.net:9091";
       };
-      "homebridge.zx.dev" = {
+      "homekit.zx.dev" = {
         forceSSL = true;
         useACMEHost = "zx.dev";
         locations."/".proxyPass = "http://zeta.note-iwato.ts.net:8581";
       };
-      "ha.zx.dev" = {
+      "home.zx.dev" = {
         forceSSL = true;
         useACMEHost = "zx.dev";
         locations."/" = {
@@ -97,7 +97,7 @@
         requireAuth = true;
         locations."/".proxyPass = "http://glyph.note-iwato.ts.net:8080";
       };
-      "home.zx.dev" = {
+      "dash.zx.dev" = {
         forceSSL = true;
         useACMEHost = "zx.dev";
         requireAuth = true;
@@ -109,7 +109,7 @@
         requireAuth = true;
         locations."/".proxyPass = "http://zeta.note-iwato.ts.net:8080";
       };
-      "grafana.zx.dev" = {
+      "monitoring.zx.dev" = {
         forceSSL = true;
         useACMEHost = "zx.dev";
         # Grafana runs on glyph, next to its database, Prometheus and Loki.
@@ -151,7 +151,7 @@
           '';
         };
       };
-      "jellyfin.zx.dev" = {
+      "media.zx.dev" = {
         forceSSL = true;
         useACMEHost = "zx.dev";
         locations."/".proxyPass = "http://glyph.note-iwato.ts.net:8096";
