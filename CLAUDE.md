@@ -50,6 +50,8 @@ agenix, least privilege: each host decrypts only its own secrets plus the admin 
 agenix -e hosts/spore/secrets/some-secret.age   # edit (needs a key that can decrypt it)
 agenix --rekey                                  # after adding a host key
 ```
+macOS hosts get agenix's darwin module too: Stroma's system secrets decrypt at boot with sshd's host key (`/etc/ssh/ssh_host_ed25519_key`, which `hosts/Stroma/key.pub` holds), so its services can read them before login. Home-manager secrets on every host decrypt with the shared `home` key (`~/.ssh/id_ed25519_agenix`) only after login.
+
 To add a secret: add its entry to `lib/secrets/<host>.nix`, create it with `agenix -e hosts/<host>/secrets/<name>.age`, and reference it with `age.secrets.<name>.file`. A new host needs its key in `lib/keys.nix` and in the relevant secrets entries before it can decrypt anything.
 
 ## Branching
@@ -178,7 +180,7 @@ Scraped series carry `instance` and an identical `host` label, so `{host="glyph"
 | `grafana` | 3000 | glyph | Grafana itself: `grafana_alerting_rule_evaluation_failures_total`, notification and HTTP metrics |
 | `alloy` | 12345 | glyph, spore, zeta, stroma | Alloy itself: `loki_write_sent_entries_total`, `loki_write_dropped_entries_total`, journal read counters |
 | `mcpjungle` | 8090 | glyph | MCP gateway tool calls: `mcpjungle_tool_calls_ratio_total{mcp_server_name, tool_name, outcome}` and `mcpjungle_tool_call_latency_seconds`. `outcome="error"` means the gateway couldn't reach or talk to the upstream server, not a tool's own error result. The `_ratio` comes from the OTel unit `"1"`; series appear after a tool's first call |
-| `omlx` | 7979/probe | stroma | oMLX via json_exporter, which fetches `http://127.0.0.1:8000/api/status` per scrape with the oMLX sub-key in `~/.omlx/monitoring-key` (a missing or rejected key makes `up` 0): `omlx_requests_{active,waiting}`, `omlx_{requests,prompt_tokens,completion_tokens,cached_tokens}_total`, `omlx_models_{loaded,loading,discovered}`, `omlx_loaded_model_info{model}`, `omlx_model_memory_used_bytes`, `omlx_avg_{prefill,generation}_tokens_per_second`, `omlx_cache_efficiency_percent`, `omlx_info{version}`. Counters reset when oMLX restarts and the averages run from its start; `up == 0` means oMLX isn't answering |
+| `omlx` | 7979/probe | stroma | oMLX via json_exporter, which fetches `http://127.0.0.1:8000/api/status` per scrape with the oMLX sub-key from agenix (`omlx-monitoring-key.age`; a missing or rejected key makes `up` 0): `omlx_requests_{active,waiting}`, `omlx_{requests,prompt_tokens,completion_tokens,cached_tokens}_total`, `omlx_models_{loaded,loading,discovered}`, `omlx_loaded_model_info{model}`, `omlx_model_memory_used_bytes`, `omlx_avg_{prefill,generation}_tokens_per_second`, `omlx_cache_efficiency_percent`, `omlx_info{version}`. Counters reset when oMLX restarts and the averages run from its start; `up == 0` means oMLX isn't answering |
 | `open-webui` | push (OTLP) | glyph | `http_server_requests_total`, `http_server_duration_*`, `webui_users_*`; pushed to Prometheus's OTLP receiver, not scraped, so no `up` series |
 
 **Picking a port on glyph:** grep the repo and check defaults that aren't declared in Nix. Transmission's RPC takes 9091 (`torrents.zx.dev`), so an exporter there fails with "address already in use".

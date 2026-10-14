@@ -107,6 +107,7 @@ inputs @ {
         ./../modules/base
         ./../modules/darwin
         ./../hosts/${configDir}
+        agenix.darwinModules.default
         home-manager.darwinModules.home-manager
         (mkHomeManager {
           inherit username hostname system lightweight configDir;
