@@ -102,6 +102,14 @@
     group = "grafana-mcp";
   };
 
+  # Created by hand with the token from GoodLinks' Settings → API on Stroma:
+  #   direnv exec . agenix -e hosts/glyph/secrets/goodlinks-api-token.age
+  # LoadCredential reads it as root, so it stays root-only.
+  age.secrets.goodlinks-api-token = {
+    file = ./../secrets/goodlinks-api-token.age;
+    mode = "400";
+  };
+
   services.basic-memory.enable = true;
   rc.backup = {
     enable = true;
@@ -121,6 +129,13 @@
     grafanaUrl = "https://monitoring.zx.dev";
     tokenFile = config.age.secrets.grafana-mcp-token.path;
   };
+  # GoodLinks' API on Stroma, forwarded to the tailnet by
+  # hosts/Stroma/programs.nix.
+  services.goodlinks-mcp = {
+    enable = true;
+    goodlinksUrl = "http://stroma.note-iwato.ts.net:9429/api/v1";
+    tokenFile = config.age.secrets.goodlinks-api-token.path;
+  };
   services.obsidian-vault-mcp = {
     enable = true;
     inherit (config.rc.obsidian-sync) vaultPath;
@@ -135,7 +150,7 @@
   # tool list doesn't.
   systemd.timers.mcpjungle-register.restartTriggers =
     map (name: config.systemd.units."${name}.service".unit)
-    ["basic-memory" "mcp-nixos" "grafana-mcp" "obsidian-vault-mcp"];
+    ["basic-memory" "mcp-nixos" "grafana-mcp" "goodlinks-mcp" "obsidian-vault-mcp"];
   services.mcpjungle = {
     enable = true;
     servers.basic-memory = {
@@ -156,6 +171,10 @@
     servers.grafana = {
       url = "http://127.0.0.1:8095/mcp";
       description = "Grafana dashboards, Loki logs, and Prometheus metrics";
+    };
+    servers.goodlinks = {
+      url = "http://127.0.0.1:8093/mcp";
+      description = "Read-later library in GoodLinks (on Stroma): search, article content, tags, highlights";
     };
     servers.obsidian-vault = {
       url = "http://127.0.0.1:8097/mcp";
