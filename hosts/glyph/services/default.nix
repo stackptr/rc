@@ -68,9 +68,9 @@
       iptables -A nixos-fw -p udp --dport 30000:65535 -s 192.168.4.0/24 -j nixos-fw-accept
     '';
   };
-  services.tailscale = {
+  rc.tailscale.server = {
     enable = true;
-    extraUpFlags = ["--ssh"];
+    ssh = true;
   };
 
   age.secrets.obsidian-auth-token = {
