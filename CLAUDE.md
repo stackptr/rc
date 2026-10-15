@@ -91,6 +91,8 @@ Grafana, Loki and Prometheus on glyph. Use them before `journalctl` or SSH when 
 
 **MCPJungle** serves the tool list it fetched when each server registered. `mcpjungle-register` re-registers every server at boot and when a local server's unit changes (`restartTriggers` in `hosts/glyph/services/default.nix`); by hand: `systemctl restart mcpjungle-register`. Re-registering deregisters first, so a server that fails loses its tools and the unit exits non-zero (the "Systemd unit failed" alert fires); `{unit="mcpjungle-register.service"} |= "ERROR"` names it. Servers needing auth take `headers` plus an `environmentFile`.
 
+Registration is authoritative: the unit also deregisters any server not in `services.mcpjungle.servers` (so don't register one by hand), re-applies each server's `disabledTools`, and then recreates the tool groups in `services.mcpjungle.groups`, each served at `/v0/groups/<name>/mcp` (Open WebUI uses `chat`). Groups are deleted and recreated, not updated: while servers re-sync in parallel, MCPJungle can leave a re-added tool out of a group's endpoint even though `GET /api/v0/tool-groups/<name>/effective-tools` lists it, and `update group` with an unchanged config doesn't repair it. A group that includes a disabled tool can't be created, so the module adds every `disabledTools` entry to each group's `excluded_tools`.
+
 **Grafana exits with "Using the default [rendering]renderer_token is not allowed":** Grafana 13 rejects the default token whenever an image renderer is configured. `grafana.nix` sets the same `rendererToken` on both sides; keep them in sync.
 
 ### Loki label schema
