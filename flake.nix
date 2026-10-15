@@ -56,6 +56,14 @@
     attic = {
       url = "github:zhaofengli/attic";
     };
+    # Pinned to a release tag: main moves several times a day and the Update
+    # workflow would follow it. Bump the tag by hand. nixpkgs is not followed:
+    # Hermes picks its Python from its own lock (pm/lock.json) and refuses a
+    # nixpkgs without that version, and upstream builds only against its own.
+    hermes-agent = {
+      url = "github:NousResearch/hermes-agent/v0.21.7";
+      inputs.flake-parts.follows = "flake-parts";
+    };
     zx-dev = {
       url = "github:stackptr/zx.dev";
       inputs.nixpkgs.follows = "nixpkgs";
