@@ -34,6 +34,16 @@
       interface = "eth0";
     };
     nameservers = ["8.8.8.8"];
+    # nginx resolves every proxy_pass host when it loads its config, and
+    # fails to start or reload if one doesn't resolve. Through MagicDNS
+    # these names don't while tailscaled is down or restarting (as in the
+    # 2026-10-11 lockout, or a deploy that upgrades it), and a failed nginx
+    # takes id.zx.dev down with it. Tailnet IPs stay with a machine across
+    # logins; if one changes, update it here.
+    hosts = {
+      "100.79.196.96" = ["glyph.note-iwato.ts.net"];
+      "100.100.142.9" = ["zeta.note-iwato.ts.net"];
+    };
   };
 
   networking.firewall.allowedTCPPorts = [80 443];
