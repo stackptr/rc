@@ -73,6 +73,8 @@ If `nix` is installed, run `scripts/fmt-sandboxed` instead of `nix fmt .`. Cloud
 
 ## Common Patterns
 
+**launchd daemons on macOS hosts:** set `launchd.daemons.<name>.command`, not `serviceConfig.ProgramArguments`, when the program is in `/nix/store`. nix-darwin wraps `command` in `/bin/wait4path /nix/store`; with ProgramArguments, launchd starts the daemon at boot before the Nix volume is mounted, and it stays down until the next switch (Stroma's alloy, mactop and json-exporter were down for three days after a reboot). Programs outside the store, like oMLX from Homebrew, are fine either way.
+
 **`lib.mkForce` vs `lib.mkDefault`:** a host that must diverge from a value a shared module sets uses `lib.mkForce`; without it Nix errors on the conflicting definitions. A shared module that wants hosts to override freely sets `lib.mkDefault` instead. Example: `modules/base/gc.nix` sets `nix.gc.dates = "weekly"`, and `hosts/spore/default.nix` overrides it with `lib.mkForce "daily"`.
 
 ## Monitoring Stack
