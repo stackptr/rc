@@ -39,12 +39,12 @@ nix-flake eval darwinConfigurations.<host>.system.drvPath                       
 ## Key Configuration Details
 
 - Usernames: `mu` on Linux, `corey` on macOS
-- SSH key authentication everywhere; keys in `lib/keys.nix`, each host's read from `hosts/<host>/key.pub`
+- SSH key authentication everywhere; keys in `lib/keys.nix`. `keys.<host>` is the host's sshd host key from `hosts/<host>/key.pub` (agenix recipient, deploy known_hosts); `keys.users.<host>` is the login key (`~/.ssh/id_ed25519.pub`) of a machine people SSH from, read from `hosts/<host>/user.pub`, for `authorized_keys` only
 - macOS hosts use nix-homebrew with taps pinned as flake inputs (`mutableTaps = false` in `lib/hosts.nix`)
 
 ## Secrets
 
-agenix, least privilege: each host decrypts only its own secrets. The admin recipients are two YubiKeys (`keys.admins` in `lib/keys.nix`; age-plugin-yubikey, PIV slot 1): `a` for daily use, `b` an offline spare. Their identity files in `lib/admin/` only point at the YubiKey slot and aren't secret. Host rules are built by `lib/secrets/mk-host.nix` (`import ./mk-host.nix "<host>" ["<name>" ...]` gives `hosts/<host>/secrets/<name>.age` the host's key plus `keys.admins`); shared and home-manager rules are written out in `lib/secrets/default.nix`, `home.nix` and `lobtop.nix`.
+agenix, least privilege: each host decrypts only its own secrets. The admin recipients are two YubiKeys (`keys.admins` in `lib/keys.nix`; age-plugin-yubikey, PIV slot 1): `a` for daily use, `b` an offline spare. Their identity files in `lib/admin/` only point at the YubiKey slot and aren't secret. Host rules are built by `lib/secrets/mk-host.nix` (`import ./mk-host.nix "<host>" ["<name>" ...]` gives `hosts/<host>/secrets/<name>.age` the host's key plus `keys.admins`); secrets shared by several hosts are written out in `lib/secrets/default.nix` (system) and `home.nix` (user).
 
 ```bash
 agenix -e hosts/spore/secrets/some-secret.age -i lib/admin/yubikey-a.txt   # edit: PIV PIN, then touch
@@ -52,7 +52,7 @@ agenix -r -i lib/admin/yubikey-a.txt                                       # re-
 ```
 Creating a secret, or replacing one from stdin (`echo -n value | agenix -e ...`), only encrypts and needs no YubiKey. The devShell puts `age-plugin-yubikey` on PATH, which agenix's `age` needs to use YubiKey recipients and identities. `agenix -c` can't check age-plugin recipients and fails on every file, so don't rely on it.
 
-macOS hosts get agenix's darwin module too: Stroma's system secrets decrypt at boot with sshd's host key (`/etc/ssh/ssh_host_ed25519_key`, which `hosts/Stroma/key.pub` holds), so its services can read them before login. Home-manager secrets on every host decrypt with the shared `home` key (`~/.ssh/id_ed25519_agenix`) only after login.
+Every host, macOS included, decrypts with one identity: sshd's host key (`/etc/ssh/ssh_host_ed25519_key`, which `hosts/<host>/key.pub` holds; on a Mac, `sudo ssh-keygen -A` creates it). On macOS agenix's darwin module decrypts at boot, before login. There's no home-manager agenix: a user's secret is a system secret with `owner = username`, declared in the host's config, and home-manager reads its path from `osConfig.age.secrets.<name>.path`. aichat is only installed on hosts that declare `aichat-env`.
 
 To add a secret: add its name to the host's list in `lib/secrets/<host>.nix`, create it with `agenix -e hosts/<host>/secrets/<name>.age`, and reference it with `age.secrets.<name>.file`. A new host needs `hosts/<host>/key.pub`, an entry in `lib/keys.nix`, and a `lib/secrets/<host>.nix` imported by `lib/secrets.nix` before it can decrypt anything.
 

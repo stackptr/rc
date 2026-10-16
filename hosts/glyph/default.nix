@@ -1,4 +1,8 @@
-{config, ...}: {
+{
+  config,
+  username,
+  ...
+}: {
   imports = [
     ./hardware.nix
     ./services
@@ -67,6 +71,18 @@
   age.secrets.user-password.file = ./secrets/user-password.age;
 
   users.users.mu.hashedPasswordFile = config.age.secrets.user-password.path;
+
+  # User secrets, read by home-manager through osConfig
+  age.secrets = {
+    aichat-env = {
+      file = ../../home/secrets/aichat-env.age;
+      owner = username;
+    };
+    opencode-env = {
+      file = ./secrets/opencode-env.age;
+      owner = username;
+    };
+  };
 
   system.stateVersion = "24.05";
 }

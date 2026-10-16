@@ -1,8 +1,7 @@
-# Home-manager secrets, decrypted with the shared `home` key
+# User secrets shared by several hosts. Each host decrypts them with its own
+# host key and gives them to its user (owner = username).
 let
   keys = import ../keys.nix;
-  recipients = [keys.home] ++ keys.admins;
 in {
-  "home/secrets/aichat-env.age".publicKeys = recipients;
-  "home/secrets/opencode-env.age".publicKeys = recipients;
+  "home/secrets/aichat-env.age".publicKeys = [keys.glyph keys.Rhizome keys.Stroma] ++ keys.admins;
 }

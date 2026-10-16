@@ -13,4 +13,5 @@ import ./mk-host.nix "glyph" [
   "user-password"
   "obsidian-auth-token"
   "navidrome-env"
+  "opencode-env"
 ]

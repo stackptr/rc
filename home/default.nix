@@ -1,5 +1,4 @@
 {
-  config,
   pkgs,
   lib,
   lightweight,
@@ -7,10 +6,6 @@
 }: {
   imports = [
     ./programs
-  ];
-
-  age.identityPaths = [
-    "${config.home.homeDirectory}/.ssh/id_ed25519_agenix"
   ];
 
   rc = lib.mkMerge [

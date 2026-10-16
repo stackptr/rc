@@ -1,5 +1,6 @@
 {
   config,
+  osConfig,
   pkgs,
   ...
 }: {
@@ -8,10 +9,6 @@
   # MCP servers on a work machine are managed by my employer, and lobtop
   # can't reach the gateway on glyph anyway.
   rc.development.ai.gateway.enable = false;
-
-  age.secrets.otel-token = {
-    file = ./secrets/otel-token.age;
-  };
 
   programs.claude-code.settings.env = {
     CLAUDE_CODE_USE_BEDROCK = "1";
@@ -30,7 +27,7 @@
   };
 
   programs.zsh.initContent = ''
-    export OTEL_EXPORTER_OTLP_HEADERS="Authorization=Bearer $(cat ${config.age.secrets.otel-token.path})"
+    export OTEL_EXPORTER_OTLP_HEADERS="Authorization=Bearer $(cat ${osConfig.age.secrets.otel-token.path})"
     if [[ -f "${config.home.homeDirectory}/Development/lob/shell-integration.zsh" ]]; then
       source ${config.home.homeDirectory}/Development/lob/shell-integration.zsh
     fi
