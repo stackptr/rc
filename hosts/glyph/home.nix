@@ -8,6 +8,13 @@
 in {
   home.packages = [pkgs.mktorrent pkgs.obsidian-headless];
 
+  # `just switch-remote spore` and the tailnet-lockout tunnel log in to spore
+  # and zeta as root with glyph's client key, decrypted by agenix at boot.
+  programs.ssh.matchBlocks."spore zeta *.note-iwato.ts.net" = {
+    identityFile = osConfig.age.secrets.ssh-client-key.path;
+    identitiesOnly = true;
+  };
+
   programs.opencode = {
     enable = true;
     enableMcpIntegration = true;

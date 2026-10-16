@@ -82,6 +82,11 @@
       file = ./secrets/opencode-env.age;
       owner = username;
     };
+    # glyph's SSH client key (keys.clients.glyph) for root on spore and zeta
+    ssh-client-key = {
+      file = ./secrets/ssh-client-key.age;
+      owner = username;
+    };
   };
 
   system.stateVersion = "24.05";
