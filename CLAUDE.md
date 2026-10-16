@@ -44,15 +44,17 @@ nix-flake eval darwinConfigurations.<host>.system.drvPath                       
 
 ## Secrets
 
-agenix, least privilege: each host decrypts only its own secrets plus the admin keys. Recipients are listed per host in `lib/secrets/<host>.nix` (shared ones in `lib/secrets/default.nix`).
+agenix, least privilege: each host decrypts only its own secrets. The admin recipients are two YubiKeys (`keys.admins` in `lib/keys.nix`; age-plugin-yubikey, PIV slot 1): `a` for daily use, `b` an offline spare. Their identity files in `lib/admin/` only point at the YubiKey slot and aren't secret. Host rules are built by `lib/secrets/mk-host.nix` (`import ./mk-host.nix "<host>" ["<name>" ...]` gives `hosts/<host>/secrets/<name>.age` the host's key plus `keys.admins`); shared and home-manager rules are written out in `lib/secrets/default.nix`, `home.nix` and `lobtop.nix`.
 
 ```bash
-agenix -e hosts/spore/secrets/some-secret.age   # edit (needs a key that can decrypt it)
-agenix --rekey                                  # after adding a host key
+agenix -e hosts/spore/secrets/some-secret.age -i lib/admin/yubikey-a.txt   # edit: PIV PIN, then touch
+agenix -r -i lib/admin/yubikey-a.txt                                       # re-encrypt after changing recipients
 ```
+Creating a secret, or replacing one from stdin (`echo -n value | agenix -e ...`), only encrypts and needs no YubiKey. The devShell puts `age-plugin-yubikey` on PATH, which agenix's `age` needs to use YubiKey recipients and identities. `agenix -c` can't check age-plugin recipients and fails on every file, so don't rely on it.
+
 macOS hosts get agenix's darwin module too: Stroma's system secrets decrypt at boot with sshd's host key (`/etc/ssh/ssh_host_ed25519_key`, which `hosts/Stroma/key.pub` holds), so its services can read them before login. Home-manager secrets on every host decrypt with the shared `home` key (`~/.ssh/id_ed25519_agenix`) only after login.
 
-To add a secret: add its entry to `lib/secrets/<host>.nix`, create it with `agenix -e hosts/<host>/secrets/<name>.age`, and reference it with `age.secrets.<name>.file`. A new host needs its key in `lib/keys.nix` and in the relevant secrets entries before it can decrypt anything.
+To add a secret: add its name to the host's list in `lib/secrets/<host>.nix`, create it with `agenix -e hosts/<host>/secrets/<name>.age`, and reference it with `age.secrets.<name>.file`. A new host needs `hosts/<host>/key.pub`, an entry in `lib/keys.nix`, and a `lib/secrets/<host>.nix` imported by `lib/secrets.nix` before it can decrypt anything.
 
 ## Branching
 

@@ -216,6 +216,7 @@
             packages =
               [
                 inputs'.agenix.packages.default
+                pkgs.age-plugin-yubikey
                 pkgs.just
               ]
               ++ config.pre-commit.settings.enabledPackages;
