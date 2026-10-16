@@ -27,6 +27,11 @@ in
       lobtop = firstLine (builtins.readFile ./../hosts/lobtop/user.pub);
     };
 
+    # SSH login keys on the YubiKeys (FIDO2 ed25519-sk, resident, application
+    # ssh:rc), for authorized_keys with verify-required: every login needs the
+    # FIDO2 PIN and a touch. b is the offline spare.
+    yubikeys = map (k: firstLine (builtins.readFile ./admin/ssh-yubikey-${k}.pub)) ["a" "b"];
+
     # agenix admin recipients: age-plugin-yubikey keys (PIV slot 1, PIN once,
     # touch cached). Identity files are in lib/admin/; b is the offline spare.
     admins = [

@@ -29,7 +29,9 @@
       KbdInteractiveAuthentication no
     '';
   };
-  users.users.${config.system.primaryUser}.openssh.authorizedKeys.keys = [keys.users.Rhizome];
+  users.users.${config.system.primaryUser}.openssh.authorizedKeys.keys =
+    [keys.users.Rhizome]
+    ++ map (k: "verify-required ${k}") keys.yubikeys;
 
   # A user secret, read by home-manager through osConfig
   age.secrets.aichat-env = {
