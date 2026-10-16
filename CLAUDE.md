@@ -39,7 +39,7 @@ nix-flake eval darwinConfigurations.<host>.system.drvPath                       
 ## Key Configuration Details
 
 - Usernames: `mu` on Linux, `corey` on macOS
-- SSH key authentication everywhere; keys in `lib/keys.nix`. `keys.<host>` is the host's sshd host key from `hosts/<host>/key.pub` (agenix recipient, deploy known_hosts); `keys.users.<host>` is the login key (`~/.ssh/id_ed25519.pub`) of a machine people SSH from, read from `hosts/<host>/user.pub`, for `authorized_keys` only
+- SSH key authentication everywhere; keys in `lib/keys.nix`. `keys.<host>` is the host's sshd host key from `hosts/<host>/key.pub` (agenix recipient, deploy known_hosts); `keys.users.<host>` is the login key (`~/.ssh/id_ed25519.pub`) of a machine people SSH from, read from `hosts/<host>/user.pub`, for `authorized_keys` only; `keys.yubikeys` are the YubiKeys' FIDO2 SSH keys (`lib/admin/ssh-yubikey-{a,b}.pub`), listed with `verify-required` so every login needs the FIDO2 PIN and a touch. The Macs use nixpkgs' OpenSSH (Apple's can't use security keys); a missing key handle comes back with `ssh-keygen -K`
 - macOS hosts use nix-homebrew with taps pinned as flake inputs (`mutableTaps = false` in `lib/hosts.nix`)
 
 ## Secrets
