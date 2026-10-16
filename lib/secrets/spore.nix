@@ -10,4 +10,5 @@ import ./mk-host.nix "spore" [
   "oauth2-proxy-env"
   "pocket-id-encryption-key"
   "tailscale-auth-key"
+  "user-password"
 ]
