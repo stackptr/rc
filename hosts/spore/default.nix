@@ -72,5 +72,10 @@
     max-free = 5 * 1024 * 1024 * 1024; # 5 GB — stop GC once this much space is free
   };
 
+  # For logging in at CloudCone's web console when SSH is unavailable.
+  # sshd never accepts it (modules/nixos/ssh.nix).
+  age.secrets.user-password.file = ./secrets/user-password.age;
+  users.users.mu.hashedPasswordFile = config.age.secrets.user-password.path;
+
   system.stateVersion = "24.05";
 }
