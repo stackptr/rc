@@ -42,7 +42,6 @@ inputs @ {
         [
           nix-index-database.homeModules.nix-index
           direnv-instant.homeModules.direnv-instant
-          agenix.homeManagerModules.default
           ./../modules/home
           ./../home
         ]

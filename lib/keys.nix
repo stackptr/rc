@@ -17,8 +17,15 @@ let
 in
   builtins.listToAttrs hostKeyPairs
   // {
-    home = firstLine (builtins.readFile ./../home/key.pub);
     deploy = firstLine (builtins.readFile ./deploy.pub);
+
+    # SSH login keys (~/.ssh/id_ed25519.pub) of the hosts people SSH from, for
+    # authorized_keys only. The attributes above are host keys: agenix
+    # recipients and known_hosts.
+    users = {
+      Rhizome = firstLine (builtins.readFile ./../hosts/Rhizome/user.pub);
+      lobtop = firstLine (builtins.readFile ./../hosts/lobtop/user.pub);
+    };
 
     # agenix admin recipients: age-plugin-yubikey keys (PIV slot 1, PIN once,
     # touch cached). Identity files are in lib/admin/; b is the offline spare.

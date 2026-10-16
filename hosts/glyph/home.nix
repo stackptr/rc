@@ -1,6 +1,6 @@
 {
-  config,
   llm-profile,
+  osConfig,
   pkgs,
   ...
 }: let
@@ -26,7 +26,7 @@ in {
         npm = "@ai-sdk/openai-compatible";
         name = "Stroma";
         options.baseURL = "http://stroma.note-iwato.ts.net:8000/v1";
-        # An oMLX sub-key, from opencode-env.age below
+        # An oMLX sub-key, from opencode-env.age (hosts/glyph/default.nix)
         options.apiKey = "{env:STROMA_API_KEY}";
         models.${stromaModel}.name = "Qwen 3.8 27B";
       };
@@ -34,11 +34,7 @@ in {
   };
 
   systemd.user.services.opencode-web.Service.EnvironmentFile =
-    config.age.secrets.opencode-env.path;
-
-  age.secrets.opencode-env = {
-    file = ../../home/secrets/opencode-env.age;
-  };
+    osConfig.age.secrets.opencode-env.path;
 
   programs.beets = {
     enable = true;

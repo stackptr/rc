@@ -2,6 +2,7 @@
   config,
   keys,
   pkgs,
+  username,
   ...
 }: {
   imports = [
@@ -28,5 +29,11 @@
       KbdInteractiveAuthentication no
     '';
   };
-  users.users.${config.system.primaryUser}.openssh.authorizedKeys.keys = [keys.Rhizome];
+  users.users.${config.system.primaryUser}.openssh.authorizedKeys.keys = [keys.users.Rhizome];
+
+  # A user secret, read by home-manager through osConfig
+  age.secrets.aichat-env = {
+    file = ../../home/secrets/aichat-env.age;
+    owner = username;
+  };
 }

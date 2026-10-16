@@ -7,16 +7,16 @@
   ...
 }: {
   users.users.root.openssh.authorizedKeys.keys = [
-    keys.Rhizome
+    keys.users.Rhizome
     keys.glyph
     keys.deploy
   ];
 
   users.users.mu.openssh.authorizedKeys.keys = [
-    keys.Rhizome
+    keys.users.Rhizome
     keys.glyph
     keys.Stroma
-    keys.lobtop
+    keys.users.lobtop
   ];
 
   # Keys only. Both default to true in NixOS, and mu has a password on
