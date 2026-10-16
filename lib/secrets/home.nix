@@ -1,6 +1,8 @@
+# Home-manager secrets, decrypted with the shared `home` key
 let
-  keys = with (import ../keys.nix); [home Rhizome];
+  keys = import ../keys.nix;
+  recipients = [keys.home] ++ keys.admins;
 in {
-  "home/secrets/aichat-env.age".publicKeys = keys;
-  "home/secrets/opencode-env.age".publicKeys = keys;
+  "home/secrets/aichat-env.age".publicKeys = recipients;
+  "home/secrets/opencode-env.age".publicKeys = recipients;
 }

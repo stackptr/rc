@@ -1,18 +1,16 @@
-let
-  keys = with (import ../keys.nix); [glyph Rhizome];
-in {
-  "hosts/glyph/secrets/filebrowser-env.age".publicKeys = keys;
-  "hosts/glyph/secrets/slack-bot-token.age".publicKeys = keys;
-  "hosts/glyph/secrets/grafana-client-secret.age".publicKeys = keys;
-  "hosts/glyph/secrets/grafana-secret-key.age".publicKeys = keys;
-  "hosts/glyph/secrets/kagi-api-key.age".publicKeys = keys;
-  "hosts/glyph/secrets/context7-api-key.age".publicKeys = keys;
-  "hosts/glyph/secrets/open-terminal-env.age".publicKeys = keys;
-  "hosts/glyph/secrets/open-webui-api-key.age".publicKeys = keys;
-  "hosts/glyph/secrets/open-webui-env.age".publicKeys = keys;
-  "hosts/glyph/secrets/grafana-mcp-token.age".publicKeys = keys;
-  "hosts/glyph/secrets/attic-credentials.age".publicKeys = keys;
-  "hosts/glyph/secrets/user-password.age".publicKeys = keys;
-  "hosts/glyph/secrets/obsidian-auth-token.age".publicKeys = keys;
-  "hosts/glyph/secrets/navidrome-env.age".publicKeys = keys;
-}
+import ./mk-host.nix "glyph" [
+  "filebrowser-env"
+  "slack-bot-token"
+  "grafana-client-secret"
+  "grafana-secret-key"
+  "kagi-api-key"
+  "context7-api-key"
+  "open-terminal-env"
+  "open-webui-api-key"
+  "open-webui-env"
+  "grafana-mcp-token"
+  "attic-credentials"
+  "user-password"
+  "obsidian-auth-token"
+  "navidrome-env"
+]
