@@ -39,7 +39,9 @@ nix-flake eval darwinConfigurations.<host>.system.drvPath                       
 ## Key Configuration Details
 
 - Usernames: `mu` on Linux, `corey` on macOS
-- SSH key authentication everywhere; keys in `lib/keys.nix`. `keys.<host>` is the host's sshd host key from `hosts/<host>/key.pub` (agenix recipient, deploy known_hosts); `keys.users.<host>` is the login key (`~/.ssh/id_ed25519.pub`) of a machine people SSH from, read from `hosts/<host>/user.pub`, for `authorized_keys` only; `keys.yubikeys` are the YubiKeys' FIDO2 SSH keys (`lib/admin/ssh-yubikey-{a,b}.pub`), listed with `verify-required` so every login needs the FIDO2 PIN and a touch. The Macs use nixpkgs' OpenSSH (Apple's can't use security keys); a missing key handle comes back with `ssh-keygen -K`
+- SSH key authentication everywhere; keys in `lib/keys.nix`. `keys.<host>` is the host's sshd host key from `hosts/<host>/key.pub` (agenix recipient, deploy known_hosts), never a login key.
+- People log in only with the YubiKeys: `keys.yubikeys` (`lib/admin/ssh-yubikey-{a,b}.pub`, FIDO2 `ed25519-sk`), listed with `verify-required`, so every login needs the FIDO2 PIN and a touch. That's mu's and root's `authorized_keys` on the NixOS hosts and the user's on Stroma. The Macs use nixpkgs' OpenSSH (Apple's client can't use security keys) with `IdentityAgent none` for the servers; on a new Mac, `ssh-keygen -K` recreates the key handles, renamed to `~/.ssh/id_ed25519_sk_rc_{a,b}`. nixpkgs' `ssh` gets "No route to host" to LAN IPs (macOS Local Network privacy), so use tailnet names.
+- Unattended SSH is root only: `keys.deploy` (CI) everywhere, and `keys.clients.glyph` on spore and zeta (`hosts/glyph/client.pub`; private key is glyph's agenix secret `ssh-client-key`, used by mu's SSH config on glyph). Nothing logs into glyph unattended. Tailscale SSH is off (`extraSetFlags = ["--ssh=false"]` on glyph and zeta), so port 22 on tailnet addresses reaches sshd
 - macOS hosts use nix-homebrew with taps pinned as flake inputs (`mutableTaps = false` in `lib/hosts.nix`)
 
 ## Secrets
@@ -214,7 +216,7 @@ Know these before concluding "no data means no problem":
 
 Tailscale logs in through Pocket ID (`id.zx.dev`, on spore), whose database is on glyph over the tailnet. If glyph's or spore's node key expires, `id.zx.dev` returns 502 (and `cache.zx.dev` 504), so no device can log back in. Break the cycle with a reverse SSH tunnel to glyph's Postgres (`pg_hba` trusts loopback) over spore's public IP:
 ```bash
-ssh -N -R 127.0.0.1:5432:127.0.0.1:5432 root@<spore-public-ip>    # on glyph, over the LAN; keep it running
+ssh -i /run/agenix/ssh-client-key -N -R 127.0.0.1:5432:127.0.0.1:5432 root@<spore-public-ip>    # on glyph as mu; keep it running
 # on spore (runtime only; gone on reboot):
 mkdir -p /run/systemd/system/pocket-id.service.d
 echo 'DB_CONNECTION_STRING=postgres://pocketid@127.0.0.1/pocketid' > /run/pocket-id-override.env

@@ -15,17 +15,15 @@ let
       "zeta"
     ];
 in
+  # keys.<host> are sshd host keys: agenix recipients and known_hosts, never
+  # login keys.
   builtins.listToAttrs hostKeyPairs
   // {
     deploy = firstLine (builtins.readFile ./deploy.pub);
 
-    # SSH login keys (~/.ssh/id_ed25519.pub) of the hosts people SSH from, for
-    # authorized_keys only. The attributes above are host keys: agenix
-    # recipients and known_hosts.
-    users = {
-      Rhizome = firstLine (builtins.readFile ./../hosts/Rhizome/user.pub);
-      lobtop = firstLine (builtins.readFile ./../hosts/lobtop/user.pub);
-    };
+    # glyph's SSH client key, for its unattended jobs on spore and zeta (root).
+    # The private half is glyph's agenix secret ssh-client-key, owned by mu.
+    clients.glyph = firstLine (builtins.readFile ./../hosts/glyph/client.pub);
 
     # SSH login keys on the YubiKeys (FIDO2 ed25519-sk, resident, application
     # ssh:rc), for authorized_keys with verify-required: every login needs the

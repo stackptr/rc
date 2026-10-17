@@ -20,7 +20,7 @@
     system = true;
   };
 
-  # Remote Login, open only to Rhizome. sshd's host key is also Stroma's
+  # Remote Login, open only to the YubiKeys. sshd's host key is also Stroma's
   # agenix identity (hosts/Stroma/key.pub).
   services.openssh = {
     enable = true;
@@ -30,8 +30,7 @@
     '';
   };
   users.users.${config.system.primaryUser}.openssh.authorizedKeys.keys =
-    [keys.users.Rhizome]
-    ++ map (k: "verify-required ${k}") keys.yubikeys;
+    map (k: "verify-required ${k}") keys.yubikeys;
 
   # A user secret, read by home-manager through osConfig
   age.secrets.aichat-env = {
