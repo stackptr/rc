@@ -1,8 +1,3 @@
-# Global secrets that multiple hosts need access to
-let
-  keys = import ../keys.nix;
-  recipients = [keys.glyph keys.spore] ++ keys.admins;
-in {
-  "secrets/restic-env.age".publicKeys = recipients;
-  "secrets/restic-password.age".publicKeys = recipients;
-}
+# System secrets that several hosts decrypt. Prefer one secret per host: two
+# hosts sharing a credential can each use (or leak) the other's access.
+{}

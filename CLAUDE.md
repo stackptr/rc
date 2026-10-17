@@ -46,7 +46,7 @@ nix-flake eval darwinConfigurations.<host>.system.drvPath                       
 
 ## Secrets
 
-agenix, least privilege: each host decrypts only its own secrets. The admin recipients are two YubiKeys (`keys.admins` in `lib/keys.nix`; age-plugin-yubikey, PIV slot 1): `a` for daily use, `b` an offline spare. Their identity files in `lib/admin/` only point at the YubiKey slot and aren't secret. Host rules are built by `lib/secrets/mk-host.nix` (`import ./mk-host.nix "<host>" ["<name>" ...]` gives `hosts/<host>/secrets/<name>.age` the host's key plus `keys.admins`); secrets shared by several hosts are written out in `lib/secrets/default.nix` (system) and `home.nix` (user).
+agenix, least privilege: each host decrypts only its own secrets. The admin recipients are two YubiKeys (`keys.admins` in `lib/keys.nix`; age-plugin-yubikey, PIV slot 1): `a` for daily use, `b` an offline spare. Their identity files in `lib/admin/` only point at the YubiKey slot and aren't secret. Host rules are built by `lib/secrets/mk-host.nix` (`import ./mk-host.nix "<host>" ["<name>" ...]` gives `hosts/<host>/secrets/<name>.age` the host's key plus `keys.admins`); secrets shared by several hosts are written out in `lib/secrets/default.nix` (system; currently none) and `home.nix` (user). restic (`rc.backup`, glyph only) reads `hosts/<host>/secrets/restic-{env,password}.age`: a host that starts backing up needs its own R2 bucket and bucket-scoped token, since R2 tokens can't be limited to a prefix.
 
 ```bash
 agenix -e hosts/spore/secrets/some-secret.age -i lib/admin/yubikey-a.txt   # edit: PIV PIN, then touch
