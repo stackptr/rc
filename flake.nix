@@ -159,6 +159,11 @@
             spore = {
               hostname = "spore";
               sshUser = "root";
+              # Copy the whole closure from the runner instead of substituting
+              # on the target, which reads cache.zx.dev (atticd on glyph): a
+              # glyph deploy in the same run restarts atticd, and the target's
+              # 502s abort the copy. The runner has already built the closure.
+              fastConnection = true;
               profiles.system = {
                 user = "root";
                 path =
@@ -170,6 +175,8 @@
             zeta = {
               hostname = "zeta";
               sshUser = "root";
+              # See spore.
+              fastConnection = true;
               profiles.system = {
                 user = "root";
                 path =
