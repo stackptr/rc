@@ -64,6 +64,7 @@ To add a secret: add its name to the host's list in `lib/secrets/<host>.nix`, cr
 - Branch naming: `scope/type-short-slug`, where scope is the hostname (`glyph`, `spore`, `zeta`, `Rhizome`, `Stroma`, `lobtop`) or `home` for shared home-manager changes. Top-level or cross-cutting changes drop the scope: `type-short-slug`.
   - `type` is one of `feat`, `fix`, `chore`, `refactor`; the slug is 2 to 4 words.
   - Examples: `spore/fix-gc-options`, `home/feat-claude-memory`, `chore-update-flake-inputs`.
+- In cloud sessions, name branches with the repo's scheme, even when the session assigns a `claude/…` branch name: `<host>/type-short-slug` for a change to one host (`glyph/fix-gc-options`), and `type-short-slug` with no scope for changes to several hosts or none (`chore-cloud-branch-naming`).
 - PR title: `type(scope): short description`, with the scope omitted for top-level changes, e.g. `fix(spore): gc options`, `chore: update flake inputs`. PRs are squash-merged, so the title becomes the commit message.
 - PR description: a brief summary of what changed and what to test or verify.
 
