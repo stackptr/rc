@@ -13,6 +13,21 @@
     inherit (config.services.hister) group;
   };
 
+  # My personal access token (search.zx.dev/profile), stored twice: raw for
+  # Prometheus's credentials_file, which needs an admin's token, and as
+  # HISTER_TOKEN=<token> for mcpjungle-register (default.nix). Regenerating
+  # the token in the UI invalidates both.
+  age.secrets.hister-token = {
+    file = ./../secrets/hister-token.age;
+    mode = "400";
+    owner = "prometheus";
+    group = "prometheus";
+  };
+  age.secrets.hister-mcp-env = {
+    file = ./../secrets/hister-mcp-env.age;
+    mode = "440";
+  };
+
   services.hister = {
     enable = true;
     environmentFile = config.age.secrets.hister-env.path;
@@ -28,6 +43,7 @@
         base_url = "https://search.zx.dev";
         # Over the socket, which glyph's Postgres trusts (db.nix)
         database = "host=/run/postgresql user=hister dbname=hister sslmode=disable";
+        metrics = true;
         oauth_only = true;
         oauth.oidc.configuration_url = "https://id.zx.dev/.well-known/openid-configuration";
       };

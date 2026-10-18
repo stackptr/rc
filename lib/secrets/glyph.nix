@@ -4,6 +4,8 @@ import ./mk-host.nix "glyph" [
   "grafana-client-secret"
   "grafana-secret-key"
   "hister-env"
+  "hister-mcp-env"
+  "hister-token"
   "kagi-api-key"
   "context7-api-key"
   "open-terminal-env"
