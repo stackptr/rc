@@ -3,6 +3,7 @@ import ./mk-host.nix "glyph" [
   "slack-bot-token"
   "grafana-client-secret"
   "grafana-secret-key"
+  "hister-env"
   "kagi-api-key"
   "context7-api-key"
   "open-terminal-env"

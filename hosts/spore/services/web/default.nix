@@ -126,6 +126,22 @@
           proxyWebsockets = true;
         };
       };
+      "search.zx.dev" = {
+        forceSSL = true;
+        useACMEHost = "zx.dev";
+        # Hister (hosts/glyph/services/hister.nix) does its own Pocket ID
+        # login; requireAuth would block the extension's token-authenticated
+        # API calls.
+        locations."/" = {
+          proxyPass = "http://glyph.note-iwato.ts.net:4433";
+          proxyWebsockets = true;
+          # The extension posts whole rendered pages, and imports batch them
+          # up to Hister's max_batch_body_size (40 MiB).
+          extraConfig = ''
+            client_max_body_size 40m;
+          '';
+        };
+      };
       "code.zx.dev" = {
         forceSSL = true;
         useACMEHost = "zx.dev";

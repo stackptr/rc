@@ -172,6 +172,13 @@ in {
           description = "chat.zx.dev (Open WebUI) is down; check open-webui.service on glyph";
         })
         (mkEndpoint {
+          name = "hister";
+          group = "sites";
+          url = "https://search.zx.dev/health";
+          conditions = ["[STATUS] == 200"];
+          description = "search.zx.dev (Hister) is down; check hister.service on glyph";
+        })
+        (mkEndpoint {
           name = "freshrss";
           group = "sites";
           # Unauthenticated self-test of the Google Reader API that Reeder
