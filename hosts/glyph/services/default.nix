@@ -141,7 +141,7 @@
   # tool list doesn't.
   systemd.timers.mcpjungle-register.restartTriggers =
     map (name: config.systemd.units."${name}.service".unit)
-    ["basic-memory" "mcp-nixos" "grafana-mcp" "obsidian-vault-mcp"];
+    ["basic-memory" "mcp-nixos" "grafana-mcp" "hister" "obsidian-vault-mcp"];
   services.mcpjungle = {
     enable = true;
     servers.basic-memory = {
@@ -162,6 +162,12 @@
     servers.grafana = {
       url = "http://127.0.0.1:8095/mcp";
       description = "Grafana dashboards, Loki logs, and Prometheus metrics";
+    };
+    servers.hister = {
+      url = "http://127.0.0.1:4433/mcp";
+      description = "Search pages I've visited (Hister): full text, stored previews, and recently indexed or opened history";
+      headers.Authorization = "Bearer $HISTER_TOKEN";
+      environmentFile = config.age.secrets.hister-mcp-env.path;
     };
     servers.obsidian-vault = {
       url = "http://127.0.0.1:8097/mcp";
@@ -218,6 +224,10 @@
           "search_notes"
           "write_note"
           "edit_note"
+        ]
+        ++ map (tool: "hister__${tool}") [
+          "search"
+          "get_preview"
         ]
         ++ map (tool: "rc-source__${tool}") [
           "directory_tree"

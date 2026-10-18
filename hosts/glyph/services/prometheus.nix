@@ -245,6 +245,18 @@ in {
         ];
       }
       {
+        # Hister (hister.nix). With user handling on, /metrics takes an
+        # admin's personal access token.
+        job_name = "hister";
+        authorization.credentials_file = config.age.secrets.hister-token.path;
+        static_configs = [
+          {
+            targets = ["localhost:4433"];
+            labels.instance = "glyph";
+          }
+        ];
+      }
+      {
         # Gatus watchdog on zeta (hosts/zeta/services/gatus.nix).
         job_name = "gatus";
         static_configs = [
