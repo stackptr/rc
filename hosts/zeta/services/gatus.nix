@@ -45,8 +45,8 @@ in {
     # Holds SLACK_BOT_TOKEN, the same bot Grafana posts with;
     # GATUS_EXTERNAL_TOKEN, which tailscale-key-expiry pushes results with;
     # and TS_API_CLIENT_ID/TS_API_CLIENT_SECRET, a Tailscale OAuth client
-    # with the devices:core:read scope (OAuth clients don't expire; API
-    # keys do).
+    # with the devices:core:read and auth_keys:read scopes (OAuth clients
+    # don't expire; API keys do).
     environmentFile = config.age.secrets.gatus-env.path;
     settings = {
       web.port = 8080;
@@ -229,7 +229,7 @@ in {
           # Fails when the hourly push stops arriving
           heartbeat.interval = "3h";
           alerts = [
-            ((alert "A Tailscale node key expires within 14 days or has expired, or a server has key expiry enabled; the error on the status page names the machines. Renew or disable expiry at login.tailscale.com while id.zx.dev still works")
+            ((alert "A Tailscale node key or the Deploy workflow's TS_AUTHKEY expires within 14 days or has expired, or a server has key expiry enabled; the error on the status page names which. Renew or disable node expiry at login.tailscale.com while id.zx.dev still works; replace TS_AUTHKEY as CLAUDE.md describes")
               // {
                 failure-threshold = 1;
                 minimum-reminder-interval = "24h";
@@ -241,8 +241,10 @@ in {
   };
 
   # Hourly: every machine whose key expires within 14 days (or has expired),
-  # and any server with expiry enabled at all. Uses the public Tailscale API,
-  # so it works while the tailnet doesn't.
+  # any server with expiry enabled at all, and the Deploy workflow's signed
+  # tag:ci auth key (TS_AUTHKEY, 90 days at most) expiring within 14 days or
+  # missing. Uses the public Tailscale API, so it works while the tailnet
+  # doesn't.
   systemd.services.tailscale-key-expiry = {
     description = "Report Tailscale node key expiry to Gatus";
     wants = ["network-online.target"];
@@ -264,7 +266,13 @@ in {
           -d "client_id=$TS_API_CLIENT_ID" -d "client_secret=$TS_API_CLIENT_SECRET" \
           | jq -er .access_token) \
         || ! devices=$(curl -sf -H "Authorization: Bearer $token" \
-          https://api.tailscale.com/api/v2/tailnet/-/devices); then
+          https://api.tailscale.com/api/v2/tailnet/-/devices) \
+        || ! ids=$(curl -sf -H "Authorization: Bearer $token" \
+          "https://api.tailscale.com/api/v2/tailnet/-/keys?all=true" | jq -r '.keys[].id') \
+        || ! keys=$(for id in $ids; do
+          curl -sf -H "Authorization: Bearer $token" \
+            "https://api.tailscale.com/api/v2/tailnet/-/keys/$id" || exit 1
+        done); then
         report false "Tailscale API request failed"
         exit 1
       fi
@@ -279,6 +287,18 @@ in {
            then "\($host): key expires \(.expires[:10])"
            else empty end]
         | join("; ")' <<<"$devices")
+
+      # The key listing only gives IDs; each key's own record has its
+      # capabilities and expiry. No match means the key is gone or this client
+      # can't see it, and either way the next deploy would fail.
+      problems=$(jq -rs --argjson horizon "$horizon" --arg devices "$problems" '
+        [.[] | select(.invalid != true)
+         | select(.capabilities.devices.create? | .reusable and .ephemeral and ((.tags // []) | index("tag:ci")))
+         | .expires | sub("\\.[0-9]+"; "") | fromdateiso8601]
+        | (if length == 0 then "no reusable, ephemeral tag:ci auth key (TS_AUTHKEY)"
+           elif max < $horizon then "TS_AUTHKEY expires \(max | todate | .[:10])"
+           else "" end) as $ci
+        | [$devices, $ci] | map(select(. != "")) | join("; ")' <<<"$keys")
 
       if [ -n "$problems" ]; then
         report false "$problems"
