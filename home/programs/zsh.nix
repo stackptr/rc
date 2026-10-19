@@ -29,6 +29,15 @@
       enable = true;
     };
 
+    # direnv-instant's hook evals its cached export (an absolute `export PATH=...`)
+    # on every prompt, which clobbers what `nix shell` / `nix-shell -p` prepended.
+    # A shell that inherits __DIRENV_INSTANT_CURRENT_DIR is nested inside a loaded
+    # environment already, so it doesn't need the cache. Runs in .zshenv, before
+    # the hook's first prompt.
+    envExtra = ''
+      [[ -n $__DIRENV_INSTANT_CURRENT_DIR ]] && typeset -g DIRENV_INSTANT_USE_CACHE=0
+    '';
+
     initContent = ''
       incog () {
         unset HISTFILE
