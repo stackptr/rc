@@ -13,7 +13,6 @@ import ./mk-host.nix "glyph" [
   "user-password"
   "obsidian-auth-token"
   "navidrome-env"
-  "audiomuse-env"
   "opencode-env"
   "restic-env"
   "restic-password"
