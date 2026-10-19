@@ -46,7 +46,10 @@ in {
       # The Macs log in to the servers with the YubiKeys (keys.yubikeys), the
       # only keys the servers accept from people, through the key handles
       # installed below. No agent: gpg-agent can't hold security keys and would only offer
-      # its own key first.
+      # its own key first. Connections are shared: one PIN and touch covers
+      # every ssh/scp/git to that host until 10 minutes after its last session
+      # closes (`ssh -O exit <host>` ends it sooner). Meanwhile any process
+      # running as the user can open sessions through it without the YubiKey.
       matchBlocks."glyph spore zeta stroma *.note-iwato.ts.net" = lib.mkIf pkgs.stdenv.hostPlatform.isDarwin (lib.hm.dag.entryBefore ["*"] {
         identityFile = [
           "~/.ssh/id_ed25519_sk_rc_a"
@@ -55,6 +58,8 @@ in {
         identitiesOnly = true;
         identityAgent = "none";
         addKeysToAgent = "no";
+        controlMaster = "auto";
+        controlPersist = "10m";
       });
       extraConfig = ''
         IgnoreUnknown UseKeychain
