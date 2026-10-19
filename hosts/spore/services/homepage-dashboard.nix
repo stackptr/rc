@@ -17,6 +17,61 @@
       options.numeric = "auto";
     };
   };
+
+  percent = label: query: {
+    inherit label query;
+    format = {
+      type = "percent";
+      options.maximumFractionDigits = 0;
+    };
+  };
+
+  # CPU, memory, disk and boot time for one host, with the queries from the
+  # Node and Apple Silicon dashboards.
+  hostCard = {
+    name,
+    description,
+    icon,
+    cpu,
+    memory,
+    disk,
+  }: {
+    ${name} = {
+      inherit description icon;
+      href = "https://monitoring.zx.dev/d/${
+        if name == "stroma"
+        then "apple-silicon"
+        else "node-overview"
+      }?var-instance=${name}";
+      widget = {
+        type = "prometheusmetric";
+        url = prometheus;
+        refreshInterval = 30000;
+        metrics = [
+          (percent "CPU" cpu)
+          (percent "Memory" memory)
+          (percent "Disk" disk)
+          {
+            label = "Booted";
+            query = ''max(node_boot_time_seconds{host="${name}"})'';
+            format = {
+              type = "relativeDate";
+              scale = 1000;
+              options.numeric = "auto";
+            };
+          }
+        ];
+      };
+    };
+  };
+
+  linuxHost = name: description: icon:
+    hostCard {
+      inherit name description icon;
+      cpu = ''100 * (1 - avg(rate(node_cpu_seconds_total{host="${name}", mode="idle"}[5m])))'';
+      memory = ''100 * (1 - max(node_memory_MemAvailable_bytes{host="${name}"}) / max(node_memory_MemTotal_bytes{host="${name}"}))'';
+      disk = ''100 * (1 - max(node_filesystem_avail_bytes{host="${name}", mountpoint="/"}) / max(node_filesystem_size_bytes{host="${name}", mountpoint="/"}))'';
+    };
 in {
   age.secrets.homepage-env.file = ./../secrets/homepage-env.age;
   # systemd reads environmentFiles only at start, and the decrypted path never
@@ -32,13 +87,9 @@ in {
       title = "dash.zx.dev";
     };
     bookmarks = [];
+    # Per-host resources are in the Hosts group: the resources widget only
+    # sees spore, where Homepage runs.
     widgets = [
-      {
-        resources = {
-          cpu = true;
-          memory = true;
-        };
-      }
       {
         search = {
           provider = "custom";
@@ -120,6 +171,40 @@ in {
               description = "AI chat interface";
               href = "https://chat.zx.dev";
               icon = "open-webui";
+              widget = {
+                type = "prometheusmetric";
+                url = prometheus;
+                refreshInterval = 60000;
+                # Pushed over OTLP every 60s (hosts/glyph/services/open-webui.nix).
+                metrics = [
+                  {
+                    label = "Active";
+                    query = "max(webui_users_active)";
+                  }
+                  {
+                    label = "Today";
+                    query = "max(webui_users_active_today)";
+                  }
+                  {
+                    label = "Users";
+                    query = "max(webui_users_total)";
+                  }
+                ];
+              };
+            };
+          }
+          {
+            "OpenCode" = {
+              description = "Coding agent on glyph";
+              href = "https://code.zx.dev";
+              icon = "opencode";
+            };
+          }
+          {
+            "File Browser" = {
+              description = "Files on glyph";
+              href = "https://files.zx.dev";
+              icon = "filebrowser";
             };
           }
           {
@@ -259,8 +344,62 @@ in {
               description = "RSS reader";
               href = "https://rss.zx.dev";
               icon = "freshrss";
+              widget = {
+                type = "freshrss";
+                url = "http://glyph.note-iwato.ts.net:8084";
+                # The Google Reader API password from FreshRSS's profile
+                # settings, not the login (which is Pocket ID).
+                username = "{{HOMEPAGE_VAR_FRESHRSS_USER}}";
+                password = "{{HOMEPAGE_VAR_FRESHRSS_PASSWORD}}";
+              };
             };
           }
+        ];
+      }
+      {
+        Home = [
+          {
+            "Home Assistant" = {
+              description = "Home automation";
+              href = "https://home.zx.dev";
+              icon = "home-assistant";
+              widget = {
+                type = "homeassistant";
+                # Directly, not through spore, which HA must trust as a proxy.
+                url = "http://zeta.note-iwato.ts.net:8123";
+                key = "{{HOMEPAGE_VAR_HOMEASSISTANT_KEY}}";
+              };
+            };
+          }
+          {
+            "Homebridge" = {
+              description = "HomeKit bridge";
+              href = "https://homekit.zx.dev";
+              icon = "homebridge";
+              widget = {
+                type = "homebridge";
+                url = "http://zeta.note-iwato.ts.net:8581";
+                username = "{{HOMEPAGE_VAR_HOMEBRIDGE_USER}}";
+                password = "{{HOMEPAGE_VAR_HOMEBRIDGE_PASSWORD}}";
+              };
+            };
+          }
+        ];
+      }
+      {
+        Hosts = [
+          (linuxHost "glyph" "Home server & NAS" "nixos")
+          (linuxHost "spore" "VPS" "nixos")
+          (linuxHost "zeta" "Raspberry Pi 4" "raspberry-pi")
+          (hostCard {
+            name = "stroma";
+            description = "Mac Studio";
+            icon = "mdi-apple";
+            cpu = "max(mactop_cpu_usage_percent)";
+            memory = ''100 * max(mactop_memory_gb{type="used"}) / max(mactop_memory_gb{type="total"})'';
+            # The sealed system volume is a snapshot; data lives here.
+            disk = ''100 * (1 - max(node_filesystem_avail_bytes{host="stroma", mountpoint="/System/Volumes/Data"}) / max(node_filesystem_size_bytes{host="stroma", mountpoint="/System/Volumes/Data"}))'';
+          })
         ];
       }
       {
