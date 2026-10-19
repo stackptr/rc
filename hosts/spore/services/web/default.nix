@@ -186,8 +186,8 @@
       "mix.zx.dev" = {
         forceSSL = true;
         useACMEHost = "zx.dev";
-        # AudioMuse-AI has its own login too, but its auth changes often;
-        # Navidrome's plugin calls it on glyph directly, so SSO costs nothing.
+        # The only gate: AudioMuse-AI's own auth is off, as for other tailnet
+        # services. Navidrome's plugin calls it on glyph directly.
         requireAuth = true;
         locations."/" = {
           proxyPass = "http://glyph.note-iwato.ts.net:8001";
