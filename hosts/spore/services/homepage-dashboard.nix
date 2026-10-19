@@ -209,6 +209,37 @@ in {
             };
           }
           {
+            "AudioMuse-AI" = {
+              description = "Sonic analysis & playlists";
+              href = "https://mix.zx.dev";
+              icon = "audiomuse-ai.png";
+              widget = {
+                type = "prometheusmetric";
+                url = prometheus;
+                refreshInterval = 300000;
+                metrics = [
+                  {
+                    # From a timer on glyph (hosts/glyph/services/audiomuse.nix)
+                    label = "Analysed";
+                    query = "max(audiomuse_tracks_analysed)";
+                  }
+                  {
+                    label = "Library";
+                    query = ''max(db_model_totals{model="media"})'';
+                  }
+                  {
+                    label = "Coverage";
+                    query = ''100 * max(audiomuse_tracks_analysed) / max(db_model_totals{model="media"})'';
+                    format = {
+                      type = "percent";
+                      options.maximumFractionDigits = 0;
+                    };
+                  }
+                ];
+              };
+            };
+          }
+          {
             "FreshRSS" = {
               description = "RSS reader";
               href = "https://rss.zx.dev";

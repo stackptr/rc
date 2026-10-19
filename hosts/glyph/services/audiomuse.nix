@@ -18,6 +18,10 @@
       POSTGRES_DB = "audiomuse";
       # Plugins pip-install code at runtime
       PLUGINS_ENABLED = "false";
+      # Honour X-Forwarded-* from spore's nginx (mix.zx.dev). Only seeds a new
+      # database: an existing one keeps its app_config row, so flip that with
+      # UPDATE app_config SET value = 'true' WHERE key = 'ENABLE_PROXY_FIX'
+      ENABLE_PROXY_FIX = "true";
     };
     volumes = [
       "/run/postgresql:/run/postgresql"
@@ -52,5 +56,32 @@ in {
   in {
     podman-audiomuse-flask = afterPostgres;
     podman-audiomuse-worker = afterPostgres;
+
+    # AudioMuse has no metrics endpoint and its stats API needs the
+    # admin-equivalent API token, so count analysed tracks straight from the
+    # database for node_exporter's textfile collector (Homepage reads it).
+    audiomuse-metrics =
+      afterPostgres
+      // {
+        serviceConfig.Type = "oneshot";
+        script = let
+          # deploy-marker's directory, already passed to node_exporter
+          textfileDir = "/var/lib/prometheus-node-exporter-textfile";
+        in ''
+          tracks=$(${config.services.postgresql.package}/bin/psql -h /run/postgresql \
+            -U audiomuse -d audiomuse -tAc 'SELECT count(*) FROM score')
+          mkdir -p ${textfileDir}
+          echo "audiomuse_tracks_analysed $tracks" > ${textfileDir}/audiomuse.prom.tmp
+          mv ${textfileDir}/audiomuse.prom.tmp ${textfileDir}/audiomuse.prom
+        '';
+      };
+  };
+
+  systemd.timers.audiomuse-metrics = {
+    wantedBy = ["timers.target"];
+    timerConfig = {
+      OnBootSec = "5m";
+      OnUnitActiveSec = "5m";
+    };
   };
 }

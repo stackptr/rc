@@ -183,6 +183,24 @@
         useACMEHost = "zx.dev";
         locations."/".proxyPass = "http://glyph.note-iwato.ts.net:4533";
       };
+      "mix.zx.dev" = {
+        forceSSL = true;
+        useACMEHost = "zx.dev";
+        # AudioMuse-AI has its own login too, but its auth changes often;
+        # Navidrome's plugin calls it on glyph directly, so SSO costs nothing.
+        requireAuth = true;
+        locations."/" = {
+          proxyPass = "http://glyph.note-iwato.ts.net:8001";
+          extraConfig = ''
+            # The playlist chat streams over SSE and waits on the LLM for up
+            # to AudioMuse's 300s request timeout
+            proxy_buffering off;
+            proxy_read_timeout 300;
+            # Search by Recording uploads clips; AudioMuse enforces its own limit
+            client_max_body_size 0;
+          '';
+        };
+      };
       "models.zx.dev" = {
         forceSSL = true;
         useACMEHost = "zx.dev";
