@@ -161,6 +161,28 @@ in {
             };
           }
           {
+            "oMLX Models" = {
+              description = "Available for inference";
+              href = "https://models.zx.dev";
+              icon = "mdi-chip";
+              widget = {
+                type = "customapi";
+                url = "http://stroma.note-iwato.ts.net:8000/v1/models";
+                refreshInterval = 60000;
+                # oMLX requires a key on any non-loopback bind
+                # (hosts/Stroma/omlx.nix). HOMEPAGE_VAR_OMLX_KEY is an oMLX sub-key in homepage-env.age.
+                headers.Authorization = "Bearer {{HOMEPAGE_VAR_OMLX_KEY}}";
+                display = "dynamic-list";
+                mappings = {
+                  items = "data";
+                  name = "id";
+                  label = "id";
+                  limit = 8;
+                };
+              };
+            };
+          }
+          {
             "Jellyfin" = {
               description = "TV & movie streaming";
               href = "https://media.zx.dev";
