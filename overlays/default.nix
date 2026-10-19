@@ -11,4 +11,10 @@
 
   # Skip paho-mqtt's flaky test suite (nixpkgs#542586)
   (import ./paho-mqtt.nix)
+
+  # Link alloy against full systemd so it can read zstd journals
+  (import ./grafana-alloy.nix)
+
+  # mactop 2.1.6 for M5 Ultra power readings, ahead of nixpkgs
+  (import ./mactop.nix)
 ]

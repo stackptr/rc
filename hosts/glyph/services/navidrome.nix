@@ -31,8 +31,9 @@ in {
     group = "media";
     environmentFile = config.age.secrets.navidrome-env.path;
     plugins = [
-      pkgs.navidromePlugins.apple-music
-      pkgs.navidromePlugins.audiomuseai
+      # Plugins are WASM and must be cross-compiled for wasi
+      pkgs.pkgsCross.wasi32.navidromePlugins.apple-music
+      pkgs.pkgsCross.wasi32.navidromePlugins.audiomuseai
       nd-lyrics
     ];
     settings = {

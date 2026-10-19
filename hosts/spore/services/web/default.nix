@@ -23,6 +23,26 @@
     recommendedProxySettings = true;
     recommendedTlsSettings = true;
     recommendedGzipSettings = true;
+    # Access logs go to journald as JSON so Alloy ships them to Loki as
+    # {app="nginx_access"}. `vhost` avoids clashing with Loki's `host` label.
+    # Writing to the journal socket directly keeps them out of /var/log/nginx.
+    commonHttpConfig = ''
+      log_format json_access escape=json '{'
+        '"vhost":"$host",'
+        '"method":"$request_method",'
+        '"uri":"$request_uri",'
+        '"status":$status,'
+        '"bytes":$body_bytes_sent,'
+        '"request_time":$request_time,'
+        '"upstream_time":"$upstream_response_time",'
+        '"upstream_status":"$upstream_status",'
+        '"remote_addr":"$remote_addr",'
+        '"referer":"$http_referer",'
+        '"user_agent":"$http_user_agent",'
+        '"protocol":"$server_protocol"'
+      '}';
+      access_log syslog:server=unix:/run/systemd/journal/dev-log,tag=nginx_access,nohostname json_access;
+    '';
     additionalModules = [pkgs.nginxModules.develkit pkgs.nginxModules.set-misc];
 
     virtualHosts = {
@@ -51,14 +71,6 @@
           "/pgp".return = "302 https://keyoxide.org/hkp/413d1a0152bcb08d2e3ddacaf88c08579051ab48";
         };
       };
-      "windmill.zx.dev" = {
-        forceSSL = true;
-        useACMEHost = "zx.dev";
-        locations."/" = {
-          proxyPass = "http://glyph.note-iwato.ts.net:8100";
-          proxyWebsockets = true;
-        };
-      };
       "torrents.zx.dev" = {
         forceSSL = true;
         useACMEHost = "zx.dev";
@@ -66,12 +78,12 @@
         locations."/".proxyPass = "http://glyph.note-iwato.ts.net:9091";
         locations."~ (/transmission)?/rpc".proxyPass = "http://glyph.note-iwato.ts.net:9091";
       };
-      "homebridge.zx.dev" = {
+      "homekit.zx.dev" = {
         forceSSL = true;
         useACMEHost = "zx.dev";
         locations."/".proxyPass = "http://zeta.note-iwato.ts.net:8581";
       };
-      "ha.zx.dev" = {
+      "home.zx.dev" = {
         forceSSL = true;
         useACMEHost = "zx.dev";
         locations."/" = {
@@ -85,16 +97,26 @@
         requireAuth = true;
         locations."/".proxyPass = "http://glyph.note-iwato.ts.net:8080";
       };
-      "home.zx.dev" = {
+      "dash.zx.dev" = {
         forceSSL = true;
         useACMEHost = "zx.dev";
         requireAuth = true;
         locations."/".proxyPass = "http://127.0.0.1:8082";
       };
-      "grafana.zx.dev" = {
+      "status.zx.dev" = {
         forceSSL = true;
         useACMEHost = "zx.dev";
-        locations."/".proxyPass = "http://127.0.0.1:${toString config.services.grafana.settings.server.http_port}";
+        requireAuth = true;
+        locations."/".proxyPass = "http://zeta.note-iwato.ts.net:8080";
+      };
+      "monitoring.zx.dev" = {
+        forceSSL = true;
+        useACMEHost = "zx.dev";
+        # Grafana runs on glyph, next to its database, Prometheus and Loki.
+        locations."/".proxyPass = "http://glyph.note-iwato.ts.net:3000";
+        # Grafana serves /metrics without auth; Prometheus scrapes it on
+        # glyph directly, so don't publish it.
+        locations."= /metrics".return = "404";
       };
       "chat.zx.dev" = {
         forceSSL = true;
@@ -120,13 +142,16 @@
           proxyPass = "http://glyph.note-iwato.ts.net:8199";
           extraConfig = ''
             client_max_body_size 0;
+            # Fail fast when glyph is unreachable, so Nix gives up on the
+            # cache instead of waiting out the 60s default on every path.
+            proxy_connect_timeout 5s;
             proxy_read_timeout 300;
             proxy_buffering off;
             proxy_http_version 1.1;
           '';
         };
       };
-      "jellyfin.zx.dev" = {
+      "media.zx.dev" = {
         forceSSL = true;
         useACMEHost = "zx.dev";
         locations."/".proxyPass = "http://glyph.note-iwato.ts.net:8096";
@@ -157,6 +182,49 @@
         forceSSL = true;
         useACMEHost = "zx.dev";
         locations."/".proxyPass = "http://glyph.note-iwato.ts.net:4533";
+      };
+      "models.zx.dev" = {
+        forceSSL = true;
+        useACMEHost = "zx.dev";
+        locations = {
+          # Serve the admin UI at the site root; everything else (API, assets) passes through as-is
+          "= /".proxyPass = "http://stroma.note-iwato.ts.net:8000/admin";
+          "/" = {
+            proxyPass = "http://stroma.note-iwato.ts.net:8000";
+            extraConfig = ''
+              # Stream tokens as they're generated; long generations can idle for a while
+              proxy_buffering off;
+              proxy_read_timeout 600;
+              client_max_body_size 0;
+            '';
+          };
+        };
+      };
+      "rss.zx.dev" = {
+        forceSSL = true;
+        useACMEHost = "zx.dev";
+        requireAuth = true;
+        # FreshRSS uses http_auth and trusts Remote-User from the tailnet, so
+        # pass on the Pocket ID username oauth2-proxy verified.
+        locations."/" = {
+          proxyPass = "http://glyph.note-iwato.ts.net:8084";
+          extraConfig = ''
+            auth_request_set $rss_user $upstream_http_x_auth_request_preferred_username;
+            proxy_set_header Remote-User $rss_user;
+          '';
+        };
+        # Reeder authenticates the Google Reader API with FreshRSS's own API
+        # password and can't do the OIDC redirect, so skip SSO for it alone;
+        # the rest of /api/ (Fever, extensions) stays behind Pocket ID.
+        # requireAuth only guards locations."/", and nginx picks the longest
+        # matching prefix. No SSO means a client could send its own
+        # Remote-User, so drop it.
+        locations."/api/greader.php" = {
+          proxyPass = "http://glyph.note-iwato.ts.net:8084";
+          extraConfig = ''
+            proxy_set_header Remote-User "";
+          '';
+        };
       };
       "mcp.zx.dev" = {
         forceSSL = true;
@@ -218,6 +286,8 @@
         port = 9080;
       }
     ];
+    # Scraped every 15s by the exporter; not worth logging.
+    extraConfig = "access_log off;";
     locations."/nginx_status".extraConfig = "stub_status;";
   };
 
@@ -234,6 +304,10 @@
       dnsProvider = "cloudflare";
       environmentFile = config.age.secrets.cloudflare-dns.path;
       extraDomainNames = ["zx.dev" "cjohns.com"];
+      # spore has IPv6 disabled, but Tailscale puts its IPv6 MagicDNS address
+      # (fd7a:115c:a1e0::53) in resolv.conf and lego can't dial it, so the
+      # DNS-01 propagation check never succeeds. Query a resolver directly.
+      dnsResolver = "8.8.8.8:53";
     };
   };
   users.users.nginx.extraGroups = ["acme"];

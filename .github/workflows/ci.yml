@@ -5,38 +5,31 @@ on:
   push:
     branches: main
 
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
-  eval:
+  lint:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    - uses: cachix/install-nix-action@v31
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+    - uses: cachix/install-nix-action@13d8dd58da0234aa297dedd986986ccb8e7f3e24 # v31.11.1
       with:
         github_access_token: ${{ secrets.GITHUB_TOKEN }}
-    - name: Check all configurations evaluate
+    # The flake's formatter runs every pre-commit hook (alejandra, statix,
+    # nil) on all files, and fails if a hook fails or rewrites a file.
+    - name: Check formatting and lints
       run: |
-        eval_host() {
-          local host="$1"
-          local expr="$2"
-          local rc=0
-          echo "Evaluating $host..."
-          stderr=$(nix eval "$expr" 2>&1 >/dev/null) || rc=$?
-          if [ -n "$stderr" ]; then
-            echo "$stderr"
-            if echo "$stderr" | grep -q "evaluation warning:"; then
-              encoded=$(printf '%s' "$stderr" | python3 -c "import sys; print(sys.stdin.read().replace('%','%25').replace('\n','%0A').replace('\r','%0D'))")
-              echo "::warning title=Evaluation warnings ($host)::${encoded}"
-            fi
-          fi
-          return $rc
-        }
-        for host in glyph spore zeta; do
-          eval_host "$host" ".#nixosConfigurations.$host.config.system.build.toplevel.drvPath"
-        done
-        eval_host "Rhizome" ".#darwinConfigurations.Rhizome.system.drvPath"
+        if ! nix fmt; then
+          git --no-pager diff
+          exit 1
+        fi
 
   build:
-    needs: eval
     strategy:
       fail-fast: false
       matrix:
@@ -47,6 +40,12 @@ jobs:
           - host: Rhizome
             system: aarch64-darwin
             runner: macos-latest
+          - host: Stroma
+            system: aarch64-darwin
+            runner: macos-latest
+          - host: lobtop
+            system: aarch64-darwin
+            runner: macos-latest
           - host: spore
             system: x86_64-linux
             runner: ubuntu-latest
@@ -55,28 +54,47 @@ jobs:
             runner: ubuntu-24.04-arm
     runs-on: ${{ matrix.runner }}
     steps:
-    - uses: actions/checkout@v4
-    - uses: cachix/install-nix-action@v31
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+    - uses: cachix/install-nix-action@13d8dd58da0234aa297dedd986986ccb8e7f3e24 # v31.11.1
       with:
         github_access_token: ${{ secrets.GITHUB_TOKEN }}
         extra_nix_config: |
           extra-substituters = https://cache.zx.dev/main
           extra-trusted-public-keys = main:mu0jkxdJTGWC3djDSEQb3rvZgqlhA8WVMulcTo5IW6c=
+    - name: Evaluate system configuration
+      id: eval
+      env:
+        HOST: ${{ matrix.host }}
+        SYSTEM: ${{ matrix.system }}
+      run: |
+        if [ "$SYSTEM" = "aarch64-darwin" ]; then
+          attr=".#darwinConfigurations.$HOST.system"
+        else
+          attr=".#nixosConfigurations.$HOST.config.system.build.toplevel"
+        fi
+        rc=0
+        drv=$(nix eval --raw "$attr.drvPath" 2>eval.log) || rc=$?
+        cat eval.log
+        if grep -q "evaluation warning:" eval.log; then
+          encoded=$(python3 -c "import sys; print(sys.stdin.read().replace('%','%25').replace('\n','%0A').replace('\r','%0D'))" < eval.log)
+          echo "::warning title=Evaluation warnings ($HOST)::${encoded}"
+        fi
+        echo "drv=$drv" >> "$GITHUB_OUTPUT"
+        exit $rc
     - name: Configure Attic cache
+      env:
+        ATTIC_TOKEN: ${{ secrets.ATTIC_TOKEN }}
       run: |
         nix profile install --inputs-from . attic#attic-client --fallback
-        attic login rc https://cache.zx.dev ${{ secrets.ATTIC_TOKEN }}
+        attic login rc https://cache.zx.dev "$ATTIC_TOKEN"
         attic use rc:main
     - name: Allow unprivileged user namespaces (needed by bubblewrap-based FHS builds)
       if: runner.os == 'Linux'
       run: sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
     - name: Build system configuration
-      run: |
-        if [ "${{ matrix.system }}" = "aarch64-darwin" ]; then
-          nix build .#darwinConfigurations.${{ matrix.host }}.system
-        else
-          nix build .#nixosConfigurations.${{ matrix.host }}.config.system.build.toplevel
-        fi
+      env:
+        DRV: ${{ steps.eval.outputs.drv }}
+      run: nix build "$DRV^*"
     - name: Push to Attic
       if: github.ref == 'refs/heads/main'
       run: |
@@ -84,69 +102,18 @@ jobs:
         attic push rc:main $(which attic)
         nix build .#devShells.${{ matrix.system }}.default -o ./result-devshell
         attic push rc:main ./result-devshell
-    - name: Prepare Slack context
-      if: failure()
-      id: slack-context
-      env:
-        EVENT_NAME: ${{ github.event_name }}
-        SHA: ${{ github.sha }}
-        PR_NUMBER: ${{ github.event.pull_request.number }}
-        PR_TITLE: ${{ github.event.pull_request.title }}
-        PR_URL: ${{ github.event.pull_request.html_url }}
-        COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
-        COMMIT_URL: ${{ github.event.head_commit.url }}
-      run: |
-        echo "short_sha=${SHA:0:7}" >> $GITHUB_OUTPUT
-        if [ "$EVENT_NAME" = "pull_request" ]; then
-          echo "trigger=PR <${PR_URL}|#${PR_NUMBER}: ${PR_TITLE}>" >> $GITHUB_OUTPUT
-        else
-          FIRST_LINE=$(printf '%s' "$COMMIT_MESSAGE" | head -1)
-          echo "trigger=push <${COMMIT_URL}|${FIRST_LINE}>" >> $GITHUB_OUTPUT
-        fi
-    - name: Notify Slack on failure
-      if: failure()
-      uses: slackapi/slack-github-action@v2
+
+  # One Slack message per failed run, naming every failed job.
+  notify:
+    needs: [lint, build]
+    if: failure()
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+    steps:
+    - uses: stackptr/actions/slack-notify@8f86bf2d6b69d2225bee5726b080fc6ce1066bd9 # v1.0.0
       with:
-        webhook: ${{ secrets.SLACK_WEBHOOK_UPDATES_CI }}
-        webhook-type: incoming-webhook
-        payload-templating: true
-        payload: |
-          {
-            "attachments": [
-              {
-                "color": "#CC0000",
-                "blocks": [
-                  {
-                    "type": "header",
-                    "text": {
-                      "type": "plain_text",
-                      "text": ":x: CI build failed",
-                      "emoji": true
-                    }
-                  },
-                  {
-                    "type": "section",
-                    "fields": [
-                      {
-                        "type": "mrkdwn",
-                        "text": "*Host*\n${{ matrix.host }}"
-                      },
-                      {
-                        "type": "mrkdwn",
-                        "text": "*Trigger*\n${{ steps.slack-context.outputs.trigger }}"
-                      }
-                    ]
-                  },
-                  {
-                    "type": "context",
-                    "elements": [
-                      {
-                        "type": "mrkdwn",
-                        "text": "<${{ github.server_url }}/${{ github.repository }}|${{ github.repository }}> · <${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}|${{ steps.slack-context.outputs.short_sha }}> · <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View run>"
-                      }
-                    ]
-                  }
-                ]
-              }
-            ]
-          }
+        token: ${{ secrets.SLACK_BOT_TOKEN }}
+        channel: "#alerts"
+        status: failure
+        failed-jobs: true

@@ -10,6 +10,7 @@ inputs @ {
   homebrew-cask,
   llm-profile,
   nix-index-database,
+  direnv-instant,
   zx-dev,
   attic,
   disko,
@@ -40,7 +41,7 @@ inputs @ {
       imports =
         [
           nix-index-database.homeModules.nix-index
-          agenix.homeManagerModules.default
+          direnv-instant.homeModules.direnv-instant
           ./../modules/home
           ./../home
         ]
@@ -105,6 +106,7 @@ inputs @ {
         ./../modules/base
         ./../modules/darwin
         ./../hosts/${configDir}
+        agenix.darwinModules.default
         home-manager.darwinModules.home-manager
         (mkHomeManager {
           inherit username hostname system lightweight configDir;

@@ -5,6 +5,7 @@ let
   glyphSecrets = import ./secrets/glyph.nix;
   lobtopSecrets = import ./secrets/lobtop.nix;
   sporeSecrets = import ./secrets/spore.nix;
+  stromaSecrets = import ./secrets/Stroma.nix;
   zetaSecrets = import ./secrets/zeta.nix;
   homeSecrets = import ./secrets/home.nix;
 in
@@ -12,5 +13,6 @@ in
   // glyphSecrets
   // lobtopSecrets
   // sporeSecrets
+  // stromaSecrets
   // zetaSecrets
   // homeSecrets

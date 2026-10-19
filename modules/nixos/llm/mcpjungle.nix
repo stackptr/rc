@@ -45,10 +45,58 @@ in {
             default = null;
             description = "Path to environment file for variable substitution in headers.";
           };
+          disabledTools = lib.mkOption {
+            type = lib.types.listOf lib.types.str;
+            default = [];
+            example = ["write_file"];
+            description = ''
+              Tools (without the server prefix) to hide from every client and
+              group. Reapplied after each registration, since a re-registered
+              server starts with all its tools enabled.
+            '';
+          };
         };
       });
       default = {};
-      description = "MCP servers to register with the gateway.";
+      description = ''
+        MCP servers to register with the gateway. Registration is
+        authoritative: servers registered by hand are deregistered.
+      '';
+    };
+
+    groups = lib.mkOption {
+      type = lib.types.attrsOf (lib.types.submodule {
+        options = {
+          description = lib.mkOption {
+            type = lib.types.str;
+            default = "";
+            description = "Description of the tool group.";
+          };
+          includedServers = lib.mkOption {
+            type = lib.types.listOf lib.types.str;
+            default = [];
+            description = "Servers whose tools are all in the group.";
+          };
+          includedTools = lib.mkOption {
+            type = lib.types.listOf lib.types.str;
+            default = [];
+            example = ["basic-memory__read_note"];
+            description = "Individual tools in the group, as `<server>__<tool>`.";
+          };
+          excludedTools = lib.mkOption {
+            type = lib.types.listOf lib.types.str;
+            default = [];
+            description = "Tools removed from the group, as `<server>__<tool>`.";
+          };
+        };
+      });
+      default = {};
+      description = ''
+        Tool groups, each served at `/v0/groups/<name>/mcp` and limited to its
+        tools. Groups are recreated after every registration. Servers'
+        disabledTools are excluded automatically: MCPJungle refuses a group
+        that resolves to a disabled tool.
+      '';
     };
   };
 
@@ -63,6 +111,10 @@ in {
       description = "MCPJungle MCP Gateway";
       after = ["network.target"];
       wantedBy = ["multi-user.target"];
+
+      # Serves Prometheus metrics at /metrics on the gateway port, including
+      # mcpjungle_tool_calls_ratio_total{mcp_server_name,tool_name,outcome}.
+      environment.OTEL_ENABLED = "true";
 
       serviceConfig = {
         ExecStart = "${lib.getExe cfg.package} start --port ${toString cfg.port}";
@@ -90,8 +142,10 @@ in {
     systemd.timers.mcpjungle-register = lib.mkIf (cfg.servers != {}) {
       description = "Trigger MCP server registration";
       wantedBy = ["timers.target"];
-      # Re-trigger when server configuration changes
-      restartTriggers = [(builtins.hashString "sha256" (builtins.toJSON cfg.servers))];
+      # Re-trigger when server or group configuration changes. Hosts can add
+      # the units behind local servers, so a changed binary or flags re-syncs
+      # tools.
+      restartTriggers = [(builtins.hashString "sha256" (builtins.toJSON [cfg.servers cfg.groups]))];
       timerConfig = {
         OnActiveSec = "5s";
       };
@@ -106,7 +160,7 @@ in {
       serviceConfig = {
         Type = "simple";
       };
-      path = [pkgs.curl pkgs.envsubst];
+      path = [pkgs.curl pkgs.envsubst pkgs.jq];
       script = let
         registry = "http://127.0.0.1:${toString cfg.port}";
         bin = lib.getExe cfg.package;
@@ -116,7 +170,8 @@ in {
           configJson = builtins.toJSON {
             inherit name;
             inherit (server) url description headers;
-            transport = "streamable-http";
+            # MCPJungle 0.3.x rejects "streamable-http" in config files.
+            transport = "streamable_http";
           };
           registerCmd =
             if hasHeaders
@@ -128,17 +183,29 @@ in {
               ''}
               tmpfile=$(mktemp --suffix=.json)
               echo '${configJson}' | envsubst > "$tmpfile"
-              ${bin} register --conf "$tmpfile" --registry ${registry} || echo "ERROR: failed to register ${name}"
+              status=0
+              ${bin} register --conf "$tmpfile" --registry ${registry} || status=$?
               rm -f "$tmpfile"
+              if [ "$status" -ne 0 ]; then
+                echo "ERROR: failed to register ${name}"
+                exit 1
+              fi
             ''
             else ''
-              ${bin} register --name '${name}' --description '${server.description}' --url '${server.url}' --registry ${registry} || echo "ERROR: failed to register ${name}"
+              if ! ${bin} register --name '${name}' --description '${server.description}' --url '${server.url}' --registry ${registry}; then
+                echo "ERROR: failed to register ${name}"
+                exit 1
+              fi
             '';
+          disableCmds =
+            lib.concatMapStrings (tool: ''
+              if ! ${bin} disable tool '${name}__${tool}' --registry ${registry}; then
+                echo "ERROR: failed to disable ${name}__${tool}"
+                exit 1
+              fi
+            '')
+            server.disabledTools;
         in ''
-          if ${bin} list servers --registry ${registry} 2>/dev/null | grep -q '${name}'; then
-            echo "${name} already registered, skipping."
-          else
-
           # Wait for server to be reachable before registering
           ready=false
           for i in $(seq 1 30); do
@@ -152,11 +219,14 @@ in {
           done
 
           if [ "$ready" = true ]; then
+            # Re-sync rather than skip: MCPJungle keeps the tool list (and
+            # tool annotations) it fetched at registration, so an already
+            # registered server would never pick up changed tools.
+            ${bin} deregister '${name}' --registry ${registry} >/dev/null 2>&1 || true
             ${registerCmd}
+            ${disableCmds}
           else
             echo "WARNING: ${name} at ${server.url} not reachable after 60s, skipping registration."
-          fi
-
           fi
         '';
 
@@ -164,12 +234,69 @@ in {
           (
             ${mkRegistration name server}
           ) &
+          pids+=($!)
         '';
 
         registrations = lib.concatStringsSep "\n" (lib.mapAttrsToList mkBackgroundRegistration cfg.servers);
+
+        disabledTools = lib.concatLists (lib.mapAttrsToList (name: server: map (tool: "${name}__${tool}") server.disabledTools) cfg.servers);
+
+        mkGroup = name: group: let
+          configFile = pkgs.writeText "mcpjungle-group-${name}.json" (builtins.toJSON {
+            inherit name;
+            inherit (group) description;
+            included_servers = group.includedServers;
+            included_tools = group.includedTools;
+            excluded_tools = group.excludedTools ++ disabledTools;
+          });
+        in ''
+          # Recreate rather than update: when servers re-sync in parallel,
+          # MCPJungle doesn't put a re-added tool back into a group while
+          # another of its servers is mid re-sync, and an update with an
+          # unchanged config doesn't repair the group.
+          ${bin} delete group '${name}' --registry ${registry} >/dev/null 2>&1 || true
+          if ! ${bin} create group --conf ${configFile} --registry ${registry}; then
+            echo "ERROR: failed to create group ${name}"
+            status=1
+          fi
+        '';
+
+        groups = lib.concatStringsSep "\n" (lib.mapAttrsToList mkGroup cfg.groups);
       in ''
+        for i in $(seq 1 30); do
+          if curl -sf ${registry}/health >/dev/null; then
+            break
+          fi
+          sleep 1
+        done
+
+        # Registration is authoritative: deregister servers that aren't
+        # declared (registered by hand, or removed from the config), which
+        # re-syncing alone would leave in MCPJungle's database.
+        servers=$(curl -sf ${registry}/api/v0/servers)
+        for name in $(echo "$servers" | jq -r '.[].name'); do
+          case "$name" in
+            ${lib.concatMapStringsSep "|" lib.escapeShellArg (lib.attrNames cfg.servers)}) ;;
+            *)
+              echo "Deregistering undeclared server $name"
+              ${bin} deregister "$name" --registry ${registry}
+              ;;
+          esac
+        done
+
+        pids=()
         ${registrations}
-        wait
+        # Fail the unit if any registration failed. Re-sync deregisters
+        # first, so a failure leaves that server's tools missing; a failed
+        # unit raises the "Systemd unit failed" alert.
+        status=0
+        for pid in "''${pids[@]}"; do
+          wait "$pid" || status=1
+        done
+
+        # Groups resolve against the registered tools, so they come last.
+        ${groups}
+        exit "$status"
       '';
     };
 

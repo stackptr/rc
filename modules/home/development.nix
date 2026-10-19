@@ -1,5 +1,6 @@
 {
   config,
+  hostname,
   lib,
   llm-profile,
   pkgs,
@@ -8,11 +9,34 @@
   inherit (lib) mkIf mkOption;
 
   cfg = config.rc.development;
+  profile = import ../../lib/llm-profile.nix llm-profile;
 in {
   options = {
     rc.development = {
       ai = {
         enable = lib.mkEnableOption "tools using LLMs";
+
+        gateway.enable = mkOption {
+          default = true;
+          example = false;
+          description = ''
+            Whether this host can reach the MCP gateway on glyph. Disable on
+            hosts where MCP servers are managed elsewhere (e.g. by an
+            employer) and glyph isn't reachable.
+          '';
+          type = lib.types.bool;
+        };
+
+        telemetry.enable = mkOption {
+          default = cfg.ai.gateway.enable;
+          defaultText = lib.literalExpression "config.rc.development.ai.gateway.enable";
+          example = false;
+          description = ''
+            Whether Claude Code sends OpenTelemetry metrics to Prometheus and
+            events to Loki on glyph. Prompt and response text stay redacted.
+          '';
+          type = lib.types.bool;
+        };
       };
 
       containers = {
@@ -32,21 +56,46 @@ in {
         CLAUDE_PACE_API_FALLBACK = "0";
       };
 
-      programs.mcp = {
-        enable = true;
-        servers.glyph = {
-          url = "http://glyph:8090/mcp";
-        };
-      };
-
       programs.claude-code = {
         enable = true;
         enableMcpIntegration = true;
-        context = "${llm-profile}/README.md";
+        context =
+          if cfg.ai.gateway.enable
+          then profile.agent
+          else profile."agent-standalone";
+        # propose-rule is currently the only skill. Its fallback (leaving a
+        # note in Basic Memory for a later session) needs the gateway, and
+        # on a work machine, proposed rule changes shouldn't go to a public
+        # repo anyway — so skip skills entirely when the gateway is disabled.
+        skills =
+          if cfg.ai.gateway.enable
+          then profile.skills
+          else {};
         settings = {
           model = "sonnet";
           # Disabled in favor of Basic Memory MCP for cross-device access
           autoMemoryEnabled = false;
+          env =
+            {
+              # Skip GPG signing for agent commits (it needs user interaction)
+              GIT_CONFIG_COUNT = "1";
+              GIT_CONFIG_KEY_0 = "commit.gpgsign";
+              GIT_CONFIG_VALUE_0 = "false";
+            }
+            // lib.optionalAttrs cfg.ai.telemetry.enable {
+              CLAUDE_CODE_ENABLE_TELEMETRY = "1";
+              OTEL_METRICS_EXPORTER = "otlp";
+              OTEL_LOGS_EXPORTER = "otlp";
+              OTEL_EXPORTER_OTLP_PROTOCOL = "http/protobuf";
+              OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = "http://glyph.note-iwato.ts.net:9099/api/v1/otlp/v1/metrics";
+              OTEL_EXPORTER_OTLP_LOGS_ENDPOINT = "http://glyph.note-iwato.ts.net:3100/otlp/v1/logs";
+              # Prometheus's OTLP receiver rejects delta temporality, Claude
+              # Code's default.
+              OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE = "cumulative";
+              # Becomes a host label on metrics and an indexed label in Loki,
+              # matching the other hosts' {host="..."}.
+              OTEL_RESOURCE_ATTRIBUTES = "host=${lib.toLower hostname}";
+            };
           statusLine = {
             type = "command";
             command = "${pkgs.claude-pace}/bin/claude-pace";
@@ -135,41 +184,6 @@ in {
               "Bash(gh run list*)"
               "Bash(gh run view*)"
               "Bash(gh search:*)"
-              # Graphite: info
-              "Bash(gt log*)"
-              "Bash(gt l*)"
-              "Bash(gt ls*)"
-              "Bash(gt status*)"
-              "Bash(gt info*)"
-              "Bash(gt children*)"
-              "Bash(gt parent*)"
-              # Graphite: navigation
-              "Bash(gt checkout *)"
-              "Bash(gt co *)"
-              "Bash(gt up*)"
-              "Bash(gt u)"
-              "Bash(gt u *)"
-              "Bash(gt down*)"
-              "Bash(gt d)"
-              "Bash(gt d *)"
-              "Bash(gt top*)"
-              "Bash(gt t)"
-              "Bash(gt t *)"
-              "Bash(gt bottom*)"
-              "Bash(gt b)"
-              "Bash(gt b *)"
-              "Bash(gt trunk*)"
-              # Graphite: workflow
-              "Bash(gt create *)"
-              "Bash(gt c *)"
-              "Bash(gt modify *)"
-              "Bash(gt m *)"
-              "Bash(gt submit*)"
-              "Bash(gt s)"
-              "Bash(gt s *)"
-              "Bash(gt ss*)"
-              "Bash(gt restack*)"
-              "Bash(gt sync*)"
               # System
               "Bash(journalctl *)"
               "Bash(mkdir *)"
@@ -196,101 +210,31 @@ in {
               "mcp__figma__get_design_context"
               "mcp__figma__get_metadata"
               "mcp__figma__get_screenshot"
-              # MCP: basic-memory
-              "mcp__glyph__basic-memory__build_context"
-              "mcp__glyph__basic-memory__canvas"
-              "mcp__glyph__basic-memory__create_memory_project"
-              "mcp__glyph__basic-memory__delete_note"
-              "mcp__glyph__basic-memory__delete_project"
-              "mcp__glyph__basic-memory__edit_note"
-              "mcp__glyph__basic-memory__fetch"
-              "mcp__glyph__basic-memory__list_directory"
-              "mcp__glyph__basic-memory__list_memory_projects"
-              "mcp__glyph__basic-memory__move_note"
-              "mcp__glyph__basic-memory__read_content"
-              "mcp__glyph__basic-memory__read_note"
-              "mcp__glyph__basic-memory__recent_activity"
-              "mcp__glyph__basic-memory__search"
-              "mcp__glyph__basic-memory__search_by_metadata"
-              "mcp__glyph__basic-memory__search_notes"
-              "mcp__glyph__basic-memory__view_note"
-              "mcp__glyph__basic-memory__write_note"
-              # MCP: context7
-              "mcp__glyph__context7__resolve-library-id"
-              "mcp__glyph__context7__query-docs"
-              # MCP: graphite
-              "mcp__glyph__graphite__learn_gt"
-              "mcp__glyph__graphite__run_gt_cmd"
-              # MCP: mcp-nixos
-              "mcp__glyph__mcp-nixos__nix"
-              "mcp__glyph__mcp-nixos__nix_versions"
-              # MCP: deepwiki
-              "mcp__glyph__deepwiki__ask_question"
-              "mcp__glyph__deepwiki__read_wiki_contents"
-              "mcp__glyph__deepwiki__read_wiki_structure"
-              # MCP: kagi
-              "mcp__glyph__kagi__kagi_search_fetch"
-              "mcp__glyph__kagi__kagi_summarizer"
-              # MCP: aws-knowledge
-              "mcp__glyph__aws-knowledge__aws___get_regional_availability"
-              "mcp__glyph__aws-knowledge__aws___list_regions"
-              "mcp__glyph__aws-knowledge__aws___read_documentation"
-              "mcp__glyph__aws-knowledge__aws___recommend"
-              "mcp__glyph__aws-knowledge__aws___search_documentation"
-              # MCP: grafana
-              "mcp__glyph__grafana__add_activity_to_incident"
-              "mcp__glyph__grafana__alerting_manage_routing"
-              "mcp__glyph__grafana__alerting_manage_rules"
-              "mcp__glyph__grafana__create_annotation"
-              "mcp__glyph__grafana__create_folder"
-              "mcp__glyph__grafana__create_incident"
-              "mcp__glyph__grafana__fetch_pyroscope_profile"
-              "mcp__glyph__grafana__find_error_pattern_logs"
-              "mcp__glyph__grafana__find_slow_requests"
-              "mcp__glyph__grafana__generate_deeplink"
-              "mcp__glyph__grafana__get_alert_group"
-              "mcp__glyph__grafana__get_annotation_tags"
-              "mcp__glyph__grafana__get_annotations"
-              "mcp__glyph__grafana__get_assertions"
-              "mcp__glyph__grafana__get_current_oncall_users"
-              "mcp__glyph__grafana__get_dashboard_by_uid"
-              "mcp__glyph__grafana__get_dashboard_panel_queries"
-              "mcp__glyph__grafana__get_dashboard_property"
-              "mcp__glyph__grafana__get_dashboard_summary"
-              "mcp__glyph__grafana__get_datasource"
-              "mcp__glyph__grafana__get_incident"
-              "mcp__glyph__grafana__get_oncall_shift"
-              "mcp__glyph__grafana__get_panel_image"
-              "mcp__glyph__grafana__get_sift_analysis"
-              "mcp__glyph__grafana__get_sift_investigation"
-              "mcp__glyph__grafana__list_alert_groups"
-              "mcp__glyph__grafana__list_datasources"
-              "mcp__glyph__grafana__list_incidents"
-              "mcp__glyph__grafana__list_loki_label_names"
-              "mcp__glyph__grafana__list_loki_label_values"
-              "mcp__glyph__grafana__list_oncall_schedules"
-              "mcp__glyph__grafana__list_oncall_teams"
-              "mcp__glyph__grafana__list_oncall_users"
-              "mcp__glyph__grafana__list_prometheus_label_names"
-              "mcp__glyph__grafana__list_prometheus_label_values"
-              "mcp__glyph__grafana__list_prometheus_metric_metadata"
-              "mcp__glyph__grafana__list_prometheus_metric_names"
-              "mcp__glyph__grafana__list_pyroscope_label_names"
-              "mcp__glyph__grafana__list_pyroscope_label_values"
-              "mcp__glyph__grafana__list_pyroscope_profile_types"
-              "mcp__glyph__grafana__list_sift_investigations"
-              "mcp__glyph__grafana__query_loki_logs"
-              "mcp__glyph__grafana__query_loki_patterns"
-              "mcp__glyph__grafana__query_loki_stats"
-              "mcp__glyph__grafana__query_prometheus"
-              "mcp__glyph__grafana__query_prometheus_histogram"
-              "mcp__glyph__grafana__search_dashboards"
-              "mcp__glyph__grafana__search_folders"
-              "mcp__glyph__grafana__update_annotation"
-              "mcp__glyph__grafana__update_dashboard"
+              # MCP: the gateway on glyph, by upstream server. Globs follow tool
+              # renames upstream; obsidian-vault is left out so its writes prompt.
+              "mcp__glyph__aws-knowledge__*"
+              "mcp__glyph__basic-memory__*"
+              "mcp__glyph__cloudflare-docs__*"
+              "mcp__glyph__context7__*"
+              "mcp__glyph__deepwiki__*"
+              # grafana is read-only; see modules/nixos/llm/grafana-mcp.nix
+              "mcp__glyph__grafana__*"
+              "mcp__glyph__kagi__*"
+              "mcp__glyph__mcp-nixos__*"
+              # rc-source serves a read-only store path
+              "mcp__glyph__rc-source__*"
             ];
             deny = [];
           };
+        };
+      };
+    })
+
+    (mkIf (cfg.ai.enable && cfg.ai.gateway.enable) {
+      programs.mcp = {
+        enable = true;
+        servers.glyph = {
+          url = "http://glyph:8090/mcp";
         };
       };
     })
@@ -299,7 +243,10 @@ in {
       home.packages = with pkgs; [
         lazydocker
       ];
+    })
 
+    # Colima provides the Docker VM on macOS; on Linux it has no use here
+    (mkIf (cfg.containers.enable && pkgs.stdenv.isDarwin) {
       services.colima = {
         enable = true;
         profiles.default = {

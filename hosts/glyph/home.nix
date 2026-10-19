@@ -1,33 +1,47 @@
 {
-  config,
   llm-profile,
+  osConfig,
   pkgs,
   ...
-}: {
+}: let
+  stromaModel = "Qwen3.8-27B-MTPLX-Optimized-Quality";
+in {
   home.packages = [pkgs.mktorrent pkgs.obsidian-headless];
+
+  # `just switch-remote spore` and the tailnet-lockout tunnel log in to spore
+  # and zeta as root with glyph's client key, decrypted by agenix at boot.
+  programs.ssh.matchBlocks."spore zeta *.note-iwato.ts.net" = {
+    identityFile = osConfig.age.secrets.ssh-client-key.path;
+    identitiesOnly = true;
+  };
 
   programs.opencode = {
     enable = true;
     enableMcpIntegration = true;
     web.enable = true;
     web.extraArgs = ["--port" "8890" "--hostname" "0.0.0.0"];
-    context = builtins.readFile "${llm-profile}/README.md";
+    # A shorter prompt helps a 27B model more than it helps Claude.
+    context = (import ../../lib/llm-profile.nix llm-profile).agent;
     settings = {
-      model = "anthropic/claude-opus-4-6";
-      small_model = "anthropic/claude-haiku-4-5";
-      enabled_providers = ["anthropic"];
+      model = "stroma/${stromaModel}";
+      small_model = "stroma/${stromaModel}";
+      enabled_providers = ["stroma"];
       autoupdate = false;
       share = "disabled";
-      plugin = ["${pkgs.opencode-claude-auth}/lib/node_modules/opencode-claude-auth"];
+      # oMLX on Stroma (hosts/Stroma/omlx.nix)
+      provider.stroma = {
+        npm = "@ai-sdk/openai-compatible";
+        name = "Stroma";
+        options.baseURL = "http://stroma.note-iwato.ts.net:8000/v1";
+        # An oMLX sub-key, from opencode-env.age (hosts/glyph/default.nix)
+        options.apiKey = "{env:STROMA_API_KEY}";
+        models.${stromaModel}.name = "Qwen 3.8 27B";
+      };
     };
   };
 
   systemd.user.services.opencode-web.Service.EnvironmentFile =
-    config.age.secrets.opencode-env.path;
-
-  age.secrets.opencode-env = {
-    file = ../../home/secrets/opencode-env.age;
-  };
+    osConfig.age.secrets.opencode-env.path;
 
   programs.beets = {
     enable = true;

@@ -1,5 +1,6 @@
 {
   config,
+  inputs,
   lib,
   pkgs,
   ...
@@ -12,6 +13,8 @@
     ./avahi.nix
     ./dns.nix
     ./filebrowser.nix
+    ./freshrss.nix
+    ./grafana.nix
     ./jellyfin.nix
     ./loki.nix
     ./navidrome.nix
@@ -23,7 +26,6 @@
     ./samba.nix
     ./webdav.nix
     ./torrents.nix
-    ./windmill.nix
   ];
   users.groups.media = {};
   users.users.mu.extraGroups = ["media"];
@@ -69,7 +71,10 @@
   };
   services.tailscale = {
     enable = true;
-    extraUpFlags = ["--ssh"];
+    # No Tailscale SSH: it answers port 22 on the tailnet address before
+    # sshd, bypassing authorized_keys. The setting persists in tailscaled's
+    # state, so it has to be turned off explicitly, not just left out of up.
+    extraSetFlags = ["--ssh=false"];
   };
 
   age.secrets.obsidian-auth-token = {
@@ -87,8 +92,6 @@
   age.secrets.kagi-api-key = {
     file = ./../secrets/kagi-api-key.age;
     mode = "440";
-    owner = "kagi-mcp";
-    group = "kagi-mcp";
   };
 
   age.secrets.context7-api-key = {
@@ -103,19 +106,13 @@
     group = "grafana-mcp";
   };
 
-  age.secrets.graphite-auth-token = {
-    file = ./../secrets/graphite-auth-token.age;
-    mode = "440";
-    owner = "graphite-mcp";
-    group = "graphite-mcp";
-  };
-
   services.basic-memory.enable = true;
   rc.backup = {
     enable = true;
     paths =
       [
         config.services.postgresqlBackup.location
+        config.services.freshrss.dataDir
         "/var/lib/basic-memory"
         "/var/lib/open-webui"
         "/var/lib/roon-server/backup"
@@ -123,23 +120,26 @@
       ++ lib.optional config.rc.obsidian-sync.enable config.rc.obsidian-sync.vaultPath;
   };
   services.mcp-nixos.enable = true;
-  services.kagi-mcp = {
-    enable = true;
-    environmentFile = config.age.secrets.kagi-api-key.path;
-  };
   services.grafana-mcp = {
     enable = true;
-    grafanaUrl = "https://grafana.zx.dev";
+    grafanaUrl = "https://monitoring.zx.dev";
     tokenFile = config.age.secrets.grafana-mcp-token.path;
-  };
-  services.graphite-mcp = {
-    enable = true;
-    authTokenFile = config.age.secrets.graphite-auth-token.path;
   };
   services.obsidian-vault-mcp = {
     enable = true;
     inherit (config.rc.obsidian-sync) vaultPath;
   };
+  services.rc-source-mcp = {
+    enable = true;
+    sourcePath = "${inputs.self}";
+  };
+  # Re-register MCP servers when a local server's unit changes (new binary,
+  # flags or environment), so MCPJungle's copy of its tool list stays
+  # current. rc-source is left out: its unit changes on every commit, but its
+  # tool list doesn't.
+  systemd.timers.mcpjungle-register.restartTriggers =
+    map (name: config.systemd.units."${name}.service".unit)
+    ["basic-memory" "mcp-nixos" "grafana-mcp" "obsidian-vault-mcp"];
   services.mcpjungle = {
     enable = true;
     servers.basic-memory = {
@@ -151,20 +151,26 @@
       description = "NixOS options, packages, and Home Manager search";
     };
     servers.kagi = {
-      url = "http://127.0.0.1:8093/mcp";
-      description = "Kagi web search and page summarization";
+      # Kagi's hosted server; it takes the API key as a bearer token.
+      url = "https://mcp.kagi.com/mcp";
+      description = "Kagi web search and page extraction";
+      headers.Authorization = "Bearer $KAGI_API_KEY";
+      environmentFile = config.age.secrets.kagi-api-key.path;
     };
     servers.grafana = {
       url = "http://127.0.0.1:8095/mcp";
       description = "Grafana dashboards, Loki logs, and Prometheus metrics";
     };
-    servers.graphite = {
-      url = "http://127.0.0.1:8094/mcp";
-      description = "Graphite CLI for stacked PRs and code review";
-    };
     servers.obsidian-vault = {
       url = "http://127.0.0.1:8097/mcp";
       description = "Read and write files in the Obsidian vault";
+    };
+    servers.rc-source = {
+      url = "http://127.0.0.1:8098/mcp";
+      description = "Read-only source of my NixOS and nix-darwin configuration (github.com/stackptr/rc), as last deployed on glyph. Use it for questions about how my machines and services are set up.";
+      # It serves a store path, so writes always fail; read_file is a
+      # deprecated alias of read_text_file.
+      disabledTools = ["create_directory" "edit_file" "move_file" "write_file" "read_file"];
     };
     servers.context7 = {
       url = "https://mcp.context7.com/mcp";
@@ -181,12 +187,43 @@
       description = "AWS documentation and development reference";
     };
     servers.cloudflare-docs = {
-      url = "https://docs.mcp.cloudflare.com/sse";
+      url = "https://docs.mcp.cloudflare.com/mcp";
       description = "Cloudflare documentation and API reference";
     };
-    servers.semgrep = {
-      url = "https://mcp.semgrep.ai/mcp";
-      description = "Code security scanning for vulnerabilities, supply chain, and secrets";
+    # Open WebUI's local model gets every tool schema in its context on each
+    # turn, so it uses this subset; the full gateway stays available to it as
+    # a second, opt-in tool server.
+    groups.chat = {
+      description = "Tools for Open WebUI";
+      includedServers = ["mcp-nixos" "deepwiki" "context7"];
+      includedTools =
+        map (tool: "grafana__${tool}") [
+          "list_datasources"
+          "query_prometheus"
+          "list_prometheus_metric_names"
+          "list_prometheus_label_values"
+          "query_loki_logs"
+          "query_loki_patterns"
+          "query_loki_stats"
+          "list_loki_label_values"
+          "search_dashboards"
+          "get_dashboard_summary"
+        ]
+        ++ map (tool: "basic-memory__${tool}") [
+          "build_context"
+          "read_note"
+          "recent_activity"
+          "search_notes"
+          "write_note"
+          "edit_note"
+        ]
+        ++ map (tool: "rc-source__${tool}") [
+          "directory_tree"
+          "list_directory"
+          "read_text_file"
+          "read_multiple_files"
+          "search_files"
+        ];
     };
   };
 }

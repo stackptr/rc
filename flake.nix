@@ -14,10 +14,7 @@
     };
     agenix = {
       url = "github:ryantm/agenix";
-      inputs.darwin.follows = "nix-darwin";
-      inputs.home-manager.follows = "home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
-      inputs.systems.follows = "systems";
     };
     home-manager = {
       url = "github:nix-community/home-manager";
@@ -32,6 +29,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nixos-hardware.url = "github:NixOS/nixos-hardware";
+    direnv-instant = {
+      url = "github:Mic92/direnv-instant";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-parts.follows = "flake-parts";
+    };
 
     # Deployment
     deploy-rs = {
@@ -74,6 +76,11 @@
     };
     homebrew-cask = {
       url = "github:homebrew/homebrew-cask";
+      flake = false;
+    };
+    # oMLX's own tap (the repo root holds Formula/omlx.rb); Stroma only
+    homebrew-omlx = {
+      url = "github:jundot/omlx";
       flake = false;
     };
     llm-profile = {
@@ -178,14 +185,10 @@
           (system: deployLib: deployLib.deployChecks inputs.self.deploy)
           inputs.deploy-rs.lib;
 
+        # The binary cache is set per host in modules/base/nix-config.nix
+        # (glyph reads it locally), and in the CI workflows.
         nixConfig = {
           experimental-features = ["nix-command" "flakes"];
-          extra-substituters = [
-            "https://cache.zx.dev/main"
-          ];
-          extra-trusted-public-keys = [
-            "main:mu0jkxdJTGWC3djDSEQb3rvZgqlhA8WVMulcTo5IW6c="
-          ];
         };
       };
 
@@ -202,8 +205,6 @@
           overlays = import ./overlays;
           config.allowUnfreePredicate = pkg:
             builtins.elem (inputs.nixpkgs.lib.getName pkg) [
-              "graphite-cli"
-              "graphite-cli-unwrapped"
               "obsidian-headless"
             ];
         };
@@ -215,13 +216,16 @@
             packages =
               [
                 inputs'.agenix.packages.default
-                pkgs.graphite-cli
+                pkgs.age-plugin-yubikey
                 pkgs.just
               ]
               ++ config.pre-commit.settings.enabledPackages;
             shellHook = ''
               ${config.pre-commit.shellHook}
-              entire enable -y --agent claude-code 2>/dev/null || true
+              # Settings are tracked; only (re)install when Entire's git hooks are missing.
+              if ! grep -qs entire "$(git rev-parse --git-path hooks 2>/dev/null)/prepare-commit-msg"; then
+                entire enable -y --agent claude-code >/dev/null 2>&1 || true
+              fi
             '';
           };
         };

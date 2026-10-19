@@ -1,18 +1,14 @@
-let
-  keys = with (import ../keys.nix); [spore Rhizome];
-in {
-  "hosts/spore/secrets/cloudflare-dns.age".publicKeys = keys;
-  "hosts/spore/secrets/docs-htpasswd.age".publicKeys = keys;
-  "hosts/spore/secrets/homepage-env.age".publicKeys = keys;
-  "hosts/spore/secrets/grafana-client-secret.age".publicKeys = keys;
-  "hosts/spore/secrets/grafana-secret-key.age".publicKeys = keys;
-  "hosts/spore/secrets/slack-bot-token.age".publicKeys = keys;
-  "hosts/spore/secrets/mastodon-s3-env.age".publicKeys = keys;
-  "hosts/spore/secrets/mastodon-secret-key-base.age".publicKeys = keys;
-  "hosts/spore/secrets/mastodon-vapid-public-key.age".publicKeys = keys;
-  "hosts/spore/secrets/mastodon-vapid-private-key.age".publicKeys = keys;
-  "hosts/spore/secrets/notifier-smtp-password.age".publicKeys = keys;
-  "hosts/spore/secrets/oauth2-proxy-env.age".publicKeys = keys;
-  "hosts/spore/secrets/pocket-id-encryption-key.age".publicKeys = keys;
-  "hosts/spore/secrets/tailscale-auth-key.age".publicKeys = keys;
-}
+import ./mk-host.nix "spore" [
+  "cloudflare-dns"
+  "docs-htpasswd"
+  "homepage-env"
+  "mastodon-s3-env"
+  "mastodon-secret-key-base"
+  "mastodon-vapid-public-key"
+  "mastodon-vapid-private-key"
+  "notifier-smtp-password"
+  "oauth2-proxy-env"
+  "pocket-id-encryption-key"
+  "tailscale-auth-key"
+  "user-password"
+]
