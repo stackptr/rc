@@ -176,7 +176,11 @@ in {
                 mappings = {
                   items = "data";
                   name = "id";
-                  label = "id";
+                  # Context window in K tokens (max_model_len / 1024).
+                  label = "max_model_len";
+                  format = "number";
+                  scale = "1/1024";
+                  suffix = "K ctx";
                   limit = 8;
                 };
               };
