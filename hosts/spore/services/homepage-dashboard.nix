@@ -209,6 +209,21 @@ in {
             };
           }
           {
+            "Navidrome" = {
+              description = "Music streaming";
+              href = "https://music.zx.dev";
+              icon = "navidrome";
+              widget = {
+                type = "navidrome";
+                url = "http://glyph.note-iwato.ts.net:4533";
+                # Subsonic token auth: TOKEN is md5(password + SALT)
+                user = "{{HOMEPAGE_VAR_NAVIDROME_USER}}";
+                token = "{{HOMEPAGE_VAR_NAVIDROME_TOKEN}}";
+                salt = "{{HOMEPAGE_VAR_NAVIDROME_SALT}}";
+              };
+            };
+          }
+          {
             "AudioMuse-AI" = {
               description = "Sonic analysis & playlists";
               href = "https://mix.zx.dev";
