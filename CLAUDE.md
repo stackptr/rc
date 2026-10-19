@@ -115,6 +115,8 @@ Journald streams carry these labels:
 | `priority` | `PRIORITY` | `0`–`7` (0=emerg, 3=err, 4=warn, 6=info, 7=debug) |
 | `app` | `SYSLOG_IDENTIFIER` | `navidrome`, `nginx`, `kernel` |
 
+**Podman containers log everything at `priority="3"`:** oci-containers units (`podman-<name>.service` on glyph: audiomuse-flask, audiomuse-worker, open-terminal) write the containers' stderr to the journal at err, INFO lines included, so `priority=~"[0-3]"` matches everything. Filter on the text instead, e.g. `|~ "\\[(ERROR|CRITICAL|WARNING)\\]|Traceback"`.
+
 **Alloy journal relabel names:** the source label is `__journal_` plus the lowercased field name, so `_SYSTEMD_UNIT` becomes `__journal__systemd_unit` (double underscore) and `PRIORITY` becomes `__journal_priority`.
 
 **Alloy active but shipping nothing:** if `loki_source_journal_target_lines_total` (`curl -s localhost:12345/metrics`) stays at 0 while `journalctl` works, alloy's libsystemd can't read the zstd-compressed journal. nixpkgs links it against `systemdLibs`, built without zstd; `overlays/grafana-alloy.nix` relinks it against full systemd. Deleting alloy's saved positions doesn't help.
@@ -181,7 +183,7 @@ Scraped series carry `instance` and an identical `host` label, so `{host="glyph"
 
 | Job | Port | Host | Covers |
 |---|---|---|---|
-| `node` | 9100 | glyph, spore, zeta, stroma | CPU, memory, disk, network, systemd unit states, restarts (`node_systemd_service_restart_total`), start times, timer last-trigger. Stroma is macOS: no systemd series and no `node_memory_MemAvailable_bytes` |
+| `node` | 9100 | glyph, spore, zeta, stroma | CPU, memory, disk, network, systemd unit states, restarts (`node_systemd_service_restart_total`, which counts only systemd's own `Restart=` restarts; catch a stop/start or a recreated container with `time() - node_systemd_unit_start_time_seconds`), start times, timer last-trigger. Stroma is macOS: no systemd series and no `node_memory_MemAvailable_bytes` |
 | `mactop` | 9101 | stroma | Apple Silicon: `mactop_cpu_usage_percent` (and `mactop_{e,p,s}core_usage_percent`; M5 has P- and S-cores, no E-cores), `mactop_gpu_usage_percent`, `mactop_power_watts{component}` (cpu, gpu, ane, dram, gpu_sram, system, total: total is whole-machine power and system is the remainder, so the others sum to total; on M5 these need mactop 2.1.6+, see `overlays/mactop.nix`), `mactop_dram_bandwidth_gbs` (0 on M5 Ultra), `mactop_soc_temp_celsius`, `mactop_thermal_state` (0–3), `mactop_memory_gb{type}`, fans |
 | `zfs` | 9134 | glyph | Pool health, ARC hit ratio, pool space |
 | `postgres` | 9187 | glyph | Connections, query throughput, vacuum, per-DB stats |
@@ -204,6 +206,10 @@ Scraped series carry `instance` and an identical `host` label, so `{host="glyph"
 **smartctl exporter fails every scrape with `collected metric ... with unregistered descriptor`:** v0.14.0 registers metrics only for disks readable at startup, so a disk that becomes readable later (NVMe ACL, drive waking) breaks it until `systemctl restart prometheus-smartctl-exporter`. Fixed in v0.15.0 (prometheus-community/smartctl_exporter#329).
 
 **`home.zx.dev` returns "400: Bad Request"** (Home Assistant on zeta): since HA 2026.8 the HTTP server settings live in the UI, not `configuration.yaml`. YAML `http:` is imported once, then ignored, so editing it in Nix does nothing. If the import is rolled back (an admin must confirm the new settings within 5 minutes, impossible while logins are broken), HA falls back to defaults and rejects spore's proxy: `{host="zeta", unit="home-assistant.service"} |= "untrusted proxy"` shows `Received X-Forwarded-For header from an untrusted proxy <spore's tailnet IP>`. Fix: open `http://zeta.note-iwato.ts.net:8123` directly (not through spore), then Settings > System > Network > HTTP server: turn on Trust X-Forwarded-For, add `100.64.0.0/10` to Trusted proxies, save, log back in after the restart and confirm within 5 minutes. The Gatus `sites/home-assistant` check expects 401 from `https://home.zx.dev/api/` and fires on a 400.
+
+**AudioMuse-AI** (glyph:8001, `hosts/glyph/services/audiomuse.nix`): the upstream image as two podman containers, flask and worker, on glyph's Postgres (database `audiomuse`, over `/run/postgresql`). Only infrastructure is in Nix. Its settings (Navidrome login, the oMLX provider and sub-key, its admin and the API token Navidrome's plugin uses) live in the database and override environment variables after the first start, so change them in its UI. The worker's first analysis ran at about 10 tracks/min using a third to half of glyph's 24 cores (about 36h for 22k tracks); progress is `SELECT count(*) FROM score;` in `audiomuse`. Lost admin access: delete the `AUDIOMUSE_USER`/`AUDIOMUSE_PASSWORD` rows from `app_config` and the admin rows from `audiomuse_users`, restart both units, and the Setup Wizard returns. The image tag is pinned; bump it by hand. Gatus's `glyph/audiomuse` checks flask's `/api/health`; the worker has no endpoint, and since oci-containers units restart on failure, a crash-looping worker may never reach the "Systemd unit failed" alert: check its start time (above).
+
+**Navidrome rebuilds whenever its plugins change:** `services.navidrome.plugins` overrides the `navidrome` package itself (its `postInstall` links the `.ndp` files), so the plugin list is an input to the full Go and web UI build and cache.nixos.org never has it. CI builds it into attic; if the CI run for a commit was cancelled, switching glyph compiles Navidrome locally.
 
 ### Blind spots
 
