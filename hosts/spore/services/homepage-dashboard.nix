@@ -19,6 +19,9 @@
   };
 in {
   age.secrets.homepage-env.file = ./../secrets/homepage-env.age;
+  # systemd reads environmentFiles only at start, and the decrypted path never
+  # changes, so a new secret otherwise waits for the next restart.
+  systemd.services.homepage-dashboard.restartTriggers = [config.age.secrets.homepage-env.file];
   services.homepage-dashboard = {
     enable = true;
     environmentFiles = [config.age.secrets.homepage-env.path];
