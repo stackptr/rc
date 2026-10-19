@@ -14,6 +14,7 @@
     ./filebrowser.nix
     ./freshrss.nix
     ./grafana.nix
+    ./hister.nix
     ./jellyfin.nix
     ./loki.nix
     ./navidrome.nix
@@ -113,6 +114,8 @@
         config.services.postgresqlBackup.location
         config.services.freshrss.dataDir
         "/var/lib/basic-memory"
+        # Full-text index and stored pages; the rest is in Postgres
+        "/var/lib/hister"
         "/var/lib/open-webui"
         "/var/lib/roon-server/backup"
       ]
