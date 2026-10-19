@@ -8,6 +8,7 @@
   imports = [
     ./alloy.nix
     ./attic.nix
+    ./audiomuse.nix
     ./db.nix
     ./avahi.nix
     ./dns.nix

@@ -12,7 +12,7 @@
       port = 5432;
       max_connections = 150;
     };
-    ensureDatabases = ["atticd" "freshrss" "grafana" "open-webui" "pocketid"];
+    ensureDatabases = ["atticd" "audiomuse" "freshrss" "grafana" "open-webui" "pocketid"];
     ensureUsers = [
       {
         name = "mu";
@@ -20,6 +20,10 @@
       }
       {
         name = "atticd";
+        ensureDBOwnership = true;
+      }
+      {
+        name = "audiomuse";
         ensureDBOwnership = true;
       }
       {
@@ -43,6 +47,6 @@
 
   services.postgresqlBackup = {
     enable = true;
-    databases = ["atticd" "freshrss" "grafana" "open-webui" "pocketid"];
+    databases = ["atticd" "audiomuse" "freshrss" "grafana" "open-webui" "pocketid"];
   };
 }
