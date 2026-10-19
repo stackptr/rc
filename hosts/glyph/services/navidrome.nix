@@ -43,7 +43,7 @@ in {
       Scanner.Schedule = "@every 1h";
       RecentlyAddedByModTime = true;
       Prometheus.Enabled = true;
-      Agents = "apple-music,lastfm,deezer,audiomuseai";
+      Agents = "audiomuseai,apple-music,lastfm,deezer";
       LyricsPriority = ".ttml,.yaml,.yml,.elrc,.lrc,.srt,.txt,embedded,nd-lyrics";
     };
   };
