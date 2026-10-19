@@ -113,6 +113,17 @@ in {
           description = "Loki is down or has received no logs from zeta in 10m";
         })
         (mkEndpoint {
+          name = "audiomuse";
+          group = "glyph";
+          # Unauthenticated liveness probe; covers the flask container only
+          url = "http://${glyph}:8001/api/health";
+          conditions = [
+            "[STATUS] == 200"
+            "[BODY].status == ok"
+          ];
+          description = "AudioMuse-AI's web container on glyph is not answering, so Navidrome's audiomuseai plugin can't reach it";
+        })
+        (mkEndpoint {
           name = "reachable";
           group = "spore";
           url = "tcp://${spore}:22";
