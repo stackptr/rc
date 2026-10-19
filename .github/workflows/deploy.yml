@@ -70,12 +70,16 @@ jobs:
           attic login rc https://cache.zx.dev "$ATTIC_TOKEN"
           attic use rc:main
 
+      # Tailnet Lock rejects nodes an OAuth client creates, so the runner joins
+      # with a reusable, ephemeral tag:ci auth key signed on a signing node
+      # (`tailscale lock sign`). The key expires within 90 days; zeta's
+      # tailscale-key-expiry warns 14 days ahead. statedir holds the tailnet
+      # key authority state the lock needs.
       - name: Connect to Tailscale
         uses: tailscale/github-action@6cae46e2d796f265265cfcf628b72a32b4d7cade # v3.3.0
         with:
-          oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
-          oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
-          tags: tag:ci
+          authkey: ${{ secrets.TS_AUTHKEY }}
+          statedir: ${{ runner.temp }}/tailscale
 
       # Host keys come from hosts/<host>/key.pub (the same keys agenix uses),
       # so the runner never trusts a key it sees for the first time.
