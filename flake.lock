@@ -278,17 +278,16 @@
         ]
       },
       "locked": {
-        "lastModified": 1787148908,
-        "narHash": "sha256-1jJGOXOkQtfL7h8cKWNS4btJGMQjdzSiUPLdosZbajM=",
+        "lastModified": 1790171299,
+        "narHash": "sha256-lIt63F0a5AQNANln/ZtlpbMPNvqdEcutu2ybOT5vE6I=",
         "owner": "tailscale",
         "repo": "golink",
-        "rev": "52e1fd108b6362c7269fc834f854146b21a3bfc7",
+        "rev": "e034189e44e1d01c0672c401b038b8959d58aea6",
         "type": "github"
       },
       "original": {
         "owner": "tailscale",
         "repo": "golink",
-        "rev": "52e1fd108b6362c7269fc834f854146b21a3bfc7",
         "type": "github"
       }
     },
