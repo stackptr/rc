@@ -17,11 +17,12 @@
   paseoHome = "/var/lib/paseo";
   opencodePort = 8890;
   paseoPort = 6767;
-  # spore's tailnet address, from `tailscale status`
+  # spore's tailnet addresses, from `tailscale ip spore`
   spore = "100.89.150.33";
+  spore6 = "fd7a:115c:a1e0::a033:9621";
   onlyFromSpore = port: ''
     iptables -I nixos-fw 1 -i tailscale0 -p tcp --dport ${toString port} ! -s ${spore} -j REJECT --reject-with tcp-reset
-    ip6tables -I nixos-fw 1 -i tailscale0 -p tcp --dport ${toString port} -j REJECT --reject-with tcp-reset
+    ip6tables -I nixos-fw 1 -i tailscale0 -p tcp --dport ${toString port} ! -s ${spore6} -j REJECT --reject-with tcp-reset
   '';
 
   stromaModel = "Qwen3.8-27B-MTPLX-Optimized-Quality";
@@ -209,8 +210,8 @@ in {
 
   # tailscale0 is trusted, so without the first rules any tailnet device
   # could use OpenCode's server or Paseo directly. Only spore's nginx may,
-  # which puts Pocket ID in front of them (code.zx.dev, agents.zx.dev). IPv6
-  # gets a reset rather than a drop, so nginx retries glyph's IPv4 at once.
+  # which puts Pocket ID in front of them (code.zx.dev, agents.zx.dev).
+  # Others get a reset rather than a drop, so they fail at once.
   #
   # Postgres trusts every local connection (hosts/glyph/services/db.nix), so
   # anything running as this user could connect as the superuser. The socket
