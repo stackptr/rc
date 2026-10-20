@@ -14,6 +14,12 @@
       "camera"
       "mobile_app"
       "zeroconf"
+      # Device integrations, set up in the UI. Listing them here installs
+      # their Python dependencies; without it the config flow fails.
+      "lutron_caseta" # Local LEAP client of the Smart Bridge; HomeKit stays paired
+      "midea" # Local; save each device's V3 token and key, Midea is retiring the cloud lookup
+      "lg_thinq" # Cloud push; needs a ThinQ Connect personal access token
+      "nest" # Device Access (SDM) API over Google Cloud Pub/Sub
     ];
     config = {
       # No `http` block: since 2026.8 the HTTP server settings (including
