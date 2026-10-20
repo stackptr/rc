@@ -124,6 +124,14 @@ in {
           description = "AudioMuse-AI's web container on glyph is not answering, so Navidrome's audiomuseai plugin can't reach it";
         })
         (mkEndpoint {
+          name = "paseo";
+          group = "glyph";
+          # Unauthenticated liveness probe
+          url = "http://${glyph}:6767/api/health";
+          conditions = ["[STATUS] == 200"];
+          description = "Paseo on glyph is not answering, so agents.zx.dev and its agents are down";
+        })
+        (mkEndpoint {
           name = "reachable";
           group = "spore";
           url = "tcp://${spore}:22";

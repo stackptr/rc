@@ -15,6 +15,8 @@ import ./mk-host.nix "glyph" [
   "navidrome-env"
   "opencode-env"
   "opencode-web-env"
+  "paseo-env"
+  "claude-code-env"
   "restic-env"
   "restic-password"
   "ssh-client-key"

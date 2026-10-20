@@ -135,6 +135,23 @@
           proxyWebsockets = true;
         };
       };
+      "agents.zx.dev" = {
+        forceSSL = true;
+        useACMEHost = "zx.dev";
+        # Paseo on glyph, which also requires its own password
+        requireAuth = true;
+        locations."/" = {
+          proxyPass = "http://glyph.note-iwato.ts.net:6767";
+          proxyWebsockets = true;
+          extraConfig = ''
+            # Agent output streams over a WebSocket for the whole session
+            proxy_buffering off;
+            proxy_read_timeout 3600s;
+            proxy_send_timeout 3600s;
+            client_max_body_size 100m;
+          '';
+        };
+      };
       "cache.zx.dev" = {
         forceSSL = true;
         useACMEHost = "zx.dev";
