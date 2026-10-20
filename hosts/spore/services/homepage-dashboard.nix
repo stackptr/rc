@@ -208,6 +208,13 @@ in {
             };
           }
           {
+            "pgAdmin" = {
+              description = "Databases on glyph";
+              href = "https://db.zx.dev";
+              icon = "pgadmin";
+            };
+          }
+          {
             "oMLX" = {
               description = "Local LLMs on Stroma";
               href = "https://monitoring.zx.dev/d/apple-silicon";

@@ -22,6 +22,7 @@
     ./ntfy.nix
     ./open-terminal.nix
     ./open-webui.nix
+    ./pgadmin.nix
     ./prometheus.nix
     ./samba.nix
     ./webdav.nix
