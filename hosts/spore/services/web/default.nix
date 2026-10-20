@@ -140,6 +140,9 @@
         useACMEHost = "zx.dev";
         # Paseo on glyph, which also requires its own password
         requireAuth = true;
+        # For Gatus: glyph only accepts Paseo's port from spore. requireAuth
+        # only guards locations."/", so this exact match skips Pocket ID.
+        locations."= /api/health".proxyPass = "http://glyph.note-iwato.ts.net:6767";
         locations."/" = {
           proxyPass = "http://glyph.note-iwato.ts.net:6767";
           proxyWebsockets = true;

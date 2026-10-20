@@ -126,10 +126,11 @@ in {
         (mkEndpoint {
           name = "paseo";
           group = "glyph";
-          # Unauthenticated liveness probe
-          url = "http://${glyph}:6767/api/health";
+          # Unauthenticated liveness probe, through spore: glyph only accepts
+          # Paseo's port from spore
+          url = "https://agents.zx.dev/api/health";
           conditions = ["[STATUS] == 200"];
-          description = "Paseo on glyph is not answering, so agents.zx.dev and its agents are down";
+          description = "Paseo on glyph is not answering through spore, so agents.zx.dev and its agents are down";
         })
         (mkEndpoint {
           name = "reachable";

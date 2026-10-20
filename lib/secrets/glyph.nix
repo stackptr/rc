@@ -14,7 +14,6 @@ import ./mk-host.nix "glyph" [
   "obsidian-auth-token"
   "navidrome-env"
   "opencode-env"
-  "opencode-web-env"
   "paseo-env"
   "claude-code-env"
   "restic-env"
