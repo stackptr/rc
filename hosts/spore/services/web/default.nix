@@ -78,12 +78,12 @@
         locations."/".proxyPass = "http://glyph.note-iwato.ts.net:9091";
         locations."~ (/transmission)?/rpc".proxyPass = "http://glyph.note-iwato.ts.net:9091";
       };
-      "homebridge.zx.dev" = {
+      "homekit.zx.dev" = {
         forceSSL = true;
         useACMEHost = "zx.dev";
         locations."/".proxyPass = "http://zeta.note-iwato.ts.net:8581";
       };
-      "ha.zx.dev" = {
+      "home.zx.dev" = {
         forceSSL = true;
         useACMEHost = "zx.dev";
         locations."/" = {
@@ -97,7 +97,7 @@
         requireAuth = true;
         locations."/".proxyPass = "http://glyph.note-iwato.ts.net:8080";
       };
-      "home.zx.dev" = {
+      "dash.zx.dev" = {
         forceSSL = true;
         useACMEHost = "zx.dev";
         requireAuth = true;
@@ -109,7 +109,7 @@
         requireAuth = true;
         locations."/".proxyPass = "http://zeta.note-iwato.ts.net:8080";
       };
-      "grafana.zx.dev" = {
+      "monitoring.zx.dev" = {
         forceSSL = true;
         useACMEHost = "zx.dev";
         # Grafana runs on glyph, next to its database, Prometheus and Loki.
@@ -142,13 +142,16 @@
           proxyPass = "http://glyph.note-iwato.ts.net:8199";
           extraConfig = ''
             client_max_body_size 0;
+            # Fail fast when glyph is unreachable, so Nix gives up on the
+            # cache instead of waiting out the 60s default on every path.
+            proxy_connect_timeout 5s;
             proxy_read_timeout 300;
             proxy_buffering off;
             proxy_http_version 1.1;
           '';
         };
       };
-      "jellyfin.zx.dev" = {
+      "media.zx.dev" = {
         forceSSL = true;
         useACMEHost = "zx.dev";
         locations."/".proxyPass = "http://glyph.note-iwato.ts.net:8096";
@@ -179,6 +182,41 @@
         forceSSL = true;
         useACMEHost = "zx.dev";
         locations."/".proxyPass = "http://glyph.note-iwato.ts.net:4533";
+      };
+      "mix.zx.dev" = {
+        forceSSL = true;
+        useACMEHost = "zx.dev";
+        # The only gate: AudioMuse-AI's own auth is off, as for other tailnet
+        # services. Navidrome's plugin calls it on glyph directly.
+        requireAuth = true;
+        locations."/" = {
+          proxyPass = "http://glyph.note-iwato.ts.net:8001";
+          extraConfig = ''
+            # The playlist chat streams over SSE and waits on the LLM for up
+            # to AudioMuse's 300s request timeout
+            proxy_buffering off;
+            proxy_read_timeout 300;
+            # Search by Recording uploads clips; AudioMuse enforces its own limit
+            client_max_body_size 0;
+          '';
+        };
+      };
+      "models.zx.dev" = {
+        forceSSL = true;
+        useACMEHost = "zx.dev";
+        locations = {
+          # Serve the admin UI at the site root; everything else (API, assets) passes through as-is
+          "= /".proxyPass = "http://stroma.note-iwato.ts.net:8000/admin";
+          "/" = {
+            proxyPass = "http://stroma.note-iwato.ts.net:8000";
+            extraConfig = ''
+              # Stream tokens as they're generated; long generations can idle for a while
+              proxy_buffering off;
+              proxy_read_timeout 600;
+              client_max_body_size 0;
+            '';
+          };
+        };
       };
       "rss.zx.dev" = {
         forceSSL = true;
@@ -284,6 +322,10 @@
       dnsProvider = "cloudflare";
       environmentFile = config.age.secrets.cloudflare-dns.path;
       extraDomainNames = ["zx.dev" "cjohns.com"];
+      # spore has IPv6 disabled, but Tailscale puts its IPv6 MagicDNS address
+      # (fd7a:115c:a1e0::53) in resolv.conf and lego can't dial it, so the
+      # DNS-01 propagation check never succeeds. Query a resolver directly.
+      dnsResolver = "8.8.8.8:53";
     };
   };
   users.users.nginx.extraGroups = ["acme"];

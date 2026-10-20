@@ -13,7 +13,10 @@
   services.openssh.enable = true;
   services.tailscale = {
     enable = true;
-    extraUpFlags = ["--ssh"];
+    # No Tailscale SSH: it answers port 22 on the tailnet address before
+    # sshd, bypassing authorized_keys. The setting persists in tailscaled's
+    # state, so it has to be turned off explicitly, not just left out of up.
+    extraSetFlags = ["--ssh=false"];
   };
   services.prometheus.exporters.node = {
     enable = true;

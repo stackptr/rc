@@ -1,0 +1,7 @@
+#       Serial: 37287590, Slot: 1
+#         Name: rc-admin-a
+#      Created: Fri, 16 Oct 2026 15:44:39 +0000
+#   PIN policy: Once   (A PIN is required once per session, if set)
+# Touch policy: Cached (A physical touch is required for decryption, and is cached for 15 seconds)
+#    Recipient: age1yubikey1q0h7amkmv8va7zvzd9k64l603qvafuxklq8467jsmgrhhdsc0cjdc2x33cq
+AGE-PLUGIN-YUBIKEY-15MMRSQ5ZMFY066G78N8NV

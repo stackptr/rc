@@ -1,6 +1,7 @@
 {
   config,
   pkgs,
+  username,
   ...
 }: {
   imports = [
@@ -14,5 +15,12 @@
     homebrew = true;
     security = true;
     system = true;
+  };
+
+  # A user secret, read by home-manager through osConfig. Decrypted at boot
+  # with sshd's host key (hosts/Rhizome/key.pub).
+  age.secrets.aichat-env = {
+    file = ../../home/secrets/aichat-env.age;
+    owner = username;
   };
 }

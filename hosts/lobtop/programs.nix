@@ -43,6 +43,8 @@
     enable = true;
   };
 
+  programs.ykding.enable = true;
+
   programs.scroll-reverser = {
     enable = true;
     startOnActivation = true;

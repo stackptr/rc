@@ -33,6 +33,7 @@ in {
     plugins = [
       # Plugins are WASM and must be cross-compiled for wasi
       pkgs.pkgsCross.wasi32.navidromePlugins.apple-music
+      pkgs.pkgsCross.wasi32.navidromePlugins.audiomuseai
       nd-lyrics
     ];
     settings = {
@@ -42,7 +43,7 @@ in {
       Scanner.Schedule = "@every 1h";
       RecentlyAddedByModTime = true;
       Prometheus.Enabled = true;
-      Agents = "apple-music,lastfm,deezer";
+      Agents = "audiomuseai,apple-music,lastfm,deezer";
       LyricsPriority = ".ttml,.yaml,.yml,.elrc,.lrc,.srt,.txt,embedded,nd-lyrics";
     };
   };

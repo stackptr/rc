@@ -1,6 +1,10 @@
 {config, ...}: {
   age.secrets.attic-credentials.file = ./../secrets/attic-credentials.age;
 
+  # Read the cache directly. cache.zx.dev goes out to spore and back over
+  # the tailnet, so builds here stalled on 504s while the tailnet was down.
+  nix.settings.extra-substituters = ["http://127.0.0.1:8199/main"];
+
   services.atticd = {
     enable = true;
     environmentFile = config.age.secrets.attic-credentials.path;

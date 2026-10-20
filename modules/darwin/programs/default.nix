@@ -11,5 +11,6 @@
     ./roon.nix
     ./scroll-reverser.nix
     ./soundsource.nix
+    ./ykding.nix
   ];
 }

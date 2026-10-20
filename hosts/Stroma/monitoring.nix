@@ -133,66 +133,59 @@ in {
   # bandwidth, SoC/GPU temperatures, thermal state and fans. Uses IOReport
   # and SMC, so no root needed.
   #
-  # These daemons set `command`, not serviceConfig.ProgramArguments:
-  # nix-darwin then starts them through `/bin/wait4path /nix/store`. launchd
-  # starts daemons at boot before the Nix volume is mounted, and a direct
-  # /nix/store path fails to spawn (last exit 78) and isn't retried, even
-  # with KeepAlive. node_exporter's module already does this.
-  launchd.daemons.mactop = {
-    command = lib.escapeShellArgs [
-      "${pkgs.mactop}/bin/mactop"
-      "--headless"
-      "--count"
-      "0"
-      # Sample every 10s; Prometheus scrapes every 60s.
-      "--interval"
-      "10000"
-      "--prometheus"
-      "9101"
-    ];
-    serviceConfig = {
-      UserName = config.system.primaryUser;
-      RunAtLoad = true;
-      KeepAlive = true;
-      # Headless mode also prints every sample as JSON on stdout.
-      StandardOutPath = "/dev/null";
-      StandardErrorPath = "/tmp/mactop.log";
-    };
+  # These daemons use `command`, not serviceConfig.ProgramArguments: nix-darwin
+  # wraps `command` in `/bin/wait4path /nix/store`. With ProgramArguments
+  # pointing into /nix/store, launchd starts them at boot before the Nix
+  # volume is mounted, and they stay down until the next switch.
+  launchd.daemons.mactop.command = lib.escapeShellArgs [
+    "${pkgs.mactop}/bin/mactop"
+    "--headless"
+    "--count"
+    "0"
+    # Sample every 10s; Prometheus scrapes every 60s.
+    "--interval"
+    "10000"
+    "--prometheus"
+    "9101"
+  ];
+  launchd.daemons.mactop.serviceConfig = {
+    UserName = config.system.primaryUser;
+    RunAtLoad = true;
+    KeepAlive = true;
+    # Headless mode also prints every sample as JSON on stdout.
+    StandardOutPath = "/dev/null";
+    StandardErrorPath = "/tmp/mactop.log";
   };
 
   # oMLX's /api/status as metrics, authenticated with the key above.
-  launchd.daemons.json-exporter = {
-    command = lib.escapeShellArgs [
-      "${pkgs.prometheus-json-exporter}/bin/json_exporter"
-      "--config.file=${jsonExporterConfig}"
-      "--web.listen-address=:7979"
-    ];
-    serviceConfig = {
-      UserName = user;
-      RunAtLoad = true;
-      KeepAlive = true;
-      StandardOutPath = "/tmp/json-exporter.log";
-      StandardErrorPath = "/tmp/json-exporter.log";
-    };
+  launchd.daemons.json-exporter.command = lib.escapeShellArgs [
+    "${pkgs.prometheus-json-exporter}/bin/json_exporter"
+    "--config.file=${jsonExporterConfig}"
+    "--web.listen-address=:7979"
+  ];
+  launchd.daemons.json-exporter.serviceConfig = {
+    UserName = user;
+    RunAtLoad = true;
+    KeepAlive = true;
+    StandardOutPath = "/tmp/json-exporter.log";
+    StandardErrorPath = "/tmp/json-exporter.log";
   };
 
   # Ships oMLX's log (per-request tokens, tok/s, TTFT, errors) to Loki as
   # {host="stroma", app="omlx"}. Runs as the user, who owns the log.
-  launchd.daemons.alloy = {
-    command = lib.escapeShellArgs [
-      "${pkgs.grafana-alloy}/bin/alloy"
-      "run"
-      # Prometheus on glyph scrapes Alloy's own metrics (job "alloy").
-      "--server.http.listen-addr=0.0.0.0:12345"
-      "--storage.path=${home}/Library/Application Support/Alloy"
-      "${alloyConfig}"
-    ];
-    serviceConfig = {
-      UserName = user;
-      RunAtLoad = true;
-      KeepAlive = true;
-      StandardOutPath = "/tmp/alloy.log";
-      StandardErrorPath = "/tmp/alloy.log";
-    };
+  launchd.daemons.alloy.command = lib.escapeShellArgs [
+    "${pkgs.grafana-alloy}/bin/alloy"
+    "run"
+    # Prometheus on glyph scrapes Alloy's own metrics (job "alloy").
+    "--server.http.listen-addr=0.0.0.0:12345"
+    "--storage.path=${home}/Library/Application Support/Alloy"
+    "${alloyConfig}"
+  ];
+  launchd.daemons.alloy.serviceConfig = {
+    UserName = user;
+    RunAtLoad = true;
+    KeepAlive = true;
+    StandardOutPath = "/tmp/alloy.log";
+    StandardErrorPath = "/tmp/alloy.log";
   };
 }

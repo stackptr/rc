@@ -20,6 +20,8 @@
   home = config.users.users.${user}.home;
   basePath = "${home}/.omlx";
   brewBin = "${config.homebrew.prefix}/bin";
+  # Points at the installed keg, e.g. ../Cellar/omlx/0.7.1rc1
+  optLink = "${config.homebrew.prefix}/opt/omlx";
 in {
   nix-homebrew.taps."jundot/homebrew-omlx" = inputs.homebrew-omlx;
   homebrew.brews = ["jundot/omlx/omlx"];
@@ -60,4 +62,21 @@ in {
     StandardOutPath = "${basePath}/logs/launchd.log";
     StandardErrorPath = "${basePath}/logs/launchd.log";
   };
+
+  # Activation runs `brew bundle` with upgrade and cleanup
+  # (homebrew.onActivation in modules/darwin/rc.nix), so a switch that moves
+  # the homebrew-omlx input installs a new keg and deletes the one the daemon
+  # is running from. The daemon keeps serving the API from memory, but /admin
+  # reads its templates from disk and returns 500 (models.zx.dev) until
+  # oMLX restarts. Restart it when the keg changed. Activation is one script
+  # that runs preActivation first and postActivation after the homebrew step.
+  system.activationScripts.preActivation.text = ''
+    omlxKegBefore=$(readlink ${optLink} || true)
+  '';
+  system.activationScripts.postActivation.text = ''
+    if [ "$(readlink ${optLink} || true)" != "''${omlxKegBefore:-}" ]; then
+      echo "restarting oMLX: Homebrew changed it to $(readlink ${optLink})" >&2
+      launchctl kickstart -k system/${config.launchd.daemons.omlx.serviceConfig.Label} || true
+    fi
+  '';
 }

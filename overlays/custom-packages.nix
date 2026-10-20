@@ -30,4 +30,7 @@ self: super: {
 
   # Ungoogled Chromium with privacy enhancements
   ungoogled-chromium = super.callPackage ./../packages/ungoogled-chromium/package.nix {};
+
+  # Sound and banner when a YubiKey waits for a touch (macOS)
+  ykding = super.callPackage ./../packages/ykding/package.nix {};
 }

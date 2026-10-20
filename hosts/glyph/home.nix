@@ -1,12 +1,19 @@
 {
-  config,
   llm-profile,
+  osConfig,
   pkgs,
   ...
 }: let
   stromaModel = "Qwen3.8-27B-MTPLX-Optimized-Quality";
 in {
   home.packages = [pkgs.mktorrent pkgs.obsidian-headless];
+
+  # `just switch-remote spore` and the tailnet-lockout tunnel log in to spore
+  # and zeta as root with glyph's client key, decrypted by agenix at boot.
+  programs.ssh.matchBlocks."spore zeta *.note-iwato.ts.net" = {
+    identityFile = osConfig.age.secrets.ssh-client-key.path;
+    identitiesOnly = true;
+  };
 
   programs.opencode = {
     enable = true;
@@ -26,7 +33,7 @@ in {
         npm = "@ai-sdk/openai-compatible";
         name = "Stroma";
         options.baseURL = "http://stroma.note-iwato.ts.net:8000/v1";
-        # An oMLX sub-key, from opencode-env.age below
+        # An oMLX sub-key, from opencode-env.age (hosts/glyph/default.nix)
         options.apiKey = "{env:STROMA_API_KEY}";
         models.${stromaModel}.name = "Qwen 3.8 27B";
       };
@@ -34,11 +41,7 @@ in {
   };
 
   systemd.user.services.opencode-web.Service.EnvironmentFile =
-    config.age.secrets.opencode-env.path;
-
-  age.secrets.opencode-env = {
-    file = ../../home/secrets/opencode-env.age;
-  };
+    osConfig.age.secrets.opencode-env.path;
 
   programs.beets = {
     enable = true;
