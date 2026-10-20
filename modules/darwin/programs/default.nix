@@ -4,6 +4,7 @@
     ./cmux.nix
     ./daisydisk.nix
     ./fastscripts.nix
+    ./goodlinks.nix
     ./iina.nix
     ./little-snitch.nix
     ./popclip.nix
