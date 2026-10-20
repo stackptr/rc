@@ -94,6 +94,33 @@ _: let
       summary = "{{ $labels.instance }} has {{ printf \"%.0f\" $values.A.Value }}% memory available";
       for = "10m";
     })
+    # Pressure stall information: the share of time some task was stalled
+    # waiting for the resource. Unlike utilisation, it stays low on a busy
+    # host whose work isn't contending (glyph's capped AudioMuse workers), and
+    # rises when something is actually being made to wait. macOS has no PSI,
+    # so Stroma has no series.
+    (mkRule {
+      uid = "cpu-pressure";
+      title = "CPU pressure high";
+      expr = "100 * rate(node_pressure_cpu_waiting_seconds_total[10m]) > 50";
+      summary = "Runnable tasks on {{ $labels.instance }} waited for CPU {{ printf \"%.0f\" $values.A.Value }}% of the time over 10m";
+      for = "30m";
+    })
+    (mkRule {
+      uid = "memory-pressure";
+      title = "Memory pressure high";
+      # Catches reclaim and swap thrashing while MemAvailable still looks fine
+      expr = "100 * rate(node_pressure_memory_waiting_seconds_total[5m]) > 10";
+      summary = "Tasks on {{ $labels.instance }} stalled on memory {{ printf \"%.0f\" $values.A.Value }}% of the time over 5m";
+      for = "10m";
+    })
+    (mkRule {
+      uid = "oom-kill";
+      title = "OOM kill";
+      expr = "increase(node_vmstat_oom_kill[10m]) > 0";
+      summary = "The kernel OOM-killed {{ printf \"%.0f\" $values.A.Value }} process(es) on {{ $labels.instance }} in the last 10m; check {app=\"kernel\"} in Loki";
+      for = "0s";
+    })
     (mkRule {
       uid = "backup-stale";
       title = "Backup timer stale";
