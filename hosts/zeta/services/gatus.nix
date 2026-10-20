@@ -124,6 +124,16 @@ in {
           description = "AudioMuse-AI's web container on glyph is not answering, so Navidrome's audiomuseai plugin can't reach it";
         })
         (mkEndpoint {
+          name = "home-assistant";
+          group = "zeta";
+          # Direct, not through spore, so this separates Home Assistant being
+          # down from sites/home-assistant's proxy failures. Unauthenticated,
+          # so a healthy instance answers 401.
+          url = "http://127.0.0.1:8123/api/";
+          conditions = ["[STATUS] == 401"];
+          description = "Home Assistant on zeta is down; its automations have stopped and devices it bridges to Apple Home show No Response. Check home-assistant.service on zeta";
+        })
+        (mkEndpoint {
           name = "reachable";
           group = "spore";
           url = "tcp://${spore}:22";
@@ -217,7 +227,7 @@ in {
           # missing from its UI-managed trusted proxies), as on 2026-10-14.
           url = "https://home.zx.dev/api/";
           conditions = ["[STATUS] == 401"];
-          description = "home.zx.dev (Home Assistant) is down or rejecting spore's proxy (400 means Trusted proxies in Settings > System > Network no longer includes 100.64.0.0/10); check home-assistant.service on zeta";
+          description = "home.zx.dev (Home Assistant) is unreachable or rejecting spore's proxy (400 means Trusted proxies in Settings > System > Network no longer includes 100.64.0.0/10); if zeta/home-assistant is also failing, Home Assistant itself is down";
         })
         (mkEndpoint {
           name = "models";
