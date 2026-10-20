@@ -6,6 +6,8 @@
   ...
 }: let
   port = 8890;
+  # spore's tailnet address, from `tailscale status`
+  spore = "100.89.150.33";
   home = "/var/lib/opencode";
   stromaModel = "Qwen3.8-27B-MTPLX-Optimized-Quality";
   # A shorter prompt helps a 27B model more than it helps Claude.
@@ -38,13 +40,6 @@ in {
     file = ../secrets/opencode-env.age;
     owner = "opencode";
   };
-  # OPENCODE_SERVER_PASSWORD: HTTP basic auth (user "opencode") on every
-  # route, since tailscale0 is trusted and code.zx.dev's Pocket ID only
-  # covers requests that come through spore
-  age.secrets.opencode-web-env = {
-    file = ../secrets/opencode-web-env.age;
-    owner = "opencode";
-  };
 
   # Agents run shell commands as this user, so it gets none of mu's access:
   # no /home (mu's SSH config and keys), no /mnt pools, no other secrets
@@ -55,10 +50,19 @@ in {
   };
   users.groups.opencode = {};
 
+  # tailscale0 is trusted, so without the first two rules any tailnet device
+  # could use the server directly. Only spore's nginx may, which puts Pocket
+  # ID in front of it (code.zx.dev). IPv6 gets a reset rather than a drop, so
+  # nginx retries glyph's IPv4 address at once.
+  #
   # Postgres trusts every local connection (hosts/glyph/services/db.nix), so
   # anything running as this user could connect as the superuser. The socket
-  # is hidden from the unit below; this rejects TCP to 5432 on any address.
+  # is hidden from the unit below; the opencode-out chain rejects its TCP to
+  # 5432 on any address.
   networking.firewall.extraCommands = ''
+    iptables -I nixos-fw 1 -i tailscale0 -p tcp --dport ${toString port} ! -s ${spore} -j REJECT --reject-with tcp-reset
+    ip6tables -I nixos-fw 1 -i tailscale0 -p tcp --dport ${toString port} -j REJECT --reject-with tcp-reset
+
     ip46tables -N opencode-out 2>/dev/null || ip46tables -F opencode-out
     ip46tables -A opencode-out -p tcp --dport 5432 -j REJECT
     ip46tables -D OUTPUT -m owner --uid-owner opencode -j opencode-out 2>/dev/null || true
@@ -85,10 +89,7 @@ in {
       User = "opencode";
       Group = "opencode";
       ExecStart = "${lib.getExe pkgs.opencode} serve --port ${toString port} --hostname 0.0.0.0";
-      EnvironmentFile = [
-        config.age.secrets.opencode-env.path
-        config.age.secrets.opencode-web-env.path
-      ];
+      EnvironmentFile = config.age.secrets.opencode-env.path;
       StateDirectory = "opencode";
       StateDirectoryMode = "0700";
       WorkingDirectory = home;
