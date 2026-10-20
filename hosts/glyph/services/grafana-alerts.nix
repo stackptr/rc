@@ -9,6 +9,9 @@ _: let
   logHosts = ["glyph" "spore" "zeta"];
 
   # Build a rule: query A (instant) compared by threshold expression C.
+  # C fires on each series whose value passes the evaluator (default > 0),
+  # so a PromQL filter must leave a non-zero value: `up == 0` keeps only
+  # zeros and never fires. Query the raw value and set the evaluator instead.
   mkRule = {
     uid,
     title,
@@ -76,7 +79,11 @@ _: let
     (mkRule {
       uid = "scrape-target-down";
       title = "Scrape target down";
-      expr = "up == 0";
+      expr = "up";
+      evaluator = {
+        type = "lt";
+        params = [1];
+      };
       summary = "Prometheus cannot scrape job {{ $labels.job }} on {{ $labels.instance }}";
       severity = "critical";
     })
@@ -166,7 +173,11 @@ _: let
     (mkRule {
       uid = "smart-failing";
       title = "SMART health check failing";
-      expr = "smartctl_device_smart_status != 1";
+      expr = "smartctl_device_smart_status";
+      evaluator = {
+        type = "lt";
+        params = [1];
+      };
       summary = "Disk {{ $labels.device }} on {{ $labels.instance }} is failing its SMART health check";
       severity = "critical";
     })
