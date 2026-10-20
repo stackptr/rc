@@ -6,8 +6,9 @@
   ...
 }: let
   port = 8890;
-  # spore's tailnet address, from `tailscale status`
+  # spore's tailnet addresses, from `tailscale ip spore`
   spore = "100.89.150.33";
+  spore6 = "fd7a:115c:a1e0::a033:9621";
   home = "/var/lib/opencode";
   stromaModel = "Qwen3.8-27B-MTPLX-Optimized-Quality";
   # A shorter prompt helps a 27B model more than it helps Claude.
@@ -52,8 +53,8 @@ in {
 
   # tailscale0 is trusted, so without the first two rules any tailnet device
   # could use the server directly. Only spore's nginx may, which puts Pocket
-  # ID in front of it (code.zx.dev). IPv6 gets a reset rather than a drop, so
-  # nginx retries glyph's IPv4 address at once.
+  # ID in front of it (code.zx.dev). Others get a reset rather than a drop,
+  # so they fail at once instead of timing out.
   #
   # Postgres trusts every local connection (hosts/glyph/services/db.nix), so
   # anything running as this user could connect as the superuser. The socket
@@ -61,7 +62,7 @@ in {
   # 5432 on any address.
   networking.firewall.extraCommands = ''
     iptables -I nixos-fw 1 -i tailscale0 -p tcp --dport ${toString port} ! -s ${spore} -j REJECT --reject-with tcp-reset
-    ip6tables -I nixos-fw 1 -i tailscale0 -p tcp --dport ${toString port} -j REJECT --reject-with tcp-reset
+    ip6tables -I nixos-fw 1 -i tailscale0 -p tcp --dport ${toString port} ! -s ${spore6} -j REJECT --reject-with tcp-reset
 
     ip46tables -N opencode-out 2>/dev/null || ip46tables -F opencode-out
     ip46tables -A opencode-out -p tcp --dport 5432 -j REJECT
