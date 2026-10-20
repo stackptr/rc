@@ -6,6 +6,7 @@
   environment.systemPackages = with pkgs; [
     m-cli
     mas
+    secretive
     the-unarchiver
   ];
 
