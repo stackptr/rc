@@ -1,11 +1,8 @@
 {
-  llm-profile,
   osConfig,
   pkgs,
   ...
-}: let
-  stromaModel = "Qwen3.8-27B-MTPLX-Optimized-Quality";
-in {
+}: {
   home.packages = [pkgs.mktorrent pkgs.obsidian-headless];
 
   # `just switch-remote spore` and the tailnet-lockout tunnel log in to spore
@@ -14,34 +11,6 @@ in {
     identityFile = osConfig.age.secrets.ssh-client-key.path;
     identitiesOnly = true;
   };
-
-  programs.opencode = {
-    enable = true;
-    enableMcpIntegration = true;
-    web.enable = true;
-    web.extraArgs = ["--port" "8890" "--hostname" "0.0.0.0"];
-    # A shorter prompt helps a 27B model more than it helps Claude.
-    context = (import ../../lib/llm-profile.nix llm-profile).agent;
-    settings = {
-      model = "stroma/${stromaModel}";
-      small_model = "stroma/${stromaModel}";
-      enabled_providers = ["stroma"];
-      autoupdate = false;
-      share = "disabled";
-      # oMLX on Stroma (hosts/Stroma/omlx.nix)
-      provider.stroma = {
-        npm = "@ai-sdk/openai-compatible";
-        name = "Stroma";
-        options.baseURL = "http://stroma.note-iwato.ts.net:8000/v1";
-        # An oMLX sub-key, from opencode-env.age (hosts/glyph/default.nix)
-        options.apiKey = "{env:STROMA_API_KEY}";
-        models.${stromaModel}.name = "Qwen 3.8 27B";
-      };
-    };
-  };
-
-  systemd.user.services.opencode-web.Service.EnvironmentFile =
-    osConfig.age.secrets.opencode-env.path;
 
   programs.beets = {
     enable = true;
