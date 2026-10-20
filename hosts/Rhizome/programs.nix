@@ -78,4 +78,10 @@
     enable = true;
     enableDefaults = true;
   };
+
+  programs.karabiner = {
+    enable = true;
+    enableDefaults = true;
+    startOnActivation = true;
+  };
 }
