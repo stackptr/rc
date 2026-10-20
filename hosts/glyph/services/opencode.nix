@@ -55,6 +55,21 @@ in {
   };
   users.groups.opencode = {};
 
+  # Postgres trusts every local connection (hosts/glyph/services/db.nix), so
+  # anything running as this user could connect as the superuser. The socket
+  # is hidden from the unit below; this rejects TCP to 5432 on any address.
+  networking.firewall.extraCommands = ''
+    ip46tables -N opencode-out 2>/dev/null || ip46tables -F opencode-out
+    ip46tables -A opencode-out -p tcp --dport 5432 -j REJECT
+    ip46tables -D OUTPUT -m owner --uid-owner opencode -j opencode-out 2>/dev/null || true
+    ip46tables -I OUTPUT -m owner --uid-owner opencode -j opencode-out
+  '';
+  networking.firewall.extraStopCommands = ''
+    ip46tables -D OUTPUT -m owner --uid-owner opencode -j opencode-out 2>/dev/null || true
+    ip46tables -F opencode-out 2>/dev/null || true
+    ip46tables -X opencode-out 2>/dev/null || true
+  '';
+
   # code.zx.dev on spore proxies here
   systemd.services.opencode-web = {
     description = "OpenCode server";
@@ -83,7 +98,7 @@ in {
       ProtectSystem = "strict";
       ProtectHome = true;
       # EnvironmentFile is read by systemd before the namespace is set up
-      InaccessiblePaths = ["/mnt" "/run/agenix" "/run/agenix.d"];
+      InaccessiblePaths = ["/mnt" "/run/agenix" "/run/agenix.d" "/run/postgresql"];
       PrivateTmp = true;
       PrivateDevices = true;
       NoNewPrivileges = true;
