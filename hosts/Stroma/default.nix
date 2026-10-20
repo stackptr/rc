@@ -30,7 +30,7 @@
     '';
   };
   users.users.${config.system.primaryUser}.openssh.authorizedKeys.keys =
-    map (k: "verify-required ${k}") keys.yubikeys;
+    map (k: "verify-required ${k}") keys.yubikeys ++ [keys.secureEnclave.Rhizome];
 
   # A user secret, read by home-manager through osConfig
   age.secrets.aichat-env = {

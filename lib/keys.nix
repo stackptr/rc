@@ -30,6 +30,15 @@ in
     # FIDO2 PIN and a touch. b is the offline spare.
     yubikeys = map (k: firstLine (builtins.readFile ./admin/ssh-yubikey-${k}.pub)) ["a" "b"];
 
+    # SSH login keys in these Macs' Secure Enclaves (Secretive, Touch ID on
+    # every use; hosts/<host>/secretive.pub). Plain ecdsa keys, so sshd can't
+    # check the Touch ID the way verify-required checks the YubiKey PIN: the
+    # requirement lives in the key's access control on the Mac.
+    secureEnclave = builtins.listToAttrs (map (h: {
+      name = h;
+      value = firstLine (builtins.readFile ./../hosts/${h}/secretive.pub);
+    }) ["Rhizome" "Stroma"]);
+
     # agenix admin recipients: age-plugin-yubikey keys (PIV slot 1, PIN once,
     # touch cached). Identity files are in lib/admin/; b is the offline spare.
     admins = [
