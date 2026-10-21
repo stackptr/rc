@@ -32,6 +32,15 @@
   users.users.${config.system.primaryUser}.openssh.authorizedKeys.keys =
     map (k: "verify-required ${k}") keys.yubikeys ++ [keys.secureEnclave.Rhizome];
 
+  # Stroma serves oMLX and is scraped by Prometheus, so the system never sleeps
+  # (a sleeping Mac drops node, mactop, alloy and omlx and trips Gatus). Display
+  # sleep is unaffected. pmset rather than power.sleep.computer, which goes
+  # through systemsetup and needs Full Disk Access.
+  system.activationScripts.postActivation.text = ''
+    /usr/bin/pmset -a sleep 0
+    /usr/bin/pmset -a womp 1
+  '';
+
   # A user secret, read by home-manager through osConfig
   age.secrets.aichat-env = {
     file = ../../home/secrets/aichat-env.age;
