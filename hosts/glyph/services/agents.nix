@@ -256,7 +256,19 @@ in {
     };
     link = target: {"L+".argument = "${target}";};
   in {
-    ${home} = dir;
+    # The home predates these units: an earlier DynamicUser unit left it,
+    # and systemd moved it into place, owned by nobody (65534), so neither
+    # OpenCode nor nono could write to it. Everything in it belongs to the
+    # agent user, so Z resets ownership recursively; modes are left alone.
+    ${home} =
+      dir
+      // {
+        Z = {
+          inherit user;
+          group = user;
+          mode = "-";
+        };
+      };
     ${workspaces} = dir;
     "${home}/.config" = dir;
     "${home}/.config/opencode" = dir;
@@ -284,7 +296,7 @@ in {
     description = "OpenCode server";
     wantedBy = ["multi-user.target"];
     wants = ["network-online.target"];
-    after = ["network-online.target" "systemd-tmpfiles-setup.service"];
+    after = ["network-online.target" "systemd-tmpfiles-setup.service" "systemd-tmpfiles-resetup.service"];
     inherit (startLimit) startLimitIntervalSec startLimitBurst;
     inherit path;
     environment = {
@@ -308,7 +320,7 @@ in {
     description = "Paseo agent daemon";
     wantedBy = ["multi-user.target"];
     wants = ["network-online.target"];
-    after = ["network-online.target" "systemd-tmpfiles-setup.service"];
+    after = ["network-online.target" "systemd-tmpfiles-setup.service" "systemd-tmpfiles-resetup.service"];
     inherit (startLimit) startLimitIntervalSec startLimitBurst;
     path = path ++ [pkgs.paseo];
     environment = {
