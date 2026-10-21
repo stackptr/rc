@@ -21,8 +21,8 @@
   spore = "100.89.150.33";
   spore6 = "fd7a:115c:a1e0::a033:9621";
   onlyFromSpore = port: ''
-    iptables -I nixos-fw 1 -i tailscale0 -p tcp --dport ${toString port} ! -s ${spore} -j REJECT --reject-with tcp-reset
-    ip6tables -I nixos-fw 1 -i tailscale0 -p tcp --dport ${toString port} ! -s ${spore6} -j REJECT --reject-with tcp-reset
+    iptables -t mangle -A opencode-in -i tailscale0 -p tcp --dport ${toString port} ! -s ${spore} -j DROP
+    ip6tables -t mangle -A opencode-in -i tailscale0 -p tcp --dport ${toString port} ! -s ${spore6} -j DROP
   '';
 
   stromaModel = "Qwen3.8-27B-MTPLX-Optimized-Quality";
@@ -218,23 +218,32 @@ in {
   };
   users.groups.${user} = {};
 
-  # tailscale0 is trusted, so without the first rules any tailnet device
-  # could use OpenCode's server or Paseo directly. Only spore's nginx may,
-  # which puts Pocket ID in front of them (code.zx.dev, agents.zx.dev).
-  # Others get a reset rather than a drop, so they fail at once.
+  # Only spore's nginx may reach OpenCode's server or Paseo over the
+  # tailnet, which puts Pocket ID in front of them (code.zx.dev,
+  # agents.zx.dev). This can't go in nixos-fw: tailscaled's ts-input chain,
+  # first in filter INPUT, accepts everything from tailscale0 before nixos-fw
+  # sees it. mangle INPUT runs earlier and tailscaled leaves it alone; it
+  # can't REJECT, so others time out.
   #
   # Postgres trusts every local connection (hosts/glyph/services/db.nix), so
   # anything running as this user could connect as the superuser. The socket
   # is hidden from the units; the opencode-out chain rejects TCP to 5432 on
   # any address.
   networking.firewall.extraCommands = ''
+    ip46tables -t mangle -N opencode-in 2>/dev/null || ip46tables -t mangle -F opencode-in
     ${onlyFromSpore opencodePort}${onlyFromSpore paseoPort}
+    ip46tables -t mangle -D INPUT -j opencode-in 2>/dev/null || true
+    ip46tables -t mangle -I INPUT -j opencode-in
+
     ip46tables -N opencode-out 2>/dev/null || ip46tables -F opencode-out
     ip46tables -A opencode-out -p tcp --dport 5432 -j REJECT
     ip46tables -D OUTPUT -m owner --uid-owner ${user} -j opencode-out 2>/dev/null || true
     ip46tables -I OUTPUT -m owner --uid-owner ${user} -j opencode-out
   '';
   networking.firewall.extraStopCommands = ''
+    ip46tables -t mangle -D INPUT -j opencode-in 2>/dev/null || true
+    ip46tables -t mangle -F opencode-in 2>/dev/null || true
+    ip46tables -t mangle -X opencode-in 2>/dev/null || true
     ip46tables -D OUTPUT -m owner --uid-owner ${user} -j opencode-out 2>/dev/null || true
     ip46tables -F opencode-out 2>/dev/null || true
     ip46tables -X opencode-out 2>/dev/null || true
