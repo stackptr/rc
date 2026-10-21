@@ -140,8 +140,11 @@
     daemon = {
       listen = "0.0.0.0:${toString paseoPort}";
       hostnames = ["agents.zx.dev" "glyph" "glyph.note-iwato.ts.net"];
-      # spore's nginx, for X-Forwarded-Proto
-      trustedProxies = ["loopback" "100.64.0.0/10"];
+      # Whose X-Forwarded-* headers to believe: spore's nginx, on either
+      # address family. Paseo derives the web UI's ws:// or wss:// from
+      # X-Forwarded-Proto, so a spore connection over IPv6 that isn't listed
+      # here gets ws://, which the browser blocks on https://agents.zx.dev.
+      trustedProxies = ["loopback" tailnet.spore.v4 tailnet.spore.v6];
       relay.enabled = false;
       # Paseo's tools (launching and messaging agents) for the supervisor
       mcp = {
