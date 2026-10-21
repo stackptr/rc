@@ -17,13 +17,33 @@
   paseoHome = "/var/lib/paseo";
   opencodePort = 8890;
   paseoPort = 6767;
-  # spore's tailnet addresses, from `tailscale ip spore`
-  spore = "100.89.150.33";
-  spore6 = "fd7a:115c:a1e0::a033:9621";
-  onlyFromSpore = port: ''
-    iptables -t mangle -A opencode-in -i tailscale0 -p tcp --dport ${toString port} ! -s ${spore} -j DROP
-    ip6tables -t mangle -A opencode-in -i tailscale0 -p tcp --dport ${toString port} ! -s ${spore6} -j DROP
-  '';
+  # Tailnet addresses, from `tailscale ip <device>`; update them if a device
+  # re-registers
+  tailnet = {
+    spore = {
+      v4 = "100.89.150.33";
+      v6 = "fd7a:115c:a1e0::a033:9621";
+    };
+    # The iPhone and iPad, for the Paseo app
+    blip = {
+      v4 = "100.82.15.58";
+      v6 = "fd7a:115c:a1e0::3333:f3a";
+    };
+    slate = {
+      v4 = "100.74.6.1";
+      v6 = "fd7a:115c:a1e0::a33:601";
+    };
+  };
+  # Drops tailnet connections to port unless they come from one of devices
+  onlyFrom = devices: port:
+    lib.concatMapStrings (device: ''
+      iptables -t mangle -A opencode-in -i tailscale0 -p tcp --dport ${toString port} -s ${tailnet.${device}.v4} -j RETURN
+      ip6tables -t mangle -A opencode-in -i tailscale0 -p tcp --dport ${toString port} -s ${tailnet.${device}.v6} -j RETURN
+    '')
+    devices
+    + ''
+      ip46tables -t mangle -A opencode-in -i tailscale0 -p tcp --dport ${toString port} -j DROP
+    '';
 
   stromaModel = "Qwen3.8-27B-MTPLX-Optimized-Quality";
   stromaURL = "http://stroma.note-iwato.ts.net:8000/v1";
@@ -220,7 +240,10 @@ in {
 
   # Only spore's nginx may reach OpenCode's server or Paseo over the
   # tailnet, which puts Pocket ID in front of them (code.zx.dev,
-  # agents.zx.dev). This can't go in nixos-fw: tailscaled's ts-input chain,
+  # agents.zx.dev). The exception is Paseo from the iPhone and iPad: its app
+  # can't log in to Pocket ID, so it connects directly with only Paseo's
+  # password, and any device listed here can drive the agents. This can't
+  # go in nixos-fw: tailscaled's ts-input chain,
   # first in filter INPUT, accepts everything from tailscale0 before nixos-fw
   # sees it. mangle INPUT runs earlier and tailscaled leaves it alone; it
   # can't REJECT, so others time out.
@@ -231,7 +254,7 @@ in {
   # any address.
   networking.firewall.extraCommands = ''
     ip46tables -t mangle -N opencode-in 2>/dev/null || ip46tables -t mangle -F opencode-in
-    ${onlyFromSpore opencodePort}${onlyFromSpore paseoPort}
+    ${onlyFrom ["spore"] opencodePort}${onlyFrom ["spore" "blip" "slate"] paseoPort}
     ip46tables -t mangle -D INPUT -j opencode-in 2>/dev/null || true
     ip46tables -t mangle -I INPUT -j opencode-in
 
