@@ -110,7 +110,13 @@
     # that would cover ~/.ssh and the rest, which Landlock can't then deny, so
     # nono refuses to start. A process whose directory isn't granted starts in /.
     filesystem = {
-      read = ["/etc"];
+      read = [
+        "/etc"
+        # Paseo writes its OpenCode bridge plugins here, and the OpenCode
+        # server it starts has to load them; read-only, so agents can't
+        # change what Paseo's server runs
+        "${paseoHome}/runtime/opencode"
+      ];
       allow = [
         # Repositories and Paseo's worktrees, where agents work
         workspaces
@@ -210,7 +216,9 @@
     RestrictAddressFamilies = ["AF_UNIX" "AF_INET" "AF_INET6" "AF_NETLINK"];
     # Bun's JIT needs writable executable memory, so no MemoryDenyWriteExecute
   };
-  path = with pkgs; [bash coreutils findutils gnugrep gnused git];
+  # procps for ps: Paseo lists an OpenCode server's children with
+  # `ps --ppid` when it stops one, and an ENOENT there crashes its worker
+  path = with pkgs; [bash coreutils findutils gnugrep gnused git procps];
   # Give up after 5 failed starts in 5 minutes instead of looping, so the
   # "Systemd unit failed" alert fires rather than only the restart one
   startLimit = {
@@ -331,6 +339,8 @@ in {
     ${paseoHome} = dir;
     # Granted by the nono profile, so it has to exist before Paseo first runs
     "${paseoHome}/opencode-home" = dir;
+    "${paseoHome}/runtime" = dir;
+    "${paseoHome}/runtime/opencode" = dir;
     "${paseoHome}/config.json" = link paseoConfig;
   };
 
