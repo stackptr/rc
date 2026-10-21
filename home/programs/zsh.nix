@@ -43,16 +43,22 @@
         unset HISTFILE
       }
 
+      # Pin a prompt until prompt_auto; otherwise _prompt_auto_width picks one
+      # by terminal width before every prompt.
       prompt_minimal () {
-        export STARSHIP_CONFIG=''${XDG_CONFIG_HOME:-$HOME/.config}/starship-minimal.toml
+        typeset -g _prompt_mode=minimal
       }
 
       prompt_full () {
-        unset STARSHIP_CONFIG
+        typeset -g _prompt_mode=full
+      }
+
+      prompt_auto () {
+        unset _prompt_mode
       }
 
       _prompt_auto_width () {
-        if [[ "$TERM" == "linux" || $COLUMNS -lt 100 ]]; then
+        if [[ $_prompt_mode == minimal || ( -z $_prompt_mode && ( "$TERM" == "linux" || $COLUMNS -lt 100 ) ) ]]; then
           export STARSHIP_CONFIG=''${XDG_CONFIG_HOME:-$HOME/.config}/starship-minimal.toml
         else
           unset STARSHIP_CONFIG
