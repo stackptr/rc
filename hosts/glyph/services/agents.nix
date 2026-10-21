@@ -137,10 +137,54 @@
   # reads it, and failing to create it there stops the agent from starting.
   # The journal has each unit's output.
   nonoRun = "${lib.getExe pkgs.nono} -s run --profile agents --no-audit --";
+  # Agents can write to their own config directories (the sandbox has to
+  # grant them, and Landlock can't make files inside a granted directory
+  # read-only), so one could plant instructions or code for every later
+  # session: a CLAUDE.md, a skill, a hook, an MCP server, a Pi extension.
+  # Unlike a repo's own AGENTS.md or .claude/, nothing would show it in a
+  # diff. Before every launch, outside the sandbox, relink what
+  # home-manager manages and remove the other places they read from.
+  hm = config.home-manager.users.${user};
+  managed = prefix:
+    map (file: file.target)
+    (lib.filter (file: file.enable && lib.hasPrefix prefix file.target) (lib.attrValues hm.home.file));
+  resetAgentConfig = pkgs.writeShellScript "reset-agent-config" ''
+    set -eu
+    cd ${home}
+    for target in ${lib.escapeShellArgs (managed ".claude/" ++ managed ".pi/agent/")}; do
+      mkdir -p "$(dirname "$target")"
+      [ -L "$target" ] || rm -rf "$target"
+      ln -sfnT "${hm.home-files}/$target" "$target"
+    done
+    for entry in .claude/skills/* .claude/skills/.[!.]*; do
+      [ -e "$entry" ] || [ -L "$entry" ] || continue
+      case " ${toString (managed ".claude/skills/")} " in
+        *" $entry "*) ;;
+        *) rm -rf "$entry" ;;
+      esac
+    done
+    rm -rf .claude/agents .claude/commands .claude/hooks .claude/plugins .claude/output-styles
+    rm -rf .pi/agent/extensions .pi/agent/skills .pi/agent/prompts .pi/agent/themes
+    rm -f .pi/agent/AGENTS.override.md .pi/agent/AGENTS.MD .pi/agent/CLAUDE.md .pi/agent/CLAUDE.MD \
+      .pi/agent/SYSTEM.md .pi/agent/APPEND_SYSTEM.md .pi/agent/mcp.json
+    # OpenCode's settings come from OPENCODE_CONFIG, so its global config
+    # directory holds nothing of ours
+    mkdir -p .config/opencode
+    find .config/opencode -mindepth 1 -delete
+    # Claude keeps user- and local-scope MCP servers in its state file;
+    # only the gateway, from home-manager, and Paseo's own should exist
+    state=.claude/.claude.json
+    filter='del(.mcpServers) | if .projects then .projects |= map_values(del(.mcpServers)) else . end'
+    if [ -f "$state" ] && ! ${lib.getExe pkgs.jq} -e "($filter) == ." "$state" >/dev/null; then
+      ${lib.getExe pkgs.jq} "$filter" "$state" > "$state.reset"
+      mv "$state.reset" "$state"
+    fi
+  '';
   # Paseo launches each provider through these, so every agent it starts is
   # sandboxed. Workers don't get Claude's token.
   sandboxed = name: command:
     pkgs.writeShellScript "${name}-sandboxed" ''
+      ${resetAgentConfig}
       exec ${nonoRun} ${command} "$@"
     '';
   claudeSandboxed = sandboxed "claude" (lib.getExe pkgs.claude-code);
@@ -335,8 +379,6 @@ in {
     "${home}/.claude" = dir;
     "${home}/.pi" = dir;
     "${home}/.pi/agent" = dir;
-    "${home}/.pi/agent/models.json" = link piModels;
-    "${home}/.pi/agent/settings.json" = link piSettings;
     ${paseoHome} = dir;
     # Granted by the nono profile, so it has to exist before Paseo first runs
     "${paseoHome}/opencode-home" = dir;
@@ -360,6 +402,7 @@ in {
     serviceConfig =
       hardening
       // {
+        ExecStartPre = resetAgentConfig;
         ExecStart = "${nonoRun} ${lib.getExe pkgs.opencode} serve --port ${toString opencodePort} --hostname 0.0.0.0";
         EnvironmentFile = config.age.secrets.opencode-env.path;
         StateDirectory = "opencode";
@@ -369,29 +412,39 @@ in {
   };
 
   # Paseo runs Claude Code with this user's config (CLAUDE_CONFIG_DIR is
-  # ~/.claude), so the same home-manager module as the Macs gives its Claude
-  # agents the llm-profile prompt (~/.claude/CLAUDE.md), the glyph MCP gateway
-  # and skills, and they follow llm-profile and Paseo updates with the flake.
+  # ~/.claude), so it uses the same module as my own Claude Code
+  # (modules/home/development.nix): the llm-profile prompt, the glyph MCP
+  # gateway, llm-profile's skills, the read-only permission allowlist and
+  # telemetry. They follow llm-profile and Paseo updates with the flake.
+  # resetAgentConfig restores these before every launch.
   home-manager.users.${user} = {
+    imports = [../../../modules/home/development.nix];
     home.stateVersion = "23.11";
+    rc.development.ai.enable = true;
     programs.claude-code = {
-      enable = true;
       # Paseo runs pkgs.claude-code itself, through the nono wrapper
       package = null;
-      context = profile.agent;
-      mcpServers.glyph = {
-        type = "http";
-        url = "http://glyph:8090/mcp";
-      };
-      # llm-profile's skills, as on the Macs, and Paseo's orchestration
-      # skills from the source of the Paseo it runs. The nixpkgs package
-      # leaves out the skills/ directory its own installer copies from, so
-      # Settings > Agents > Orchestration skills can't install them.
+      # Paseo's orchestration skills, from the source of the Paseo it runs.
+      # The nixpkgs package leaves out the skills/ directory its own
+      # installer copies from, so Settings > Agents > Orchestration skills
+      # can't install them.
       skills =
-        lib.mapAttrs (name: _: "${profile.skills}/${name}")
-        (lib.filterAttrs (_: type: type == "directory") (builtins.readDir profile.skills))
-        // lib.genAttrs ["paseo" "paseo-handoff" "paseo-committee" "paseo-advisor"]
+        lib.genAttrs ["paseo" "paseo-handoff" "paseo-committee" "paseo-advisor"]
         (name: "${pkgs.paseo.src}/skills/${name}");
+    };
+    # Pi's endpoint, default model and instructions. It has no MCP gateway,
+    # so it gets the standalone prompt. force: tmpfiles linked the first
+    # two before home-manager managed them.
+    home.file = {
+      ".pi/agent/models.json" = {
+        source = piModels;
+        force = true;
+      };
+      ".pi/agent/settings.json" = {
+        source = piSettings;
+        force = true;
+      };
+      ".pi/agent/AGENTS.md".text = profile."agent-standalone";
     };
   };
 

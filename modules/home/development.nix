@@ -67,10 +67,12 @@ in {
         # note in Basic Memory for a later session) needs the gateway, and
         # on a work machine, proposed rule changes shouldn't go to a public
         # repo anyway — so skip skills entirely when the gateway is disabled.
-        skills =
-          if cfg.ai.gateway.enable
-          then profile.skills
-          else {};
+        # One entry per skill, rather than the directory, so other configs
+        # can add their own (Paseo's agents on glyph, hosts/glyph/services/agents.nix)
+        skills = lib.optionalAttrs cfg.ai.gateway.enable (
+          lib.mapAttrs (name: _: "${profile.skills}/${name}")
+          (lib.filterAttrs (_: type: type == "directory") (builtins.readDir profile.skills))
+        );
         settings = {
           model = "sonnet";
           # Disabled in favor of Basic Memory MCP for cross-device access
