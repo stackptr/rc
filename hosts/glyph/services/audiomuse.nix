@@ -8,12 +8,12 @@
   dataDir = "/var/lib/audiomuse";
 
   # Each worker container runs one album job at a time, so analysis scales by
-  # adding containers; they claim jobs from the same Postgres queue. The first
-  # keeps its original name.
-  workers = ["audiomuse-worker" "audiomuse-worker-2" "audiomuse-worker-3"];
+  # adding containers; they claim jobs from the same Postgres queue. One keeps
+  # up with a few albums a day; for a full re-analysis add "audiomuse-worker-2"
+  # and "audiomuse-worker-3" (3 x workerCpus stays under glyph's 24 cores).
+  workers = ["audiomuse-worker"];
   # Cores per worker. AudioMuse sizes its BLAS and ONNX thread pools from the
-  # container's cgroup quota (cpu_budget.py), so this also sets their threads;
-  # 3 x 7 leaves glyph 3 of its 24 cores even when all are busy.
+  # container's cgroup quota (cpu_budget.py), so this also sets their threads.
   workerCpus = 7;
 
   # Flask and the worker run the same image; SERVICE_TYPE picks the processes
