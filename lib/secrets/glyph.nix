@@ -14,6 +14,8 @@ import ./mk-host.nix "glyph" [
   "obsidian-auth-token"
   "navidrome-env"
   "opencode-env"
+  "paseo-env"
+  "claude-code-env"
   "restic-env"
   "restic-password"
   "ssh-client-key"
