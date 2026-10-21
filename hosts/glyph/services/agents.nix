@@ -49,8 +49,9 @@
   stromaURL = "http://stroma.note-iwato.ts.net:8000/v1";
   json = pkgs.formats.json {};
 
+  profile = import ../../../lib/llm-profile.nix inputs.llm-profile;
   # A shorter prompt helps a 27B model more than it helps Claude.
-  context = pkgs.writeText "AGENTS.md" (import ../../../lib/llm-profile.nix inputs.llm-profile).agent;
+  context = pkgs.writeText "AGENTS.md" profile.agent;
   opencodeSettings = json.generate "opencode.json" {
     "$schema" = "https://opencode.ai/config.json";
     model = "stroma/${stromaModel}";
@@ -367,13 +368,41 @@ in {
       };
   };
 
+  # Paseo runs Claude Code with this user's config (CLAUDE_CONFIG_DIR is
+  # ~/.claude), so the same home-manager module as the Macs gives its Claude
+  # agents the llm-profile prompt (~/.claude/CLAUDE.md), the glyph MCP gateway
+  # and skills, and they follow llm-profile and Paseo updates with the flake.
+  home-manager.users.${user} = {
+    home.stateVersion = "23.11";
+    programs.claude-code = {
+      enable = true;
+      # Paseo runs pkgs.claude-code itself, through the nono wrapper
+      package = null;
+      context = profile.agent;
+      mcpServers.glyph = {
+        type = "http";
+        url = "http://glyph:8090/mcp";
+      };
+      # llm-profile's skills, as on the Macs, and Paseo's orchestration
+      # skills from the source of the Paseo it runs. The nixpkgs package
+      # leaves out the skills/ directory its own installer copies from, so
+      # Settings > Agents > Orchestration skills can't install them.
+      skills =
+        lib.mapAttrs (name: _: "${profile.skills}/${name}")
+        (lib.filterAttrs (_: type: type == "directory") (builtins.readDir profile.skills))
+        // lib.genAttrs ["paseo" "paseo-handoff" "paseo-committee" "paseo-advisor"]
+        (name: "${pkgs.paseo.src}/skills/${name}");
+    };
+  };
+
   # agents.zx.dev on spore proxies here. Its web UI loads without the
   # password; the API and WebSocket need it.
   systemd.services.paseo = {
     description = "Paseo agent daemon";
     wantedBy = ["multi-user.target"];
-    wants = ["network-online.target"];
-    after = ["network-online.target" "systemd-tmpfiles-setup.service" "systemd-tmpfiles-resetup.service"];
+    # Claude's config above, written by home-manager's activation unit
+    wants = ["network-online.target" "home-manager-${user}.service"];
+    after = ["network-online.target" "systemd-tmpfiles-setup.service" "systemd-tmpfiles-resetup.service" "home-manager-${user}.service"];
     inherit (startLimit) startLimitIntervalSec startLimitBurst;
     path = path ++ [pkgs.paseo];
     environment = {
