@@ -75,12 +75,23 @@ in {
     ip46tables -X opencode-out 2>/dev/null || true
   '';
 
+  # The home predates this unit: an earlier DynamicUser unit left it, and
+  # systemd moved it into place, owned by nobody (65534), so OpenCode couldn't
+  # write its database. Everything in it belongs to the agent user, so reset
+  # ownership recursively on every boot and switch; modes are left alone.
+  systemd.tmpfiles.settings.opencode.${home}.Z = {
+    user = "opencode";
+    group = "opencode";
+    mode = "-";
+  };
+
   # code.zx.dev on spore proxies here
   systemd.services.opencode-web = {
     description = "OpenCode server";
     wantedBy = ["multi-user.target"];
     wants = ["network-online.target"];
-    after = ["network-online.target"];
+    # After the ownership reset above, at boot and on a switch
+    after = ["network-online.target" "systemd-tmpfiles-setup.service" "systemd-tmpfiles-resetup.service"];
     # Give up after 5 failed starts in 5 minutes instead of looping, so the
     # "Systemd unit failed" alert fires rather than only the restart one
     startLimitIntervalSec = 300;
