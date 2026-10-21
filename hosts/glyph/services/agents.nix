@@ -92,8 +92,9 @@
   };
 
   # nono adds its `default` profile: system paths read-only, ~/.ssh and other
-  # credentials denied, workdir none. Paths not listed here, like Paseo's
-  # home and the rest of /var/lib, don't exist inside the sandbox.
+  # credentials denied, workdir none. Paths not listed here, like the rest of
+  # Paseo's home (its local credential and config) and of /var/lib, don't
+  # exist inside the sandbox.
   nonoProfile = json.generate "agents.json" {
     meta = {
       name = "agents";
@@ -104,12 +105,23 @@
       # rm, mv, cp, npm, kill and so on, which agents need
       exclude = ["dangerous_commands"];
     };
-    # The agent's working directory: a worktree, or OpenCode's server home
-    workdir.access = "readwrite";
+    # Explicit grants only, never the working directory: Paseo starts some
+    # processes in the home (probing Pi from Settings, for one), and granting
+    # that would cover ~/.ssh and the rest, which Landlock can't then deny, so
+    # nono refuses to start. A process whose directory isn't granted starts in /.
     filesystem = {
-      read = ["/etc"];
+      read = [
+        "/etc"
+        # Paseo writes its OpenCode bridge plugins here, and the OpenCode
+        # server it starts has to load them; read-only, so agents can't
+        # change what Paseo's server runs
+        "${paseoHome}/runtime/opencode"
+      ];
       allow = [
+        # Repositories and Paseo's worktrees, where agents work
         workspaces
+        # The working directory of the OpenCode server Paseo starts
+        "${paseoHome}/opencode-home"
         "${home}/.config/opencode"
         "${home}/.local/share/opencode"
         "${home}/.local/state/opencode"
@@ -123,7 +135,7 @@
   # No audit trail: nono would keep it in ~/.local/state/nono, where nothing
   # reads it, and failing to create it there stops the agent from starting.
   # The journal has each unit's output.
-  nonoRun = "${lib.getExe pkgs.nono} -s run --profile agents --allow-cwd --no-audit --";
+  nonoRun = "${lib.getExe pkgs.nono} -s run --profile agents --no-audit --";
   # Paseo launches each provider through these, so every agent it starts is
   # sandboxed. Workers don't get Claude's token.
   sandboxed = name: command:
@@ -204,7 +216,9 @@
     RestrictAddressFamilies = ["AF_UNIX" "AF_INET" "AF_INET6" "AF_NETLINK"];
     # Bun's JIT needs writable executable memory, so no MemoryDenyWriteExecute
   };
-  path = with pkgs; [bash coreutils findutils gnugrep gnused git];
+  # procps for ps: Paseo lists an OpenCode server's children with
+  # `ps --ppid` when it stops one, and an ENOENT there crashes its worker
+  path = with pkgs; [bash coreutils findutils gnugrep gnused git procps];
   # Give up after 5 failed starts in 5 minutes instead of looping, so the
   # "Systemd unit failed" alert fires rather than only the restart one
   startLimit = {
@@ -323,6 +337,10 @@ in {
     "${home}/.pi/agent/models.json" = link piModels;
     "${home}/.pi/agent/settings.json" = link piSettings;
     ${paseoHome} = dir;
+    # Granted by the nono profile, so it has to exist before Paseo first runs
+    "${paseoHome}/opencode-home" = dir;
+    "${paseoHome}/runtime" = dir;
+    "${paseoHome}/runtime/opencode" = dir;
     "${paseoHome}/config.json" = link paseoConfig;
   };
 
