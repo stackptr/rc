@@ -81,6 +81,10 @@ in {
     wantedBy = ["multi-user.target"];
     wants = ["network-online.target"];
     after = ["network-online.target"];
+    # Give up after 5 failed starts in 5 minutes instead of looping, so the
+    # "Systemd unit failed" alert fires rather than only the restart one
+    startLimitIntervalSec = 300;
+    startLimitBurst = 5;
     path = with pkgs; [bash coreutils findutils gnugrep gnused git];
     environment = {
       HOME = home;
