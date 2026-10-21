@@ -100,11 +100,15 @@
     # The daemon's password would let an agent drive Paseo itself
     environment.deny_vars = ["PASEO_PASSWORD"];
   };
+  # No audit trail: nono would keep it in ~/.local/state/nono, where nothing
+  # reads it, and failing to create it there stops the agent from starting.
+  # The journal has each unit's output.
+  nonoRun = "${lib.getExe pkgs.nono} -s run --profile agents --allow-cwd --no-audit --";
   # Paseo launches each provider through these, so every agent it starts is
   # sandboxed. Workers don't get Claude's token.
   sandboxed = name: command:
     pkgs.writeShellScript "${name}-sandboxed" ''
-      exec ${lib.getExe pkgs.nono} -s run --profile agents --allow-cwd -- ${command} "$@"
+      exec ${nonoRun} ${command} "$@"
     '';
   claudeSandboxed = sandboxed "claude" (lib.getExe pkgs.claude-code);
   opencodeSandboxed = sandboxed "opencode" "env -u CLAUDE_CODE_OAUTH_TOKEN ${lib.getExe pkgs.opencode}";
@@ -178,6 +182,12 @@
     # Bun's JIT needs writable executable memory, so no MemoryDenyWriteExecute
   };
   path = with pkgs; [bash coreutils findutils gnugrep gnused git];
+  # Give up after 5 failed starts in 5 minutes instead of looping, so the
+  # "Systemd unit failed" alert fires rather than only the restart one
+  startLimit = {
+    startLimitIntervalSec = 300;
+    startLimitBurst = 5;
+  };
 in {
   # STROMA_API_KEY
   age.secrets.opencode-env = {
@@ -253,6 +263,13 @@ in {
     "${home}/.config/nono" = dir;
     "${home}/.config/nono/profiles" = dir;
     "${home}/.config/nono/profiles/agents.json" = link nonoProfile;
+    # The profile grants OpenCode's data and state directories, so they have
+    # to exist and be the agent user's before the first start
+    "${home}/.local" = dir;
+    "${home}/.local/share" = dir;
+    "${home}/.local/share/opencode" = dir;
+    "${home}/.local/state" = dir;
+    "${home}/.local/state/opencode" = dir;
     "${home}/.claude" = dir;
     "${home}/.pi" = dir;
     "${home}/.pi/agent" = dir;
@@ -268,6 +285,7 @@ in {
     wantedBy = ["multi-user.target"];
     wants = ["network-online.target"];
     after = ["network-online.target" "systemd-tmpfiles-setup.service"];
+    inherit (startLimit) startLimitIntervalSec startLimitBurst;
     inherit path;
     environment = {
       HOME = home;
@@ -276,7 +294,7 @@ in {
     serviceConfig =
       hardening
       // {
-        ExecStart = "${lib.getExe pkgs.nono} -s run --profile agents --allow-cwd -- ${lib.getExe pkgs.opencode} serve --port ${toString opencodePort} --hostname 0.0.0.0";
+        ExecStart = "${nonoRun} ${lib.getExe pkgs.opencode} serve --port ${toString opencodePort} --hostname 0.0.0.0";
         EnvironmentFile = config.age.secrets.opencode-env.path;
         StateDirectory = "opencode";
         StateDirectoryMode = "0700";
@@ -291,6 +309,7 @@ in {
     wantedBy = ["multi-user.target"];
     wants = ["network-online.target"];
     after = ["network-online.target" "systemd-tmpfiles-setup.service"];
+    inherit (startLimit) startLimitIntervalSec startLimitBurst;
     path = path ++ [pkgs.paseo];
     environment = {
       HOME = home;
