@@ -20,6 +20,7 @@
     ./navidrome.nix
     ./nfs.nix
     ./ntfy.nix
+    ./opencode.nix
     ./open-terminal.nix
     ./open-webui.nix
     ./prometheus.nix
