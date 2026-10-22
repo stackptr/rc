@@ -7,7 +7,6 @@
     github-desktop
     m-cli
     mas
-    secretive
     mochi
     the-unarchiver
   ];
@@ -17,6 +16,7 @@
     casks = [
       "dash"
       "legcord"
+      "secretive"
       "textual"
     ];
   };

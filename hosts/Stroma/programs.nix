@@ -6,7 +6,6 @@
   environment.systemPackages = with pkgs; [
     m-cli
     mas
-    secretive
     the-unarchiver
   ];
 
@@ -14,6 +13,7 @@
     enable = true;
     casks = [
       "legcord"
+      "secretive"
     ];
   };
 
