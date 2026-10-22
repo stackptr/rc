@@ -24,7 +24,7 @@
       v4 = "100.89.150.33";
       v6 = "fd7a:115c:a1e0::a033:9621";
     };
-    # The iPhone and iPad, for the Paseo app
+    # The iPhone, iPad and the Macs that run the Paseo app
     blip = {
       v4 = "100.82.15.58";
       v6 = "fd7a:115c:a1e0::3333:f3a";
@@ -32,6 +32,14 @@
     slate = {
       v4 = "100.74.6.1";
       v6 = "fd7a:115c:a1e0::a33:601";
+    };
+    stroma = {
+      v4 = "100.122.26.71";
+      v6 = "fd7a:115c:a1e0::1133:1a48";
+    };
+    rhizome = {
+      v4 = "100.89.6.21";
+      v6 = "fd7a:115c:a1e0::7a33:615";
     };
   };
   # Drops tailnet connections to port unless they come from one of devices
@@ -264,9 +272,9 @@ in {
 
   # Only spore's nginx may reach OpenCode's server or Paseo over the
   # tailnet, which puts Pocket ID in front of them (code.zx.dev,
-  # agents.zx.dev). The exception is Paseo from the iPhone and iPad: its app
-  # can't log in to Pocket ID, so it connects directly with only Paseo's
-  # password, and any device listed here can drive the agents. This can't
+  # agents.zx.dev). The exception is Paseo from the iPhone, iPad, Stroma and
+  # Rhizome: its app can't log in to Pocket ID, so it connects directly with
+  # only Paseo's password, and any device listed here can drive the agents. This can't
   # go in nixos-fw: tailscaled's ts-input chain,
   # first in filter INPUT, accepts everything from tailscale0 before nixos-fw
   # sees it. mangle INPUT runs earlier and tailscaled leaves it alone; it
@@ -278,7 +286,7 @@ in {
   # any address.
   networking.firewall.extraCommands = ''
     ip46tables -t mangle -N opencode-in 2>/dev/null || ip46tables -t mangle -F opencode-in
-    ${onlyFrom ["spore"] opencodePort}${onlyFrom ["spore" "blip" "slate"] paseoPort}
+    ${onlyFrom ["spore"] opencodePort}${onlyFrom ["spore" "blip" "slate" "stroma" "rhizome"] paseoPort}
     ip46tables -t mangle -D INPUT -j opencode-in 2>/dev/null || true
     ip46tables -t mangle -I INPUT -j opencode-in
 
