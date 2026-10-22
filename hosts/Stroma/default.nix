@@ -8,6 +8,7 @@
   imports = [
     ./dock.nix
     ./hardware.nix
+    ./linux-builder.nix
     ./monitoring.nix
     ./omlx.nix
     ./programs.nix
