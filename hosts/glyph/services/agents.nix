@@ -188,11 +188,20 @@
         }
         {
           id = "worker";
-          name = "Worker (Qwen)";
+          name = "Worker";
           provider = "opencode";
           # The model is opencode.json's default, Qwen on Stroma
           modeId = "build";
           notes = "Local model on Stroma, for well-scoped tasks";
+        }
+        {
+          id = "implementer";
+          name = "Implementer";
+          provider = "claude-worker";
+          model = "claude-sonnet-5-5";
+          thinkingOptionId = "high";
+          modeId = "acceptEdits";
+          notes = "Multi-file changes the local worker can't handle reliably";
         }
       ];
     };
@@ -239,6 +248,23 @@
           {
             id = "claude-haiku-5-5";
             label = "Haiku 5.5";
+          }
+        ];
+      };
+      # Claude as a worker, for the Implementer profile: Paseo's tools are set
+      # per provider, so without its own the Implementer could launch agents
+      claude-worker = {
+        extends = "claude";
+        label = "Claude Worker";
+        command = ["${claudeSandboxed}"];
+        paseoTools.enabled = false;
+        order = 4;
+        # A derived provider doesn't inherit Claude's model list
+        models = [
+          {
+            id = "claude-sonnet-5-5";
+            label = "Sonnet 5.5";
+            isDefault = true;
           }
         ];
       };
