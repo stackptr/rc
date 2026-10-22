@@ -77,6 +77,26 @@ _: let
       for = "2m";
     })
     (mkRule {
+      uid = "systemd-units-stopped";
+      title = "Systemd units stopped";
+      # A switch interrupted after its stop phase leaves units inactive, not
+      # failed (glyph, 2026-10-22: a deploy-rs rollback died mid-switch), so
+      # the failed-unit rule never sees it. Compares active services with the
+      # host's peak over 6h; a deploy that removes several services fires
+      # until the peak ages out. Can't fire when glyph's own Prometheus or
+      # Grafana is among the stopped units: Gatus covers that.
+      expr = ''
+        max_over_time(count by (instance) (node_systemd_unit_state{state="active", name=~".+\\.service"} == 1)[6h:1m])
+          - count by (instance) (node_systemd_unit_state{state="active", name=~".+\\.service"} == 1)
+      '';
+      evaluator = {
+        type = "gt";
+        params = [5];
+      };
+      summary = "{{ $labels.instance }} has {{ printf \"%.0f\" $values.A.Value }} fewer active services than its 6h peak; check `systemctl list-units --type=service --state=inactive` and the last deploy";
+      for = "10m";
+    })
+    (mkRule {
       uid = "scrape-target-down";
       title = "Scrape target down";
       expr = "up";
