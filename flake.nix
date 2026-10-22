@@ -178,6 +178,13 @@
           };
         };
 
+        # docs/ports.md, written by scripts/ports
+        ports = import ./lib/ports.nix {
+          inherit (inputs.nixpkgs) lib;
+          inherit (inputs.self) nixosConfigurations darwinConfigurations;
+          network = import ./lib/network.nix;
+        };
+
         checks =
           builtins.mapAttrs
           (system: deployLib: deployLib.deployChecks inputs.self.deploy)

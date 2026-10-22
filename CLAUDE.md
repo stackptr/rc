@@ -16,6 +16,7 @@ Layout:
 - `lib/hosts.nix`: host builders (`mkNixosHost`, `mkDarwinHost`); `lib/keys.nix`, `lib/secrets/`: SSH keys and agenix recipients
 - `overlays/`: package overrides, listed in `overlays/default.nix` with a comment saying why each exists
 - `packages/<name>/package.nix`: packages not in nixpkgs, exposed by `overlays/custom-packages.nix`
+- `docs/ports.md`: generated list of what each host's firewall lets in from the internet, the LAN and the tailnet (see Common Commands)
 
 ## Common Commands
 
@@ -31,6 +32,8 @@ just switch-remote spore          # Build on this host, deploy to spore (it's me
 nix-flake eval nixosConfigurations.<host>.config.system.build.toplevel.drvPath   # NixOS
 nix-flake eval darwinConfigurations.<host>.system.drvPath                       # macOS
 ```
+
+**Ports:** after changing a firewall, a service's `openFirewall`, or the router forwards in `lib/network.nix` (copied by hand from the eero app), run `scripts/ports` and commit `docs/ports.md` (rendered by `lib/ports.nix`). CI's `ports` job fails while it's stale, including on a flake update that changes a module's firewall defaults: that's the point, so review the diff rather than just regenerating.
 
 **Flake inputs:** `nix flake update --commit-lock-file`. The Update workflow does this daily and auto-merges once CI passes.
 

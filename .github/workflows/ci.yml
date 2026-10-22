@@ -29,6 +29,23 @@ jobs:
           exit 1
         fi
 
+  # docs/ports.md is generated from every host's firewall, so a change to a
+  # firewall or an openFirewall shows up in the PR diff.
+  ports:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+    - uses: cachix/install-nix-action@13d8dd58da0234aa297dedd986986ccb8e7f3e24 # v31.11.1
+      with:
+        github_access_token: ${{ secrets.GITHUB_TOKEN }}
+    - name: Check docs/ports.md is current
+      run: |
+        scripts/ports
+        if ! git diff --exit-code docs/ports.md; then
+          echo "::error file=docs/ports.md::Out of date: run scripts/ports and commit the result"
+          exit 1
+        fi
+
   build:
     strategy:
       fail-fast: false
@@ -105,7 +122,7 @@ jobs:
 
   # One Slack message per failed run, naming every failed job.
   notify:
-    needs: [lint, build]
+    needs: [lint, ports, build]
     if: failure()
     runs-on: ubuntu-latest
     permissions:
