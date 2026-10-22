@@ -12,5 +12,6 @@
     ./users.nix
     ./ssh.nix
     ./sudo.nix
+    ./tailscale.nix
   ];
 }
