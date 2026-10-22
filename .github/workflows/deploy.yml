@@ -55,20 +55,14 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
+      # The cache is public, so deploys substitute from it without a token
+      # (and never push to it).
       - uses: cachix/install-nix-action@13d8dd58da0234aa297dedd986986ccb8e7f3e24 # v31.11.1
         with:
           github_access_token: ${{ secrets.GITHUB_TOKEN }}
           extra_nix_config: |
             extra-substituters = https://cache.zx.dev/main
             extra-trusted-public-keys = main:mu0jkxdJTGWC3djDSEQb3rvZgqlhA8WVMulcTo5IW6c=
-
-      - name: Configure Attic cache
-        env:
-          ATTIC_TOKEN: ${{ secrets.ATTIC_TOKEN }}
-        run: |
-          nix profile install --inputs-from . attic#attic-client --fallback
-          attic login rc https://cache.zx.dev "$ATTIC_TOKEN"
-          attic use rc:main
 
       # Tailnet Lock rejects nodes an OAuth client creates, so the runner joins
       # with a reusable, ephemeral tag:ci auth key signed on a signing node
