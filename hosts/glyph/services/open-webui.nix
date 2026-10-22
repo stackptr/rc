@@ -172,6 +172,10 @@ in {
         # ENABLE_OTEL imports opentelemetry.instrumentation.system_metrics,
         # which nixpkgs leaves out of the package's dependencies.
         ++ [pkgs.python3Packages.opentelemetry-instrumentation-system-metrics];
+      # nixpkgs passes "--set FRONTEND_BUILD_DIR <dir>" as one string, which
+      # makeWrapper now rejects; fixed on nixpkgs master by splitting it. Drop
+      # this once nixos-unstable has that fix.
+      makeWrapperArgs = ["--set" "FRONTEND_BUILD_DIR" "${old.passthru.frontend}/share/open-webui"];
     });
     inherit port;
     host = "0.0.0.0";
