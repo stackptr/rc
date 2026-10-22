@@ -175,6 +175,26 @@
         enabled = true;
         injectIntoAgents = true;
       };
+      # Presets of provider, model, mode and effort in the new-agent picker
+      agentProfiles = [
+        {
+          id = "supervisor";
+          name = "Supervisor";
+          provider = "claude";
+          model = "claude-opus-5-5";
+          thinkingOptionId = "high";
+          modeId = "auto";
+          notes = "Plans, delegates to workers and reviews their work";
+        }
+        {
+          id = "worker";
+          name = "Worker (Qwen)";
+          provider = "opencode";
+          # The model is opencode.json's default, Qwen on Stroma
+          modeId = "build";
+          notes = "Local model on Stroma, for well-scoped tasks";
+        }
+      ];
     };
     worktrees.root = "${workspaces}/.worktrees";
     features.webUi.enabled = true;
