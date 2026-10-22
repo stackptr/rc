@@ -1,0 +1,76 @@
+name: Port scan
+
+# Scans every TCP port on spore's public address from a GitHub runner,
+# outside every network spore trusts, and alerts if one is open that
+# spore's firewall on main doesn't allow: an undeployed or reverted change,
+# a rule outside networking.firewall, or something at CloudCone.
+on:
+  schedule:
+  - cron: "17 13 * * *"
+  workflow_dispatch:
+  pull_request:
+    paths:
+    - .github/workflows/port-scan.yml
+
+permissions:
+  contents: read
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+    - uses: cachix/install-nix-action@13d8dd58da0234aa297dedd986986ccb8e7f3e24 # v31.11.1
+      with:
+        github_access_token: ${{ secrets.GITHUB_TOKEN }}
+    - name: Read spore's address and allowed ports
+      id: expected
+      run: |
+        address=$(nix eval --raw .#nixosConfigurations.spore.config.networking.interfaces.eth0.ipv4.addresses \
+          --apply 'as: (builtins.head as).address')
+        ports=$(nix eval --raw .#nixosConfigurations.spore.config.networking.firewall --apply 'fw:
+          toString (fw.allowedTCPPorts
+            ++ builtins.concatMap (r: builtins.genList (i: r.from + i) (r.to - r.from + 1)) fw.allowedTCPPortRanges)')
+        echo "address=$address" >> "$GITHUB_OUTPUT"
+        echo "ports=$ports" >> "$GITHUB_OUTPUT"
+    - name: Scan
+      id: scan
+      env:
+        ADDRESS: ${{ steps.expected.outputs.address }}
+        EXPECTED: ${{ steps.expected.outputs.ports }}
+      run: |
+        nix profile install --inputs-from . nixpkgs#nmap
+        # Connect scan: no root needed. Ports spore drops time out, so
+        # --min-rate keeps the full range to a few minutes.
+        nmap -sT -Pn -p- -T4 --min-rate 1000 --open -oG scan.txt "$ADDRESS" >/dev/null
+        open=$(grep -oE '[0-9]+/open/tcp' scan.txt | cut -d/ -f1 | sort -n | xargs)
+        unexpected=$(comm -23 <(tr ' ' '\n' <<<"$open" | sort) <(tr ' ' '\n' <<<"$EXPECTED" | sort) | sort -n | xargs)
+        echo "Open: ${open:-none}"
+        echo "Allowed: $EXPECTED"
+
+        if [ -z "$open" ]; then
+          # spore's down or the scan is being blocked; either way it saw nothing
+          echo "title=Port scan of spore found no open ports" >> "$GITHUB_OUTPUT"
+          echo "::error::No open ports on $ADDRESS, not even 443"
+          exit 1
+        fi
+        if [ -n "$unexpected" ]; then
+          echo "title=Port scan found ports open on spore that its firewall doesn't allow" >> "$GITHUB_OUTPUT"
+          {
+            echo "fields<<EOF"
+            echo "Unexpected: $unexpected"
+            echo "Allowed: $EXPECTED"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+          echo "::error::Open on $ADDRESS but not allowed by spore's firewall: $unexpected"
+          exit 1
+        fi
+    - uses: stackptr/actions/slack-notify@8f86bf2d6b69d2225bee5726b080fc6ce1066bd9 # v1.0.0
+      if: failure()
+      with:
+        token: ${{ secrets.SLACK_BOT_TOKEN }}
+        channel: "#alerts"
+        status: failure
+        title: ${{ steps.scan.outputs.title || 'Port scan of spore failed' }}
+        fields: ${{ steps.scan.outputs.fields }}
+        dry-run: ${{ github.event_name == 'pull_request' }}
