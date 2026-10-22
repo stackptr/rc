@@ -175,6 +175,35 @@
         enabled = true;
         injectIntoAgents = true;
       };
+      # Presets of provider, model, mode and effort in the new-agent picker
+      agentProfiles = [
+        {
+          id = "supervisor";
+          name = "Supervisor";
+          provider = "claude";
+          model = "claude-opus-5-5";
+          thinkingOptionId = "high";
+          modeId = "auto";
+          notes = "Plans, delegates to workers and reviews their work";
+        }
+        {
+          id = "worker";
+          name = "Worker";
+          provider = "opencode";
+          # The model is opencode.json's default, Qwen on Stroma
+          modeId = "build";
+          notes = "Local model on Stroma, for well-scoped tasks";
+        }
+        {
+          id = "implementer";
+          name = "Implementer";
+          provider = "claude-worker";
+          model = "claude-sonnet-5-5";
+          thinkingOptionId = "high";
+          modeId = "acceptEdits";
+          notes = "Multi-file changes the local worker can't handle reliably";
+        }
+      ];
     };
     worktrees.root = "${workspaces}/.worktrees";
     features.webUi.enabled = true;
@@ -182,20 +211,71 @@
       level = "info";
       format = "json";
     };
+    # The picker lists providers by `order`, lowest first. Paseo 0.12.0
+    # parses it but doesn't apply it yet, and lists the built-in providers in
+    # its own order (Claude, then OpenCode, then Pi).
     agents.providers = {
-      # The supervisor: plans, delegates and reviews
-      claude.command = ["${claudeSandboxed}"];
       # Workers, on oMLX: they get no Paseo tools, so they can't launch agents
       opencode = {
         command = ["${opencodeSandboxed}"];
         paseoTools.enabled = false;
+        order = 1;
       };
       pi = {
         command = ["${piSandboxed}"];
         paseoTools.enabled = false;
+        order = 2;
+      };
+      # The supervisor: plans, delegates and reviews
+      claude = {
+        command = ["${claudeSandboxed}"];
+        order = 3;
+        # Replaces the model list Paseo discovers. Paseo fills in each model's
+        # thinking options from its own manifest, matched by id.
+        models = [
+          {
+            id = "claude-opus-5-5";
+            label = "Opus 5.5";
+            isDefault = true;
+          }
+          {
+            id = "claude-sonnet-5-5";
+            label = "Sonnet 5.5";
+          }
+          # Paseo writes agent titles, commit messages and other metadata with
+          # the first model whose id contains "haiku"; without one it uses the
+          # agent's own model
+          {
+            id = "claude-haiku-5-5";
+            label = "Haiku 5.5";
+          }
+        ];
+      };
+      # Claude as a worker, for the Implementer profile: Paseo's tools are set
+      # per provider, so without its own the Implementer could launch agents
+      claude-worker = {
+        extends = "claude";
+        label = "Claude Worker";
+        command = ["${claudeSandboxed}"];
+        paseoTools.enabled = false;
+        order = 4;
+        # A derived provider doesn't inherit Claude's model list
+        models = [
+          {
+            id = "claude-sonnet-5-5";
+            label = "Sonnet 5.5";
+            isDefault = true;
+          }
+        ];
       };
       codex.enabled = false;
+      copilot.enabled = false;
       omp.enabled = false;
+      # Registered by plugins built into Paseo, which load at every start
+      # whatever the plugin settings say, so removing them in the UI doesn't
+      # last; an override here hides their providers
+      antigravity.enabled = false;
+      muse.enabled = false;
     };
   };
 
