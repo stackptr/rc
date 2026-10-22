@@ -102,7 +102,10 @@
       description = "Coding agents on glyph";
     };
     groups = {
-      include = ["nix_runtime" "git_config" "user_caches_linux" "claude_cache_linux"];
+      # linux_temp_read: the default profile only lets agents write /tmp, and
+      # Claude Code refuses to start when it can't read its /tmp/claude-<uid>.
+      # PrivateTmp makes /tmp the units' own.
+      include = ["nix_runtime" "git_config" "user_caches_linux" "claude_cache_linux" "linux_temp_read"];
       # rm, mv, cp, npm, kill and so on, which agents need
       exclude = ["dangerous_commands"];
     };
@@ -217,6 +220,9 @@
     RestrictAddressFamilies = ["AF_UNIX" "AF_INET" "AF_INET6" "AF_NETLINK"];
     # Bun's JIT needs writable executable memory, so no MemoryDenyWriteExecute
   };
+  # systemd sets SHELL from the user's passwd entry, nologin for a system
+  # user, and the agents run their shell tools with it
+  shell = lib.getExe pkgs.bash;
   # procps for ps: Paseo lists an OpenCode server's children with
   # `ps --ppid` when it stops one, and an ENOENT there crashes its worker
   path = with pkgs; [bash coreutils findutils gnugrep gnused git procps];
@@ -353,6 +359,7 @@ in {
     inherit path;
     environment = {
       HOME = home;
+      SHELL = shell;
       OPENCODE_CONFIG = opencodeSettings;
     };
     serviceConfig =
@@ -414,6 +421,7 @@ in {
     path = path ++ [pkgs.paseo];
     environment = {
       HOME = home;
+      SHELL = shell;
       PASEO_HOME = paseoHome;
       # Read by the OpenCode server Paseo starts
       OPENCODE_CONFIG = opencodeSettings;
