@@ -76,7 +76,10 @@ jobs:
           PR: ${{ steps.create-pr.outputs.pull-request-number }}
       - if: ${{ steps.create-pr.outputs.pull-request-number }}
         name: Merge
-        run: gh pr merge "$PR" --squash --match-head-commit "$SHA"
+        # --admin sends the merge despite the PR showing as blocked; without it
+        # gh refuses before asking. GitHub then applies the app's bypass of the
+        # approval ruleset only; "Require CI" has no bypass and still applies.
+        run: gh pr merge "$PR" --squash --admin --match-head-commit "$SHA"
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
           PR: ${{ steps.create-pr.outputs.pull-request-number }}
