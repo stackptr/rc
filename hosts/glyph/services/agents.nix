@@ -3,7 +3,7 @@
 # runs as one unprivileged user, and every agent process runs inside the same
 # nono profile, which grants the workspaces and the agents' own state but not
 # Paseo's home (its local credential and config) or anything else of glyph's.
-# On GitHub they act as the stackptr-agents app: they can push branches and
+# On GitHub they act as the teleomycete app: they can push branches and
 # open PRs, but not change workflows, and rulesets keep them from merging.
 {
   config,
@@ -21,7 +21,7 @@
   # into tokenDir, which the agents can read but not the app's key.
   githubApp = {
     clientId = "Iv23liplzBiAJHoFzanK";
-    slug = "stackptr-agents";
+    slug = "teleomycete";
     # The bot account's user ID, not the app ID: commits made with this
     # noreply address link to the bot
     botUserId = 346624003;
