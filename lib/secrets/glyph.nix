@@ -13,6 +13,8 @@ import ./mk-host.nix "glyph" [
   "user-password"
   "obsidian-auth-token"
   "navidrome-env"
+  "pgadmin-client-secret"
+  "pgadmin-password"
   "opencode-env"
   "paseo-env"
   "claude-code-env"
