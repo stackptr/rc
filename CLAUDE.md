@@ -256,3 +256,4 @@ Then log the expired machines back in (Tailnet Lock re-signs them; nothing needs
 
 - All files should end with a newline.
 - After executing large changes, run `nix fmt .`. It runs alejandra, statix and nil; CI runs it too and fails if it changes or flags anything.
+- Test change: verifying the agent PR workflow. Safe to revert.
