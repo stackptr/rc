@@ -5,6 +5,7 @@
 }: {
   imports = [
     ./hardware.nix
+    ./remote-builder.nix
     ./services
   ];
 
