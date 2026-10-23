@@ -7,6 +7,9 @@ on:
 
 permissions:
   contents: read
+  # Waiting on the PR's checks
+  checks: read
+  pull-requests: read
 
 jobs:
   update:
@@ -53,8 +56,28 @@ jobs:
           token: ${{ steps.app-token.outputs.token }}
           author: ${{ env.BOT_NAME }} <${{ env.BOT_EMAIL }}>
           committer: ${{ env.BOT_NAME }} <${{ env.BOT_EMAIL }}>
+      # Auto-merge waits for the approval the app may skip, so wait for the
+      # required checks here and merge directly. The app can skip only the
+      # approval ruleset; "Require CI" still applies to the merge.
       - if: ${{ steps.create-pr.outputs.pull-request-number }}
-        name: Enable auto-merge after requirements met
-        run: gh pr merge --squash --auto "${{ steps.create-pr.outputs.pull-request-number }}"
+        name: Wait for required checks
+        run: |
+          # gh exits 1 until the checks are reported, 8 while they're pending
+          for _ in $(seq 20); do
+            rc=0
+            gh pr checks "$PR" --required >/dev/null 2>&1 || rc=$?
+            [ "$rc" -eq 0 ] || [ "$rc" -eq 8 ] && break
+            sleep 15
+          done
+          gh pr checks "$PR" --required --watch --fail-fast --interval 30
+        env:
+          # The app has no Checks permission; the job's token reads them
+          GH_TOKEN: ${{ github.token }}
+          PR: ${{ steps.create-pr.outputs.pull-request-number }}
+      - if: ${{ steps.create-pr.outputs.pull-request-number }}
+        name: Merge
+        run: gh pr merge "$PR" --squash --match-head-commit "$SHA"
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          PR: ${{ steps.create-pr.outputs.pull-request-number }}
+          SHA: ${{ steps.create-pr.outputs.pull-request-head-sha }}
