@@ -3,6 +3,8 @@
 # runs as one unprivileged user, and every agent process runs inside the same
 # nono profile, which grants the workspaces and the agents' own state but not
 # Paseo's home (its local credential and config) or anything else of glyph's.
+# On GitHub they act as the teleomycete app: they can push branches and
+# open PRs, but not change workflows, and rulesets keep them from merging.
 {
   config,
   inputs,
@@ -15,6 +17,30 @@
   # Repositories the agents work on; Paseo's worktrees go in .worktrees
   workspaces = "${home}/workspaces";
   paseoHome = "/var/lib/paseo";
+  # The agents' GitHub App. A separate user mints its installation tokens
+  # into tokenDir, which the agents can read but not the app's key.
+  githubApp = {
+    clientId = "Iv23liplzBiAJHoFzanK";
+    slug = "teleomycete";
+    # The bot account's user ID, not the app ID: commits made with this
+    # noreply address link to the bot
+    botUserId = 346624003;
+    owner = "stackptr";
+  };
+  tokenUser = "agents-github";
+  tokenDir = "/run/agents-github";
+  tokenFile = "${tokenDir}/token";
+  gitCredential = pkgs.writeShellScript "git-credential-agents-github" ''
+    # git also calls helpers with store and erase; only get has an answer
+    [ "$1" = get ] || exit 0
+    echo username=x-access-token
+    echo "password=$(cat ${tokenFile})"
+  '';
+  ghWithToken = pkgs.writeShellScriptBin "gh" ''
+    GH_TOKEN=$(cat ${tokenFile})
+    export GH_TOKEN
+    exec ${lib.getExe pkgs.gh} "$@"
+  '';
   opencodePort = 8890;
   paseoPort = 6767;
   # Tailnet addresses, from `tailscale ip <device>`; update them if a device
@@ -58,8 +84,18 @@
   json = pkgs.formats.json {};
 
   profile = import ../../../lib/llm-profile.nix inputs.llm-profile;
+  # Added to every agent's instructions. Only these agents push as the app,
+  # so it isn't in llm-profile, whose prompt my own Claude Code shares.
+  githubNote = ''
+
+    ## GitHub
+
+    You push and open pull requests as the `${githubApp.slug}[bot]` GitHub App, which only has access to the repositories it's installed on. It has no Workflows permission, so GitHub rejects any push that adds or changes a file under `.github/workflows/`, which can include merging or rebasing a branch across workflow changes on the default branch. When that happens, don't retry or work around it (don't drop, split or rewrite the commits to get them through): stop and tell the user which change needs pushing.
+
+    You can only push branches named `agents/<name>` (e.g. `git push origin HEAD:agents/fix-gc-options`); GitHub rejects pushes to any other branch. After opening a pull request, turn on auto-merge with `gh pr merge --auto --squash <number>`: it merges once CI passes and the user approves, and a push after their approval needs a new one.
+  '';
   # A shorter prompt helps a 27B model more than it helps Claude.
-  context = pkgs.writeText "AGENTS.md" profile.agent;
+  context = pkgs.writeText "AGENTS.md" (profile.agent + githubNote);
   opencodeSettings = json.generate "opencode.json" {
     "$schema" = "https://opencode.ai/config.json";
     model = "stroma/${stromaModel}";
@@ -128,6 +164,10 @@
         # server it starts has to load them; read-only, so agents can't
         # change what Paseo's server runs
         "${paseoHome}/runtime/opencode"
+        # The GitHub token. The directory, not the file: each mint replaces
+        # the file, and Landlock grants follow the inode the path had when
+        # the sandbox started.
+        tokenDir
       ];
       allow = [
         # Repositories and Paseo's worktrees, where agents work
@@ -313,7 +353,7 @@
   shell = lib.getExe pkgs.bash;
   # procps for ps: Paseo lists an OpenCode server's children with
   # `ps --ppid` when it stops one, and an ENOENT there crashes its worker
-  path = with pkgs; [bash coreutils findutils gnugrep gnused git procps];
+  path = [ghWithToken] ++ (with pkgs; [bash coreutils findutils gnugrep gnused git procps]);
   # Give up after 5 failed starts in 5 minutes instead of looping, so the
   # "Systemd unit failed" alert fires rather than only the restart one
   startLimit = {
@@ -341,6 +381,12 @@ in {
     owner = user;
   };
 
+  # The GitHub App's private key, readable only by the minting service
+  age.secrets.github-app-key = {
+    file = ../secrets/github-app-key.age;
+    owner = tokenUser;
+  };
+
   # Agents run shell commands as this user, so it gets none of mu's access:
   # no /home (mu's SSH config and keys), no /mnt pools, no other secrets
   users.users.${user} = {
@@ -349,6 +395,11 @@ in {
     inherit home;
   };
   users.groups.${user} = {};
+  users.users.${tokenUser} = {
+    isSystemUser = true;
+    group = tokenUser;
+  };
+  users.groups.${tokenUser} = {};
 
   # Only spore's nginx may reach OpenCode's server or Paseo over the
   # tailnet, which puts Pocket ID in front of them (code.zx.dev,
@@ -429,6 +480,13 @@ in {
     "${home}/.claude" = dir;
     "${home}/.pi" = dir;
     "${home}/.pi/agent" = dir;
+    # setgid, so the token is created in the agents' group, which can read
+    # it but not replace it
+    ${tokenDir}.d = {
+      user = tokenUser;
+      group = user;
+      mode = "2750";
+    };
     ${paseoHome} = dir;
     # Granted by the nono profile, so it has to exist before Paseo first runs
     "${paseoHome}/opencode-home" = dir;
@@ -437,12 +495,68 @@ in {
     "${paseoHome}/config.json" = link paseoConfig;
   };
 
+  # Installation tokens last an hour. Every 20 minutes, so a single failed run
+  # (which fires the "Systemd unit failed" alert) doesn't let the token expire.
+  systemd.services.agents-github-token = {
+    description = "Mint a GitHub App installation token for the coding agents";
+    wants = ["network-online.target"];
+    after = ["network-online.target" "systemd-tmpfiles-setup.service" "systemd-tmpfiles-resetup.service"];
+    path = with pkgs; [coreutils curl jq openssl];
+    serviceConfig = {
+      Type = "oneshot";
+      User = tokenUser;
+      Group = tokenUser;
+      UMask = "0027";
+      ProtectSystem = "strict";
+      ProtectHome = true;
+      ReadWritePaths = [tokenDir];
+      PrivateTmp = true;
+      PrivateDevices = true;
+      NoNewPrivileges = true;
+      CapabilityBoundingSet = "";
+      RestrictAddressFamilies = ["AF_UNIX" "AF_INET" "AF_INET6"];
+    };
+    script = ''
+      set -o pipefail
+      b64url() { openssl base64 -A | tr '+/' '-_' | tr -d '='; }
+
+      # A JWT for the app, valid for 9 minutes; iat is backdated for clock skew
+      now=$(date +%s)
+      header=$(printf '{"alg":"RS256","typ":"JWT"}' | b64url)
+      payload=$(jq -nc --argjson now "$now" --arg iss ${githubApp.clientId} \
+        '{iat: ($now - 60), exp: ($now + 540), iss: $iss}' | b64url)
+      signature=$(printf '%s.%s' "$header" "$payload" \
+        | openssl dgst -sha256 -sign ${config.age.secrets.github-app-key.path} | b64url)
+      jwt="$header.$payload.$signature"
+
+      api() {
+        curl -sSf -H "Authorization: Bearer $jwt" \
+          -H "Accept: application/vnd.github+json" \
+          -H "X-GitHub-Api-Version: 2022-11-28" "$@"
+      }
+      # The app is private, so its only installation is on ${githubApp.owner}
+      installation=$(api https://api.github.com/users/${githubApp.owner}/installation | jq -er .id)
+      token=$(api -X POST "https://api.github.com/app/installations/$installation/access_tokens" \
+        | jq -er .token)
+
+      printf '%s' "$token" >${tokenFile}.new
+      mv ${tokenFile}.new ${tokenFile}
+    '';
+  };
+  systemd.timers.agents-github-token = {
+    wantedBy = ["timers.target"];
+    timerConfig = {
+      OnBootSec = "1m";
+      OnUnitActiveSec = "20m";
+    };
+  };
+
   # code.zx.dev on spore proxies here
   systemd.services.opencode-web = {
     description = "OpenCode server";
     wantedBy = ["multi-user.target"];
-    wants = ["network-online.target"];
-    after = ["network-online.target" "systemd-tmpfiles-setup.service" "systemd-tmpfiles-resetup.service"];
+    wants = ["network-online.target" "agents-github-token.service"];
+    after = ["network-online.target" "systemd-tmpfiles-setup.service" "systemd-tmpfiles-resetup.service" "agents-github-token.service"];
     inherit (startLimit) startLimitIntervalSec startLimitBurst;
     inherit path;
     environment = {
@@ -473,6 +587,8 @@ in {
     programs.claude-code = {
       # Paseo runs pkgs.claude-code itself, through the nono wrapper
       package = null;
+      # Appended to the llm-profile prompt development.nix sets (lines merge)
+      context = lib.mkAfter githubNote;
       # Paseo's orchestration skills, from the source of the Paseo it runs.
       # The nixpkgs package leaves out the skills/ directory its own
       # installer copies from, so Settings > Agents > Orchestration skills
@@ -480,6 +596,20 @@ in {
       skills =
         lib.genAttrs ["paseo" "paseo-handoff" "paseo-committee" "paseo-advisor"]
         (name: "${pkgs.paseo.src}/skills/${name}");
+    };
+    # Commits as the app's bot, and pushes with its installation token. No
+    # SSH key, so SSH remotes are rewritten to HTTPS.
+    programs.git = {
+      enable = true;
+      signing.format = null;
+      settings = {
+        user = {
+          name = "${githubApp.slug}[bot]";
+          email = "${toString githubApp.botUserId}+${githubApp.slug}[bot]@users.noreply.github.com";
+        };
+        credential."https://github.com".helper = "${gitCredential}";
+        url."https://github.com/".insteadOf = ["git@github.com:" "ssh://git@github.com/"];
+      };
     };
     # Pi's endpoint, default model and instructions. It has no MCP gateway,
     # so it gets the standalone prompt. force: tmpfiles linked the first
@@ -493,7 +623,7 @@ in {
         source = piSettings;
         force = true;
       };
-      ".pi/agent/AGENTS.md".text = profile."agent-standalone";
+      ".pi/agent/AGENTS.md".text = profile."agent-standalone" + githubNote;
     };
   };
 
@@ -503,8 +633,8 @@ in {
     description = "Paseo agent daemon";
     wantedBy = ["multi-user.target"];
     # Claude's config above, written by home-manager's activation unit
-    wants = ["network-online.target" "home-manager-${user}.service"];
-    after = ["network-online.target" "systemd-tmpfiles-setup.service" "systemd-tmpfiles-resetup.service" "home-manager-${user}.service"];
+    wants = ["network-online.target" "home-manager-${user}.service" "agents-github-token.service"];
+    after = ["network-online.target" "systemd-tmpfiles-setup.service" "systemd-tmpfiles-resetup.service" "home-manager-${user}.service" "agents-github-token.service"];
     inherit (startLimit) startLimitIntervalSec startLimitBurst;
     path = path ++ [pkgs.paseo];
     environment = {
