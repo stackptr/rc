@@ -14,16 +14,26 @@
   # email claim, and OAUTH2_AUTO_CREATE_USER is off.
   user = "corey@zx.dev";
 
-  # One entry covers every database on the server. pg_hba trusts the socket,
-  # so there's no password to store.
+  # pg_hba trusts the socket, so there's no password. pgAdmin still prompts
+  # for one unless the server has a saved password, passfile, PassExecCommand
+  # or libpq service, so it gets a service with the same connection.
+  conn = {
+    host = "/run/postgresql";
+    port = config.services.postgresql.settings.port;
+    user = "pgadmin";
+  };
+  serviceFile = pkgs.writeText "pg_service.conf" (lib.generators.toINI {} {glyph = conn;});
+
+  # One entry covers every database on the server
   servers = pkgs.writeText "pgadmin-servers.json" (builtins.toJSON {
     Servers."1" = {
       Name = "glyph";
       Group = "Servers";
-      Host = "/run/postgresql";
-      Port = config.services.postgresql.settings.port;
+      Service = "glyph";
+      Host = conn.host;
+      Port = conn.port;
       MaintenanceDB = "postgres";
-      Username = "pgadmin";
+      Username = conn.user;
     };
   });
 in {
@@ -64,6 +74,7 @@ in {
   '';
 
   systemd.services.pgadmin = {
+    environment.PGSERVICEFILE = serviceFile;
     serviceConfig.LoadCredential = [
       "oauth2_client_secret:${config.age.secrets.pgadmin-client-secret.path}"
     ];
