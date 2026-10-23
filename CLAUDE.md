@@ -32,7 +32,7 @@ nix-flake eval nixosConfigurations.<host>.config.system.build.toplevel.drvPath  
 nix-flake eval darwinConfigurations.<host>.system.drvPath                       # macOS
 ```
 
-**Flake inputs:** `nix flake update --commit-lock-file`. The Update workflow does this daily and auto-merges once CI passes.
+**Flake inputs:** `nix flake update --commit-lock-file`. The Update workflow does this daily and auto-merges once CI passes. It acts as the private `teleotrope` app, whose client ID and key are in the `update` environment (main only), so its PRs start CI, unlike ones opened with `GITHUB_TOKEN`.
 
 **Dev shell:** `nix develop` provides agenix and just. Claude Code sessions in Zed don't run inside it; prefix devShell tools with `direnv exec .`, e.g. `direnv exec . agenix -e hosts/spore/secrets/foo.age`.
 
