@@ -84,8 +84,16 @@
   json = pkgs.formats.json {};
 
   profile = import ../../../lib/llm-profile.nix inputs.llm-profile;
+  # Added to every agent's instructions. Only these agents push as the app,
+  # so it isn't in llm-profile, whose prompt my own Claude Code shares.
+  githubNote = ''
+
+    ## GitHub
+
+    You push and open pull requests as the `${githubApp.slug}[bot]` GitHub App, which only has access to the repositories it's installed on. It has no Workflows permission, so GitHub rejects any push that adds or changes a file under `.github/workflows/`, which can include merging or rebasing a branch across workflow changes on the default branch. When that happens, don't retry or work around it (don't drop, split or rewrite the commits to get them through): stop and tell the user which change needs pushing. Pull requests need the user's approval to merge.
+  '';
   # A shorter prompt helps a 27B model more than it helps Claude.
-  context = pkgs.writeText "AGENTS.md" profile.agent;
+  context = pkgs.writeText "AGENTS.md" (profile.agent + githubNote);
   opencodeSettings = json.generate "opencode.json" {
     "$schema" = "https://opencode.ai/config.json";
     model = "stroma/${stromaModel}";
@@ -577,6 +585,8 @@ in {
     programs.claude-code = {
       # Paseo runs pkgs.claude-code itself, through the nono wrapper
       package = null;
+      # Appended to the llm-profile prompt development.nix sets (lines merge)
+      context = lib.mkAfter githubNote;
       # Paseo's orchestration skills, from the source of the Paseo it runs.
       # The nixpkgs package leaves out the skills/ directory its own
       # installer copies from, so Settings > Agents > Orchestration skills
@@ -611,7 +621,7 @@ in {
         source = piSettings;
         force = true;
       };
-      ".pi/agent/AGENTS.md".text = profile."agent-standalone";
+      ".pi/agent/AGENTS.md".text = profile."agent-standalone" + githubNote;
     };
   };
 
