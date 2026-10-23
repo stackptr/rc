@@ -90,7 +90,9 @@
 
     ## GitHub
 
-    You push and open pull requests as the `${githubApp.slug}[bot]` GitHub App, which only has access to the repositories it's installed on. It has no Workflows permission, so GitHub rejects any push that adds or changes a file under `.github/workflows/`, which can include merging or rebasing a branch across workflow changes on the default branch. When that happens, don't retry or work around it (don't drop, split or rewrite the commits to get them through): stop and tell the user which change needs pushing. Pull requests need the user's approval to merge.
+    You push and open pull requests as the `${githubApp.slug}[bot]` GitHub App, which only has access to the repositories it's installed on. It has no Workflows permission, so GitHub rejects any push that adds or changes a file under `.github/workflows/`, which can include merging or rebasing a branch across workflow changes on the default branch. When that happens, don't retry or work around it (don't drop, split or rewrite the commits to get them through): stop and tell the user which change needs pushing.
+
+    You can only push branches named `agents/<name>` (e.g. `git push origin HEAD:agents/fix-gc-options`); GitHub rejects pushes to any other branch. After opening a pull request, turn on auto-merge with `gh pr merge --auto --squash <number>`: it merges once CI passes and the user approves, and a push after their approval needs a new one.
   '';
   # A shorter prompt helps a 27B model more than it helps Claude.
   context = pkgs.writeText "AGENTS.md" (profile.agent + githubNote);
