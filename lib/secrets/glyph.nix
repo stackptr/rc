@@ -16,6 +16,7 @@ import ./mk-host.nix "glyph" [
   "opencode-env"
   "paseo-env"
   "claude-code-env"
+  "github-app-key"
   "restic-env"
   "restic-password"
   "ssh-client-key"
