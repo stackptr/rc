@@ -239,7 +239,7 @@ Then log the expired machines back in (Tailnet Lock re-signs them; nothing needs
 
 ## Guardrails
 
-- Merging doesn't deploy: deploys are manual, via `just switch` or the Deploy workflow. Don't switch a host, merge a PR, or run the Deploy workflow unless asked.
+- Merging doesn't deploy right away: deploys are manual, via `just switch` or the Deploy workflow, except that the Deploy workflow also deploys main to spore daily at 15:00 UTC once main's CI has passed (skipped if spore already runs main). So a change merged for spore reaches it within a day, and a branch deployed to spore by hand is replaced by main at the next scheduled run. Don't switch a host, merge a PR, or run the Deploy workflow unless asked.
 
 ## Committing
 

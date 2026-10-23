@@ -1,8 +1,14 @@
 name: Deploy
 run-name: >-
-  deploy${{ inputs.glyph && ' glyph' || '' }}${{ inputs.spore && ' spore' || '' }}${{ inputs.zeta && ' zeta' || '' }}
+  deploy${{ inputs.glyph && ' glyph' || '' }}${{ (inputs.spore || github.event_name == 'schedule') && ' spore' || '' }}${{ inputs.zeta && ' zeta' || '' }}${{ github.event_name == 'schedule' && ' (scheduled)' || '' }}
 
 on:
+  # spore faces the internet, so it shouldn't wait on a manual deploy for
+  # security fixes: deploy main to it daily, a few hours after the Update
+  # workflow's PR usually merges. Skipped when main's CI hasn't passed or
+  # spore already runs main.
+  schedule:
+    - cron: "0 15 * * *"
   workflow_dispatch:
     inputs:
       glyph:
@@ -24,12 +30,31 @@ permissions:
 jobs:
   plan:
     runs-on: ubuntu-latest
+    permissions:
+      actions: read
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
-      - id: set-matrix
+      # Built and pushed to Attic by CI, so the deploy substitutes rather
+      # than builds, and a commit that fails CI never deploys unattended
+      - name: Check CI passed on main
+        id: ci
+        if: github.event_name == 'schedule'
         env:
-          SELECTED: ${{ toJSON(inputs) }}
+          GH_TOKEN: ${{ github.token }}
+          SHA: ${{ github.sha }}
+        run: |
+          conclusion=$(gh run list -R "$GITHUB_REPOSITORY" --workflow ci.yml --commit "$SHA" \
+            --event push --limit 1 --json conclusion --jq '.[0].conclusion // ""')
+          if [[ "$conclusion" != success ]]; then
+            echo "::notice::Skipping the scheduled deploy: CI on $SHA is '${conclusion:-not finished}'"
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - id: set-matrix
+        if: steps.ci.outputs.skip != 'true'
+        env:
+          SELECTED: ${{ github.event_name == 'schedule' && '{"spore":true}' || toJSON(inputs) }}
         run: |
           include=$(jq -nc --argjson sel "$SELECTED" '
             [ {host: "glyph", runner: "ubuntu-latest"},
@@ -44,6 +69,7 @@ jobs:
 
   deploy:
     needs: plan
+    if: needs.plan.outputs.matrix != ''
     concurrency:
       group: deploy-${{ matrix.host }}
       cancel-in-progress: false
@@ -102,8 +128,23 @@ jobs:
             ConnectTimeout 10
           EOF
 
+      # nixos-version reports the flake revision the host runs
+      - name: Check deployed revision
+        id: current
+        if: github.event_name == 'schedule'
+        env:
+          HOST: ${{ matrix.host }}
+          SHA: ${{ github.sha }}
+        run: |
+          deployed=$(ssh "$HOST" nixos-version --configuration-revision)
+          if [[ "$deployed" == "$SHA" ]]; then
+            echo "::notice::$HOST already runs $SHA"
+            echo "up-to-date=true" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Deploy to ${{ matrix.host }}
         id: deploy
+        if: steps.current.outputs.up-to-date != 'true'
         run: |
           set -o pipefail
           nix run --inputs-from . deploy-rs -- \
@@ -135,3 +176,18 @@ jobs:
           fi
           echo "deploy ${OUTCOME}: revision=${REVISION} actor=${ACTOR} run=${RUN_URL}" \
             | ssh "$HOST" systemd-cat -t deploy-rs -p "$priority"
+
+  # Nobody is watching a scheduled run, so post its failures
+  notify:
+    needs: [plan, deploy]
+    if: failure() && github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+    steps:
+      - uses: stackptr/actions/slack-notify@8f86bf2d6b69d2225bee5726b080fc6ce1066bd9 # v1.0.0
+        with:
+          token: ${{ secrets.SLACK_BOT_TOKEN }}
+          channel: "#alerts"
+          status: failure
+          failed-jobs: true
