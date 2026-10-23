@@ -81,13 +81,6 @@ jobs:
         fi
         echo "drv=$drv" >> "$GITHUB_OUTPUT"
         exit $rc
-    - name: Configure Attic cache
-      env:
-        ATTIC_TOKEN: ${{ secrets.ATTIC_TOKEN }}
-      run: |
-        nix profile install --inputs-from . attic#attic-client --fallback
-        attic login rc https://cache.zx.dev "$ATTIC_TOKEN"
-        attic use rc:main
     - name: Allow unprivileged user namespaces (needed by bubblewrap-based FHS builds)
       if: runner.os == 'Linux'
       run: sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
@@ -95,12 +88,22 @@ jobs:
       env:
         DRV: ${{ steps.eval.outputs.drv }}
       run: nix build "$DRV^*"
+    # Only main gets ATTIC_TOKEN, and only after everything is built: branch
+    # and PR builds read the public cache through extra-substituters above,
+    # and no branch code (a lock file pointing attic elsewhere, or an
+    # unsandboxed derivation on the macOS runners) runs with the token
+    # around. The client comes from a fixed rev, not the flake's lock, so a
+    # lock change can't swap it either; bump it by hand.
     - name: Push to Attic
       if: github.ref == 'refs/heads/main'
+      env:
+        ATTIC_TOKEN: ${{ secrets.ATTIC_TOKEN }}
       run: |
-        attic push rc:main ./result
-        attic push rc:main $(which attic)
         nix build .#devShells.${{ matrix.system }}.default -o ./result-devshell
+        nix profile install github:zhaofengli/attic/7a19204df10d606c5070e6bb72615c3461900c05#attic-client --fallback
+        attic login rc https://cache.zx.dev "$ATTIC_TOKEN"
+        attic push rc:main ./result
+        attic push rc:main "$(which attic)"
         attic push rc:main ./result-devshell
 
   # One Slack message per failed run, naming every failed job.

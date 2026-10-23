@@ -221,6 +221,16 @@
           '';
         };
       };
+      "db.zx.dev" = {
+        forceSSL = true;
+        useACMEHost = "zx.dev";
+        # pgAdmin on glyph, which also signs in through Pocket ID
+        requireAuth = true;
+        locations."/" = {
+          proxyPass = "http://glyph.note-iwato.ts.net:5050";
+          proxyWebsockets = true;
+        };
+      };
       "models.zx.dev" = {
         forceSSL = true;
         useACMEHost = "zx.dev";
