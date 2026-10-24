@@ -52,8 +52,8 @@
     };
     # The iPhone, iPad and the Macs that run the Paseo app
     blip = {
-      v4 = "100.82.15.58";
-      v6 = "fd7a:115c:a1e0::3333:f3a";
+      v4 = "100.71.241.100";
+      v6 = "fd7a:115c:a1e0::1c33:f165";
     };
     slate = {
       v4 = "100.74.6.1";
