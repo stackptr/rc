@@ -39,9 +39,9 @@ in
       value = firstLine (builtins.readFile ./../hosts/${h}/secretive.pub);
     }) ["Rhizome" "Stroma"]);
 
-    # SSH login keys on the iPhones (Rootshell, Touch ID on every use).
-    # Software ed25519 in the Keychain, not the Secure Enclave, so like
-    # secureEnclave the Touch ID is enforced on the phone, not by sshd.
+    # SSH login keys in the iPhones' Secure Enclaves (Rootshell, Touch ID on
+    # every use). Plain ecdsa like secureEnclave, so the Touch ID is enforced
+    # on the phone, not by sshd.
     phones = {
       blip = firstLine (builtins.readFile ./admin/ssh-blip.pub);
     };
