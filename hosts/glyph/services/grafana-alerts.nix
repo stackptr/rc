@@ -112,8 +112,9 @@ _: let
       title = "Filesystem nearly full";
       # Stroma: /private holds Xcode's sealed simulator runtimes (always ~98%
       # full), the agenix ramdisk and app nullfs wrappers; /Volumes/Archive
-      # (smbfs) is glyph's pool, covered by the ZFS rule.
-      expr = ''100 * (1 - node_filesystem_avail_bytes{fstype!~"tmpfs|ramfs|overlay|squashfs|nfs.*|smbfs|nullfs|autofs|devicefs", mountpoint!~"/nix/store|/private/.*"} / node_filesystem_size_bytes) > 90'';
+      # (smbfs) is glyph's pool, covered by the ZFS rule. APFS volumes share
+      # their container's free space, so only the Data volume is checked.
+      expr = ''100 * (1 - node_filesystem_avail_bytes{fstype!~"tmpfs|ramfs|overlay|squashfs|nfs.*|smbfs|nullfs|autofs|devicefs", mountpoint!~"/nix/store|/private/.*"} / node_filesystem_size_bytes) > 90 unless on(instance, mountpoint) node_filesystem_size_bytes{fstype="apfs", mountpoint!="/System/Volumes/Data"}'';
       summary = "{{ $labels.mountpoint }} on {{ $labels.instance }} is {{ printf \"%.0f\" $values.A.Value }}% full";
       for = "15m";
     })
