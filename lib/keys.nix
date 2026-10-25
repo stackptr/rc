@@ -39,6 +39,13 @@ in
       value = firstLine (builtins.readFile ./../hosts/${h}/secretive.pub);
     }) ["Rhizome" "Stroma"]);
 
+    # SSH login keys on the iPhones (Rootshell, Touch ID on every use).
+    # Software ed25519 in the Keychain, not the Secure Enclave, so like
+    # secureEnclave the Touch ID is enforced on the phone, not by sshd.
+    phones = {
+      blip = firstLine (builtins.readFile ./admin/ssh-blip.pub);
+    };
+
     # agenix admin recipients: age-plugin-yubikey keys (PIV slot 1, PIN once,
     # touch cached). Identity files are in lib/admin/; b is the offline spare.
     admins = [
