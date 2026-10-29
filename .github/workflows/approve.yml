@@ -1,0 +1,41 @@
+name: Approve my PRs
+
+# Approves PRs I author as the teleoid app, so they can auto-merge once CI
+# passes; I can't approve my own PRs, and the "Require approval" ruleset
+# applies to them. Agents' PRs (teleomycete) and forks never match.
+#
+# pull_request_target runs this file from main, not from the PR, so a PR
+# can't change what it does. Never check out the PR or interpolate its fields
+# into a script: the job holds teleoid's key.
+on:
+  pull_request_target:
+    types: [opened, reopened, synchronize, ready_for_review]
+
+permissions: {}
+
+jobs:
+  approve:
+    if: >-
+      github.event.pull_request.user.login == 'stackptr'
+      && github.event.pull_request.head.repo.full_name == github.repository
+      && !github.event.pull_request.draft
+    runs-on: ubuntu-latest
+    # Main-only environment holding the teleoid app's credentials
+    environment: approve
+    steps:
+      - uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
+        id: app-token
+        with:
+          client-id: ${{ vars.APPROVER_CLIENT_ID }}
+          private-key: ${{ secrets.APPROVER_PRIVATE_KEY }}
+      # Approves the commit this event is for; a later push dismisses it and
+      # triggers another run
+      - name: Approve
+        run: |
+          gh api "repos/$REPO/pulls/$PR/reviews" \
+            -f event=APPROVE -f commit_id="$SHA" >/dev/null
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+          SHA: ${{ github.event.pull_request.head.sha }}
