@@ -30,6 +30,10 @@
     enable = true;
   };
 
+  programs.netnewswire = {
+    enable = true;
+  };
+
   programs.popclip = {
     enable = true;
     startOnActivation = true;
