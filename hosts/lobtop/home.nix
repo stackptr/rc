@@ -20,6 +20,11 @@
     OTEL_METRIC_EXPORT_INTERVAL = "60000";
   };
 
+  # cmux's claude wrapper adds its computer-use MCP server with --mcp-config,
+  # which Claude Code refuses while Lob's managed-mcp.json is present. The
+  # wrapper only skips it for disableSideloadFlags or a policyHelper.
+  programs.zsh.sessionVariables.CMUX_COMPUTER_USE_MCP_DISABLED = "1";
+
   programs.zsh.initContent = ''
     export OTEL_EXPORTER_OTLP_HEADERS="Authorization=Bearer $(cat ${osConfig.age.secrets.otel-token.path})"
     if [[ -f "${config.home.homeDirectory}/Development/lob/shell-integration.zsh" ]]; then
