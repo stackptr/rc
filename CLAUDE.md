@@ -141,6 +141,8 @@ Grafana, Loki and Prometheus on glyph. Use them before `journalctl` or SSH when 
 
 Registration is authoritative: the unit also deregisters any server not in `services.mcpjungle.servers` (so don't register one by hand), re-applies each server's `disabledTools`, and then recreates the tool groups in `services.mcpjungle.groups`, each served at `/v0/groups/<name>/mcp` (Open WebUI uses `chat`). Groups are deleted and recreated, not updated: while servers re-sync in parallel, MCPJungle can leave a re-added tool out of a group's endpoint even though `GET /api/v0/tool-groups/<name>/effective-tools` lists it, and `update group` with an unchanged config doesn't repair it. A group that includes a disabled tool can't be created, so the module adds every `disabledTools` entry to each group's `excluded_tools`.
 
+**An MCP server behind `mcp-proxy` fails with `McpError: Connection closed`** (grafana-mcp, and the others in `modules/nixos/llm/` that wrap a stdio server): `mcp-proxy` starts the real server as a child, and that child exited, so the traceback hides its error. Run the child by hand with the module's arguments (e.g. `mcp-grafana --disable-write ...`) to see it, and check whether the last flake update moved its major version: mcp-grafana 2.x dropped `--disable-sift`, and Go CLIs exit on a flag they don't know, so glyph's build passed and the service crash-looped only after the switch.
+
 **Grafana exits with "Using the default [rendering]renderer_token is not allowed":** Grafana 13 rejects the default token whenever an image renderer is configured. `grafana.nix` sets the same `rendererToken` on both sides; keep them in sync.
 
 ### Loki label schema

@@ -8,13 +8,13 @@
 
   # Read-only: alert rules and dashboards are provisioned from the flake, so
   # agents only need to query. The other categories need Grafana Cloud
-  # products (OnCall, Incident, Sift, Asserts) or a Pyroscope datasource
-  # that doesn't exist here.
+  # products (OnCall, Incident, Asserts) or a Pyroscope datasource that
+  # doesn't exist here. mcp-grafana exits on an unknown flag, so drop any
+  # flag a release removes (2.x removed Sift and `--disable-sift`).
   grafanaArgs = [
     "--disable-write"
     "--disable-oncall"
     "--disable-incident"
-    "--disable-sift"
     "--disable-asserts"
     "--disable-pyroscope"
   ];
@@ -73,6 +73,8 @@ in {
       environment = {
         HOME = "/var/lib/grafana-mcp";
         GRAFANA_URL = cfg.grafanaUrl;
+        # 2.x reports anonymous usage statistics to Grafana Labs by default
+        GRAFANA_USAGE_STATS = "disabled";
       };
 
       serviceConfig = {
