@@ -11,7 +11,7 @@
       "/System/Applications/Mail.app"
       "/Applications/Zed.app"
       "/Applications/cmux.app"
-      "/Applications/Reeder.app"
+      "/Applications/Nix Apps/NetNewsWire.app"
       "/Applications/Roon.app"
       "/System/Applications/Calendar.app"
       "/System/Applications/Reminders.app"

@@ -261,7 +261,7 @@
             proxy_set_header Remote-User $rss_user;
           '';
         };
-        # Reeder authenticates the Google Reader API with FreshRSS's own API
+        # NetNewsWire authenticates the Google Reader API with FreshRSS's own API
         # password and can't do the OIDC redirect, so skip SSO for it alone;
         # the rest of /api/ (Fever, extensions) stays behind Pocket ID.
         # requireAuth only guards locations."/", and nginx picks the longest

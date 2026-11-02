@@ -210,7 +210,7 @@ in {
           (mkEndpoint {
             name = "freshrss";
             group = "sites";
-            # Unauthenticated self-test of the Google Reader API that Reeder
+            # Unauthenticated self-test of the Google Reader API that NetNewsWire
             # syncs through. It answers FAIL unless it can read an Authorization
             # header, so this also catches a proxy that drops it. FreshRSS logs
             # a warning per call, hence the longer interval.
@@ -221,7 +221,7 @@ in {
               "[STATUS] == 200"
               "[BODY] == PASS"
             ];
-            description = "rss.zx.dev (FreshRSS) API is down or failing its self-test; Reeder can't sync. Check phpfpm-freshrss.service and nginx on glyph";
+            description = "rss.zx.dev (FreshRSS) API is down or failing its self-test; NetNewsWire can't sync. Check phpfpm-freshrss.service and nginx on glyph";
           })
           (mkEndpoint {
             name = "pocket-id";
