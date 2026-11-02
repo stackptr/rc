@@ -8,10 +8,11 @@ _: {
       "/Applications/Zed.app"
       "/Applications/cmux.app"
       "/Applications/NetNewsWire.app"
+      "/Applications/NaviBeat.app" # TestFlight beta, installed by hand
       "/System/Applications/Calendar.app"
       "/System/Applications/Reminders.app"
       "/Applications/Obsidian.app"
-      "/Applications/Things.app"
+      "/Applications/Things3.app"
       "/System/Applications/Messages.app"
       "/Applications/Slack.app"
     ];
