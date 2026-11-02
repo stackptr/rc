@@ -18,6 +18,9 @@ permissions:
 jobs:
   scan:
     runs-on: ubuntu-latest
+    outputs:
+      title: ${{ steps.scan.outputs.title }}
+      fields: ${{ steps.scan.outputs.fields }}
     steps:
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
     - uses: cachix/install-nix-action@13d8dd58da0234aa297dedd986986ccb8e7f3e24 # v31.11.1
@@ -65,12 +68,21 @@ jobs:
           echo "::error::Open on $ADDRESS but not allowed by spore's firewall: $unexpected"
           exit 1
         fi
+
+  # Runs of main post from the main-only `notify` environment, which holds
+  # SLACK_BOT_TOKEN. This workflow also runs on PRs that change it: those
+  # get no environment, so no token, and only dry-run the notification.
+  notify:
+    needs: scan
+    if: failure() && (github.event_name == 'pull_request' || github.ref == 'refs/heads/main')
+    runs-on: ubuntu-latest
+    environment: ${{ github.event_name != 'pull_request' && 'notify' || '' }}
+    steps:
     - uses: stackptr/actions/slack-notify@8f86bf2d6b69d2225bee5726b080fc6ce1066bd9 # v1.0.0
-      if: failure()
       with:
         token: ${{ secrets.SLACK_BOT_TOKEN }}
         channel: "#alerts"
         status: failure
-        title: ${{ steps.scan.outputs.title || 'Port scan of spore failed' }}
-        fields: ${{ steps.scan.outputs.fields }}
+        title: ${{ needs.scan.outputs.title || 'Port scan of spore failed' }}
+        fields: ${{ needs.scan.outputs.fields }}
         dry-run: ${{ github.event_name == 'pull_request' }}

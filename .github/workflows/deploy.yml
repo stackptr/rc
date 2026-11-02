@@ -176,6 +176,8 @@ jobs:
     needs: [plan, deploy]
     if: failure() && github.event_name == 'schedule'
     runs-on: ubuntu-latest
+    # SLACK_BOT_TOKEN is in the main-only `notify` environment
+    environment: notify
     permissions:
       actions: read
     steps:
