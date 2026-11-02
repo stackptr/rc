@@ -53,6 +53,10 @@ jobs:
             system: aarch64-linux
             runner: ubuntu-24.04-arm
     runs-on: ${{ matrix.runner }}
+    # Builds of main run in the main-only `attic` environment, which holds
+    # ATTIC_TOKEN. Branch and PR builds get no environment (an empty name
+    # means none), so they can't reach it.
+    environment: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && 'attic' || '' }}
     steps:
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
     - uses: cachix/install-nix-action@13d8dd58da0234aa297dedd986986ccb8e7f3e24 # v31.11.1
@@ -88,7 +92,8 @@ jobs:
       env:
         DRV: ${{ steps.eval.outputs.drv }}
       run: nix build "$DRV^*"
-    # Only main gets ATTIC_TOKEN, and only after everything is built: branch
+    # Only main gets ATTIC_TOKEN (from the `attic` environment), and only
+    # after everything is built: branch
     # and PR builds read the public cache through extra-substituters above,
     # and no branch code (a lock file pointing attic elsewhere, or an
     # unsandboxed derivation on the macOS runners) runs with the token
@@ -106,11 +111,14 @@ jobs:
         attic push rc:main "$(which attic)"
         attic push rc:main ./result-devshell
 
-  # One Slack message per failed run, naming every failed job.
+  # One Slack message per failed run on main, naming every failed job. The
+  # token is in the main-only `notify` environment, so PR runs can't post;
+  # their failures show on the PR.
   notify:
     needs: [lint, build]
-    if: failure()
+    if: failure() && github.event_name == 'push'
     runs-on: ubuntu-latest
+    environment: notify
     permissions:
       actions: read
     steps:
