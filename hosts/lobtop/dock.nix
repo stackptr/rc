@@ -7,7 +7,7 @@ _: {
       "/System/Applications/Mail.app"
       "/Applications/Zed.app"
       "/Applications/cmux.app"
-      "/Applications/Nix Apps/NetNewsWire.app"
+      "/Applications/NetNewsWire.app"
       "/System/Applications/Calendar.app"
       "/System/Applications/Reminders.app"
       "/Applications/Obsidian.app"

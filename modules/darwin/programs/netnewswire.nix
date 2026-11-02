@@ -1,7 +1,6 @@
 {
   config,
   lib,
-  pkgs,
   ...
 }:
 with lib; let
@@ -11,8 +10,15 @@ in {
     enable = mkEnableOption "NetNewsWire";
   };
 
+  # The cask rather than nixpkgs' net-news-wire, which trails upstream releases
+  # by weeks. The app updates itself with Sparkle; greedy lets Homebrew upgrade
+  # it too.
   config = mkIf cfg.enable {
-    environment.systemPackages = [pkgs.net-news-wire];
-    system.disableUpdates = ["com.ranchero.NetNewsWire-Evergreen"];
+    homebrew.casks = [
+      {
+        name = "netnewswire";
+        greedy = true;
+      }
+    ];
   };
 }
