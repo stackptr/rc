@@ -12,7 +12,7 @@ _: {
       "/System/Applications/Calendar.app"
       "/System/Applications/Reminders.app"
       "/Applications/Obsidian.app"
-      "/Applications/Things.app"
+      "/Applications/Things3.app"
       "/System/Applications/Messages.app"
       "/Applications/Slack.app"
     ];
