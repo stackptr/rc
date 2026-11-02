@@ -5,8 +5,8 @@ run-name: >-
 on:
   # spore faces the internet, so it shouldn't wait on a manual deploy for
   # security fixes: deploy main to it daily, a few hours after the Update
-  # workflow's PR usually merges. Skipped when main's CI hasn't passed or
-  # spore already runs main.
+  # workflow's PR usually merges. Skipped when CI's spore build hasn't passed
+  # on main or spore already runs main.
   schedule:
     - cron: "0 15 * * *"
   workflow_dispatch:
@@ -35,19 +35,33 @@ jobs:
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
-      # Built and pushed to Attic by CI, so the deploy substitutes rather
-      # than builds, and a commit that fails CI never deploys unattended
-      - name: Check CI passed on main
+      # Built and pushed to Attic by CI's spore build, so the deploy
+      # substitutes rather than builds, and a commit whose spore build fails
+      # never deploys unattended. Only that job counts: the macOS builds can
+      # be cancelled for want of a runner, which says nothing about spore.
+      - name: Check spore's CI build passed on main
         id: ci
         if: github.event_name == 'schedule'
         env:
           GH_TOKEN: ${{ github.token }}
           SHA: ${{ github.sha }}
         run: |
-          conclusion=$(gh run list -R "$GITHUB_REPOSITORY" --workflow ci.yml --commit "$SHA" \
-            --event push --limit 1 --json conclusion --jq '.[0].conclusion // ""')
+          run=$(gh run list -R "$GITHUB_REPOSITORY" --workflow ci.yml --commit "$SHA" \
+            --event push --limit 1 --json databaseId --jq '.[0].databaseId // ""')
+          conclusion=""
+          if [[ -n $run ]]; then
+            # The latest attempt, so re-running failed jobs counts
+            view=$(gh run view "$run" -R "$GITHUB_REPOSITORY" --json status,jobs)
+            conclusion=$(jq -r '[.jobs[] | select(.name | startswith("build (spore,"))][0].conclusion // ""' <<< "$view")
+            # A finished run with no spore build means the job was renamed:
+            # fail, so it alerts, rather than skip every day
+            if [[ $(jq -r .status <<< "$view") == completed && -z $conclusion ]]; then
+              echo "::error::CI run $run on $SHA has no 'build (spore, ...)' job"
+              exit 1
+            fi
+          fi
           if [[ "$conclusion" != success ]]; then
-            echo "::notice::Skipping the scheduled deploy: CI on $SHA is '${conclusion:-not finished}'"
+            echo "::notice::Skipping the scheduled deploy: spore's CI build on $SHA is '${conclusion:-not finished}'"
             echo "skip=true" >> "$GITHUB_OUTPUT"
           fi
 
