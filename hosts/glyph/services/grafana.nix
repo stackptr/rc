@@ -11,10 +11,10 @@
 in {
   imports = [./grafana-alerts.nix];
 
-  # Kept apart from ./ntfy.nix's root-only slack-bot-token: Grafana reads
-  # this one itself, as the grafana user.
+  # Hypha's token: the same file as ./ntfy.nix's root-only slack-bot-token,
+  # decrypted a second time so Grafana can read it as the grafana user.
   age.secrets.grafana-slack-bot-token = {
-    file = ./../secrets/grafana-slack-bot-token.age;
+    file = ./../secrets/slack-bot-token.age;
     mode = "440";
     owner = "grafana";
     group = "grafana";
@@ -38,14 +38,14 @@ in {
     enable = true;
     settings = {
       server = {
-        # spore proxies grafana.zx.dev here over the tailnet (tailscale0 is
+        # spore proxies monitoring.zx.dev here over the tailnet (tailscale0 is
         # a trusted interface); other interfaces don't open port 3000.
         http_addr = "0.0.0.0";
         http_port = 3000;
         enforce_domain = true;
         enable_gzip = true;
-        domain = "grafana.zx.dev";
-        root_url = "https://grafana.zx.dev";
+        domain = "monitoring.zx.dev";
+        root_url = "https://monitoring.zx.dev";
       };
       auth = {
         disable_login_form = true;
@@ -78,10 +78,10 @@ in {
         resolve_timeout = "1m";
       };
       # provisionGrafana below points the renderer's browser at http_addr,
-      # which is 0.0.0.0 here, and a Host other than grafana.zx.dev fails
+      # which is 0.0.0.0 here, and a Host other than monitoring.zx.dev fails
       # enforce_domain. Load pages through the public URL instead.
       rendering = {
-        callback_url = lib.mkForce "https://grafana.zx.dev/";
+        callback_url = lib.mkForce "https://monitoring.zx.dev/";
         renderer_token = rendererToken;
       };
     };
@@ -103,10 +103,8 @@ in {
               type = "slack";
               settings = {
                 token = "$__file{${config.age.secrets.grafana-slack-bot-token.path}}";
-                recipient = "#updates";
-                username = "Grafana";
-                icon_emoji = ":grafana:";
-                title = ''{{ if .Alerts.Firing }}[FIRING] {{ .GroupLabels.alertname }}{{ else }}[RESOLVED] {{ .GroupLabels.alertname }}{{ end }}'';
+                recipient = "#alerts";
+                title = ''{{ if .Alerts.Firing }}:x: {{ .GroupLabels.alertname }}{{ else }}:white_check_mark: {{ .GroupLabels.alertname }}{{ end }}'';
                 text = ''                  {{ range .Alerts }}• {{ .Labels.alertname }}: {{ .Annotations.summary }}
                   {{ end }}'';
               };

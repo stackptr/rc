@@ -16,12 +16,10 @@
       "zeroconf"
     ];
     config = {
-      http = {
-        use_x_forwarded_for = true;
-        trusted_proxies = [
-          "100.64.0.0/10"
-        ];
-      };
+      # No `http` block: since 2026.8 the HTTP server settings (including
+      # Trust X-Forwarded-For and Trusted proxies, which spore's nginx needs)
+      # live in the UI under Settings > System > Network. YAML is imported
+      # once and ignored afterwards.
       mobile_app = {};
       zeroconf = {};
     };

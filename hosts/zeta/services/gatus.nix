@@ -4,6 +4,7 @@
 # Slack directly. Grafana in turn alerts if zeta's node exporter goes away.
 {
   config,
+  lib,
   pkgs,
   ...
 }: let
@@ -15,6 +16,20 @@
   # through id.zx.dev, which needs spore and glyph on it, so an expired
   # server can lock every device out (as on 2026-10-11).
   servers = ["glyph" "spore" "zeta" "stroma"];
+
+  # Ports spore's services listen on that must stay off the internet,
+  # probed on its public address. zeta reaches that over the internet, not
+  # the tailnet, so spore's firewall applies. The daily port scan workflow
+  # covers every port; these catch a regression within minutes.
+  sporePrivatePorts = {
+    node-exporter = 9100;
+    nginx-exporter = 9113;
+    alloy = 12345;
+    glances = 61208;
+    homepage = 8082;
+    pocket-id = 1411;
+    oauth2-proxy = 4180;
+  };
 
   alert = description: {
     type = "custom";
@@ -45,8 +60,8 @@ in {
     # Holds SLACK_BOT_TOKEN, the same bot Grafana posts with;
     # GATUS_EXTERNAL_TOKEN, which tailscale-key-expiry pushes results with;
     # and TS_API_CLIENT_ID/TS_API_CLIENT_SECRET, a Tailscale OAuth client
-    # with the devices:core:read scope (OAuth clients don't expire; API
-    # keys do).
+    # with the devices:core:read and auth_keys:read scopes (OAuth clients
+    # don't expire; API keys do).
     environmentFile = config.age.secrets.gatus-env.path;
     settings = {
       web.port = 8080;
@@ -61,143 +76,195 @@ in {
           Authorization = "Bearer \${SLACK_BOT_TOKEN}";
           Content-Type = "application/json; charset=utf-8";
         };
+        # Same shape as Grafana's alerts: the text is the notification
+        # preview, posted as Hypha. "(Gatus)" marks the out-of-band path.
         body = builtins.toJSON {
-          channel = "#updates";
-          username = "Gatus (zeta)";
-          icon_emoji = ":rotating_light:";
-          text = "[ALERT_TRIGGERED_OR_RESOLVED] [ENDPOINT_GROUP]/[ENDPOINT_NAME]: [ALERT_DESCRIPTION]";
+          channel = "#alerts";
+          text = "[ALERT_TRIGGERED_OR_RESOLVED] [ENDPOINT_GROUP]/[ENDPOINT_NAME] (Gatus): [ALERT_DESCRIPTION]";
+          unfurl_links = false;
         };
         placeholders.ALERT_TRIGGERED_OR_RESOLVED = {
-          TRIGGERED = "[FIRING]";
-          RESOLVED = "[RESOLVED]";
+          TRIGGERED = ":x:";
+          RESOLVED = ":white_check_mark:";
         };
       };
 
-      endpoints = [
-        (mkEndpoint {
-          name = "reachable";
-          group = "glyph";
-          url = "tcp://${glyph}:22";
-          conditions = ["[CONNECTED] == true"];
-          description = "glyph is unreachable over the tailnet; Prometheus, Loki and Grafana's database are down with it";
-        })
-        (mkEndpoint {
-          name = "postgres";
-          group = "glyph";
-          url = "tcp://${glyph}:5432";
-          conditions = ["[CONNECTED] == true"];
-          description = "PostgreSQL on glyph is not accepting connections; Grafana, pocket-id and others depend on it";
-        })
-        (mkEndpoint {
-          name = "prometheus";
-          group = "glyph";
-          # An instant query only returns samples from the last 5m, so an empty
-          # result means scraping or ingestion has stalled.
-          url = "http://${glyph}:9099/api/v1/query?query=up";
-          conditions = [
-            "[STATUS] == 200"
-            "len([BODY].data.result) > 0"
-          ];
-          description = "Prometheus is down or has no samples from the last 5m";
-        })
-        (mkEndpoint {
-          name = "loki";
-          group = "glyph";
-          # zeta's own journal shipped through Alloy proves end-to-end ingestion.
-          url = "http://${glyph}:3100/loki/api/v1/query?query=sum(count_over_time(%7Bhost%3D%22zeta%22%7D%5B10m%5D))";
-          conditions = [
-            "[STATUS] == 200"
-            "len([BODY].data.result) > 0"
-          ];
-          description = "Loki is down or has received no logs from zeta in 10m";
-        })
-        (mkEndpoint {
-          name = "reachable";
-          group = "spore";
-          url = "tcp://${spore}:22";
-          conditions = ["[CONNECTED] == true"];
-          description = "spore is unreachable over the tailnet; *.zx.dev, including grafana.zx.dev, is down with it";
-        })
-        (mkEndpoint {
-          name = "grafana";
-          group = "glyph";
-          # Through spore's nginx, so this also fails when the proxy does.
-          url = "https://grafana.zx.dev/api/health";
-          conditions = [
-            "[STATUS] == 200"
-            "[BODY].database == ok"
-          ];
-          description = "Grafana is down or cannot reach its database; Grafana alerts will not fire";
-        })
-        (mkEndpoint {
-          name = "certificate";
-          group = "spore";
-          # *.zx.dev, zx.dev and cjohns.com share one ACME cert on spore.
-          # NixOS renews at 30 days left, so under 21 means renewal has
-          # been failing for over a week.
-          url = "https://zx.dev";
-          interval = "1h";
-          conditions = ["[CERTIFICATE_EXPIRATION] > 504h"];
-          description = "The zx.dev certificate expires in under 21 days; check acme-zx.dev.service on spore";
-        })
+      endpoints =
+        [
+          (mkEndpoint {
+            name = "reachable";
+            group = "glyph";
+            url = "tcp://${glyph}:22";
+            conditions = ["[CONNECTED] == true"];
+            description = "glyph is unreachable over the tailnet; Prometheus, Loki and Grafana's database are down with it";
+          })
+          (mkEndpoint {
+            name = "postgres";
+            group = "glyph";
+            url = "tcp://${glyph}:5432";
+            conditions = ["[CONNECTED] == true"];
+            description = "PostgreSQL on glyph is not accepting connections; Grafana, pocket-id and others depend on it";
+          })
+          (mkEndpoint {
+            name = "prometheus";
+            group = "glyph";
+            # An instant query only returns samples from the last 5m, so an empty
+            # result means scraping or ingestion has stalled.
+            url = "http://${glyph}:9099/api/v1/query?query=up";
+            conditions = [
+              "[STATUS] == 200"
+              "len([BODY].data.result) > 0"
+            ];
+            description = "Prometheus is down or has no samples from the last 5m";
+          })
+          (mkEndpoint {
+            name = "loki";
+            group = "glyph";
+            # zeta's own journal shipped through Alloy proves end-to-end ingestion.
+            url = "http://${glyph}:3100/loki/api/v1/query?query=sum(count_over_time(%7Bhost%3D%22zeta%22%7D%5B10m%5D))";
+            conditions = [
+              "[STATUS] == 200"
+              "len([BODY].data.result) > 0"
+            ];
+            description = "Loki is down or has received no logs from zeta in 10m";
+          })
+          (mkEndpoint {
+            name = "audiomuse";
+            group = "glyph";
+            # Unauthenticated liveness probe; covers the flask container only
+            url = "http://${glyph}:8001/api/health";
+            conditions = [
+              "[STATUS] == 200"
+              "[BODY].status == ok"
+            ];
+            description = "AudioMuse-AI's web container on glyph is not answering, so Navidrome's audiomuseai plugin can't reach it";
+          })
+          (mkEndpoint {
+            name = "paseo";
+            group = "glyph";
+            # Unauthenticated liveness probe, through spore: glyph only accepts
+            # Paseo's port from spore
+            url = "https://agents.zx.dev/api/health";
+            conditions = ["[STATUS] == 200"];
+            description = "Paseo on glyph is not answering through spore, so agents.zx.dev and its agents are down";
+          })
+          (mkEndpoint {
+            name = "reachable";
+            group = "spore";
+            url = "tcp://${spore}:22";
+            conditions = ["[CONNECTED] == true"];
+            description = "spore is unreachable over the tailnet; *.zx.dev, including monitoring.zx.dev, is down with it";
+          })
+          (mkEndpoint {
+            name = "grafana";
+            group = "glyph";
+            # Through spore's nginx, so this also fails when the proxy does.
+            url = "https://monitoring.zx.dev/api/health";
+            conditions = [
+              "[STATUS] == 200"
+              "[BODY].database == ok"
+            ];
+            description = "Grafana is down or cannot reach its database; Grafana alerts will not fire";
+          })
+          (mkEndpoint {
+            name = "certificate";
+            group = "spore";
+            # *.zx.dev, zx.dev and cjohns.com share one ACME cert on spore.
+            # NixOS renews at 30 days left, so under 21 means renewal has
+            # been failing for over a week.
+            url = "https://zx.dev";
+            interval = "1h";
+            conditions = ["[CERTIFICATE_EXPIRATION] > 504h"];
+            description = "The zx.dev certificate expires in under 21 days; check acme-zx.dev.service on spore";
+          })
 
-        # Public sites, checked through their public URLs, so a failure can
-        # be DNS, the certificate, spore's nginx or the backend on glyph.
-        (mkEndpoint {
-          name = "jellyfin";
-          group = "sites";
-          url = "https://jellyfin.zx.dev/health";
-          conditions = [
-            "[STATUS] == 200"
-            "[BODY] == Healthy"
-          ];
-          description = "jellyfin.zx.dev is down or unhealthy; check jellyfin.service on glyph";
-        })
-        (mkEndpoint {
-          name = "navidrome";
-          group = "sites";
-          url = "https://music.zx.dev/ping";
-          conditions = ["[STATUS] == 200"];
-          description = "music.zx.dev (Navidrome) is down; check navidrome.service on glyph";
-        })
-        (mkEndpoint {
-          name = "open-webui";
-          group = "sites";
-          url = "https://chat.zx.dev/health";
-          conditions = [
-            "[STATUS] == 200"
-            "[BODY].status == true"
-          ];
-          description = "chat.zx.dev (Open WebUI) is down; check open-webui.service on glyph";
-        })
-        (mkEndpoint {
-          name = "freshrss";
-          group = "sites";
-          # Unauthenticated self-test of the Google Reader API that Reeder
-          # syncs through. It answers FAIL unless it can read an Authorization
-          # header, so this also catches a proxy that drops it. FreshRSS logs
-          # a warning per call, hence the longer interval.
-          url = "https://rss.zx.dev/api/greader.php/check/compatibility";
-          headers.Authorization = "GoogleLogin auth=test/1";
-          interval = "5m";
-          conditions = [
-            "[STATUS] == 200"
-            "[BODY] == PASS"
-          ];
-          description = "rss.zx.dev (FreshRSS) API is down or failing its self-test; Reeder can't sync. Check phpfpm-freshrss.service and nginx on glyph";
-        })
-        (mkEndpoint {
-          name = "pocket-id";
-          group = "sites";
-          # Every requireAuth site and Grafana's login depend on this.
-          url = "https://id.zx.dev/.well-known/openid-configuration";
-          conditions = [
-            "[STATUS] == 200"
-            "[BODY].issuer == https://id.zx.dev"
-          ];
-          description = "id.zx.dev (Pocket ID) is down; logins to Grafana and every auth-protected site fail. Check pocket-id.service on spore and its database on glyph";
-        })
-      ];
+          # Public sites, checked through their public URLs, so a failure can
+          # be DNS, the certificate, spore's nginx or the backend on glyph.
+          (mkEndpoint {
+            name = "jellyfin";
+            group = "sites";
+            url = "https://media.zx.dev/health";
+            conditions = [
+              "[STATUS] == 200"
+              "[BODY] == Healthy"
+            ];
+            description = "media.zx.dev is down or unhealthy; check jellyfin.service on glyph";
+          })
+          (mkEndpoint {
+            name = "navidrome";
+            group = "sites";
+            url = "https://music.zx.dev/ping";
+            conditions = ["[STATUS] == 200"];
+            description = "music.zx.dev (Navidrome) is down; check navidrome.service on glyph";
+          })
+          (mkEndpoint {
+            name = "open-webui";
+            group = "sites";
+            url = "https://chat.zx.dev/health";
+            conditions = [
+              "[STATUS] == 200"
+              "[BODY].status == true"
+            ];
+            description = "chat.zx.dev (Open WebUI) is down; check open-webui.service on glyph";
+          })
+          (mkEndpoint {
+            name = "freshrss";
+            group = "sites";
+            # Unauthenticated self-test of the Google Reader API that NetNewsWire
+            # syncs through. It answers FAIL unless it can read an Authorization
+            # header, so this also catches a proxy that drops it. FreshRSS logs
+            # a warning per call, hence the longer interval.
+            url = "https://rss.zx.dev/api/greader.php/check/compatibility";
+            headers.Authorization = "GoogleLogin auth=test/1";
+            interval = "5m";
+            conditions = [
+              "[STATUS] == 200"
+              "[BODY] == PASS"
+            ];
+            description = "rss.zx.dev (FreshRSS) API is down or failing its self-test; NetNewsWire can't sync. Check phpfpm-freshrss.service and nginx on glyph";
+          })
+          (mkEndpoint {
+            name = "pocket-id";
+            group = "sites";
+            # Every requireAuth site and Grafana's login depend on this.
+            url = "https://id.zx.dev/.well-known/openid-configuration";
+            conditions = [
+              "[STATUS] == 200"
+              "[BODY].issuer == https://id.zx.dev"
+            ];
+            description = "id.zx.dev (Pocket ID) is down; logins to Grafana and every auth-protected site fail. Check pocket-id.service on spore and its database on glyph";
+          })
+          (mkEndpoint {
+            name = "home-assistant";
+            group = "sites";
+            # Unauthenticated, so a healthy Home Assistant answers 401. A 400
+            # means it rejected spore's proxy (X-Forwarded-For from a proxy
+            # missing from its UI-managed trusted proxies), as on 2026-10-14.
+            url = "https://home.zx.dev/api/";
+            conditions = ["[STATUS] == 401"];
+            description = "home.zx.dev (Home Assistant) is down or rejecting spore's proxy (400 means Trusted proxies in Settings > System > Network no longer includes 100.64.0.0/10); check home-assistant.service on zeta";
+          })
+          (mkEndpoint {
+            name = "models";
+            group = "sites";
+            # spore proxies / to oMLX's admin UI on Stroma. The UI loads without
+            # an API key, so this needs no credentials.
+            url = "https://models.zx.dev/";
+            conditions = ["[STATUS] == 200"];
+            description = "models.zx.dev (oMLX) is down; check oMLX on Stroma (it may be asleep or restarting) and the tailnet link from spore";
+          })
+        ]
+        ++ lib.mapAttrsToList (name: port:
+          mkEndpoint {
+            inherit name;
+            group = "exposure";
+            # zx.dev's A record is spore's public address
+            url = "tcp://zx.dev:${toString port}";
+            interval = "5m";
+            conditions = ["[CONNECTED] == false"];
+            description = "${name} (port ${toString port}) on spore accepts connections from the internet; it should be tailnet-only. Check networking.firewall on spore and docs/ports.md";
+          })
+        sporePrivatePorts;
 
       # Results pushed by tailscale-key-expiry below; Gatus conditions can't
       # compare dates in a response body.
@@ -209,7 +276,7 @@ in {
           # Fails when the hourly push stops arriving
           heartbeat.interval = "3h";
           alerts = [
-            ((alert "A Tailscale node key expires within 14 days or has expired, or a server has key expiry enabled; the error on the status page names the machines. Renew or disable expiry at login.tailscale.com while id.zx.dev still works")
+            ((alert "A Tailscale node key or the Deploy workflow's TS_AUTHKEY expires within 14 days or has expired, or a server has key expiry enabled; the error on the status page names which. Renew or disable node expiry at login.tailscale.com while id.zx.dev still works; replace TS_AUTHKEY as CLAUDE.md describes")
               // {
                 failure-threshold = 1;
                 minimum-reminder-interval = "24h";
@@ -221,8 +288,10 @@ in {
   };
 
   # Hourly: every machine whose key expires within 14 days (or has expired),
-  # and any server with expiry enabled at all. Uses the public Tailscale API,
-  # so it works while the tailnet doesn't.
+  # any server with expiry enabled at all, and the Deploy workflow's signed
+  # tag:ci auth key (TS_AUTHKEY, 90 days at most) expiring within 14 days or
+  # missing. Uses the public Tailscale API, so it works while the tailnet
+  # doesn't.
   systemd.services.tailscale-key-expiry = {
     description = "Report Tailscale node key expiry to Gatus";
     wants = ["network-online.target"];
@@ -244,7 +313,13 @@ in {
           -d "client_id=$TS_API_CLIENT_ID" -d "client_secret=$TS_API_CLIENT_SECRET" \
           | jq -er .access_token) \
         || ! devices=$(curl -sf -H "Authorization: Bearer $token" \
-          https://api.tailscale.com/api/v2/tailnet/-/devices); then
+          https://api.tailscale.com/api/v2/tailnet/-/devices) \
+        || ! ids=$(curl -sf -H "Authorization: Bearer $token" \
+          "https://api.tailscale.com/api/v2/tailnet/-/keys?all=true" | jq -r '.keys[].id') \
+        || ! keys=$(for id in $ids; do
+          curl -sf -H "Authorization: Bearer $token" \
+            "https://api.tailscale.com/api/v2/tailnet/-/keys/$id" || exit 1
+        done); then
         report false "Tailscale API request failed"
         exit 1
       fi
@@ -259,6 +334,18 @@ in {
            then "\($host): key expires \(.expires[:10])"
            else empty end]
         | join("; ")' <<<"$devices")
+
+      # The key listing only gives IDs; each key's own record has its
+      # capabilities and expiry. No match means the key is gone or this client
+      # can't see it, and either way the next deploy would fail.
+      problems=$(jq -rs --argjson horizon "$horizon" --arg devices "$problems" '
+        [.[] | select(.invalid != true)
+         | select(.capabilities.devices.create? | .reusable and .ephemeral and ((.tags // []) | index("tag:ci")))
+         | .expires | sub("\\.[0-9]+"; "") | fromdateiso8601]
+        | (if length == 0 then "no reusable, ephemeral tag:ci auth key (TS_AUTHKEY)"
+           elif max < $horizon then "TS_AUTHKEY expires \(max | todate | .[:10])"
+           else "" end) as $ci
+        | [$devices, $ci] | map(select(. != "")) | join("; ")' <<<"$keys")
 
       if [ -n "$problems" ]; then
         report false "$problems"

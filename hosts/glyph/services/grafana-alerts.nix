@@ -9,6 +9,9 @@ _: let
   logHosts = ["glyph" "spore" "zeta"];
 
   # Build a rule: query A (instant) compared by threshold expression C.
+  # C fires on each series whose value passes the evaluator (default > 0),
+  # so a PromQL filter must leave a non-zero value: `up == 0` keeps only
+  # zeros and never fires. Query the raw value and set the evaluator instead.
   mkRule = {
     uid,
     title,
@@ -74,16 +77,44 @@ _: let
       for = "2m";
     })
     (mkRule {
+      uid = "systemd-units-stopped";
+      title = "Systemd units stopped";
+      # A switch interrupted after its stop phase leaves units inactive, not
+      # failed (glyph, 2026-10-22: a deploy-rs rollback died mid-switch), so
+      # the failed-unit rule never sees it. Compares active services with the
+      # host's peak over 6h; a deploy that removes several services fires
+      # until the peak ages out. Can't fire when glyph's own Prometheus or
+      # Grafana is among the stopped units: Gatus covers that.
+      expr = ''
+        max_over_time(count by (instance) (node_systemd_unit_state{state="active", name=~".+\\.service"} == 1)[6h:1m])
+          - count by (instance) (node_systemd_unit_state{state="active", name=~".+\\.service"} == 1)
+      '';
+      evaluator = {
+        type = "gt";
+        params = [5];
+      };
+      summary = "{{ $labels.instance }} has {{ printf \"%.0f\" $values.A.Value }} fewer active services than its 6h peak; check `systemctl list-units --type=service --state=inactive` and the last deploy";
+      for = "10m";
+    })
+    (mkRule {
       uid = "scrape-target-down";
       title = "Scrape target down";
-      expr = "up == 0";
+      expr = "up";
+      evaluator = {
+        type = "lt";
+        params = [1];
+      };
       summary = "Prometheus cannot scrape job {{ $labels.job }} on {{ $labels.instance }}";
       severity = "critical";
     })
     (mkRule {
       uid = "filesystem-full";
       title = "Filesystem nearly full";
-      expr = ''100 * (1 - node_filesystem_avail_bytes{fstype!~"tmpfs|ramfs|overlay|squashfs|nfs.*", mountpoint!="/nix/store"} / node_filesystem_size_bytes) > 90'';
+      # Stroma: /private holds Xcode's sealed simulator runtimes (always ~98%
+      # full), the agenix ramdisk and app nullfs wrappers; /Volumes/Archive
+      # (smbfs) is glyph's pool, covered by the ZFS rule. APFS volumes share
+      # their container's free space, so only the Data volume is checked.
+      expr = ''100 * (1 - node_filesystem_avail_bytes{fstype!~"tmpfs|ramfs|overlay|squashfs|nfs.*|smbfs|nullfs|autofs|devicefs", mountpoint!~"/nix/store|/private/.*"} / node_filesystem_size_bytes) > 90 unless on(instance, mountpoint) node_filesystem_size_bytes{fstype="apfs", mountpoint!="/System/Volumes/Data"}'';
       summary = "{{ $labels.mountpoint }} on {{ $labels.instance }} is {{ printf \"%.0f\" $values.A.Value }}% full";
       for = "15m";
     })
@@ -93,6 +124,33 @@ _: let
       expr = "100 * node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes < 10";
       summary = "{{ $labels.instance }} has {{ printf \"%.0f\" $values.A.Value }}% memory available";
       for = "10m";
+    })
+    # Pressure stall information: the share of time some task was stalled
+    # waiting for the resource. Unlike utilisation, it stays low on a busy
+    # host whose work isn't contending (glyph's capped AudioMuse workers), and
+    # rises when something is actually being made to wait. macOS has no PSI,
+    # so Stroma has no series.
+    (mkRule {
+      uid = "cpu-pressure";
+      title = "CPU pressure high";
+      expr = "100 * rate(node_pressure_cpu_waiting_seconds_total[10m]) > 50";
+      summary = "Runnable tasks on {{ $labels.instance }} waited for CPU {{ printf \"%.0f\" $values.A.Value }}% of the time over 10m";
+      for = "30m";
+    })
+    (mkRule {
+      uid = "memory-pressure";
+      title = "Memory pressure high";
+      # Catches reclaim and swap thrashing while MemAvailable still looks fine
+      expr = "100 * rate(node_pressure_memory_waiting_seconds_total[5m]) > 10";
+      summary = "Tasks on {{ $labels.instance }} stalled on memory {{ printf \"%.0f\" $values.A.Value }}% of the time over 5m";
+      for = "10m";
+    })
+    (mkRule {
+      uid = "oom-kill";
+      title = "OOM kill";
+      expr = "increase(node_vmstat_oom_kill[10m]) > 0";
+      summary = "The kernel OOM-killed {{ printf \"%.0f\" $values.A.Value }} process(es) on {{ $labels.instance }} in the last 10m; check {app=\"kernel\"} in Loki";
+      for = "0s";
     })
     (mkRule {
       uid = "backup-stale";
@@ -139,7 +197,11 @@ _: let
     (mkRule {
       uid = "smart-failing";
       title = "SMART health check failing";
-      expr = "smartctl_device_smart_status != 1";
+      expr = "smartctl_device_smart_status";
+      evaluator = {
+        type = "lt";
+        params = [1];
+      };
       summary = "Disk {{ $labels.device }} on {{ $labels.instance }} is failing its SMART health check";
       severity = "critical";
     })

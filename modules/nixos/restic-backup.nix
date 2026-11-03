@@ -1,6 +1,7 @@
 {
   config,
   lib,
+  hostname,
   ...
 }: let
   cfg = config.rc.backup;
@@ -26,8 +27,12 @@ in {
   };
 
   config = lib.mkIf cfg.enable {
-    age.secrets.restic-env.file = ../../secrets/restic-env.age;
-    age.secrets.restic-password.file = ../../secrets/restic-password.age;
+    # Each backed-up host has its own repo password and R2 token (an API token
+    # with Object Read & Write on its bucket only), so no host can read or
+    # delete another's backups. R2 tokens can't be limited to a prefix, so a
+    # second host needs its own bucket, not a path in this one.
+    age.secrets.restic-env.file = ../../hosts/${hostname}/secrets/restic-env.age;
+    age.secrets.restic-password.file = ../../hosts/${hostname}/secrets/restic-password.age;
 
     services.restic.backups.daily = {
       initialize = true;

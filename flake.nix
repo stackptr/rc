@@ -47,9 +47,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     golink = {
-      # Pinned to last commit compatible with go 1.26.5 (nixpkgs); next commit bumped to 1.26.6
-      # Unpin when nixpkgs reaches go 1.26.6 — tracked in https://github.com/stackptr/rc/issues/536
-      url = "github:tailscale/golink/52e1fd108b6362c7269fc834f854146b21a3bfc7";
+      url = "github:tailscale/golink";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.systems.follows = "systems";
     };
@@ -193,14 +191,10 @@
           (system: deployLib: deployLib.deployChecks inputs.self.deploy)
           inputs.deploy-rs.lib;
 
+        # The binary cache is set per host in modules/base/nix-config.nix
+        # (glyph reads it locally), and in the CI workflows.
         nixConfig = {
           experimental-features = ["nix-command" "flakes"];
-          extra-substituters = [
-            "https://cache.zx.dev/main"
-          ];
-          extra-trusted-public-keys = [
-            "main:mu0jkxdJTGWC3djDSEQb3rvZgqlhA8WVMulcTo5IW6c="
-          ];
         };
       };
 
@@ -228,6 +222,7 @@
             packages =
               [
                 inputs'.agenix.packages.default
+                pkgs.age-plugin-yubikey
                 pkgs.just
               ]
               ++ config.pre-commit.settings.enabledPackages;

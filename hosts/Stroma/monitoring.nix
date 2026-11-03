@@ -4,6 +4,7 @@
 # bind only the tailnet address.
 {
   config,
+  lib,
   pkgs,
   ...
 }: let
@@ -16,15 +17,12 @@
   # JSON into metrics. Prometheus passes the target URL on each scrape (see
   # the "omlx" job on glyph). Counters reset when oMLX restarts.
   jsonExporterConfig = (pkgs.formats.yaml {}).generate "json-exporter.yml" {
-    # oMLX wants an API key here too (see ./omlx.nix). Create a sub-key in
-    # its admin dashboard and save it, mode 600, to the file below; it's
-    # read on every scrape, and a missing or wrong key makes the scrape
-    # fail (up == 0). Not an agenix secret: Stroma's secrets are
-    # home-manager's, decrypted only after login, and oMLX keeps its keys
-    # in plain text in settings.json beside it anyway.
+    # oMLX wants an API key here too (see ./omlx.nix): a sub-key from its
+    # admin dashboard, in omlx-monitoring-key.age below. It's read on every
+    # scrape, and a missing or wrong key makes the scrape fail (up == 0).
     modules.omlx.http_client_config.authorization = {
       type = "Bearer";
-      credentials_file = "${omlxBase}/monitoring-key";
+      credentials_file = config.age.secrets.omlx-monitoring-key.path;
     };
     modules.omlx.metrics = let
       gauge = name: field: help: {
@@ -119,6 +117,13 @@
     }
   '';
 in {
+  # System agenix, decrypted at boot with sshd's host key, so json_exporter
+  # can read it before anyone logs in (home-manager secrets wait for login).
+  age.secrets.omlx-monitoring-key = {
+    file = ./secrets/omlx-monitoring-key.age;
+    owner = user;
+  };
+
   # Filesystems, load, uptime: the host-level series the shared alert rules
   # and dashboards already use.
   services.prometheus.exporters.node.enable = true;
@@ -127,18 +132,23 @@ in {
   # usage and frequency, power per component (CPU, GPU, ANE, DRAM), DRAM
   # bandwidth, SoC/GPU temperatures, thermal state and fans. Uses IOReport
   # and SMC, so no root needed.
+  #
+  # These daemons use `command`, not serviceConfig.ProgramArguments: nix-darwin
+  # wraps `command` in `/bin/wait4path /nix/store`. With ProgramArguments
+  # pointing into /nix/store, launchd starts them at boot before the Nix
+  # volume is mounted, and they stay down until the next switch.
+  launchd.daemons.mactop.command = lib.escapeShellArgs [
+    "${pkgs.mactop}/bin/mactop"
+    "--headless"
+    "--count"
+    "0"
+    # Sample every 10s; Prometheus scrapes every 60s.
+    "--interval"
+    "10000"
+    "--prometheus"
+    "9101"
+  ];
   launchd.daemons.mactop.serviceConfig = {
-    ProgramArguments = [
-      "${pkgs.mactop}/bin/mactop"
-      "--headless"
-      "--count"
-      "0"
-      # Sample every 10s; Prometheus scrapes every 60s.
-      "--interval"
-      "10000"
-      "--prometheus"
-      "9101"
-    ];
     UserName = config.system.primaryUser;
     RunAtLoad = true;
     KeepAlive = true;
@@ -148,12 +158,12 @@ in {
   };
 
   # oMLX's /api/status as metrics, authenticated with the key above.
+  launchd.daemons.json-exporter.command = lib.escapeShellArgs [
+    "${pkgs.prometheus-json-exporter}/bin/json_exporter"
+    "--config.file=${jsonExporterConfig}"
+    "--web.listen-address=:7979"
+  ];
   launchd.daemons.json-exporter.serviceConfig = {
-    ProgramArguments = [
-      "${pkgs.prometheus-json-exporter}/bin/json_exporter"
-      "--config.file=${jsonExporterConfig}"
-      "--web.listen-address=:7979"
-    ];
     UserName = user;
     RunAtLoad = true;
     KeepAlive = true;
@@ -163,15 +173,15 @@ in {
 
   # Ships oMLX's log (per-request tokens, tok/s, TTFT, errors) to Loki as
   # {host="stroma", app="omlx"}. Runs as the user, who owns the log.
+  launchd.daemons.alloy.command = lib.escapeShellArgs [
+    "${pkgs.grafana-alloy}/bin/alloy"
+    "run"
+    # Prometheus on glyph scrapes Alloy's own metrics (job "alloy").
+    "--server.http.listen-addr=0.0.0.0:12345"
+    "--storage.path=${home}/Library/Application Support/Alloy"
+    "${alloyConfig}"
+  ];
   launchd.daemons.alloy.serviceConfig = {
-    ProgramArguments = [
-      "${pkgs.grafana-alloy}/bin/alloy"
-      "run"
-      # Prometheus on glyph scrapes Alloy's own metrics (job "alloy").
-      "--server.http.listen-addr=0.0.0.0:12345"
-      "--storage.path=${home}/Library/Application Support/Alloy"
-      "${alloyConfig}"
-    ];
     UserName = user;
     RunAtLoad = true;
     KeepAlive = true;

@@ -6,10 +6,12 @@
     ./fastscripts.nix
     ./iina.nix
     ./little-snitch.nix
+    ./netnewswire.nix
     ./popclip.nix
     ./postico.nix
     ./roon.nix
     ./scroll-reverser.nix
     ./soundsource.nix
+    ./ykding.nix
   ];
 }

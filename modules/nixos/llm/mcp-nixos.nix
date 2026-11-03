@@ -5,13 +5,6 @@
   ...
 }: let
   cfg = config.services.mcp-nixos;
-
-  startScript = pkgs.writeShellScript "mcp-nixos-start" ''
-    exec ${lib.getExe pkgs.uv} run --with mcp-nixos python -c "
-    from mcp_nixos.server import mcp
-    mcp.run(transport='streamable-http', port=${toString cfg.port}, host='${cfg.host}')
-    "
-  '';
 in {
   options.services.mcp-nixos = {
     enable = lib.mkEnableOption "MCP NixOS server";
@@ -47,11 +40,13 @@ in {
 
       environment = {
         HOME = "/var/lib/mcp-nixos";
-        UV_CACHE_DIR = "/var/lib/mcp-nixos/.cache/uv";
+        MCP_NIXOS_TRANSPORT = "http";
+        MCP_NIXOS_HOST = cfg.host;
+        MCP_NIXOS_PORT = toString cfg.port;
       };
 
       serviceConfig = {
-        ExecStart = "${startScript}";
+        ExecStart = lib.getExe pkgs.mcp-nixos;
         User = "mcp-nixos";
         Group = "mcp-nixos";
         WorkingDirectory = "/var/lib/mcp-nixos";
@@ -73,8 +68,6 @@ in {
         RestrictSUIDSGID = true;
       };
     };
-
-    programs.nix-ld.enable = true;
 
     networking.firewall.allowedTCPPorts = lib.mkIf cfg.openFirewall [cfg.port];
   };

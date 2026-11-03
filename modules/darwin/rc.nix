@@ -32,6 +32,8 @@ in {
       taps = builtins.attrNames config.nix-homebrew.taps; # See: zhaofengli/nix-homebrew#5
       # N.B.: Cleanup uninstalls every App Store app not listed here, however it
       # was installed (Homebrew/brew#22450)
+      # TestFlight betas (ID 0 in `mas list`) are skipped, so they can stay manual
+      # installs.
       masApps = {
         "Copilot" = 1447330651;
         "Folder Quick Look" = 6753110395;
@@ -49,7 +51,7 @@ in {
         "Parcel" = 375589283;
         "Pixea" = 1507782672;
         "Play" = 1596506190;
-        "Reeder" = 1529448980;
+        "TestFlight" = 899247664;
         "Things" = 904280696;
         "Timery" = 1425368544;
         "Tot" = 1491071483;

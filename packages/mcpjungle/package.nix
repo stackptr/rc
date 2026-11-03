@@ -5,16 +5,24 @@
 }:
 buildGoModule rec {
   pname = "mcpjungle";
-  version = "0.3.5";
+  version = "0.4.6";
 
   src = fetchFromGitHub {
     owner = "mcpjungle";
     repo = "mcpjungle";
     rev = version;
-    hash = "sha256-Q/ASyI6DygmYa284wk2pmYgVtPKRummnyh60v+Ri7bU=";
+    hash = "sha256-XzszhbkQENeUgOOVBw7dsqZWR7hU3yLYOAclf3E9gy8=";
   };
 
-  vendorHash = "sha256-pvCDf7Y+LiIOiZ0O/bJMzkf75o7HQbYpF01yFY4J9Yg=";
+  vendorHash = "sha256-3uatBXXdQzqGuhFuLkpmoMkYYqUMt1dFqm7vuazMLqs=";
+
+  # The dev-mode dashboard is a separate npm build that upstream's release
+  # pipeline copies into internal/dashboardui/dist before go:embed reads it.
+  # Embed a placeholder instead; the gateway and API don't depend on it.
+  preBuild = ''
+    mkdir -p internal/dashboardui/dist
+    echo '<!doctype html><title>MCPJungle</title>' > internal/dashboardui/dist/index.html
+  '';
 
   # Tests require HOME to exist (tilde expansion); skip in sandbox
   doCheck = false;
