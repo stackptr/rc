@@ -9,6 +9,9 @@
   # Skip paho-mqtt's flaky test suite (nixpkgs#542586)
   (import ./paho-mqtt.nix)
 
+  # posthog is marked broken over a test-only input; Open WebUI needs it
+  (import ./posthog.nix)
+
   # Link alloy against full systemd so it can read zstd journals
   (import ./grafana-alloy.nix)
 

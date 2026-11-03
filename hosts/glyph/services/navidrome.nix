@@ -1,23 +1,4 @@
-{
-  config,
-  pkgs,
-  ...
-}: let
-  nd-lyrics = pkgs.stdenvNoCC.mkDerivation {
-    pname = "nd-lyrics";
-    version = "7.2.0";
-    src = pkgs.fetchurl {
-      url = "https://github.com/J0R6IT0/navidrome-lyrics-plugin/releases/download/v7.2.0/nd-lyrics.ndp";
-      sha256 = "03slqy31d42n2mdnix8z13lqyj3gmygmrwxrrjmb4bic9rdnw6d9";
-    };
-    dontUnpack = true;
-    installPhase = ''
-      mkdir -p $out/share
-      cp $src $out/share/nd-lyrics.ndp
-    '';
-    passthru.isNavidromePlugin = true;
-  };
-in {
+{config, ...}: {
   age.secrets.navidrome-env = {
     file = ./../secrets/navidrome-env.age;
     mode = "440";
@@ -30,12 +11,8 @@ in {
     openFirewall = true;
     group = "media";
     environmentFile = config.age.secrets.navidrome-env.path;
-    plugins = [
-      # Plugins are WASM and must be cross-compiled for wasi
-      pkgs.pkgsCross.wasi32.navidromePlugins.apple-music
-      pkgs.pkgsCross.wasi32.navidromePlugins.audiomuseai
-      nd-lyrics
-    ];
+    # From pkgsCross.wasi32.navidromePlugins; lyrics-plugin is nd-lyrics
+    withPlugins = p: [p.apple-music p.audiomuseai p.lyrics-plugin];
     settings = {
       Address = "0.0.0.0";
       Port = 4533;

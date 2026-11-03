@@ -14,6 +14,7 @@
 {
   config,
   inputs,
+  pkgs,
   ...
 }: let
   user = config.system.primaryUser;
@@ -23,7 +24,20 @@
   # Points at the installed keg, e.g. ../Cellar/omlx/0.7.1rc1
   optLink = "${config.homebrew.prefix}/opt/omlx";
 in {
-  nix-homebrew.taps."jundot/homebrew-omlx" = inputs.homebrew-omlx;
+  # preshed 3.0.14 (2026-10-24) breaks the formula's install-time
+  # `spacy.load('en_core_web_sm')` check with "OverflowError: Python int too
+  # large to convert to C ssize_t", so `brew bundle` fails to upgrade oMLX
+  # and the switch fails. Pin it in every pip step until the formula does
+  # (jundot/omlx#4831); --replace-fail flags when the formula changes.
+  nix-homebrew.taps."jundot/homebrew-omlx" = pkgs.applyPatches {
+    name = "homebrew-omlx";
+    src = inputs.homebrew-omlx;
+    postPatch = ''
+      substituteInPlace Formula/omlx.rb --replace-fail \
+        '"--no-binary", no_binary]' \
+        '"--no-binary", no_binary, "preshed==3.0.13"]'
+    '';
+  };
   homebrew.brews = ["jundot/omlx/omlx"];
 
   # A daemon rather than a user agent: Stroma usually runs without anyone

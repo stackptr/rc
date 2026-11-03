@@ -221,6 +221,16 @@
           '';
         };
       };
+      "db.zx.dev" = {
+        forceSSL = true;
+        useACMEHost = "zx.dev";
+        # pgAdmin on glyph, which also signs in through Pocket ID
+        requireAuth = true;
+        locations."/" = {
+          proxyPass = "http://glyph.note-iwato.ts.net:5050";
+          proxyWebsockets = true;
+        };
+      };
       "models.zx.dev" = {
         forceSSL = true;
         useACMEHost = "zx.dev";
@@ -251,7 +261,7 @@
             proxy_set_header Remote-User $rss_user;
           '';
         };
-        # Reeder authenticates the Google Reader API with FreshRSS's own API
+        # NetNewsWire authenticates the Google Reader API with FreshRSS's own API
         # password and can't do the OIDC redirect, so skip SSO for it alone;
         # the rest of /api/ (Fever, extensions) stays behind Pocket ID.
         # requireAuth only guards locations."/", and nginx picks the longest

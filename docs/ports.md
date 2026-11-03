@@ -23,6 +23,8 @@ An allowed port with nothing listening on it is closed: this lists what the fire
 | TCP | 22, 554, 3689, 4533, 8096, 8920, 53150, 55002, 9100–9200, 9330–9339, 30000–30010 |
 | UDP | 554, 1900, 5353, 7359, 9003, 6001–6002, 5350–5353, 32768–65535 |
 
+On `podman+` only: TCP 53; UDP 53.
+
 Extra rules (`networking.firewall.extraCommands`):
 
 ```sh
@@ -31,8 +33,8 @@ ip6tables -t mangle -A opencode-in -i tailscale0 -p tcp --dport 8890 -s fd7a:115
 ip46tables -t mangle -A opencode-in -i tailscale0 -p tcp --dport 8890 -j DROP
 iptables -t mangle -A opencode-in -i tailscale0 -p tcp --dport 6767 -s 100.89.150.33 -j RETURN
 ip6tables -t mangle -A opencode-in -i tailscale0 -p tcp --dport 6767 -s fd7a:115c:a1e0::a033:9621 -j RETURN
-iptables -t mangle -A opencode-in -i tailscale0 -p tcp --dport 6767 -s 100.82.15.58 -j RETURN
-ip6tables -t mangle -A opencode-in -i tailscale0 -p tcp --dport 6767 -s fd7a:115c:a1e0::3333:f3a -j RETURN
+iptables -t mangle -A opencode-in -i tailscale0 -p tcp --dport 6767 -s 100.71.241.100 -j RETURN
+ip6tables -t mangle -A opencode-in -i tailscale0 -p tcp --dport 6767 -s fd7a:115c:a1e0::1c33:f165 -j RETURN
 iptables -t mangle -A opencode-in -i tailscale0 -p tcp --dport 6767 -s 100.74.6.1 -j RETURN
 ip6tables -t mangle -A opencode-in -i tailscale0 -p tcp --dport 6767 -s fd7a:115c:a1e0::a33:601 -j RETURN
 iptables -t mangle -A opencode-in -i tailscale0 -p tcp --dport 6767 -s 100.122.26.71 -j RETURN

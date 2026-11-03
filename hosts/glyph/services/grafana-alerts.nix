@@ -77,6 +77,26 @@ _: let
       for = "2m";
     })
     (mkRule {
+      uid = "systemd-units-stopped";
+      title = "Systemd units stopped";
+      # A switch interrupted after its stop phase leaves units inactive, not
+      # failed (glyph, 2026-10-22: a deploy-rs rollback died mid-switch), so
+      # the failed-unit rule never sees it. Compares active services with the
+      # host's peak over 6h; a deploy that removes several services fires
+      # until the peak ages out. Can't fire when glyph's own Prometheus or
+      # Grafana is among the stopped units: Gatus covers that.
+      expr = ''
+        max_over_time(count by (instance) (node_systemd_unit_state{state="active", name=~".+\\.service"} == 1)[6h:1m])
+          - count by (instance) (node_systemd_unit_state{state="active", name=~".+\\.service"} == 1)
+      '';
+      evaluator = {
+        type = "gt";
+        params = [5];
+      };
+      summary = "{{ $labels.instance }} has {{ printf \"%.0f\" $values.A.Value }} fewer active services than its 6h peak; check `systemctl list-units --type=service --state=inactive` and the last deploy";
+      for = "10m";
+    })
+    (mkRule {
       uid = "scrape-target-down";
       title = "Scrape target down";
       expr = "up";
@@ -90,7 +110,11 @@ _: let
     (mkRule {
       uid = "filesystem-full";
       title = "Filesystem nearly full";
-      expr = ''100 * (1 - node_filesystem_avail_bytes{fstype!~"tmpfs|ramfs|overlay|squashfs|nfs.*", mountpoint!="/nix/store"} / node_filesystem_size_bytes) > 90'';
+      # Stroma: /private holds Xcode's sealed simulator runtimes (always ~98%
+      # full), the agenix ramdisk and app nullfs wrappers; /Volumes/Archive
+      # (smbfs) is glyph's pool, covered by the ZFS rule. APFS volumes share
+      # their container's free space, so only the Data volume is checked.
+      expr = ''100 * (1 - node_filesystem_avail_bytes{fstype!~"tmpfs|ramfs|overlay|squashfs|nfs.*|smbfs|nullfs|autofs|devicefs", mountpoint!~"/nix/store|/private/.*"} / node_filesystem_size_bytes) > 90 unless on(instance, mountpoint) node_filesystem_size_bytes{fstype="apfs", mountpoint!="/System/Volumes/Data"}'';
       summary = "{{ $labels.mountpoint }} on {{ $labels.instance }} is {{ printf \"%.0f\" $values.A.Value }}% full";
       for = "15m";
     })

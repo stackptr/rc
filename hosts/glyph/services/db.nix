@@ -19,6 +19,11 @@
         ensureClauses.superuser = true;
       }
       {
+        # pgAdmin (pgadmin.nix) connects as this role, not as mu
+        name = "pgadmin";
+        ensureClauses.superuser = true;
+      }
+      {
         name = "atticd";
         ensureDBOwnership = true;
       }

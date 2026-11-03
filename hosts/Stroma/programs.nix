@@ -14,6 +14,7 @@
     enable = true;
     casks = [
       "legcord"
+      "paseo"
     ];
   };
 
@@ -47,6 +48,10 @@
   };
 
   programs.little-snitch = {
+    enable = true;
+  };
+
+  programs.netnewswire = {
     enable = true;
   };
 

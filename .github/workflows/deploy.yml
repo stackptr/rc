@@ -1,8 +1,14 @@
 name: Deploy
 run-name: >-
-  deploy${{ inputs.glyph && ' glyph' || '' }}${{ inputs.spore && ' spore' || '' }}${{ inputs.zeta && ' zeta' || '' }}
+  deploy${{ inputs.glyph && ' glyph' || '' }}${{ (inputs.spore || github.event_name == 'schedule') && ' spore' || '' }}${{ inputs.zeta && ' zeta' || '' }}${{ github.event_name == 'schedule' && ' (scheduled)' || '' }}
 
 on:
+  # spore faces the internet, so it shouldn't wait on a manual deploy for
+  # security fixes: deploy main to it daily, a few hours after the Update
+  # workflow's PR usually merges. Skipped when CI's spore build hasn't passed
+  # on main or spore already runs main.
+  schedule:
+    - cron: "0 15 * * *"
   workflow_dispatch:
     inputs:
       glyph:
@@ -24,12 +30,45 @@ permissions:
 jobs:
   plan:
     runs-on: ubuntu-latest
+    permissions:
+      actions: read
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
-      - id: set-matrix
+      # Built and pushed to Attic by CI's spore build, so the deploy
+      # substitutes rather than builds, and a commit whose spore build fails
+      # never deploys unattended. Only that job counts: the macOS builds can
+      # be cancelled for want of a runner, which says nothing about spore.
+      - name: Check spore's CI build passed on main
+        id: ci
+        if: github.event_name == 'schedule'
         env:
-          SELECTED: ${{ toJSON(inputs) }}
+          GH_TOKEN: ${{ github.token }}
+          SHA: ${{ github.sha }}
+        run: |
+          run=$(gh run list -R "$GITHUB_REPOSITORY" --workflow ci.yml --commit "$SHA" \
+            --event push --limit 1 --json databaseId --jq '.[0].databaseId // ""')
+          conclusion=""
+          if [[ -n $run ]]; then
+            # The latest attempt, so re-running failed jobs counts
+            view=$(gh run view "$run" -R "$GITHUB_REPOSITORY" --json status,jobs)
+            conclusion=$(jq -r '[.jobs[] | select(.name | startswith("build (spore,"))][0].conclusion // ""' <<< "$view")
+            # A finished run with no spore build means the job was renamed:
+            # fail, so it alerts, rather than skip every day
+            if [[ $(jq -r .status <<< "$view") == completed && -z $conclusion ]]; then
+              echo "::error::CI run $run on $SHA has no 'build (spore, ...)' job"
+              exit 1
+            fi
+          fi
+          if [[ "$conclusion" != success ]]; then
+            echo "::notice::Skipping the scheduled deploy: spore's CI build on $SHA is '${conclusion:-not finished}'"
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - id: set-matrix
+        if: steps.ci.outputs.skip != 'true'
+        env:
+          SELECTED: ${{ github.event_name == 'schedule' && '{"spore":true}' || toJSON(inputs) }}
         run: |
           include=$(jq -nc --argjson sel "$SELECTED" '
             [ {host: "glyph", runner: "ubuntu-latest"},
@@ -44,6 +83,7 @@ jobs:
 
   deploy:
     needs: plan
+    if: needs.plan.outputs.matrix != ''
     concurrency:
       group: deploy-${{ matrix.host }}
       cancel-in-progress: false
@@ -55,20 +95,14 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - uses: cachix/install-nix-action@13d8dd58da0234aa297dedd986986ccb8e7f3e24 # v31.11.1
+      # The cache is public, so deploys substitute from it without a token
+      # (and never push to it).
+      - uses: cachix/install-nix-action@448cde739abec1eaf0646249e3d25bb8d9bc7702 # v31.11.2
         with:
           github_access_token: ${{ secrets.GITHUB_TOKEN }}
           extra_nix_config: |
             extra-substituters = https://cache.zx.dev/main
             extra-trusted-public-keys = main:mu0jkxdJTGWC3djDSEQb3rvZgqlhA8WVMulcTo5IW6c=
-
-      - name: Configure Attic cache
-        env:
-          ATTIC_TOKEN: ${{ secrets.ATTIC_TOKEN }}
-        run: |
-          nix profile install --inputs-from . attic#attic-client --fallback
-          attic login rc https://cache.zx.dev "$ATTIC_TOKEN"
-          attic use rc:main
 
       # Tailnet Lock rejects nodes an OAuth client creates, so the runner joins
       # with a reusable, ephemeral tag:ci auth key signed on a signing node
@@ -102,8 +136,23 @@ jobs:
             ConnectTimeout 10
           EOF
 
+      # nixos-version reports the flake revision the host runs
+      - name: Check deployed revision
+        id: current
+        if: github.event_name == 'schedule'
+        env:
+          HOST: ${{ matrix.host }}
+          SHA: ${{ github.sha }}
+        run: |
+          deployed=$(ssh "$HOST" nixos-version --configuration-revision)
+          if [[ "$deployed" == "$SHA" ]]; then
+            echo "::notice::$HOST already runs $SHA"
+            echo "up-to-date=true" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Deploy to ${{ matrix.host }}
         id: deploy
+        if: steps.current.outputs.up-to-date != 'true'
         run: |
           set -o pipefail
           nix run --inputs-from . deploy-rs -- \
@@ -135,3 +184,20 @@ jobs:
           fi
           echo "deploy ${OUTCOME}: revision=${REVISION} actor=${ACTOR} run=${RUN_URL}" \
             | ssh "$HOST" systemd-cat -t deploy-rs -p "$priority"
+
+  # Nobody is watching a scheduled run, so post its failures
+  notify:
+    needs: [plan, deploy]
+    if: failure() && github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    # SLACK_BOT_TOKEN is in the main-only `notify` environment
+    environment: notify
+    permissions:
+      actions: read
+    steps:
+      - uses: stackptr/actions/slack-notify@8f86bf2d6b69d2225bee5726b080fc6ce1066bd9 # v1.0.0
+        with:
+          token: ${{ secrets.SLACK_BOT_TOKEN }}
+          channel: "#alerts"
+          status: failure
+          failed-jobs: true

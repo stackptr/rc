@@ -17,6 +17,7 @@
     casks = [
       "dash"
       "legcord"
+      "paseo"
       "textual"
     ];
   };
@@ -46,6 +47,10 @@
   };
 
   programs.little-snitch = {
+    enable = true;
+  };
+
+  programs.netnewswire = {
     enable = true;
   };
 
