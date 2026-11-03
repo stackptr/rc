@@ -16,6 +16,7 @@
     ./filebrowser.nix
     ./freshrss.nix
     ./grafana.nix
+    ./hermes.nix
     ./jellyfin.nix
     ./loki.nix
     ./navidrome.nix

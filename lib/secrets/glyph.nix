@@ -22,4 +22,6 @@ import ./mk-host.nix "glyph" [
   "restic-env"
   "restic-password"
   "ssh-client-key"
+  "hermes-omlx-env"
+  "hermes-slack-env"
 ]
