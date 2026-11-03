@@ -57,6 +57,7 @@ in {
             name = "✿ corey";
             email = "c@rey.foo";
           };
+          fetch.prune = true;
           pull.rebase = true;
           push.autosetupremote = true;
           init.defaultBranch = "main";
