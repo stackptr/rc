@@ -83,7 +83,7 @@ Environments, each limited to `main` with admin bypass off: `glyph` and `zeta` (
 
 How each kind of PR merges:
 - **Agents' (`teleomycete[bot]`, from `agents/*`):** the agent turns on auto-merge; it merges once CI passes and I approve the latest push.
-- **Mine (cloud sessions' included):** `approve.yml` runs on `pull_request_target` (from main, so a PR can't change it) and approves as teleoid when the author is `stackptr`, the branch is in this repo and the PR isn't a draft; each push dismisses it and the next run re-approves. Turn on auto-merge and it merges once CI passes. Open PRs get approved on their next push or reopen.
+- **Mine (cloud sessions' included):** `approve.yml` runs on `pull_request_target` (from main, so a PR can't change it) and calls stackptr/actions's reusable `approve.yml` (pinned by SHA; shared by every repo the agents work on), which approves as teleoid when the author is `stackptr`, the branch is in this repo and the PR isn't a draft; each push dismisses it and the next run re-approves. Turn on auto-merge and it merges once CI passes. Open PRs get approved on their next push or reopen.
 - **Updates (`teleotrope[bot]`, `gh/update-flake`, or `gh/update-flake-<run id>` for a partial update):** `update.yml` waits for the required checks and merges with `gh pr merge --admin --match-head-commit`.
 
 Rules that must keep holding:
