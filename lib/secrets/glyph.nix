@@ -24,4 +24,5 @@ import ./mk-host.nix "glyph" [
   "ssh-client-key"
   "hermes-omlx-env"
   "hermes-slack-env"
+  "hermes-freshrss-env"
 ]
