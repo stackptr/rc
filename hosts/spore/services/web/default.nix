@@ -4,7 +4,15 @@
   pkgs,
   lib,
   ...
-}: {
+}: let
+  # A login endpoint of a site without Pocket ID in front, limited per client
+  # address by the `login` zone. The app still checks the password; this
+  # only stops it being guessed at speed.
+  rateLimitedLogin = proxyPass: {
+    inherit proxyPass;
+    extraConfig = "limit_req zone=login burst=10 nodelay;";
+  };
+in {
   imports = [
     ./auth.nix
     ./irc-proxy.nix
@@ -42,6 +50,12 @@
         '"protocol":"$server_protocol"'
       '}';
       access_log syslog:server=unix:/run/systemd/journal/dev-log,tag=nginx_access,nohostname json_access;
+
+      # 10 login requests a minute per address after a burst of 10: plenty
+      # for a person or an app signing in, far too slow to guess passwords.
+      # spore is the first hop, so $binary_remote_addr is the client.
+      limit_req_zone $binary_remote_addr zone=login:10m rate=10r/m;
+      limit_req_status 429;
     '';
     additionalModules = [pkgs.nginxModules.develkit pkgs.nginxModules.set-misc];
 
@@ -82,6 +96,7 @@
         forceSSL = true;
         useACMEHost = "zx.dev";
         locations."/".proxyPass = "http://zeta.note-iwato.ts.net:8581";
+        locations."= /api/auth/login" = rateLimitedLogin "http://zeta.note-iwato.ts.net:8581";
       };
       "home.zx.dev" = {
         forceSSL = true;
@@ -90,6 +105,8 @@
           proxyPass = "http://zeta.note-iwato.ts.net:8123";
           proxyWebsockets = true;
         };
+        # Starting a login flow and each step of it (password, then MFA)
+        locations."~ ^/auth/login_flow" = rateLimitedLogin "http://zeta.note-iwato.ts.net:8123";
       };
       "files.zx.dev" = {
         forceSSL = true;
@@ -125,6 +142,7 @@
           proxyPass = "http://glyph.note-iwato.ts.net:8888";
           proxyWebsockets = true;
         };
+        locations."~ ^/api/v1/auths/(signin|signup|ldap)$" = rateLimitedLogin "http://glyph.note-iwato.ts.net:8888";
       };
       "code.zx.dev" = {
         forceSSL = true;
@@ -175,6 +193,9 @@
         forceSSL = true;
         useACMEHost = "zx.dev";
         locations."/".proxyPass = "http://glyph.note-iwato.ts.net:8096";
+        # Jellyfin's routes are case-insensitive. Playback and the rest of the
+        # API use the tokens these issue.
+        locations."~* ^/Users/(AuthenticateByName|AuthenticateWithQuickConnect|ForgotPassword|[^/]+/Authenticate)" = rateLimitedLogin "http://glyph.note-iwato.ts.net:8096";
       };
       "docs.zx.dev" = {
         forceSSL = true;
@@ -202,6 +223,9 @@
         forceSSL = true;
         useACMEHost = "zx.dev";
         locations."/".proxyPass = "http://glyph.note-iwato.ts.net:4533";
+        # The web UI's login. Subsonic clients send credentials with every
+        # /rest request, so those can't be limited without breaking playback.
+        locations."= /auth/login" = rateLimitedLogin "http://glyph.note-iwato.ts.net:4533";
       };
       "mix.zx.dev" = {
         forceSSL = true;
