@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# Regenerates docs/ports.md from the evaluated host configurations
+# (lib/ports.nix). CI runs it and fails if the file changes.
+set -euo pipefail
+
+cd "$(git rev-parse --show-toplevel)"
+
+mkdir -p docs
+out=$(nix eval --raw .#ports)
+printf '%s\n' "$out" > docs/ports.md
