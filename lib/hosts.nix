@@ -42,7 +42,6 @@ inputs @ {
         [
           nix-index-database.homeModules.nix-index
           direnv-instant.homeModules.direnv-instant
-          agenix.homeManagerModules.default
           ./../modules/home
           ./../home
         ]
@@ -107,6 +106,7 @@ inputs @ {
         ./../modules/base
         ./../modules/darwin
         ./../hosts/${configDir}
+        agenix.darwinModules.default
         home-manager.darwinModules.home-manager
         (mkHomeManager {
           inherit username hostname system lightweight configDir;

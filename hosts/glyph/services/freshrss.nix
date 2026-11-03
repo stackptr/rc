@@ -9,7 +9,7 @@ in {
     # spore puts rss.zx.dev behind Pocket ID and passes the username as
     # Remote-User; FreshRSS trusts it only from TRUSTED_PROXY below.
     authType = "http_auth";
-    # Reeder uses the Google Reader API with a per-user API password set in
+    # NetNewsWire uses the Google Reader API with a per-user API password set in
     # FreshRSS's profile settings, not the login password.
     api.enable = true;
     database = {

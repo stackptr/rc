@@ -7,6 +7,7 @@
     github-desktop
     m-cli
     mas
+    secretive
     mochi
     the-unarchiver
   ];
@@ -16,6 +17,7 @@
     casks = [
       "dash"
       "legcord"
+      "paseo"
       "textual"
     ];
   };
@@ -48,6 +50,10 @@
     enable = true;
   };
 
+  programs.netnewswire = {
+    enable = true;
+  };
+
   programs.popclip = {
     enable = true;
     startOnActivation = true;
@@ -60,6 +66,8 @@
   programs.roon = {
     enable = true;
   };
+
+  programs.ykding.enable = true;
 
   programs.scroll-reverser = {
     enable = true;

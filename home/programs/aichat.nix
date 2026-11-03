@@ -1,13 +1,16 @@
-{config, ...}: let
+{
+  lib,
+  osConfig,
+  ...
+}: let
   model = "Qwen3.8-27B-MTPLX-Optimized-Quality";
+  # STROMA_API_KEY=<oMLX sub-key>; aichat reads <CLIENT>_API_KEY from it.
+  # A system secret (home/secrets/aichat-env.age) on the hosts that declare
+  # it; aichat is only installed there.
+  envFile = osConfig.age.secrets.aichat-env.path or null;
 in {
-  # STROMA_API_KEY=<oMLX sub-key>; aichat reads <CLIENT>_API_KEY from it
-  age.secrets.aichat-env = {
-    file = ../secrets/aichat-env.age;
-  };
-
   programs.aichat = {
-    enable = true;
+    enable = envFile != null;
     settings = {
       model = "stroma:${model}";
       clients = [
@@ -22,7 +25,7 @@ in {
     };
   };
 
-  programs.zsh.sessionVariables = {
-    AICHAT_ENV_FILE = config.age.secrets.aichat-env.path;
+  programs.zsh.sessionVariables = lib.mkIf (envFile != null) {
+    AICHAT_ENV_FILE = envFile;
   };
 }
