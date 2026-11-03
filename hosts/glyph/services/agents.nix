@@ -43,31 +43,7 @@
   '';
   opencodePort = 8890;
   paseoPort = 6767;
-  # Tailnet addresses, from `tailscale ip <device>`; update them if a device
-  # re-registers
-  tailnet = {
-    spore = {
-      v4 = "100.89.150.33";
-      v6 = "fd7a:115c:a1e0::a033:9621";
-    };
-    # The iPhone, iPad and the Macs that run the Paseo app
-    blip = {
-      v4 = "100.71.241.100";
-      v6 = "fd7a:115c:a1e0::1c33:f165";
-    };
-    slate = {
-      v4 = "100.74.6.1";
-      v6 = "fd7a:115c:a1e0::a33:601";
-    };
-    stroma = {
-      v4 = "100.122.26.71";
-      v6 = "fd7a:115c:a1e0::1133:1a48";
-    };
-    rhizome = {
-      v4 = "100.89.6.21";
-      v6 = "fd7a:115c:a1e0::7a33:615";
-    };
-  };
+  tailnet = import ../tailnet.nix;
   # Drops tailnet connections to port unless they come from one of devices
   onlyFrom = devices: port:
     lib.concatMapStrings (device: ''
@@ -330,7 +306,15 @@
     ReadWritePaths = [home];
     # EnvironmentFile is read by systemd before the namespace is set up.
     # Postgres trusts every local connection (db.nix): see the firewall below.
-    InaccessiblePaths = ["/mnt" "/run/agenix" "/run/agenix.d" "/run/postgresql"];
+    # The Nix daemon's socket too: builds run as nixbld users in the daemon's
+    # cgroup, outside nono, the slice's limits and the owner rule on 5432, and
+    # fixed-output derivations share the host's network, so a build could
+    # reach Postgres on loopback as the superuser. Nothing in these units runs
+    # Nix; home-manager-opencode.service, which does, is a unit of its own.
+    InaccessiblePaths = ["/mnt" "/run/agenix" "/run/agenix.d" "/run/postgresql" "/nix/var/nix/daemon-socket"];
+    # Other users' processes and their command lines; the agents still see
+    # their own, which Paseo lists with ps
+    ProtectProc = "invisible";
     PrivateTmp = true;
     PrivateDevices = true;
     NoNewPrivileges = true;
