@@ -34,12 +34,13 @@ jobs:
         run: |
           git config --global user.email "$BOT_EMAIL"
           git config --global user.name "$BOT_NAME"
-      # A partial update gets its own branch, so the daily run doesn't
-      # overwrite its PR while it's open
+      # A partial update gets a branch of its own, named for the run, so
+      # neither the daily run nor another partial update overwrites its PR
       - name: Select inputs
         id: select
         env:
           REQUESTED: ${{ inputs.inputs }}
+          RUN_ID: ${{ github.run_id }}
         run: |
           read -ra requested <<<"${REQUESTED//,/ }"
           if [ "${#requested[@]}" -eq 0 ]; then
@@ -60,7 +61,7 @@ jobs:
           selected=$(printf '%s\n' "${requested[@]}" | sort -u | paste -sd ' ')
           {
             echo "inputs=$selected"
-            echo "branch=gh/update-flake-selected"
+            echo "branch=gh/update-flake-$RUN_ID"
             echo "title=chore: update ${selected// /, }"
           } >> "$GITHUB_OUTPUT"
       - name: Update
