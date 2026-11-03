@@ -4,6 +4,11 @@ on:
   schedule:
     - cron: "10 5 * * *"
   workflow_dispatch:
+    inputs:
+      inputs:
+        description: Flake inputs to update, separated by spaces or commas (blank updates all)
+        type: string
+        default: ""
 
 permissions:
   contents: read
@@ -29,8 +34,43 @@ jobs:
         run: |
           git config --global user.email "$BOT_EMAIL"
           git config --global user.name "$BOT_NAME"
+      # A partial update gets a branch of its own, named for the run, so
+      # neither the daily run nor another partial update overwrites its PR
+      - name: Select inputs
+        id: select
+        env:
+          REQUESTED: ${{ inputs.inputs }}
+          RUN_ID: ${{ github.run_id }}
+        run: |
+          read -ra requested <<<"${REQUESTED//,/ }"
+          if [ "${#requested[@]}" -eq 0 ]; then
+            {
+              echo "inputs="
+              echo "branch=gh/update-flake"
+              echo "title=chore: update flake inputs"
+            } >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          known=$(jq -r '.nodes.root.inputs | keys[]' flake.lock)
+          for input in "${requested[@]}"; do
+            if ! grep -qxF -- "$input" <<<"$known"; then
+              echo "::error::Unknown flake input '$input'. Inputs: $(paste -sd ' ' <<<"$known")"
+              exit 1
+            fi
+          done
+          selected=$(printf '%s\n' "${requested[@]}" | sort -u | paste -sd ' ')
+          {
+            echo "inputs=$selected"
+            echo "branch=gh/update-flake-$RUN_ID"
+            echo "title=chore: update ${selected// /, }"
+          } >> "$GITHUB_OUTPUT"
       - name: Update
-        run: nix flake update --commit-lock-file
+        env:
+          # Validated against flake.lock above; empty updates every input
+          INPUTS: ${{ steps.select.outputs.inputs }}
+        run: |
+          # shellcheck disable=SC2086
+          nix flake update $INPUTS --commit-lock-file
       - name: Get update details
         id: update-details
         run: |
@@ -50,8 +90,8 @@ jobs:
       - uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
         id: create-pr
         with:
-          branch: gh/update-flake
-          title: "chore: update flake inputs"
+          branch: ${{ steps.select.outputs.branch }}
+          title: ${{ steps.select.outputs.title }}
           body: ${{ steps.update-details.outputs.body }}
           token: ${{ steps.app-token.outputs.token }}
           author: ${{ env.BOT_NAME }} <${{ env.BOT_EMAIL }}>

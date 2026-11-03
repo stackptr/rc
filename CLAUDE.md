@@ -32,7 +32,7 @@ nix-flake eval nixosConfigurations.<host>.config.system.build.toplevel.drvPath  
 nix-flake eval darwinConfigurations.<host>.system.drvPath                       # macOS
 ```
 
-**Flake inputs:** `nix flake update --commit-lock-file`. The Update workflow does this daily as the `teleotrope` app and merges the PR itself once CI passes (see GitHub apps and rulesets).
+**Flake inputs:** `nix flake update --commit-lock-file`. The Update workflow does this daily as the `teleotrope` app and merges the PR itself once CI passes (see GitHub apps and rulesets). To update only some inputs, run it by hand with their names: `gh workflow run update.yml -f inputs="nixpkgs home-manager"` (blank updates all; unknown names fail the run). A partial update opens its PR from `gh/update-flake-<run id>`, so neither the daily run nor another partial update overwrites it.
 
 **Dev shell:** `nix develop` provides agenix and just. Claude Code sessions in Zed don't run inside it; prefix devShell tools with `direnv exec .`, e.g. `direnv exec . agenix -e hosts/spore/secrets/foo.age`.
 
@@ -84,7 +84,7 @@ Environments, each limited to `main` with admin bypass off: `glyph` and `zeta` (
 How each kind of PR merges:
 - **Agents' (`teleomycete[bot]`, from `agents/*`):** the agent turns on auto-merge; it merges once CI passes and I approve the latest push.
 - **Mine (cloud sessions' included):** `approve.yml` runs on `pull_request_target` (from main, so a PR can't change it) and approves as teleoid when the author is `stackptr`, the branch is in this repo and the PR isn't a draft; each push dismisses it and the next run re-approves. Turn on auto-merge and it merges once CI passes. Open PRs get approved on their next push or reopen.
-- **Updates (`teleotrope[bot]`, `gh/update-flake`):** `update.yml` waits for the required checks and merges with `gh pr merge --admin --match-head-commit`.
+- **Updates (`teleotrope[bot]`, `gh/update-flake`, or `gh/update-flake-<run id>` for a partial update):** `update.yml` waits for the required checks and merges with `gh pr merge --admin --match-head-commit`.
 
 Rules that must keep holding:
 - `teleomycete` is never a bypass actor and never gets Workflows. Without Workflows, GitHub rejects its pushes that change `.github/workflows/`, which is what keeps branch code away from repo-level secrets and environments.
