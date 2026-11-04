@@ -64,32 +64,32 @@ To add a secret: add its name to the host's list in `lib/secrets/<host>.nix`, cr
 
 ## GitHub apps and rulesets
 
-Three private GitHub Apps act on rc, each installed on rc only, with a role the rulesets below enforce. Rulesets, environments, workflow permissions and environment secrets are managed by stackptr/ops (`infrastructure/github/`): change them there, not in GitHub's UI, and its daily drift check flags edits made in the UI. App permissions and installations are still set by hand, recorded in ops's `apps.nix`; keep that and this section in step. Each bot commits with its user ID (not the app ID) in its noreply address, `<id>+<slug>[bot]@users.noreply.github.com`; get it with `gh api '/users/<slug>%5Bbot%5D' --jq .id`.
+Three private GitHub Apps act on rc, with a role the rulesets below enforce. rc is one of several repos under stackptr/ops's baseline; teleomycete and teleoid are installed on the ones with `agents` (rc and actions), teleotrope on rc only. Only repos the agents may change unattended get agents: pushing needs Contents write, which also covers releases and their assets, and no ruleset guards those, while the agents' token reaches every repo teleomycete is installed on (so not resume, whose release PDF `cjohns.com/resume` serves, or llm-profile, whose release bundles I paste into claude.ai). Repository settings (rc's: squash and rebase merges, the PR title as the squash subject, auto-merge, merged branches deleted), rulesets, environments and their variables, workflow permissions and environment secrets are managed by stackptr/ops (`infrastructure/github/`): change them there, not in GitHub's UI, and its daily drift check flags edits made in the UI. ops can't set `has_pull_requests`, which must stay on. App permissions and installations are still set by hand, recorded in ops's `apps.nix`; keep that and this section in step. Each bot commits with its user ID (not the app ID) in its noreply address, `<id>+<slug>[bot]@users.noreply.github.com`; get it with `gh api '/users/<slug>%5Bbot%5D' --jq .id`.
 
 | App | Permissions | Key | Used by | A leaked key could |
 |---|---|---|---|---|
-| `teleomycete` (346624003) | Contents, Pull requests, Issues R/W | `hosts/glyph/secrets/github-app-key.age`, minted on glyph (Coding agents) | Paseo and OpenCode agents | push `agents/**`, open PRs and turn on auto-merge; not merge without my approval, not touch `.github/workflows/` |
+| `teleomycete` (346624003) | Contents, Pull requests, Issues R/W | `hosts/glyph/secrets/github-app-key.age`, minted on glyph (Coding agents) | Paseo and OpenCode agents | push `agents/**` and open PRs, on every repo it's installed on; create or edit releases and tags (Contents write), except tags on repos with "Release tags" (actions); not merge without my approval, not touch `.github/workflows/` |
 | `teleotrope` (347049929) | Contents, Pull requests R/W | `update` environment (`UPDATER_CLIENT_ID`, `UPDATER_PRIVATE_KEY`) | `.github/workflows/update.yml` | push any branch outside `agents/**` and merge PRs once CI passes, without approval |
-| `teleoid` | Contents, Pull requests R/W | `approve` environment (`APPROVER_CLIENT_ID`, `APPROVER_PRIVATE_KEY`) | `.github/workflows/approve.yml` | approve and merge PRs once CI passes, except ones whose latest push is its own; push nowhere |
+| `teleoid` | Contents, Pull requests R/W | each agents repo's `approve` environment (`APPROVER_CLIENT_ID`, `APPROVER_PRIVATE_KEY`); rc's holds the key from before 2026-11-03, the others a newer one | `.github/workflows/approve.yml` | approve and merge PRs once CI passes, except ones whose latest push is its own; push nowhere |
 
 | Ruleset | Target | Rules | Bypass |
 |---|---|---|---|
 | Require CI | default branch | the six host builds must pass; no force push | Repository admin |
 | Require approval | default branch | PR with 1 approval, stale approvals dismissed, approval of the most recent push; no deletion or force push | Repository admin, `teleotrope` |
-| Agent branches | all but the default branch and `agents/**` | restrict creations, updates and deletions; no force push | Repository admin, `teleotrope` |
-| Agent-only branches | `agents/**` | restrict creations and updates | Repository admin, `teleomycete` |
+| Agent branches | all but the default branch and `agents/**` | restrict creations, updates and deletions; no force push | Repository admin, `teleotrope` (`updaterBypass`), Dependabot (`dependabot`) |
+| Agent-only branches | `agents/**` | restrict creations and updates | Repository admin, `teleomycete` (`agentsInstalled`) |
 
 Environments, each limited to `main` with admin bypass off: `glyph` and `zeta` (Deploy; need my approval), `spore` (Deploy; no reviewer, so its daily scheduled deploy runs unattended), `update` (teleotrope), `approve` (teleoid), `attic` (`ATTIC_TOKEN`) and `notify` (`SLACK_BOT_TOKEN`). Every secret is an environment secret, sealed in stackptr/ops's `sealed.json`; there are no repository-level secrets, which any branch's workflows could read, and ops's daily check alerts if one appears.
 
 How each kind of PR merges:
 - **Agents' (`teleomycete[bot]`, from `agents/*`):** the agent turns on auto-merge; it merges once CI passes and I approve the latest push.
-- **Mine (cloud sessions' included):** `approve.yml` runs on `pull_request_target` (from main, so a PR can't change it) and calls stackptr/actions's reusable `approve.yml` (pinned by SHA; shared by every repo the agents work on), which approves as teleoid when the author is `stackptr`, the branch is in this repo and the PR isn't a draft; each push dismisses it and the next run re-approves. Turn on auto-merge and it merges once CI passes. Open PRs get approved on their next push or reopen.
+- **Mine (cloud sessions' included):** `approve.yml` runs on `pull_request_target` (from main, so a PR can't change it) and calls stackptr/actions's reusable `approve.yml` (pinned to a release's SHA with `secrets: inherit`; Dependabot bumps it at each actions release; shared by every repo the agents work on), which approves as teleoid when the author is `stackptr`, the branch is in this repo and the PR isn't a draft; each push dismisses it and the next run re-approves. Turn on auto-merge and it merges once CI passes. Open PRs get approved on their next push or reopen.
 - **Updates (`teleotrope[bot]`, `gh/update-flake`, or `gh/update-flake-<run id>` for a partial update):** `update.yml` waits for the required checks and merges with `gh pr merge --admin --match-head-commit`.
 
 Rules that must keep holding:
-- `teleomycete` is never a bypass actor and never gets Workflows. Without Workflows, GitHub rejects its pushes that change `.github/workflows/`, which is what keeps branch code away from repo-level secrets and environments.
+- `teleomycete` is never a bypass actor except on "Agent-only branches", and never gets Workflows. Without Workflows, GitHub rejects its pushes that change `.github/workflows/`, which is what keeps branch code away from repo-level secrets and environments.
 - An app key lives only on glyph (agenix) or in a main-only environment, and the workflow using it runs from main (schedule, dispatch or `pull_request_target`), never checks out PR code, and passes PR fields to scripts only through `env:`.
-- Only the admin role and `teleomycete` push `agents/**`, only the admin role and `teleotrope` push other branches, and `teleoid` pushes nowhere.
+- Only the admin role and `teleomycete` push `agents/**`, only the admin role, `teleotrope` and Dependabot (its own `dependabot/**`) push other branches, and `teleoid` pushes nowhere.
 - "Allow GitHub Actions to create and approve pull requests" stays off.
 
 Learned the hard way:
@@ -97,6 +97,9 @@ Learned the hard way:
 - An app's approval counts toward required reviews only if it has write access (Contents: write); Pull requests: write alone shows "Review required".
 - A bypass actor skips every rule in its ruleset, so the approval rule is a ruleset of its own, and teleotrope can skip it without skipping CI.
 - Pushes from Claude Code cloud sessions count as my admin bypass, but their proxy refuses branch deletion (git and API).
+- GitHub rejects an app as a ruleset bypass actor (422 "must be part of the ruleset source") unless it's installed on the repo, or for Dependabot, running there. So ops adds teleomycete to "Agent-only branches" only once it's installed (`agentsInstalled`), and Dependabot to "Agent branches" only on repos with a `dependabot.yml` (`dependabot`).
+- Dependabot isn't exempt from rulesets: "Agent branches" rejected its pushes on rc from 23 Oct to 4 Nov 2026 while its runs still reported success. A failed push shows only in `gh api 'repos/stackptr/rc/rulesets/rule-suites?rule_suite_result=fail'`.
+- A reusable workflow's `secrets` holds only what the caller passes, even in a job that declares `environment:`: without `secrets: inherit` in the caller, the environment's secrets arrive empty (its variables do arrive).
 
 ## Branching
 
