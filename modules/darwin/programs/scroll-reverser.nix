@@ -15,12 +15,12 @@ in {
 
   config = mkIf cfg.enable {
     environment.systemPackages = [pkgs.scroll-reverser];
+    # 2.x sets direction per device, defaulting to natural for trackpads and
+    # classic for mice, and no longer reads 1.x's ReverseTrackpad,
+    # ReverseMouse or ReverseY.
     system.defaults.CustomUserPreferences = {
       "com.pilotmoon.scroll-reverser" = {
         InvertScrollingOn = true;
-        ReverseTrackpad = false;
-        ReverseMouse = true;
-        ReverseY = true;
         StartAtLogin = true;
       };
     };
