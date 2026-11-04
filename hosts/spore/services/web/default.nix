@@ -7,6 +7,7 @@
 }: {
   imports = [
     ./auth.nix
+    ./feishin.nix
     ./irc-proxy.nix
     ./srv.nix
   ];
@@ -197,11 +198,6 @@
             proxy_set_header Destination $dav_dest;
           '';
         };
-      };
-      "music.zx.dev" = {
-        forceSSL = true;
-        useACMEHost = "zx.dev";
-        locations."/".proxyPass = "http://glyph.note-iwato.ts.net:4533";
       };
       "mix.zx.dev" = {
         forceSSL = true;

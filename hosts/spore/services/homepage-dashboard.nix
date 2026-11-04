@@ -308,10 +308,10 @@ in {
             };
           }
           {
-            "Navidrome" = {
+            "Feishin" = {
               description = "Music streaming";
               href = "https://music.zx.dev";
-              icon = "navidrome";
+              icon = "feishin";
               widget = {
                 type = "navidrome";
                 url = "http://glyph.note-iwato.ts.net:4533";
@@ -320,6 +320,13 @@ in {
                 token = "{{HOMEPAGE_VAR_NAVIDROME_TOKEN}}";
                 salt = "{{HOMEPAGE_VAR_NAVIDROME_SALT}}";
               };
+            };
+          }
+          {
+            "Navidrome" = {
+              description = "Library and user admin";
+              href = "https://music.zx.dev/app/";
+              icon = "navidrome";
             };
           }
           {
