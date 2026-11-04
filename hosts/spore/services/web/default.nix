@@ -7,6 +7,7 @@
 }: {
   imports = [
     ./auth.nix
+    ./feishin.nix
     ./irc-proxy.nix
     ./srv.nix
   ];
@@ -318,30 +319,6 @@
             '';
           };
         };
-      };
-    };
-  };
-
-  # Feishin's web build as music.zx.dev's interface. It's static and talks to
-  # Navidrome from the browser, so Navidrome's own paths stay on this origin
-  # (no CORS), including its stock UI at /app/ for admin tasks Feishin lacks
-  # (users, scans, plugin settings), share links, and Gatus's /ping.
-  services.feishin = {
-    enable = true;
-    domain = "music.zx.dev";
-    settings = {
-      ANALYTICS_DISABLED = "true";
-      SERVER_NAME = "glyph";
-      SERVER_TYPE = "navidrome";
-      SERVER_URL = "https://music.zx.dev";
-      SERVER_LOCK = "true";
-    };
-    nginx = {
-      enable = true;
-      virtualHost = {
-        forceSSL = true;
-        useACMEHost = "zx.dev";
-        locations."~ ^/(app|auth|api|rest|share|backgrounds|ping)(/|$)".proxyPass = "http://glyph.note-iwato.ts.net:4533";
       };
     };
   };
