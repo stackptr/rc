@@ -17,4 +17,7 @@
 
   # mactop 2.1.6 for M5 Ultra power readings, ahead of nixpkgs
   (import ./mactop.nix)
+
+  # Scroll Reverser 2.1.1, ahead of nixpkgs
+  (import ./scroll-reverser.nix)
 ]
