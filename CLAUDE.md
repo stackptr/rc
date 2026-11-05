@@ -70,7 +70,7 @@ Three private GitHub Apps act on rc, with a role the rulesets below enforce. rc 
 |---|---|---|---|---|
 | `teleomycete` (346624003) | Contents, Pull requests, Issues R/W | `hosts/glyph/secrets/github-app-key.age`, minted on glyph (Coding agents) | Paseo and OpenCode agents | push `agents/**` and open PRs, on every repo it's installed on; create or edit releases and tags (Contents write), except tags on repos with "Release tags" (actions); not merge without my approval, not touch `.github/workflows/` |
 | `teleotrope` (347049929) | Contents, Pull requests R/W | `update` environment (`UPDATER_CLIENT_ID`, `UPDATER_PRIVATE_KEY`) | `.github/workflows/update.yml` | push any branch outside `agents/**` and merge PRs once CI passes, without approval |
-| `teleoid` | Contents, Pull requests R/W | each agents repo's `approve` environment (`APPROVER_CLIENT_ID`, `APPROVER_PRIVATE_KEY`); rc's holds the key from before 2026-11-03, the others a newer one | `.github/workflows/approve.yml` | approve and merge PRs once CI passes, except ones whose latest push is its own; push nowhere |
+| `teleoid` | Contents, Pull requests R/W | each agents repo's `approve` environment (`APPROVER_CLIENT_ID`, `APPROVER_PRIVATE_KEY`; one key, the same in every repo) | `.github/workflows/approve.yml` | approve and merge PRs once CI passes, except ones whose latest push is its own; push nowhere |
 
 | Ruleset | Target | Rules | Bypass |
 |---|---|---|---|
