@@ -3,4 +3,9 @@ let
   keys = import ../keys.nix;
 in {
   "lib/admin/ops-state-passphrase.age".publicKeys = keys.admins;
+  # GitHub App private keys that stackptr/ops seals into environments:
+  # teleoid's into every agent repo's `approve`, teleotrope's into rc's
+  # `update`. The only copies; GitHub shows a key once.
+  "lib/admin/github-apps/teleoid.age".publicKeys = keys.admins;
+  "lib/admin/github-apps/teleotrope.age".publicKeys = keys.admins;
 }
