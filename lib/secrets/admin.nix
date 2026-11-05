@@ -8,4 +8,8 @@ in {
   # `update`. The only copies; GitHub shows a key once.
   "lib/admin/github-apps/teleoid.age".publicKeys = keys.admins;
   "lib/admin/github-apps/teleotrope.age".publicKeys = keys.admins;
+  # stackptr/ops's own apps: teleopsis plans (its `plan` environment),
+  # teleozyme applies (`production`)
+  "lib/admin/github-apps/teleopsis.age".publicKeys = keys.admins;
+  "lib/admin/github-apps/teleozyme.age".publicKeys = keys.admins;
 }
