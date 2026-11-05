@@ -20,4 +20,7 @@
 
   # Scroll Reverser 2.1.1, ahead of nixpkgs
   (import ./scroll-reverser.nix)
+
+  # Correct opencode's Linux node_modules hash, fixed on nixpkgs master
+  (import ./opencode.nix)
 ]
