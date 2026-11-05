@@ -346,11 +346,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1793193205,
-        "narHash": "sha256-X6xa6sGA7RnJQuZGbFMC+K+KToWAlBDCCjJXfTwEPsw=",
+        "lastModified": 1793757180,
+        "narHash": "sha256-gyV7AtCwLnOImcrfSETP4J3Ie96bz19DY47B7m7Y3HM=",
         "owner": "nix-community",
         "repo": "home-manager",
-        "rev": "095fef2f265c3c0da4fe315efba8f8a04495ab34",
+        "rev": "b787c48e2ec57a9d098f5c2721882a3bc1e16f97",
         "type": "github"
       },
       "original": {
@@ -362,11 +362,11 @@
     "homebrew-cask": {
       "flake": false,
       "locked": {
-        "lastModified": 1793726309,
-        "narHash": "sha256-Wswy9gjN/noHPsxygsmHdgxorvV3hqhJrcaMWhkvrZI=",
+        "lastModified": 1793882292,
+        "narHash": "sha256-G11Cq0VUfdPK+3DvToWT/5bwHXeVfHl0C7oLz6Op8yw=",
         "owner": "homebrew",
         "repo": "homebrew-cask",
-        "rev": "fd77a6bec00ec561b38bf01dfd07a4528a36bc6c",
+        "rev": "6844a02d2719404cb8d6186c59b8ac852337c915",
         "type": "github"
       },
       "original": {
@@ -378,11 +378,11 @@
     "homebrew-core": {
       "flake": false,
       "locked": {
-        "lastModified": 1793727801,
-        "narHash": "sha256-jJOwxMi7+wKIhLePoPDONYDCPX8AFOCG4LFmsrcLUSI=",
+        "lastModified": 1793882835,
+        "narHash": "sha256-f1nXwObfZy4dSS/1yUvLZttWVb9rHKeF0bkMUN1UT6E=",
         "owner": "homebrew",
         "repo": "homebrew-core",
-        "rev": "b62effd6ba3dc74200f1c6f349ebc83ca23b7a1f",
+        "rev": "131d57998080b6d3d9270bab8b7bd1a459d83d67",
         "type": "github"
       },
       "original": {
@@ -394,11 +394,11 @@
     "homebrew-omlx": {
       "flake": false,
       "locked": {
-        "lastModified": 1793699479,
-        "narHash": "sha256-K6fqpqL/favC2jG6Hw1djUj/5FbEJJUnmFk4/UtSWB0=",
+        "lastModified": 1793868583,
+        "narHash": "sha256-l3RYdGLSNz7YeT1vkLo3/Q0yvNVDeQgmYr4skdLSY0Y=",
         "owner": "jundot",
         "repo": "omlx",
-        "rev": "d2fbf64f1dae14ce9384f281eca43fd9fe454e3e",
+        "rev": "2165e75726ba83d9651dbaced61c97728da77bba",
         "type": "github"
       },
       "original": {
@@ -410,11 +410,11 @@
     "llm-profile": {
       "flake": false,
       "locked": {
-        "lastModified": 1792019961,
-        "narHash": "sha256-OjIEFp+HVrUoHfMyR9QG59aICLz0tOui4PhPsPqhui0=",
+        "lastModified": 1793838055,
+        "narHash": "sha256-JC1LUKPtS4mooHe8hP4r/gEaL7MblQgr0kVojaA4ulQ=",
         "owner": "stackptr",
         "repo": "llm-profile",
-        "rev": "1a10d7a93ebd7e5628ca2cbb7181c7a7355114cd",
+        "rev": "6c73f5ed5181e95c6cfecc69a61085e647379126",
         "type": "github"
       },
       "original": {
@@ -507,11 +507,11 @@
         "nixpkgs": "nixpkgs_3"
       },
       "locked": {
-        "lastModified": 1793355509,
-        "narHash": "sha256-/Zs18x+IW4LuVH0rKxra0WPRgsk0DQsi0Bwkf8sOC5c=",
+        "lastModified": 1793871777,
+        "narHash": "sha256-DbFyxXHjP4SJDWVVIILkgrUZxj29cDusi8ULXoQGuZ8=",
         "owner": "NixOS",
         "repo": "nixos-hardware",
-        "rev": "04c6b94fa104bc23650983a4513aea196794d321",
+        "rev": "d645c71a58dbae3eb17ff551a07aea13a541cb1a",
         "type": "github"
       },
       "original": {
@@ -599,11 +599,11 @@
     },
     "nixpkgs_4": {
       "locked": {
-        "lastModified": 1793540411,
-        "narHash": "sha256-fiPJ88izTVucjeo2EQ3jk4aWmLg03I1D4vxnX2QjEgE=",
+        "lastModified": 1793726008,
+        "narHash": "sha256-jQp1wKvbwWdLBASTXkSi/VYmDJ5AbBi1WvcMt9HWJC8=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "0bb2eedc20e4739f29e8045034f2828ad7054f8f",
+        "rev": "1d060086d60cb76a40cf37109f979d88a5bd6396",
         "type": "github"
       },
       "original": {
@@ -812,11 +812,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1793727915,
-        "narHash": "sha256-Z1QYOyomIijm53pNTm8UR2PQ8lDMcAbDgrFEiJfKdRc=",
+        "lastModified": 1793839050,
+        "narHash": "sha256-O8BgHCAmLivt8nnI/QqzDgQ6Li/g6dEdQhO8DTkOF9o=",
         "owner": "stackptr",
         "repo": "zx.dev",
-        "rev": "6ef49315dccfcf95637cd154899e090138c72408",
+        "rev": "0d677d40b17ae8872cdd7a971221212d01bcfb21",
         "type": "github"
       },
       "original": {
