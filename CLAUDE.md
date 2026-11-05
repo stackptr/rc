@@ -81,6 +81,20 @@ Three private GitHub Apps act on rc, with a role the rulesets below enforce. rc 
 
 Environments, each limited to `main` with admin bypass off: `glyph` and `zeta` (Deploy; need my approval), `spore` (Deploy; no reviewer, so its daily scheduled deploy runs unattended), `update` (teleotrope), `approve` (teleoid), `attic` (`ATTIC_TOKEN`) and `notify` (`SLACK_BOT_TOKEN`). Every secret is an environment secret, sealed in stackptr/ops's `sealed.json`; there are no repository-level secrets, which any branch's workflows could read, and ops's daily check alerts if one appears.
 
+The same holds for every repo under ops, ops included: no secret is set by hand, so `sealed.json` can restore any of them. ops's own environments hold the credentials every plan and apply runs with:
+- `plan`: teleopsis's key, a read-only R2 token, the state passphrase and Hypha's Slack token.
+- `production`: teleozyme's key, a read-write R2 token and the passphrase, behind my approval.
+- `attic`: a token for ops's own Attic cache (`ops:ops`).
+
+Where to get a value to re-seal:
+- the app keys, from `lib/admin/github-apps/`
+- the passphrase, from `lib/admin/ops-state-passphrase.age`
+- Slack's token, from `hosts/glyph/secrets/slack-bot-token.age`
+- new R2 tokens, from Cloudflare (Object Read only, or Read & Write, on `ops-state`)
+- a new Attic token, from glyph (`atticd-atticadm make-token --push ops --pull ops`)
+
+Re-seal by piping straight into `just seal` (ops's onboarding checklist). A new value takes effect from the next run, and the old one works until it's revoked: confirm a run on the new value before revoking.
+
 How each kind of PR merges:
 - **Agents' (`teleomycete[bot]`, from `agents/*`):** the agent turns on auto-merge; it merges once CI passes and I approve the latest push.
 - **Mine (cloud sessions' included):** `approve.yml` runs on `pull_request_target` (from main, so a PR can't change it) and calls stackptr/actions's reusable `approve.yml` (pinned to a release's SHA with `secrets: inherit`; Dependabot bumps it at each actions release; shared by every repo the agents work on), which approves as teleoid when the author is `stackptr`, the branch is in this repo and the PR isn't a draft; each push dismisses it and the next run re-approves. Turn on auto-merge and it merges once CI passes. Open PRs get approved on their next push or reopen.
