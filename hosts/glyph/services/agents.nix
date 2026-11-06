@@ -388,7 +388,7 @@ in {
 
   # The GitHub App's private key, readable only by the minting service
   age.secrets.github-app-key = {
-    file = ../secrets/github-app-key.age;
+    file = ../../../lib/admin/github-apps/teleomycete.age;
     owner = tokenUser;
   };
 
