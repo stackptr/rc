@@ -12,6 +12,10 @@
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
   boot.zfs.forceImportRoot = false;
+  # Cap ARC at 12 GiB. The default (all RAM but 1 GiB) let a full-library read
+  # grow ARC to 23 GiB, and the kernel swapped services out rather than wait
+  # for ARC to shrink: MemAvailable fell to 9% with 5 GiB swapped back in.
+  boot.kernelParams = ["zfs.zfs_arc_max=${toString (12 * 1024 * 1024 * 1024)}"];
 
   fileSystems."/mnt/media" = {
     device = "zdata/media";
