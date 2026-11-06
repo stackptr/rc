@@ -24,6 +24,19 @@ _: {
       forward_to    = [loki.write.local.receiver]
     }
 
+    // CPU, memory and disk I/O per systemd unit and slice, from cgroups.
+    // Prometheus scrapes it from Alloy's own server (the cadvisor job in
+    // prometheus.nix). docker_only limits it to the root cgroup and the
+    // prefixes below, which leaves out user sessions and scopes; there's no
+    // Docker here, so nothing else matches. /machine.slice holds podman's
+    // containers, whose podman-<name>.service units only hold conmon.
+    prometheus.exporter.cadvisor "units" {
+      docker_only                 = true
+      raw_cgroup_prefix_allowlist = ["/system.slice/", "/agents.slice", "/machine.slice/"]
+      enabled_metrics             = ["cpu", "memory", "diskIO"]
+      store_container_labels      = false
+    }
+
     loki.write "local" {
       endpoint {
         url = "http://localhost:3100/loki/api/v1/push"

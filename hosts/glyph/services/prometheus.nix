@@ -245,6 +245,27 @@ in {
         ];
       }
       {
+        # CPU, memory and disk I/O per systemd unit (cgroup), from Alloy's
+        # cAdvisor exporter (alloy.nix). cAdvisor names each series by cgroup
+        # path in `id`; `unit` takes its last part, so it matches Loki's unit
+        # label ("navidrome.service"). The root cgroup ("/") gets no unit.
+        job_name = "cadvisor";
+        metrics_path = "/api/v0/component/prometheus.exporter.cadvisor.units/metrics";
+        static_configs = [
+          {
+            targets = ["localhost:12345"];
+            labels.instance = "glyph";
+          }
+        ];
+        metric_relabel_configs = [
+          {
+            source_labels = ["id"];
+            regex = ".*/([^/]+)";
+            target_label = "unit";
+          }
+        ];
+      }
+      {
         # Gatus watchdog on zeta (hosts/zeta/services/gatus.nix).
         job_name = "gatus";
         static_configs = [
