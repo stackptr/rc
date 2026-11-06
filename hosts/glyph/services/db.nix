@@ -1,10 +1,7 @@
 {pkgs, ...}: let
   # WireGuard authenticates a tailnet packet's source address, so a tailnet
-  # /32 names one machine. Update it if spore re-registers.
-  spore = {
-    v4 = "100.89.150.33";
-    v6 = "fd7a:115c:a1e0::a033:9621";
-  };
+  # /32 names one machine
+  inherit (import ../tailnet.nix) spore;
 in {
   services.postgresql = {
     enable = true;

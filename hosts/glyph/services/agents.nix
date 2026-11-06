@@ -43,31 +43,13 @@
   '';
   opencodePort = 8890;
   paseoPort = 6767;
-  # Tailnet addresses, from `tailscale ip <device>`; update them if a device
-  # re-registers
-  tailnet = {
-    spore = {
-      v4 = "100.89.150.33";
-      v6 = "fd7a:115c:a1e0::a033:9621";
-    };
-    # The iPhone, iPad and the Macs that run the Paseo app
-    blip = {
-      v4 = "100.71.241.100";
-      v6 = "fd7a:115c:a1e0::1c33:f165";
-    };
-    slate = {
-      v4 = "100.74.6.1";
-      v6 = "fd7a:115c:a1e0::a33:601";
-    };
-    stroma = {
-      v4 = "100.122.26.71";
-      v6 = "fd7a:115c:a1e0::1133:1a48";
-    };
-    rhizome = {
-      v4 = "100.89.6.21";
-      v6 = "fd7a:115c:a1e0::7a33:615";
-    };
-  };
+  # The agents reach MCPJungle only through this proxy, which serves only
+  # their tool group: on MCPJungle's own port they'd get every server
+  # (the Obsidian vault included) and its unauthenticated admin API
+  mcpPort = 8099;
+  mcpGroupPath = "/v0/groups/agents/mcp";
+  mcpURL = "http://127.0.0.1:${toString mcpPort}${mcpGroupPath}";
+  tailnet = import ../tailnet.nix;
   # Drops tailnet connections to port unless they come from one of devices
   onlyFrom = devices: port:
     lib.concatMapStrings (device: ''
@@ -106,7 +88,7 @@
     instructions = ["${context}"];
     mcp.glyph = {
       type = "remote";
-      url = "http://glyph:8090/mcp";
+      url = mcpURL;
     };
     # oMLX on Stroma (hosts/Stroma/omlx.nix)
     provider.stroma = {
@@ -330,7 +312,15 @@
     ReadWritePaths = [home];
     # EnvironmentFile is read by systemd before the namespace is set up.
     # Postgres trusts every local connection (db.nix): see the firewall below.
-    InaccessiblePaths = ["/mnt" "/run/agenix" "/run/agenix.d" "/run/postgresql"];
+    # The Nix daemon's socket too: builds run as nixbld users in the daemon's
+    # cgroup, outside nono, the slice's limits and the owner rule on 5432, and
+    # fixed-output derivations share the host's network, so a build could
+    # reach Postgres on loopback as the superuser. Nothing in these units runs
+    # Nix; home-manager-opencode.service, which does, is a unit of its own.
+    InaccessiblePaths = ["/mnt" "/run/agenix" "/run/agenix.d" "/run/postgresql" "/nix/var/nix/daemon-socket"];
+    # Other users' processes and their command lines; the agents still see
+    # their own, which Paseo lists with ps
+    ProtectProc = "invisible";
     PrivateTmp = true;
     PrivateDevices = true;
     NoNewPrivileges = true;
@@ -414,7 +404,9 @@ in {
   # Postgres trusts every local connection (hosts/glyph/services/db.nix), so
   # anything running as this user could connect as the superuser. The socket
   # is hidden from the units; the opencode-out chain rejects TCP to 5432 on
-  # any address.
+  # any address. It also rejects MCPJungle's port, so the agents use only
+  # their tool group through mcpPort, and the Obsidian vault's MCP server,
+  # which listens on loopback where they could otherwise reach it directly.
   networking.firewall.extraCommands = ''
     ip46tables -t mangle -N opencode-in 2>/dev/null || ip46tables -t mangle -F opencode-in
     ${onlyFrom ["spore"] opencodePort}${onlyFrom ["spore" "blip" "slate" "stroma" "rhizome"] paseoPort}
@@ -423,6 +415,8 @@ in {
 
     ip46tables -N opencode-out 2>/dev/null || ip46tables -F opencode-out
     ip46tables -A opencode-out -p tcp --dport 5432 -j REJECT
+    ip46tables -A opencode-out -p tcp --dport ${toString config.services.mcpjungle.port} -j REJECT
+    ip46tables -A opencode-out -p tcp --dport ${toString config.services.obsidian-vault-mcp.port} -j REJECT
     ip46tables -D OUTPUT -m owner --uid-owner ${user} -j opencode-out 2>/dev/null || true
     ip46tables -I OUTPUT -m owner --uid-owner ${user} -j opencode-out
   '';
@@ -434,6 +428,37 @@ in {
     ip46tables -F opencode-out 2>/dev/null || true
     ip46tables -X opencode-out 2>/dev/null || true
   '';
+
+  # The agents' MCP tools: every server but the Obsidian vault. Listed rather
+  # than derived, so a server added later isn't theirs until it's added here.
+  services.mcpjungle.groups.agents = {
+    description = "Tools for the coding agents";
+    includedServers = ["aws-knowledge" "basic-memory" "cloudflare-docs" "context7" "deepwiki" "grafana" "kagi" "mcp-nixos" "rc-source"];
+  };
+  # Serves only that group's endpoint. proxy_pass names the path, so
+  # whatever URI matched, MCPJungle sees this one.
+  services.nginx = {
+    enable = true;
+    virtualHosts.mcp-agents = {
+      listen = [
+        {
+          addr = "127.0.0.1";
+          port = mcpPort;
+        }
+      ];
+      locations."= ${mcpGroupPath}" = {
+        proxyPass = "http://127.0.0.1:${toString config.services.mcpjungle.port}${mcpGroupPath}";
+        # Streamable HTTP: responses can be long-lived event streams
+        extraConfig = ''
+          proxy_http_version 1.1;
+          proxy_set_header Connection "";
+          proxy_buffering off;
+          proxy_read_timeout 1h;
+        '';
+      };
+      locations."/".return = "404";
+    };
+  };
 
   # One budget for every agent, so they can't starve glyph's other services
   systemd.slices.agents.sliceConfig = {
@@ -584,6 +609,9 @@ in {
     imports = [../../../modules/home/development.nix];
     home.stateVersion = "23.11";
     rc.development.ai.enable = true;
+    # Their tool group, not the whole gateway (see mcpPort). Same server name,
+    # so the permission allowlist's mcp__glyph__ rules still match.
+    programs.mcp.servers.glyph.url = lib.mkForce mcpURL;
     programs.claude-code = {
       # Paseo runs pkgs.claude-code itself, through the nono wrapper
       package = null;
