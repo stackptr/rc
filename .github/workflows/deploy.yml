@@ -110,7 +110,7 @@ jobs:
       # tailscale-key-expiry warns 14 days ahead. statedir holds the tailnet
       # key authority state the lock needs.
       - name: Connect to Tailscale
-        uses: tailscale/github-action@d1b6cd204f8dceda5b3eaad7f1f767be390056cd # v4.2.0
+        uses: tailscale/github-action@064b10558093f38325e838ddea35486bdc6b1d5c # v4.4.0
         with:
           authkey: ${{ secrets.TS_AUTHKEY }}
           statedir: ${{ runner.temp }}/tailscale
