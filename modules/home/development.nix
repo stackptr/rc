@@ -170,8 +170,7 @@ in {
               "Bash(git status)"
               "Bash(git tag -l *)"
               "Bash(git tag --list *)"
-              # GitHub CLI
-              "Bash(gh api:*)"
+              # GitHub CLI (`gh api` is in its own block below)
               "Bash(gh issue list*)"
               "Bash(gh issue status*)"
               "Bash(gh issue view*)"
@@ -229,6 +228,33 @@ in {
             deny = [];
           };
         };
+      };
+    })
+
+    # `gh api`: reads run without asking, anything that could write asks.
+    # On the Macs `gh` holds my token, which can approve deployments and
+    # change repos as an admin. These rules catch the usual spellings, not
+    # every one (a script, or `curl` with `gh auth token`, gets past them),
+    # so they're a prompt, not a boundary. The lists here are appended to
+    # the ones above.
+    (mkIf cfg.ai.enable {
+      programs.claude-code.settings.permissions = {
+        # Paths Claude reads, written bare, with a leading slash, or quoted
+        # (as it does when the path has a `?`). A `*` matches spaces too, so
+        # these also match writes to the same paths; the ask rules catch
+        # those, since ask rules win over allow rules.
+        allow =
+          lib.concatMap
+          (path: map (prefix: "Bash(gh api ${prefix}${path})") ["" "/" "'" "'/" "\"" "\"/"])
+          ["repos/*" "user*" "search/*" "rate_limit*"];
+        # `gh api` sends a GET unless it's given a method or a body.
+        ask = [
+          "Bash(gh api *-X*)" # also -XPOST
+          "Bash(gh api *--method*)"
+          "Bash(gh api *-f*)" # also --field and --raw-field
+          "Bash(gh api *-F*)"
+          "Bash(gh api *--input*)"
+        ];
       };
     })
 
