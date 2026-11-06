@@ -179,6 +179,8 @@
         # the file, and Landlock grants follow the inode the path had when
         # the sandbox started.
         tokenDir
+        # The key for the builder VM (agent-builder.nix)
+        "${home}/.config/agent-builder"
       ];
       allow = [
         # Repositories and Paseo's worktrees, where agents work
