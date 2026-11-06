@@ -196,6 +196,8 @@ avg_over_time({host="stroma", app="omlx"} |~ " tokens in .* tok/s" | regexp `mod
 ```
 
 
+**A unit's start, stop and result:** its own stream (`unit="X.service"`) has only what the unit printed. systemd's lines about it (`Starting`, `Finished`, `Failed with result`, `Deactivated successfully`) are in `{app="systemd", unit="init.scope"}`, and the `Starting`/`Finished`/`Failed to start` ones name the unit's description, not its unit name, so match both: `{host="glyph", app="systemd"} |~ "home-manager-opencode|Home Manager environment for opencode"`. A oneshot with `RemainAfterExit` logs `Stopped`/`Deactivated` for the previous run before each new `Starting`.
+
 To summarise a noisy stream, use grafana-mcp's `query_loki_patterns` (e.g. `{host="glyph", unit="jellyfin.service"}`). Patterns live in Loki's memory, so they only cover logs since Loki last restarted.
 
 ### Deploys

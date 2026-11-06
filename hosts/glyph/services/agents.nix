@@ -76,8 +76,23 @@
 
     You can only push branches named `agents/<name>` (e.g. `git push origin HEAD:agents/fix-gc-options`); GitHub rejects pushes to any other branch. After opening a pull request, turn on auto-merge with `gh pr merge --auto --squash <number>`: it merges once CI passes and the user approves, and a push after their approval needs a new one.
   '';
+  # What these agents can't see from inside the sandbox, and where to look
+  # instead, so they don't ask the user to run journalctl or systemctl.
+  # Claude and OpenCode reach the grafana tools through the agents' MCP
+  # group; Pi has no MCP, so it doesn't get this.
+  hostsNote = ''
+
+    ## Looking at the user's hosts
+
+    You run on glyph as `${user}`, sandboxed: you can't see other users' processes or the system journal, and you can't SSH to any host. Don't ask the user to run `journalctl`, `systemctl status` or `ps` for you: the `glyph` MCP server's grafana tools answer most of that.
+
+    - Loki has journald from glyph, spore and zeta for 30 days: `{host="glyph", unit="paseo.service"}`, with `priority=~"[0-3]"` for errors. A unit's own stream has only its output; its start, stop and result lines come from systemd under the unit's description, not its name: `{host="glyph", app="systemd"} |= "Home Manager environment for opencode"`. Every deploy logs `{app="nixos-deploy"}`, with the revision and a package diff.
+    - Prometheus has unit states (`node_systemd_unit_state`), restarts (`node_systemd_service_restart_total`) and per-unit CPU and memory (`container_cpu_usage_seconds_total`, `container_memory_working_set_bytes`, by `unit`).
+
+    Ask the user only for what neither shows, and say what you checked first.
+  '';
   # A shorter prompt helps a 27B model more than it helps Claude.
-  context = pkgs.writeText "AGENTS.md" (profile.agent + githubNote);
+  context = pkgs.writeText "AGENTS.md" (profile.agent + githubNote + hostsNote);
   opencodeSettings = json.generate "opencode.json" {
     "$schema" = "https://opencode.ai/config.json";
     model = "stroma/${stromaModel}";
@@ -616,7 +631,7 @@ in {
       # Paseo runs pkgs.claude-code itself, through the nono wrapper
       package = null;
       # Appended to the llm-profile prompt development.nix sets (lines merge)
-      context = lib.mkAfter githubNote;
+      context = lib.mkAfter (githubNote + hostsNote);
       # Paseo's orchestration skills, from the source of the Paseo it runs.
       # The nixpkgs package leaves out the skills/ directory its own
       # installer copies from, so Settings > Agents > Orchestration skills
