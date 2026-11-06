@@ -1,6 +1,6 @@
 # Tailnet addresses of the devices glyph lets in to particular services
-# (agents.nix's firewall), from `tailscale ip <device>`; update them if a
-# device re-registers
+# (agents.nix's firewall, db.nix's pg_hba), from `tailscale ip <device>`;
+# update them if a device re-registers
 {
   spore = {
     v4 = "100.89.150.33";
