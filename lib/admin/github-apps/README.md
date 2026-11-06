@@ -6,13 +6,13 @@ Each `<app>.age` file holds the app's only copy of its private key, because GitH
 
 What each app may do on GitHub is enforced by rulesets and documented under "GitHub apps and rulesets" in rc's `CLAUDE.md`. App permissions and installations are set by hand and recorded in stackptr/ops's `apps.nix`. This file covers the keys and logos; keep all three in step.
 
-| App | Role | Key sealed into | Badge color |
-| --- | --- | --- | --- |
-| teleomycete | Identity for agent-created work | none: glyph mints its tokens | `#04342C` |
-| teleotrope | Flake updater for rc, merges its own PRs | rc's `update` | `#26215C` |
-| teleoid | Approves my PRs so they can auto-merge | every agent repo's `approve` | `#4A1B0C` |
-| teleopsis | Read-only observer for stackptr/ops | ops's `plan` | `#042C53` |
-| teleozyme | Applies approved plans for stackptr/ops | ops's `production` | `#FAC775` |
+| | App | Role | Key sealed into | Badge color |
+| --- | --- | --- | --- | --- |
+| <img src="teleomycete.svg" width="32" alt=""> | teleomycete | Identity for agent-created work | none: glyph mints its tokens | `#04342C` |
+| <img src="teleotrope.svg" width="32" alt=""> | teleotrope | Flake updater for rc, merges its own PRs | rc's `update` | `#26215C` |
+| <img src="teleoid.svg" width="32" alt=""> | teleoid | Approves my PRs so they can auto-merge | every agent repo's `approve` | `#4A1B0C` |
+| <img src="teleopsis.svg" width="32" alt=""> | teleopsis | Read-only observer for stackptr/ops | ops's `plan` | `#042C53` |
+| <img src="teleozyme.svg" width="32" alt=""> | teleozyme | Applies approved plans for stackptr/ops | ops's `production` | `#FAC775` |
 
 ## teleomycete
 
