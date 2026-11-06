@@ -29,6 +29,17 @@ _: {
       forward_to    = [loki.write.remote.receiver]
     }
 
+    // CPU, memory and disk I/O per systemd unit, from cgroups; Prometheus
+    // on glyph scrapes it from Alloy's server as the cadvisor job (see
+    // hosts/glyph/services/alloy.nix). docker_only limits it to the root
+    // cgroup and the allowlisted prefix, which leaves out user sessions.
+    prometheus.exporter.cadvisor "units" {
+      docker_only                 = true
+      raw_cgroup_prefix_allowlist = ["/system.slice/"]
+      enabled_metrics             = ["cpu", "memory", "diskIO"]
+      store_container_labels      = false
+    }
+
     loki.write "remote" {
       endpoint {
         url = "http://glyph.note-iwato.ts.net:3100/loki/api/v1/push"
