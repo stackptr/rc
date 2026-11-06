@@ -6,6 +6,7 @@
   ...
 }: {
   imports = [
+    ./agent-builder.nix
     ./agents.nix
     ./alloy.nix
     ./attic.nix
