@@ -136,6 +136,8 @@ If `nix` is installed, run `scripts/fmt-sandboxed` instead of `nix fmt .`. Cloud
 
 **launchd daemons on macOS hosts:** set `launchd.daemons.<name>.command`, not `serviceConfig.ProgramArguments`, when the program is in `/nix/store`. nix-darwin wraps `command` in `/bin/wait4path /nix/store`; with ProgramArguments, launchd starts the daemon at boot before the Nix volume is mounted, and it stays down until the next switch (Stroma's alloy, mactop and json-exporter were down for three days after a reboot). Programs outside the store, like oMLX from Homebrew, are fine either way.
 
+**Did a commit change a host's system?** Compare `scripts/normalized-system.nix` at both commits (`nix eval --raw --file scripts/normalized-system.nix --apply 'f: f { flake = "git+file://<repo>?rev=<sha>"; host = "glyph"; }'`), not the raw toplevel: `system.configurationRevision` and glyph's rc-source copy of the repo (`"${inputs.self}"`) change every host's or glyph's derivation on every commit. `nix eval --file` doesn't call a function with `--argstr`, hence `--apply`; and a Nix path literal there (`/var/empty`) is copied into the store, so it fails where the path doesn't exist: use a string. `git+file` with `rev` works from a detached checkout with no local branch.
+
 **`lib.mkForce` vs `lib.mkDefault`:** a host that must diverge from a value a shared module sets uses `lib.mkForce`; without it Nix errors on the conflicting definitions. A shared module that wants hosts to override freely sets `lib.mkDefault` instead. Example: `modules/base/gc.nix` sets `nix.gc.dates = "weekly"`, and `hosts/spore/default.nix` overrides it with `lib.mkForce "daily"`.
 
 ## Monitoring Stack
@@ -316,7 +318,7 @@ Hermes Agent (`hosts/glyph/services/hermes.nix`, flake input `hermes-agent` pinn
 
 ## Guardrails
 
-- Merging doesn't deploy right away: deploys are manual, via `just switch` or the Deploy workflow, except that the Deploy workflow also deploys main to spore daily at 15:00 UTC once CI's spore build has passed on main (skipped if spore already runs main). So a change merged for spore reaches it within a day, and a branch deployed to spore by hand is replaced by main at the next scheduled run. Don't switch a host, merge a PR, or run the Deploy workflow unless asked.
+- Merging doesn't deploy right away. After CI passes on main, `request-deploys.yml` dispatches Deploy for glyph and zeta when their system changed since their last successful deployment (compared by `scripts/normalized-system.nix`, which sets aside the flake revision and glyph's rc-source copy of the repo), and those deploys wait for my approval; Deploy's `supersede` job cancels an older run still waiting for the same hosts. spore gets no requests: it has no reviewer, so the Deploy workflow deploys main to it daily at 15:00 UTC once CI's spore build has passed on main (skipped if spore already runs main). So a change merged for spore reaches it within a day, and a branch deployed to spore by hand is replaced by main at the next scheduled run. Deploys otherwise run by hand, via `just switch` or the Deploy workflow. Don't switch a host, merge a PR, approve a deployment, or run the Deploy workflow unless asked.
 
 ## Committing
 

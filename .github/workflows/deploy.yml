@@ -9,6 +9,8 @@ on:
   # on main or spore already runs main.
   schedule:
     - cron: "0 15 * * *"
+  # By hand, or from Request deploys after CI passes on main, for glyph and
+  # zeta when their system changed (request-deploys.yml)
   workflow_dispatch:
     inputs:
       glyph:
@@ -80,6 +82,41 @@ jobs:
             exit 1
           fi
           echo "matrix={\"include\":$include}" >> "$GITHUB_OUTPUT"
+
+  # A newer deploy of a host replaces an older one still waiting for my
+  # approval: cancel older runs whose waiting deploys are all for hosts this
+  # run deploys too. Rejecting takes a required reviewer (me); cancelling has
+  # the same effect. A run with a deploy in progress is left alone, and this
+  # run's deploy queues behind it in the host's concurrency group. Every
+  # request deploys main's head, so the newer run carries the older's changes.
+  supersede:
+    needs: plan
+    if: needs.plan.outputs.matrix != ''
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+    steps:
+      - name: Cancel superseded runs
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MATRIX: ${{ needs.plan.outputs.matrix }}
+          RUN_ID: ${{ github.run_id }}
+        run: |
+          hosts=$(jq -c '[.include[].host]' <<< "$MATRIX")
+          runs=$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/deploy.yml/runs?status=waiting&per_page=50" \
+            --jq '.workflow_runs[].id')
+          for id in $runs; do
+            (( id < RUN_ID )) || continue
+            jobs=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$id/jobs?per_page=100" --jq '.jobs')
+            waiting=$(jq -c '[.[] | select(.status == "waiting") | .name | capture("^deploy \\((?<h>[^,]+),").h]' <<< "$jobs")
+            deploying=$(jq '[.[] | select(.status == "in_progress" and (.name | startswith("deploy (")))] | length' <<< "$jobs")
+            if [[ $deploying == 0 ]] && jq -e --argjson new "$hosts" \
+              'length > 0 and all(.[]; . as $h | $new | index($h) != null)' <<< "$waiting" > /dev/null; then
+              echo "::notice::Cancelling run $id: this run supersedes its waiting deploys of $(jq -r 'join(", ")' <<< "$waiting")"
+              gh run cancel "$id" -R "$GITHUB_REPOSITORY"
+            fi
+          done
 
   deploy:
     needs: plan
