@@ -245,8 +245,9 @@ in {
         ];
       }
       {
-        # CPU, memory and disk I/O per systemd unit (cgroup), from Alloy's
-        # cAdvisor exporter (alloy.nix). cAdvisor names each series by cgroup
+        # CPU, memory and disk I/O per systemd unit (cgroup), from the Alloy
+        # cAdvisor exporter in each host's services/alloy.nix. cAdvisor names
+        # each series by cgroup
         # path in `id`; `unit` takes its last part, so it matches Loki's unit
         # label ("navidrome.service"). The root cgroup ("/") gets no unit.
         job_name = "cadvisor";
@@ -255,6 +256,14 @@ in {
           {
             targets = ["localhost:12345"];
             labels.instance = "glyph";
+          }
+          {
+            targets = ["spore.note-iwato.ts.net:12345"];
+            labels.instance = "spore";
+          }
+          {
+            targets = ["zeta.note-iwato.ts.net:12345"];
+            labels.instance = "zeta";
           }
         ];
         metric_relabel_configs = [
