@@ -2,11 +2,13 @@
 
 The GitHub Apps that act on my repositories, with their private keys and logos.
 
-Each `<app>.age` file holds the app's only copy of its private key, because GitHub shows a key just once. These files are encrypted to the admin YubiKeys only (`keys.admins`), and no host decrypts them; the rules are in `lib/secrets/admin.nix`. stackptr/ops seals each key into the GitHub environment that uses it.
+Each `<app>.age` file holds the app's only copy of its private key, because GitHub shows a key just once. They're encrypted to the admin YubiKeys (`keys.admins`), with rules in `lib/secrets/admin.nix`. teleomycete's is the exception: glyph decrypts it to mint the agents' tokens, so it's also encrypted to glyph and its rule is in `lib/secrets/glyph.nix`. stackptr/ops seals each of the other keys into the GitHub environment that uses it.
+
+What each app may do on GitHub is enforced by rulesets and documented under "GitHub apps and rulesets" in rc's `CLAUDE.md`. App permissions and installations are set by hand and recorded in stackptr/ops's `apps.nix`. This file covers the keys and logos; keep all three in step.
 
 | App | Role | Key sealed into | Badge color |
 | --- | --- | --- | --- |
-| teleomycete | Identity for agent-created work | <!-- TODO --> | `#04342C` |
+| teleomycete | Identity for agent-created work | none: glyph mints its tokens | `#04342C` |
 | teleotrope | Flake updater for rc, merges its own PRs | rc's `update` | `#26215C` |
 | teleoid | Approves my PRs so they can auto-merge | every agent repo's `approve` | `#4A1B0C` |
 | teleopsis | Read-only observer for stackptr/ops | ops's `plan` | `#042C53` |
@@ -16,7 +18,7 @@ Each `<app>.age` file holds the app's only copy of its private key, because GitH
 
 The identity agents commit and open PRs as. teleoid never approves its PRs, so agent work always needs my review before it merges.
 
-<!-- TODO: where the key is sealed or decrypted for the agents -->
+The key is never sealed into an environment. On glyph, `agents-github-token.service` signs a JWT with it every 20 minutes and writes an installation token to `/run/agents-github/token`, which the agents can read but the key can't be (`hosts/glyph/services/agents.nix`).
 
 ## teleotrope
 
@@ -51,6 +53,10 @@ Set the badge color to the logo's own background color, from the table above. te
 ## Adding or rotating a key
 
 1. Generate the key in the app's settings. GitHub shows it only once.
-2. Encrypt it here as `<app>.age` with agenix, and add its rule to `lib/secrets/admin.nix` with `keys.admins` as the recipients.
-3. Have stackptr/ops seal it into the app's environment.
+2. Replace `<app>.age` here with agenix before sealing it anywhere. A new app gets its rule in `lib/secrets/admin.nix` (`keys.admins`), or in its host's secrets file, plus `keys.admins`, if a host decrypts it.
+3. Seal it from the ops checkout, piping it straight in:
+   ```sh
+   (cd ~/Development/rc && direnv exec . agenix -d lib/admin/github-apps/teleoid.age -i lib/admin/yubikey-a.txt) | just seal <repo> approve APPROVER_PRIVATE_KEY
+   ```
+   For teleomycete, deploy glyph instead.
 4. Delete the old key from the app's settings.
