@@ -5,8 +5,8 @@
 }: let
   ntfyUrl = "http://127.0.0.1:2586";
   ntfyTopic = "notifications";
-  # For agents and the jobs that run them; the relay never sends it to
-  # #alerts. The agents publish to it through a proxy (./agents.nix).
+  # For agents and the jobs that run them; the relay sends it to #agents,
+  # never #alerts. The agents publish to it through a proxy (./agents.nix).
   agentsTopic = "agents";
 in {
   age.secrets.slack-bot-token = {
@@ -31,7 +31,7 @@ in {
   # ntfy's own fields: title (the notification preview), message (Slack
   # mrkdwn), tags (the first is the emoji), click (a link) and priority
   # (4 and up go to #alerts, the rest to #updates). Messages on the agents'
-  # topic go to #updates as plain text, marked as an agent's. See
+  # topic go to #agents as plain text, marked as an agent's. See
   # ./ntfy-to-slack.jq.
   systemd.services.ntfy-slack-relay = {
     description = "Forward ntfy notifications to Slack";
@@ -53,7 +53,7 @@ in {
       curl -sN --retry 10 --retry-connrefused --retry-delay 1 \
         "${ntfyUrl}/${ntfyTopic},${agentsTopic}/json" |
       while IFS= read -r event; do
-        payload=$(jq -c --arg alerts "#alerts" --arg updates "#updates" \
+        payload=$(jq -c --arg alerts "#alerts" --arg updates "#updates" --arg agents "#agents" \
           --arg agentsTopic ${agentsTopic} -f ${./ntfy-to-slack.jq} <<< "$event") || continue
         [ -n "$payload" ] || continue
         curl -s https://slack.com/api/chat.postMessage \
