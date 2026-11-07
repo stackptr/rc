@@ -18,7 +18,7 @@ What each app may do on GitHub is enforced by rulesets and documented under "Git
 
 The identity agents commit and open PRs as. teleoid never approves its PRs, so agent work always needs my review before it merges.
 
-The key is never sealed into an environment. On glyph, `agents-github-token.service` signs a JWT with it every 20 minutes and writes an installation token to `/run/agents-github/token`, which the agents can read but the key can't be (`hosts/glyph/services/agents.nix`).
+The key is never sealed into an environment. On glyph, `agents-github-token.service` signs a JWT with it every 20 minutes and mints an installation token for each entry in `githubTokens` (`hosts/glyph/services/agents.nix`), each narrowed by permissions and repositories and written to `/run/agents-github/<name>/token`, where only its own group can read it: `write` for the coding agents, and `dispatcher` for the dispatcher of unattended jobs (Issues and Pull requests write, Contents and Actions read, rc only). Nothing that reads a token can read the key. A token can't ask for more than the app has, so adding one with a new permission means granting it to the app first.
 
 ## teleotrope
 
