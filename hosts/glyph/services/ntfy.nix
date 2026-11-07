@@ -31,8 +31,7 @@ in {
   # ntfy's own fields: title (the notification preview), message (Slack
   # mrkdwn), tags (the first is the emoji), click (a link) and priority
   # (4 and up go to #alerts, the rest to #updates). Messages on the agents'
-  # topic go to #agents as plain text, marked as an agent's. See
-  # ./ntfy-to-slack.jq.
+  # topic go to #agents as plain text. See ./ntfy-to-slack.jq.
   systemd.services.ntfy-slack-relay = {
     description = "Forward ntfy notifications to Slack";
     after = ["ntfy-sh.service" "network.target"];

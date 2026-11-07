@@ -7,10 +7,11 @@
 # The agents' topic is different: agents write text that other people can
 # influence (logs, CI output, PR content), so their messages always go to
 # the agents channel, whatever their priority, so they can't pass for a
-# monitoring alert or mix with the informational posts. They're also escaped like titles, so they can't carry
-# links or mentions (<!channel>), always get the robot emoji, and say who
-# sent them. The click link is dropped unless it's a plain https URL, for
-# every topic, since a | or > in it would end Slack's <url|text> early.
+# monitoring alert or mix with the informational posts. They're also
+# escaped like titles, so they can't carry links or mentions (<!channel>),
+# and always get the robot emoji. The click link is dropped unless it's a
+# plain https URL, for every topic, since a | or > in it would end Slack's
+# <url|text> early.
 def esc: gsub("&"; "&amp;") | gsub("<"; "&lt;") | gsub(">"; "&gt;");
 select((.event // "message") == "message" and (.message // "") != "")
 | (.topic == $agentsTopic) as $agent
@@ -18,15 +19,13 @@ select((.event // "message") == "message" and (.message // "") != "")
 | (if $agent then .message | esc else .message end) as $message
 | (.click // "" | if test("^https://[^\\s<>|]+$") then . else "" end) as $click
 | (if $agent then "robot_face" else (.tags // [])[0] end) as $emoji
-| (if $agent then "Agent: " else "" end) as $from
 | (
     (if .title then [{type: "section", text: {type: "mrkdwn", text: $message}}] else [] end)
     + (if $click != "" then [{type: "context", elements: [{type: "mrkdwn", text: "<\($click)|Open>"}]}] else [] end)
-    + (if $agent then [{type: "context", elements: [{type: "mrkdwn", text: "Posted by an agent on glyph"}]}] else [] end)
   ) as $blocks
 | {
     channel: (if $agent then $agents elif $urgent then $alerts else $updates end),
-    text: ([$emoji | select(.) | ":\(.):"] + [$from + if .title then .title | esc else $message end] | join(" ")),
+    text: ([$emoji | select(.) | ":\(.):"] + [if .title then .title | esc else $message end] | join(" ")),
     unfurl_links: false,
     unfurl_media: false
   }
