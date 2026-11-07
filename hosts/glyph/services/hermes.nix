@@ -18,9 +18,9 @@
   pkgs,
   ...
 }: let
-  # Slack member and channel IDs aren't secret.
-  slackUser = "U0AQQ327U4E";
-  agentChannel = "C0C8Z3TMGBY"; # #agent
+  slackIds = import ../slack.nix;
+  slackUser = slackIds.user;
+  agentChannel = slackIds.channels.agents;
 
   # Read tools only; everything else grafana-mcp offers is never registered.
   grafanaTools = [
@@ -84,7 +84,7 @@ in {
     environment = {
       SLACK_ALLOWED_USERS = slackUser;
       SLACK_HOME_CHANNEL = agentChannel; # cron delivery target
-      SLACK_HOME_CHANNEL_NAME = "agent";
+      SLACK_HOME_CHANNEL_NAME = "agents";
     };
 
     hermesHomeFiles."SOUL.md" = ''

@@ -1,0 +1,30 @@
+{
+    "display_information": {
+        "name": "Hypha",
+        "description": "Alerts and updates from my services: Grafana, Gatus, ntfy and CI.",
+        "background_color": "#4B1528"
+    },
+    "features": {
+        "bot_user": {
+            "display_name": "Hypha",
+            "always_online": false
+        }
+    },
+    "oauth_config": {
+        "scopes": {
+            "bot": [
+                "chat:write",
+                "chat:write.customize",
+                "chat:write.public"
+            ]
+        },
+        "pkce_enabled": false
+    },
+    "settings": {
+        "org_deploy_enabled": false,
+        "socket_mode_enabled": false,
+        "is_mcp_enabled": false,
+        "token_rotation_enabled": false,
+        "app_level_token_rotation_enabled": false
+    }
+}

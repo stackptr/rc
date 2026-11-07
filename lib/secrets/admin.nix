@@ -1,4 +1,6 @@
 # Rules for secrets no host decrypts: encrypted to the admin YubiKeys only.
+# lib/admin/github-apps/teleomycete.age is the exception: glyph decrypts it,
+# so its rule is in glyph.nix.
 let
   keys = import ../keys.nix;
 in {

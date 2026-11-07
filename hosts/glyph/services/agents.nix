@@ -49,6 +49,14 @@
   mcpPort = 8099;
   mcpGroupPath = "/v0/groups/agents/mcp";
   mcpURL = "http://127.0.0.1:${toString mcpPort}${mcpGroupPath}";
+  # Likewise ntfy: on its own port they could publish to any topic, and
+  # priority 4+ on `notifications` goes to #alerts. This proxy only takes
+  # publishes to the agents' topic, which the relay keeps out of #alerts
+  # (./ntfy.nix).
+  ntfyPort = lib.toInt (lib.removePrefix ":" config.services.ntfy-sh.settings.listen-http);
+  ntfyAgentsPort = 2588;
+  ntfyAgentsTopic = "agents";
+  ntfyAgentsURL = "http://127.0.0.1:${toString ntfyAgentsPort}/${ntfyAgentsTopic}";
   tailnet = import ../tailnet.nix;
   # Drops tailnet connections to port unless they come from one of devices
   onlyFrom = devices: port:
@@ -90,6 +98,10 @@
     - Prometheus has unit states (`node_systemd_unit_state`), restarts (`node_systemd_service_restart_total`) and per-unit CPU and memory (`container_cpu_usage_seconds_total`, `container_memory_working_set_bytes`, by `unit`).
 
     Ask the user only for what neither shows, and say what you checked first.
+
+    ## Notifying the user
+
+    Only when the user asks to be notified (say, when a long task finishes), publish to ntfy, which posts to their Slack: `curl -s -H 'Title: <one line>' -d '<message>' ${ntfyAgentsURL}`. Messages are plain text, so links show as text.
   '';
   # A shorter prompt helps a 27B model more than it helps Claude.
   context = pkgs.writeText "AGENTS.md" (profile.agent + githubNote + hostsNote);
@@ -388,7 +400,7 @@ in {
 
   # The GitHub App's private key, readable only by the minting service
   age.secrets.github-app-key = {
-    file = ../secrets/github-app-key.age;
+    file = ../../../lib/admin/github-apps/teleomycete.age;
     owner = tokenUser;
   };
 
@@ -420,8 +432,10 @@ in {
   # anything running as this user could connect as the superuser. The socket
   # is hidden from the units; the opencode-out chain rejects TCP to 5432 on
   # any address. It also rejects MCPJungle's port, so the agents use only
-  # their tool group through mcpPort, and the Obsidian vault's MCP server,
-  # which listens on loopback where they could otherwise reach it directly.
+  # their tool group through mcpPort, the Obsidian vault's MCP server,
+  # which listens on loopback where they could otherwise reach it directly,
+  # and ntfy's port, so they publish only to their topic through
+  # ntfyAgentsPort.
   networking.firewall.extraCommands = ''
     ip46tables -t mangle -N opencode-in 2>/dev/null || ip46tables -t mangle -F opencode-in
     ${onlyFrom ["spore"] opencodePort}${onlyFrom ["spore" "blip" "slate" "stroma" "rhizome"] paseoPort}
@@ -432,6 +446,7 @@ in {
     ip46tables -A opencode-out -p tcp --dport 5432 -j REJECT
     ip46tables -A opencode-out -p tcp --dport ${toString config.services.mcpjungle.port} -j REJECT
     ip46tables -A opencode-out -p tcp --dport ${toString config.services.obsidian-vault-mcp.port} -j REJECT
+    ip46tables -A opencode-out -p tcp --dport ${toString ntfyPort} -j REJECT
     ip46tables -D OUTPUT -m owner --uid-owner ${user} -j opencode-out 2>/dev/null || true
     ip46tables -I OUTPUT -m owner --uid-owner ${user} -j opencode-out
   '';
@@ -469,6 +484,24 @@ in {
           proxy_set_header Connection "";
           proxy_buffering off;
           proxy_read_timeout 1h;
+        '';
+      };
+      locations."/".return = "404";
+    };
+    # Publishes to the agents' topic and nothing else: not other topics,
+    # ntfy's JSON publish (which names the topic in the body) or reading
+    # the topic back
+    virtualHosts.ntfy-agents = {
+      listen = [
+        {
+          addr = "127.0.0.1";
+          port = ntfyAgentsPort;
+        }
+      ];
+      locations."= /${ntfyAgentsTopic}" = {
+        proxyPass = "http://127.0.0.1:${toString ntfyPort}/${ntfyAgentsTopic}";
+        extraConfig = ''
+          limit_except POST PUT { deny all; }
         '';
       };
       locations."/".return = "404";
