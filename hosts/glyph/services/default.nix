@@ -6,6 +6,7 @@
   ...
 }: {
   imports = [
+    ./agent-tiers.nix
     ./agents.nix
     ./alloy.nix
     ./attic.nix
