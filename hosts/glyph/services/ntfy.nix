@@ -5,6 +5,11 @@
 }: let
   ntfyUrl = "http://127.0.0.1:2586";
   ntfyTopic = "notifications";
+  # For agents and the jobs that run them; the relay sends it to #agents,
+  # never #alerts. The agents publish to it through a proxy (./agents.nix).
+  agentsTopic = "agents";
+  # #agents, by ID, so renaming the channel doesn't break the relay
+  agentsChannel = (import ../slack.nix).channels.agents;
 in {
   age.secrets.slack-bot-token = {
     file = ./../secrets/slack-bot-token.age;
@@ -24,10 +29,11 @@ in {
 
   networking.firewall.interfaces.tailscale0.allowedTCPPorts = [2586];
 
-  # Posts each message on the topic to Slack as Hypha. Publishers set
+  # Posts each message on the topics to Slack as Hypha. Publishers set
   # ntfy's own fields: title (the notification preview), message (Slack
   # mrkdwn), tags (the first is the emoji), click (a link) and priority
-  # (4 and up go to #alerts, the rest to #updates). See ./ntfy-to-slack.jq.
+  # (4 and up go to #alerts, the rest to #updates). Messages on the agents'
+  # topic go to #agents as plain text. See ./ntfy-to-slack.jq.
   systemd.services.ntfy-slack-relay = {
     description = "Forward ntfy notifications to Slack";
     after = ["ntfy-sh.service" "network.target"];
@@ -46,10 +52,10 @@ in {
       # ntfy-sh is Type=simple, so it may not be listening yet when this
       # starts alongside it (e.g. during activation); retry instead of failing.
       curl -sN --retry 10 --retry-connrefused --retry-delay 1 \
-        "${ntfyUrl}/${ntfyTopic}/json" |
+        "${ntfyUrl}/${ntfyTopic},${agentsTopic}/json" |
       while IFS= read -r event; do
-        payload=$(jq -c --arg alerts "#alerts" --arg updates "#updates" \
-          -f ${./ntfy-to-slack.jq} <<< "$event") || continue
+        payload=$(jq -c --arg alerts "#alerts" --arg updates "#updates" --arg agents ${agentsChannel} \
+          --arg agentsTopic ${agentsTopic} -f ${./ntfy-to-slack.jq} <<< "$event") || continue
         [ -n "$payload" ] || continue
         curl -s https://slack.com/api/chat.postMessage \
           -H "Authorization: Bearer $token" \
