@@ -5,6 +5,14 @@
   stromaModel = "Qwen3.8-27B-MTPLX-Optimized-Quality";
   stromaPort = 8000;
 
+  # The dispatcher's state, queue and runs (./agent-jobs.nix). Each run's
+  # prompt goes to the tier's unit as a credential, and its output comes
+  # back through StandardOutput, both opened by systemd, so the tiers never
+  # read or write this directory themselves.
+  dispatchHome = "/var/lib/agent-dispatch";
+  # The last line of a tier unit's output: the agent's exit status
+  exitMarker = "__AGENT_JOB_EXIT__";
+
   # systemd sandboxing for every unit that runs agents. Each adds its own
   # User, Group, Slice and ReadWritePaths.
   serviceConfig = {

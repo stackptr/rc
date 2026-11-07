@@ -11,9 +11,11 @@
 # They don't run under Paseo: Paseo starts every agent as its own user and
 # can't switch, so a tier would need a daemon of its own (user, port,
 # password, firewall exception), only to show unattended runs nobody
-# watches. Jobs run as transient systemd units through `agent-run <tier>
-# <command>` instead, e.g. `agent-run observe opencode run --standalone
-# "<prompt>"`, and the dispatcher (#740) keeps the record of each run.
+# watches. The dispatcher (./agent-jobs.nix) runs each job as an instance
+# of the tier's template unit, `agent-job-<tier>@<run>.service`, and keeps
+# the record of each run. By hand, as root, `agent-run <tier> <command>`
+# runs anything as a transient unit with the same sandboxing, e.g.
+# `agent-run observe opencode run --standalone "<prompt>"`.
 {
   config,
   lib,
@@ -167,7 +169,18 @@
       then lib.boolToString value
       else toString value;
   in {
-    inherit user home group mcpPath nonoProfile;
+    inherit user home group mcpPath nonoProfile path environment properties;
+    # The template unit's command. The prompt and timeout are credentials
+    # from the dispatcher's run directory; the agent's exit status ends
+    # the output, so the unit itself succeeds even when the agent fails or
+    # times out (124), which the dispatcher reports instead.
+    runner = pkgs.writeShellScript "agent-job-${name}" ''
+      timeout=$(cat "$CREDENTIALS_DIRECTORY/timeout")
+      ${pkgs.coreutils}/bin/timeout --kill-after=30 "$timeout" \
+        ${lib.getExe pkgs.nono} -s run --profile ${user} --no-audit -- \
+        opencode run --standalone <"$CREDENTIALS_DIRECTORY/prompt"
+      printf '\n${common.exitMarker} %s\n' "$?"
+    '';
     runArgs = lib.concatStringsSep " " (
       [
         "--slice=agents.slice"
@@ -292,4 +305,33 @@ in {
   };
 
   environment.systemPackages = [agentRun];
+
+  # agent-job-<tier>@<run>.service: one job, started by the dispatcher
+  # (which polkit allows for these templates only)
+  systemd.services = lib.mapAttrs' (name: cfg:
+    lib.nameValuePair "agent-job-${name}@" {
+      description = "Agent job %i (${name} tier)";
+      partOf = ["agent-jobs.target"];
+      inherit (cfg) path;
+      # PATH comes from `path`
+      environment = builtins.removeAttrs cfg.environment ["PATH"];
+      serviceConfig =
+        cfg.properties
+        // {
+          Type = "oneshot";
+          User = cfg.user;
+          Group = cfg.user;
+          Slice = "agents.slice";
+          ExecStart = cfg.runner;
+          LoadCredential = [
+            "prompt:${common.dispatchHome}/runs/%i/prompt"
+            "timeout:${common.dispatchHome}/runs/%i/timeout"
+          ];
+          StandardOutput = "truncate:${common.dispatchHome}/runs/%i/output";
+          # Each job's own timeout applies inside; this catches a runner
+          # that hangs anyway
+          TimeoutStartSec = "3h";
+        };
+    })
+  cfgs;
 }
