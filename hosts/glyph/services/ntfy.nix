@@ -8,6 +8,8 @@
   # For agents and the jobs that run them; the relay sends it to #agents,
   # never #alerts. The agents publish to it through a proxy (./agents.nix).
   agentsTopic = "agents";
+  # #agents, by ID, so renaming the channel doesn't break the relay
+  agentsChannel = (import ../slack.nix).channels.agents;
 in {
   age.secrets.slack-bot-token = {
     file = ./../secrets/slack-bot-token.age;
@@ -52,7 +54,7 @@ in {
       curl -sN --retry 10 --retry-connrefused --retry-delay 1 \
         "${ntfyUrl}/${ntfyTopic},${agentsTopic}/json" |
       while IFS= read -r event; do
-        payload=$(jq -c --arg alerts "#alerts" --arg updates "#updates" --arg agents "#agents" \
+        payload=$(jq -c --arg alerts "#alerts" --arg updates "#updates" --arg agents ${agentsChannel} \
           --arg agentsTopic ${agentsTopic} -f ${./ntfy-to-slack.jq} <<< "$event") || continue
         [ -n "$payload" ] || continue
         curl -s https://slack.com/api/chat.postMessage \
