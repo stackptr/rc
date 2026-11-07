@@ -1,5 +1,11 @@
 name: Update flake inputs
 
+# Updates flake.lock daily, or on demand for selected inputs, as the
+# teleotrope app, and merges the PR once the required checks pass.
+#
+# The job is stackptr/actions's reusable update-flake.yml, shared by every
+# repo whose flake teleotrope updates. It reads teleotrope's credentials from
+# this repo's main-only `update` environment.
 on:
   schedule:
     - cron: "10 5 * * *"
@@ -10,6 +16,7 @@ on:
         type: string
         default: ""
 
+# The reusable job's token gets no more than this
 permissions:
   contents: read
   # Waiting on the PR's checks
@@ -18,109 +25,11 @@ permissions:
 
 jobs:
   update:
-    runs-on: ubuntu-latest
-    # Main-only environment holding the teleotrope app's credentials
-    environment: update
-    env:
-      BOT_NAME: teleotrope[bot]
-      # The bot account's user ID, not the app ID
-      BOT_EMAIL: 347049929+teleotrope[bot]@users.noreply.github.com
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - uses: cachix/install-nix-action@448cde739abec1eaf0646249e3d25bb8d9bc7702 # v31.11.2
-        with:
-          github_access_token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Setup git identity
-        run: |
-          git config --global user.email "$BOT_EMAIL"
-          git config --global user.name "$BOT_NAME"
-      # A partial update gets a branch of its own, named for the run, so
-      # neither the daily run nor another partial update overwrites its PR
-      - name: Select inputs
-        id: select
-        env:
-          REQUESTED: ${{ inputs.inputs }}
-          RUN_ID: ${{ github.run_id }}
-        run: |
-          read -ra requested <<<"${REQUESTED//,/ }"
-          if [ "${#requested[@]}" -eq 0 ]; then
-            {
-              echo "inputs="
-              echo "branch=gh/update-flake"
-              echo "title=chore: update flake inputs"
-            } >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-          known=$(jq -r '.nodes.root.inputs | keys[]' flake.lock)
-          for input in "${requested[@]}"; do
-            if ! grep -qxF -- "$input" <<<"$known"; then
-              echo "::error::Unknown flake input '$input'. Inputs: $(paste -sd ' ' <<<"$known")"
-              exit 1
-            fi
-          done
-          selected=$(printf '%s\n' "${requested[@]}" | sort -u | paste -sd ' ')
-          {
-            echo "inputs=$selected"
-            echo "branch=gh/update-flake-$RUN_ID"
-            echo "title=chore: update ${selected// /, }"
-          } >> "$GITHUB_OUTPUT"
-      - name: Update
-        env:
-          # Validated against flake.lock above; empty updates every input
-          INPUTS: ${{ steps.select.outputs.inputs }}
-        run: |
-          # shellcheck disable=SC2086
-          nix flake update $INPUTS --commit-lock-file
-      - name: Get update details
-        id: update-details
-        run: |
-          body=$(git log -1 --pretty=%B)
-          echo "body<<EOF" >> "$GITHUB_OUTPUT"
-          echo "$body" >> "$GITHUB_OUTPUT"
-          echo "EOF" >> "$GITHUB_OUTPUT"
-
-      # An app token, unlike GITHUB_TOKEN, starts CI on the PR it opens, and
-      # the app can skip the approval rule so the PR auto-merges once CI passes.
-      # Scoped to this repository by default.
-      - uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
-        id: app-token
-        with:
-          client-id: ${{ vars.UPDATER_CLIENT_ID }}
-          private-key: ${{ secrets.UPDATER_PRIVATE_KEY }}
-      - uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
-        id: create-pr
-        with:
-          branch: ${{ steps.select.outputs.branch }}
-          title: ${{ steps.select.outputs.title }}
-          body: ${{ steps.update-details.outputs.body }}
-          token: ${{ steps.app-token.outputs.token }}
-          author: ${{ env.BOT_NAME }} <${{ env.BOT_EMAIL }}>
-          committer: ${{ env.BOT_NAME }} <${{ env.BOT_EMAIL }}>
-      # Auto-merge waits for the approval the app may skip, so wait for the
-      # required checks here and merge directly. The app can skip only the
-      # approval ruleset; "Require CI" still applies to the merge.
-      - if: ${{ steps.create-pr.outputs.pull-request-number }}
-        name: Wait for required checks
-        run: |
-          # gh exits 1 until the checks are reported, 8 while they're pending
-          for _ in $(seq 20); do
-            rc=0
-            gh pr checks "$PR" --required >/dev/null 2>&1 || rc=$?
-            [ "$rc" -eq 0 ] || [ "$rc" -eq 8 ] && break
-            sleep 15
-          done
-          gh pr checks "$PR" --required --watch --fail-fast --interval 30
-        env:
-          # The app has no Checks permission; the job's token reads them
-          GH_TOKEN: ${{ github.token }}
-          PR: ${{ steps.create-pr.outputs.pull-request-number }}
-      - if: ${{ steps.create-pr.outputs.pull-request-number }}
-        name: Merge
-        # --admin sends the merge despite the PR showing as blocked; without it
-        # gh refuses before asking. GitHub then applies the app's bypass of the
-        # approval ruleset only; "Require CI" has no bypass and still applies.
-        run: gh pr merge "$PR" --squash --admin --match-head-commit "$SHA"
-        env:
-          GH_TOKEN: ${{ steps.app-token.outputs.token }}
-          PR: ${{ steps.create-pr.outputs.pull-request-number }}
-          SHA: ${{ steps.create-pr.outputs.pull-request-head-sha }}
+    uses: stackptr/actions/.github/workflows/update-flake.yml@d06773accbe7c3b052aea2d5cc857b78b1da4c85 # unreleased: repin to v1.2.0
+    with:
+      flake-inputs: ${{ inputs.inputs }}
+    # A reusable workflow's `secrets` holds only what the caller passes, even
+    # for a job that declares an environment: without this, the `update`
+    # environment's UPDATER_PRIVATE_KEY arrives empty. It also passes any
+    # repository-level secrets, of which rc has none.
+    secrets: inherit
