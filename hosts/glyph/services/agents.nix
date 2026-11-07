@@ -105,8 +105,17 @@
 
     Only when the user asks to be notified (say, when a long task finishes), publish to ntfy, which posts to their Slack: `curl -s -H 'Title: <one line>' -d '<message>' ${ntfyAgentsURL}`. Messages are plain text, so links show as text.
   '';
+  # The builder VM (agent-builder.nix), where agents run Nix since the
+  # daemon's socket is hidden from them. Every agent gets it, Pi included:
+  # `builder` is plain SSH, on the units' path.
+  builderNote = ''
+
+    ## Building with Nix
+
+    Don't run Nix on this machine; its daemon isn't reachable from here. To build or test something with Nix, run it in the builder VM: `builder '<command>'` runs a command there as root over SSH, e.g. `builder 'cd ${workspaces}/rc && nix build .#nixosConfigurations.glyph.config.system.build.toplevel --no-link'`. The VM sees the workspaces read-only at the same paths, so pass `--no-link` (or `-o /tmp/result`) to `nix build`, and run tests there too. Flakes only see files git tracks, so `git add` new files first. The VM reaches the internet but not this machine or the home network, and its store is wiped whenever it restarts.
+  '';
   # A shorter prompt helps a 27B model more than it helps Claude.
-  context = pkgs.writeText "AGENTS.md" (profile.agent + githubNote + hostsNote);
+  context = pkgs.writeText "AGENTS.md" (profile.agent + githubNote + hostsNote + builderNote);
   opencodeSettings = json.generate "opencode.json" {
     "$schema" = "https://opencode.ai/config.json";
     model = "stroma/${stromaModel}";
@@ -641,7 +650,7 @@ in {
       # Paseo runs pkgs.claude-code itself, through the nono wrapper
       package = null;
       # Appended to the llm-profile prompt development.nix sets (lines merge)
-      context = lib.mkAfter (githubNote + hostsNote);
+      context = lib.mkAfter (githubNote + hostsNote + builderNote);
       # Paseo's orchestration skills, from the source of the Paseo it runs.
       # The nixpkgs package leaves out the skills/ directory its own
       # installer copies from, so Settings > Agents > Orchestration skills
@@ -676,7 +685,7 @@ in {
         source = piSettings;
         force = true;
       };
-      ".pi/agent/AGENTS.md".text = profile."agent-standalone" + githubNote;
+      ".pi/agent/AGENTS.md".text = profile."agent-standalone" + githubNote + builderNote;
     };
   };
 

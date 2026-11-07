@@ -44,13 +44,6 @@
       -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR \
       root@${vmAddress} "$@"
   '';
-
-  agentNote = ''
-
-    ## Building with Nix
-
-    Don't run Nix on this machine. To build or test something with Nix, run it in the builder VM: `builder '<command>'` runs a command there as root over SSH, e.g. `builder 'cd ${workspaces}/rc && nix build .#nixosConfigurations.glyph.config.system.build.toplevel --no-link'`. The VM sees the workspaces read-only at the same paths, so pass `--no-link` (or `-o /tmp/result`) to `nix build`, and run tests there too. Flakes only see files git tracks, so `git add` new files first. The VM reaches the internet but not this machine or the home network, and its store is wiped whenever it restarts.
-  '';
 in {
   imports = [inputs.microvm.nixosModules.host];
 
@@ -61,7 +54,9 @@ in {
       microvm = {
         hypervisor = "cloud-hypervisor";
         vcpu = 6;
-        mem = 8192;
+        # glyph has 31 GiB and its available memory bottoms out around 9 GiB;
+        # at 8 GiB a VM running flat out could leave it about 1 GiB
+        mem = 6144;
         # Free page reporting: memory the guest isn't using goes back to glyph
         balloon = true;
         # Lets cloud-hypervisor report readiness to systemd
@@ -231,13 +226,7 @@ in {
     after = ["agent-builder-key.service"];
   };
 
-  # The `builder` command and the note telling agents about it. OpenCode's
-  # instructions are a store file built in agents.nix, so its workers don't
-  # get the note yet.
+  # The `builder` command; agents.nix's builderNote tells the agents about it
   systemd.services.paseo.path = [builderCmd];
   systemd.services.opencode-web.path = [builderCmd];
-  home-manager.users.${user} = {
-    programs.claude-code.context = lib.mkAfter agentNote;
-    home.file.".pi/agent/AGENTS.md".text = lib.mkAfter agentNote;
-  };
 }
