@@ -69,6 +69,9 @@
   time.timeZone = "America/Los_Angeles";
   i18n.defaultLocale = "en_US.UTF-8";
 
+  # Unattended agent jobs (services/agent-jobs.nix); false stops them all
+  rc.agents.autonomous.enable = true;
+
   # Beets library database (beets configured in home-manager)
   rc.backup.paths = ["/home/mu/.config/beets/library.db"];
 
