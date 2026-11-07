@@ -25,7 +25,7 @@ permissions:
 
 jobs:
   update:
-    uses: stackptr/actions/.github/workflows/update-flake.yml@d06773accbe7c3b052aea2d5cc857b78b1da4c85 # unreleased: repin to v1.2.0
+    uses: stackptr/actions/.github/workflows/update-flake.yml@64f9d824393b74c4dabaec6834211b3032622008 # v1.2.0
     with:
       flake-inputs: ${{ inputs.inputs }}
     # A reusable workflow's `secrets` holds only what the caller passes, even
