@@ -344,8 +344,10 @@
   # user, and the agents run their shell tools with it
   shell = lib.getExe pkgs.bash;
   # procps for ps: Paseo lists an OpenCode server's children with
-  # `ps --ppid` when it stops one, and an ENOENT there crashes its worker
-  path = [ghWithToken] ++ (with pkgs; [bash coreutils findutils gnugrep gnused git procps]);
+  # `ps --ppid` when it stops one, and an ENOENT there crashes its worker.
+  # curl for the ntfy notifications hostsNote describes; the owner rules,
+  # not curl's absence, are what keep agents off loopback services.
+  path = [ghWithToken] ++ (with pkgs; [bash coreutils curl findutils gnugrep gnused git procps]);
   # Give up after 5 failed starts in 5 minutes instead of looping, so the
   # "Systemd unit failed" alert fires rather than only the restart one
   startLimit = {
