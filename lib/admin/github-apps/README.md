@@ -22,7 +22,7 @@ The key is never sealed into an environment. On glyph, `agents-github-token.serv
 
 ## teleotrope
 
-Updates rc's flake inputs daily, or on demand for selected inputs, from `.github/workflows/update.yml`. It runs in rc's main-only `update` environment (`UPDATER_CLIENT_ID`, `UPDATER_PRIVATE_KEY`) and commits as `teleotrope[bot]`.
+Updates rc's flake inputs daily, or on demand for selected inputs, from `.github/workflows/update.yml`, which calls stackptr/actions's reusable `update-flake.yml`. It runs in rc's main-only `update` environment (`UPDATER_CLIENT_ID`, `UPDATER_PRIVATE_KEY`) and commits as `teleotrope[bot]`.
 
 It opens the PR, waits for the required checks, and merges directly. The app may bypass rc's approval ruleset and nothing else: "Require CI" has no bypass and still applies to the merge.
 

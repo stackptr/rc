@@ -1,0 +1,207 @@
+name: Request deploys
+run-name: request deploys for ${{ github.event.workflow_run.display_title }}
+
+# After CI passes on main, asks to deploy each host whose system changed
+# since its last successful deployment, by dispatching Deploy. glyph's and
+# zeta's deploys wait for my approval in their environments (with the
+# Approve button in #alerts), and a newer request supersedes one still
+# waiting (Deploy's supersede job). spore has no reviewer, so its deploy
+# runs straight away, and every host posts its package changes to #updates
+# when it activates (modules/nixos/deploy-marker.nix).
+#
+# A host counts as changed when its system derivation differs, setting aside
+# the two things that change on every commit (scripts/normalized-system.nix):
+# the flake revision, and glyph's copy of the repo for rc-source. A commit
+# that doesn't change a host requests nothing for it.
+#
+# spore is requested only for a push of mine: I'm around to see it land. The
+# Update workflow's overnight merge, pushed by teleotrope, would otherwise
+# deploy with nobody watching, which is why Deploy's old workflow_run
+# trigger was removed; spore picks it up at the scheduled deploy instead.
+# A request deploys main's head, so it also carries an update merged
+# earlier that the schedule hasn't deployed yet.
+
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+
+permissions:
+  contents: read
+
+# A newer CI completion on main makes an evaluation still running moot
+concurrency:
+  group: request-deploys
+  cancel-in-progress: true
+
+jobs:
+  changes:
+    # `branches` also matches a fork's PR from a branch named main, so take
+    # only pushes to this repo. GITHUB_SHA is main's head when the event
+    # fired, and Deploy deploys main's head: if CI built an older commit, the
+    # newer commit's CI run requests instead.
+    if: >-
+      github.event.workflow_run.event == 'push'
+      && github.event.workflow_run.head_repository.full_name == github.repository
+      && github.event.workflow_run.head_sha == github.sha
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+      deployments: read
+    outputs:
+      hosts: ${{ steps.compare.outputs.hosts }}
+    steps:
+      # Only hosts whose CI build passed: Deploy substitutes what that build
+      # pushed to Attic. The latest attempt counts, so re-running a failed
+      # build requests the deploy then.
+      - name: Check CI's builds
+        id: ci
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_ID: ${{ github.event.workflow_run.id }}
+          PUSHER: ${{ github.event.workflow_run.actor.login }}
+        run: |
+          jobs=$(gh run view "$RUN_ID" -R "$GITHUB_REPOSITORY" --json jobs)
+          hosts=(glyph zeta)
+          if [[ $PUSHER == "$GITHUB_REPOSITORY_OWNER" ]]; then
+            hosts+=(spore)
+          else
+            echo "::notice::Not requesting spore: $PUSHER pushed this, not me; the scheduled deploy takes it"
+          fi
+          candidates=()
+          for host in "${hosts[@]}"; do
+            conclusion=$(jq -r --arg h "$host" \
+              '[.jobs[] | select(.name | startswith("build (\($h),"))][0].conclusion // ""' <<< "$jobs")
+            # A finished run with no build for the host means the job was
+            # renamed: fail, so it alerts, rather than never request again
+            if [[ -z $conclusion ]]; then
+              echo "::error::CI run $RUN_ID has no 'build ($host, ...)' job"
+              exit 1
+            elif [[ $conclusion == success ]]; then
+              candidates+=("$host")
+            else
+              echo "::notice::Not requesting $host: its CI build is '$conclusion'"
+            fi
+          done
+          echo "candidates=${candidates[*]}" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        if: steps.ci.outputs.candidates != ''
+        with:
+          # Every commit, so each host's last deployed one can be evaluated
+          fetch-depth: 0
+
+      - uses: cachix/install-nix-action@448cde739abec1eaf0646249e3d25bb8d9bc7702 # v31.11.2
+        if: steps.ci.outputs.candidates != ''
+        with:
+          github_access_token: ${{ secrets.GITHUB_TOKEN }}
+          extra_nix_config: |
+            extra-substituters = https://cache.zx.dev/main
+            extra-trusted-public-keys = main:mu0jkxdJTGWC3djDSEQb3rvZgqlhA8WVMulcTo5IW6c=
+
+      # The baseline is the host's last successful deployment, not the
+      # previous commit, so a request carries every change still undeployed,
+      # including ones whose requests I never approved. A local `just switch`
+      # isn't a deployment: after one, a host can get a request it doesn't
+      # need, which I can reject.
+      - name: Compare each host's system with its last deployment
+        id: compare
+        if: steps.ci.outputs.candidates != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CANDIDATES: ${{ steps.ci.outputs.candidates }}
+        run: |
+          # The commit of the newest deployment to environment $1 that
+          # succeeded (a later inactive status doesn't undo it)
+          last_deployed() {
+            local deployments id sha
+            deployments=$(gh api "repos/$GITHUB_REPOSITORY/deployments?environment=$1&per_page=50" \
+              --jq '.[] | "\(.id) \(.sha)"')
+            while read -r id sha; do
+              [[ -n $id ]] || continue
+              if [[ $(gh api "repos/$GITHUB_REPOSITORY/deployments/$id/statuses?per_page=100" \
+                --jq 'any(.[]; .state == "success")') == true ]]; then
+                echo "$sha"
+                return
+              fi
+            done <<< "$deployments"
+          }
+          system() {
+            nix eval --raw --file scripts/normalized-system.nix \
+              --apply "f: f { flake = \"git+file://$PWD?rev=$1\"; host = \"$2\"; }"
+          }
+
+          hosts=()
+          for host in $CANDIDATES; do
+            base=$(last_deployed "$host")
+            if [[ -z $base ]]; then
+              echo "::notice::Requesting $host: no successful deployment to compare against"
+              hosts+=("$host")
+              continue
+            fi
+            if [[ $base == "$GITHUB_SHA" ]]; then
+              echo "::notice::Not requesting $host: it already runs ${GITHUB_SHA::7}"
+              continue
+            fi
+            # CI evaluated this commit, so a failure here fails the run
+            new=$(system "$GITHUB_SHA" "$host")
+            if ! old=$(system "$base" "$host"); then
+              echo "::warning::Requesting $host: couldn't evaluate ${base::7}, its last deployment"
+              hosts+=("$host")
+            elif [[ $new != "$old" ]]; then
+              echo "::notice::Requesting $host: its system changed since ${base::7}"
+              hosts+=("$host")
+            else
+              echo "::notice::Not requesting $host: its system is unchanged since ${base::7}"
+            fi
+          done
+          echo "hosts=${hosts[*]}" >> "$GITHUB_OUTPUT"
+
+  # Its own job, so the token that can dispatch workflows never shares a
+  # runner with the evaluation. A dispatch is the one event GITHUB_TOKEN can
+  # start a run with.
+  dispatch:
+    needs: changes
+    if: needs.changes.outputs.hosts != ''
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: write
+    steps:
+      - name: Dispatch Deploy
+        env:
+          GH_TOKEN: ${{ github.token }}
+          HOSTS: ${{ needs.changes.outputs.hosts }}
+        run: |
+          # Deploy deploys main's head: if main moved on while this ran, the
+          # new commit's CI run requests instead
+          main=$(gh api "repos/$GITHUB_REPOSITORY/commits/main" --jq .sha)
+          if [[ $main != "$GITHUB_SHA" ]]; then
+            echo "::notice::Not dispatching: main moved on to ${main::7}, whose CI run will request deploys"
+            exit 0
+          fi
+          args=()
+          for host in $HOSTS; do
+            args+=(-f "$host=true")
+          done
+          gh workflow run deploy.yml -R "$GITHUB_REPOSITORY" --ref main "${args[@]}"
+          echo "::notice::Requested deploys of $HOSTS at ${GITHUB_SHA::7}"
+
+  # Nobody is watching this run, so post its failures
+  notify:
+    needs: [changes, dispatch]
+    if: failure()
+    runs-on: ubuntu-latest
+    # SLACK_BOT_TOKEN is in the main-only `notify` environment
+    environment: notify
+    permissions:
+      actions: read
+    steps:
+      - uses: stackptr/actions/slack-notify@8f86bf2d6b69d2225bee5726b080fc6ce1066bd9 # v1.0.0
+        with:
+          token: ${{ secrets.SLACK_BOT_TOKEN }}
+          channel: "#alerts"
+          status: failure
+          failed-jobs: true

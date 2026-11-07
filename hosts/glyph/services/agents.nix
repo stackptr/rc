@@ -1,7 +1,8 @@
 # Coding agents on glyph: OpenCode's server (code.zx.dev) and Paseo
 # (agents.zx.dev), which runs Claude Code, OpenCode and Pi agents. Everything
-# runs as one unprivileged user, and every agent process runs inside the same
-# nono profile, which grants the workspaces and the agents' own state but not
+# here runs as one unprivileged user, the write tier (unattended jobs that
+# need less run as the other tiers' users, ./agent-tiers.nix), and every
+# agent process runs inside the same nono profile, which grants the workspaces and the agents' own state but not
 # Paseo's home (its local credential and config) or anything else of glyph's.
 # On GitHub they act as the teleomycete app: they can push branches and
 # open PRs, but not change workflows, and rulesets keep them from merging.
@@ -78,6 +79,14 @@
   mcpPort = 8099;
   mcpGroupPath = "/v0/groups/agents/mcp";
   mcpURL = "http://127.0.0.1:${toString mcpPort}${mcpGroupPath}";
+  # Likewise ntfy: on its own port they could publish to any topic, and
+  # priority 4+ on `notifications` goes to #alerts. This proxy only takes
+  # publishes to the agents' topic, which the relay keeps out of #alerts
+  # (./ntfy.nix).
+  ntfyPort = lib.toInt (lib.removePrefix ":" config.services.ntfy-sh.settings.listen-http);
+  ntfyAgentsPort = 2588;
+  ntfyAgentsTopic = "agents";
+  ntfyAgentsURL = "http://127.0.0.1:${toString ntfyAgentsPort}/${ntfyAgentsTopic}";
   tailnet = import ../tailnet.nix;
   # Drops tailnet connections to port unless they come from one of devices
   onlyFrom = devices: port:
@@ -90,8 +99,9 @@
       ip46tables -t mangle -A opencode-in -i tailscale0 -p tcp --dport ${toString port} -j DROP
     '';
 
-  stromaModel = "Qwen3.8-27B-MTPLX-Optimized-Quality";
-  stromaURL = "http://stroma.note-iwato.ts.net:8000/v1";
+  common = import ./agents-common.nix;
+  inherit (common) stromaModel;
+  stromaURL = "http://stroma.note-iwato.ts.net:${toString common.stromaPort}/v1";
   json = pkgs.formats.json {};
 
   profile = import ../../../lib/llm-profile.nix inputs.llm-profile;
@@ -119,6 +129,10 @@
     - Prometheus has unit states (`node_systemd_unit_state`), restarts (`node_systemd_service_restart_total`) and per-unit CPU and memory (`container_cpu_usage_seconds_total`, `container_memory_working_set_bytes`, by `unit`).
 
     Ask the user only for what neither shows, and say what you checked first.
+
+    ## Notifying the user
+
+    Only when the user asks to be notified (say, when a long task finishes), publish to ntfy, which posts to their Slack: `curl -s -H 'Title: <one line>' -d '<message>' ${ntfyAgentsURL}`. Messages are plain text, so links show as text.
   '';
   # A shorter prompt helps a 27B model more than it helps Claude.
   context = pkgs.writeText "AGENTS.md" (profile.agent + githubNote + hostsNote);
@@ -345,43 +359,16 @@
     };
   };
 
-  hardening = {
-    User = user;
-    Group = user;
-    Slice = "agents.slice";
-    Restart = "always";
-    RestartSec = 5;
-    ProtectSystem = "strict";
-    ProtectHome = true;
-    ReadWritePaths = [home];
-    # EnvironmentFile is read by systemd before the namespace is set up.
-    # Postgres trusts every local connection (db.nix): see the firewall below.
-    # The Nix daemon's socket too: builds run as nixbld users in the daemon's
-    # cgroup, outside nono, the slice's limits and the owner rule on 5432, and
-    # fixed-output derivations share the host's network, so a build could
-    # reach Postgres on loopback as the superuser. Nothing in these units runs
-    # Nix; home-manager-opencode.service, which does, is a unit of its own.
-    InaccessiblePaths = ["/mnt" "/run/agenix" "/run/agenix.d" "/run/postgresql" "/nix/var/nix/daemon-socket"];
-    # Other users' processes and their command lines; the agents still see
-    # their own, which Paseo lists with ps
-    ProtectProc = "invisible";
-    PrivateTmp = true;
-    PrivateDevices = true;
-    NoNewPrivileges = true;
-    CapabilityBoundingSet = "";
-    ProtectKernelTunables = true;
-    ProtectKernelModules = true;
-    ProtectKernelLogs = true;
-    ProtectControlGroups = true;
-    ProtectClock = true;
-    ProtectHostname = true;
-    RestrictNamespaces = true;
-    RestrictRealtime = true;
-    RestrictSUIDSGID = true;
-    LockPersonality = true;
-    RestrictAddressFamilies = ["AF_UNIX" "AF_INET" "AF_INET6" "AF_NETLINK"];
-    # Bun's JIT needs writable executable memory, so no MemoryDenyWriteExecute
-  };
+  hardening =
+    common.serviceConfig
+    // {
+      User = user;
+      Group = user;
+      Slice = "agents.slice";
+      Restart = "always";
+      RestartSec = 5;
+      ReadWritePaths = [home];
+    };
   # systemd sets SHELL from the user's passwd entry, nologin for a system
   # user, and the agents run their shell tools with it
   shell = lib.getExe pkgs.bash;
@@ -454,8 +441,10 @@ in {
   # anything running as this user could connect as the superuser. The socket
   # is hidden from the units; the opencode-out chain rejects TCP to 5432 on
   # any address. It also rejects MCPJungle's port, so the agents use only
-  # their tool group through mcpPort, and the Obsidian vault's MCP server,
-  # which listens on loopback where they could otherwise reach it directly.
+  # their tool group through mcpPort, the Obsidian vault's MCP server,
+  # which listens on loopback where they could otherwise reach it directly,
+  # and ntfy's port, so they publish only to their topic through
+  # ntfyAgentsPort.
   networking.firewall.extraCommands = ''
     ip46tables -t mangle -N opencode-in 2>/dev/null || ip46tables -t mangle -F opencode-in
     ${onlyFrom ["spore"] opencodePort}${onlyFrom ["spore" "blip" "slate" "stroma" "rhizome"] paseoPort}
@@ -466,6 +455,7 @@ in {
     ip46tables -A opencode-out -p tcp --dport 5432 -j REJECT
     ip46tables -A opencode-out -p tcp --dport ${toString config.services.mcpjungle.port} -j REJECT
     ip46tables -A opencode-out -p tcp --dport ${toString config.services.obsidian-vault-mcp.port} -j REJECT
+    ip46tables -A opencode-out -p tcp --dport ${toString ntfyPort} -j REJECT
     ip46tables -D OUTPUT -m owner --uid-owner ${user} -j opencode-out 2>/dev/null || true
     ip46tables -I OUTPUT -m owner --uid-owner ${user} -j opencode-out
   '';
@@ -503,6 +493,24 @@ in {
           proxy_set_header Connection "";
           proxy_buffering off;
           proxy_read_timeout 1h;
+        '';
+      };
+      locations."/".return = "404";
+    };
+    # Publishes to the agents' topic and nothing else: not other topics,
+    # ntfy's JSON publish (which names the topic in the body) or reading
+    # the topic back
+    virtualHosts.ntfy-agents = {
+      listen = [
+        {
+          addr = "127.0.0.1";
+          port = ntfyAgentsPort;
+        }
+      ];
+      locations."= /${ntfyAgentsTopic}" = {
+        proxyPass = "http://127.0.0.1:${toString ntfyPort}/${ntfyAgentsTopic}";
+        extraConfig = ''
+          limit_except POST PUT { deny all; }
         '';
       };
       locations."/".return = "404";
