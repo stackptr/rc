@@ -32,7 +32,7 @@ nix-flake eval nixosConfigurations.<host>.config.system.build.toplevel.drvPath  
 nix-flake eval darwinConfigurations.<host>.system.drvPath                       # macOS
 ```
 
-**Flake inputs:** `nix flake update --commit-lock-file`. The Update workflow does this daily as the `teleotrope` app and merges the PR itself once CI passes (see GitHub apps and rulesets). To update only some inputs, run it by hand with their names: `gh workflow run update.yml -f inputs="nixpkgs home-manager"` (blank updates all; unknown names fail the run). A partial update opens its PR from `gh/update-flake-<run id>`, so neither the daily run nor another partial update overwrites it.
+**Flake inputs:** `nix flake update --commit-lock-file`. The Update workflow (`update.yml`, calling stackptr/actions's reusable `update-flake.yml` pinned by SHA with `secrets: inherit`) does this daily as the `teleotrope` app and merges the PR itself once CI passes (see GitHub apps and rulesets). To update only some inputs, run it by hand with their names: `gh workflow run update.yml -f inputs="nixpkgs home-manager"` (blank updates all; unknown names fail the run). A partial update opens its PR from `gh/update-flake-<run id>`, so neither the daily run nor another partial update overwrites it.
 
 **Dev shell:** `nix develop` provides agenix and just. Claude Code sessions in Zed don't run inside it; prefix devShell tools with `direnv exec .`, e.g. `direnv exec . agenix -e hosts/spore/secrets/foo.age`.
 
@@ -70,7 +70,7 @@ Three private GitHub Apps act on rc, with a role the rulesets below enforce. rc 
 | App | Permissions | Key | Used by | A leaked key could |
 |---|---|---|---|---|
 | `teleomycete` (346624003) | Contents, Pull requests, Issues R/W | `lib/admin/github-apps/teleomycete.age` (also encrypted to glyph; rule in `lib/secrets/glyph.nix`), minted on glyph (Coding agents) | Paseo and OpenCode agents | push `agents/**` and open PRs, on every repo it's installed on; create or edit releases and tags (Contents write), except tags on repos with "Release tags" (actions); not merge without my approval, not touch `.github/workflows/` |
-| `teleotrope` (347049929) | Contents, Pull requests R/W | `update` environment (`UPDATER_CLIENT_ID`, `UPDATER_PRIVATE_KEY`) | `.github/workflows/update.yml` | push any branch outside `agents/**` and merge PRs once CI passes, without approval |
+| `teleotrope` (347049929) | Contents, Pull requests R/W | `update` environment (`UPDATER_CLIENT_ID`, `UPDATER_PRIVATE_KEY`) | `.github/workflows/update.yml` (stackptr/actions's reusable `update-flake.yml`) | push any branch outside `agents/**` and merge PRs once CI passes, without approval |
 | `teleoid` | Contents, Pull requests R/W | each agents repo's `approve` environment (`APPROVER_CLIENT_ID`, `APPROVER_PRIVATE_KEY`; one key, the same in every repo) | `.github/workflows/approve.yml` | approve and merge PRs once CI passes, except ones whose latest push is its own; push nowhere |
 
 | Ruleset | Target | Rules | Bypass |
@@ -99,7 +99,7 @@ Re-seal by piping straight into `just seal` (ops's onboarding checklist). A new 
 How each kind of PR merges:
 - **Agents' (`teleomycete[bot]`, from `agents/*`):** the agent turns on auto-merge; it merges once CI passes and I approve the latest push.
 - **Mine (cloud sessions' included):** `approve.yml` runs on `pull_request_target` (from main, so a PR can't change it) and calls stackptr/actions's reusable `approve.yml` (pinned to a release's SHA with `secrets: inherit`; Dependabot bumps it at each actions release; shared by every repo the agents work on), which approves as teleoid when the author is `stackptr`, the branch is in this repo and the PR isn't a draft; each push dismisses it and the next run re-approves. Turn on auto-merge and it merges once CI passes. Open PRs get approved on their next push or reopen.
-- **Updates (`teleotrope[bot]`, `gh/update-flake`, or `gh/update-flake-<run id>` for a partial update):** `update.yml` waits for the required checks and merges with `gh pr merge --admin --match-head-commit`.
+- **Updates (`teleotrope[bot]`, `gh/update-flake`, or `gh/update-flake-<run id>` for a partial update):** `update.yml` calls stackptr/actions's reusable `update-flake.yml` (pinned to a release's SHA with `secrets: inherit`; Dependabot bumps it), which waits for the required checks and merges with `gh pr merge --admin --match-head-commit`.
 
 Rules that must keep holding:
 - `teleomycete` is never a bypass actor except on "Agent-only branches", and never gets Workflows. Without Workflows, GitHub rejects its pushes that change `.github/workflows/`, which is what keeps branch code away from repo-level secrets and environments.
