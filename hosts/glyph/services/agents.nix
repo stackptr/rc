@@ -1,7 +1,8 @@
 # Coding agents on glyph: OpenCode's server (code.zx.dev) and Paseo
 # (agents.zx.dev), which runs Claude Code, OpenCode and Pi agents. Everything
-# runs as one unprivileged user, and every agent process runs inside the same
-# nono profile, which grants the workspaces and the agents' own state but not
+# here runs as one unprivileged user, the write tier (unattended jobs that
+# need less run as the other tiers' users, ./agent-tiers.nix), and every
+# agent process runs inside the same nono profile, which grants the workspaces and the agents' own state but not
 # Paseo's home (its local credential and config) or anything else of glyph's.
 # On GitHub they act as the teleomycete app: they can push branches and
 # open PRs, but not change workflows, and rulesets keep them from merging.
@@ -69,8 +70,9 @@
       ip46tables -t mangle -A opencode-in -i tailscale0 -p tcp --dport ${toString port} -j DROP
     '';
 
-  stromaModel = "Qwen3.8-27B-MTPLX-Optimized-Quality";
-  stromaURL = "http://stroma.note-iwato.ts.net:8000/v1";
+  common = import ./agents-common.nix;
+  inherit (common) stromaModel;
+  stromaURL = "http://stroma.note-iwato.ts.net:${toString common.stromaPort}/v1";
   json = pkgs.formats.json {};
 
   profile = import ../../../lib/llm-profile.nix inputs.llm-profile;
@@ -328,43 +330,16 @@
     };
   };
 
-  hardening = {
-    User = user;
-    Group = user;
-    Slice = "agents.slice";
-    Restart = "always";
-    RestartSec = 5;
-    ProtectSystem = "strict";
-    ProtectHome = true;
-    ReadWritePaths = [home];
-    # EnvironmentFile is read by systemd before the namespace is set up.
-    # Postgres trusts every local connection (db.nix): see the firewall below.
-    # The Nix daemon's socket too: builds run as nixbld users in the daemon's
-    # cgroup, outside nono, the slice's limits and the owner rule on 5432, and
-    # fixed-output derivations share the host's network, so a build could
-    # reach Postgres on loopback as the superuser. Nothing in these units runs
-    # Nix; home-manager-opencode.service, which does, is a unit of its own.
-    InaccessiblePaths = ["/mnt" "/run/agenix" "/run/agenix.d" "/run/postgresql" "/nix/var/nix/daemon-socket"];
-    # Other users' processes and their command lines; the agents still see
-    # their own, which Paseo lists with ps
-    ProtectProc = "invisible";
-    PrivateTmp = true;
-    PrivateDevices = true;
-    NoNewPrivileges = true;
-    CapabilityBoundingSet = "";
-    ProtectKernelTunables = true;
-    ProtectKernelModules = true;
-    ProtectKernelLogs = true;
-    ProtectControlGroups = true;
-    ProtectClock = true;
-    ProtectHostname = true;
-    RestrictNamespaces = true;
-    RestrictRealtime = true;
-    RestrictSUIDSGID = true;
-    LockPersonality = true;
-    RestrictAddressFamilies = ["AF_UNIX" "AF_INET" "AF_INET6" "AF_NETLINK"];
-    # Bun's JIT needs writable executable memory, so no MemoryDenyWriteExecute
-  };
+  hardening =
+    common.serviceConfig
+    // {
+      User = user;
+      Group = user;
+      Slice = "agents.slice";
+      Restart = "always";
+      RestartSec = 5;
+      ReadWritePaths = [home];
+    };
   # systemd sets SHELL from the user's passwd entry, nologin for a system
   # user, and the agents run their shell tools with it
   shell = lib.getExe pkgs.bash;
