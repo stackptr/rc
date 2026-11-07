@@ -136,6 +136,8 @@ If `nix` is installed, run `scripts/fmt-sandboxed` instead of `nix fmt .`. Cloud
 
 **launchd daemons on macOS hosts:** set `launchd.daemons.<name>.command`, not `serviceConfig.ProgramArguments`, when the program is in `/nix/store`. nix-darwin wraps `command` in `/bin/wait4path /nix/store`; with ProgramArguments, launchd starts the daemon at boot before the Nix volume is mounted, and it stays down until the next switch (Stroma's alloy, mactop and json-exporter were down for three days after a reboot). Programs outside the store, like oMLX from Homebrew, are fine either way.
 
+**Did a commit change a host's system?** Compare `scripts/normalized-system.nix` at both commits (`nix eval --raw --file scripts/normalized-system.nix --apply 'f: f { flake = "git+file://<repo>?rev=<sha>"; host = "glyph"; }'`), not the raw toplevel: `system.configurationRevision` and glyph's rc-source copy of the repo (`"${inputs.self}"`) change every host's or glyph's derivation on every commit. `nix eval --file` doesn't call a function with `--argstr`, hence `--apply`; and a Nix path literal there (`/var/empty`) is copied into the store, so it fails where the path doesn't exist: use a string. `git+file` with `rev` works from a detached checkout with no local branch.
+
 **`lib.mkForce` vs `lib.mkDefault`:** a host that must diverge from a value a shared module sets uses `lib.mkForce`; without it Nix errors on the conflicting definitions. A shared module that wants hosts to override freely sets `lib.mkDefault` instead. Example: `modules/base/gc.nix` sets `nix.gc.dates = "weekly"`, and `hosts/spore/default.nix` overrides it with `lib.mkForce "daily"`.
 
 ## Monitoring Stack
@@ -202,7 +204,7 @@ To summarise a noisy stream, use grafana-mcp's `query_loki_patterns` (e.g. `{hos
 
 ### Deploys
 
-Check deploys first when something regressed. Dashboards show them as a purple "Deploys" annotation. On a host, `nixos-version --configuration-revision` gives the deployed revision.
+Check deploys first when something regressed. Dashboards show them as a purple "Deploys" annotation, and #updates has a ":rocket: <host> deployed <rev>" post for each activation on a NixOS host, with its package changes and a compare link from the previous revision. On a host, `nixos-version --configuration-revision` gives the deployed revision.
 
 ```logql
 # One marker per activation, whichever path ran it: action (switch/test; nh
@@ -316,7 +318,7 @@ Hermes Agent (`hosts/glyph/services/hermes.nix`, flake input `hermes-agent` pinn
 
 ## Guardrails
 
-- Merging doesn't deploy right away: deploys are manual, via `just switch` or the Deploy workflow, except that the Deploy workflow also deploys main to spore daily at 15:00 UTC once CI's spore build has passed on main (skipped if spore already runs main). So a change merged for spore reaches it within a day, and a branch deployed to spore by hand is replaced by main at the next scheduled run. Don't switch a host, merge a PR, or run the Deploy workflow unless asked.
+- Merging doesn't deploy right away. After CI passes on main, `request-deploys.yml` dispatches Deploy for each host whose system changed since its last successful deployment (compared by `scripts/normalized-system.nix`, which sets aside the flake revision and glyph's rc-source copy of the repo). glyph's and zeta's deploys wait for my approval, and Deploy's `supersede` job cancels an older run still waiting for the same hosts. spore has no reviewer, so it's requested only when I pushed the commit (the workflow_run's actor is the repo owner), and deploys right away; the Update workflow's overnight merge, pushed by teleotrope, isn't requested, and the Deploy workflow deploys main to spore daily at 17:00 UTC once CI's spore build has passed on main (skipped if spore already runs main). So a merge of mine reaches spore within minutes and an update within a day, and a branch deployed to spore by hand is replaced by main at the next request or scheduled run. Every activation on a NixOS host posts its nvd package diff and a compare link to #updates through ntfy (`modules/nixos/deploy-marker.nix`). Deploys otherwise run by hand, via `just switch` or the Deploy workflow. Don't switch a host, merge a PR, approve a deployment, or run the Deploy workflow unless asked.
 
 ## Committing
 
