@@ -5,12 +5,13 @@ run-name: >-
 on:
   # spore faces the internet, so it shouldn't wait on a manual deploy for
   # security fixes: deploy main to it daily, a few hours after the Update
-  # workflow's PR usually merges. Skipped when CI's spore build hasn't passed
-  # on main or spore already runs main.
+  # workflow's PR usually merges (about 13:00 UTC), at 09:00 PST / 10:00
+  # PDT, when I'm likely around to see what it posts to #updates. Skipped
+  # when CI's spore build hasn't passed on main or spore already runs main.
   schedule:
-    - cron: "0 15 * * *"
-  # By hand, or from Request deploys after CI passes on main, for glyph and
-  # zeta when their system changed (request-deploys.yml)
+    - cron: "0 17 * * *"
+  # By hand, or from Request deploys after CI passes on main, for each host
+  # whose system changed; spore only for a push of mine (request-deploys.yml)
   workflow_dispatch:
     inputs:
       glyph:

@@ -1,21 +1,25 @@
 name: Request deploys
 run-name: request deploys for ${{ github.event.workflow_run.display_title }}
 
-# After CI passes on main, asks to deploy glyph and zeta where their system
-# changed since their last successful deployment, by dispatching Deploy. The
-# deploys still wait for my approval in each host's environment (with the
+# After CI passes on main, asks to deploy each host whose system changed
+# since its last successful deployment, by dispatching Deploy. glyph's and
+# zeta's deploys wait for my approval in their environments (with the
 # Approve button in #alerts), and a newer request supersedes one still
-# waiting (Deploy's supersede job).
+# waiting (Deploy's supersede job). spore has no reviewer, so its deploy
+# runs straight away, and every host posts its package changes to #updates
+# when it activates (modules/nixos/deploy-marker.nix).
 #
 # A host counts as changed when its system derivation differs, setting aside
 # the two things that change on every commit (scripts/normalized-system.nix):
 # the flake revision, and glyph's copy of the repo for rc-source. A commit
 # that doesn't change a host requests nothing for it.
 #
-# spore isn't requested: it has no reviewer, so a request would deploy the
-# overnight flake update unattended, which is why Deploy's old workflow_run
-# trigger was removed. Its daily scheduled deploy stays its one unattended
-# path.
+# spore is requested only for a push of mine: I'm around to see it land. The
+# Update workflow's overnight merge, pushed by teleotrope, would otherwise
+# deploy with nobody watching, which is why Deploy's old workflow_run
+# trigger was removed; spore picks it up at the scheduled deploy instead.
+# A request deploys main's head, so it also carries an update merged
+# earlier that the schedule hasn't deployed yet.
 
 on:
   workflow_run:
@@ -57,10 +61,17 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           RUN_ID: ${{ github.event.workflow_run.id }}
+          PUSHER: ${{ github.event.workflow_run.actor.login }}
         run: |
           jobs=$(gh run view "$RUN_ID" -R "$GITHUB_REPOSITORY" --json jobs)
+          hosts=(glyph zeta)
+          if [[ $PUSHER == "$GITHUB_REPOSITORY_OWNER" ]]; then
+            hosts+=(spore)
+          else
+            echo "::notice::Not requesting spore: $PUSHER pushed this, not me; the scheduled deploy takes it"
+          fi
           candidates=()
-          for host in glyph zeta; do
+          for host in "${hosts[@]}"; do
             conclusion=$(jq -r --arg h "$host" \
               '[.jobs[] | select(.name | startswith("build (\($h),"))][0].conclusion // ""' <<< "$jobs")
             # A finished run with no build for the host means the job was

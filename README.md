@@ -29,7 +29,7 @@ nixos-rebuild switch --flake .#spore --target-host root@spore --build-host local
 
 <summary>CI and deployments</summary>
 
-CI evaluates and builds every host on every push and PR. After CI passes on main, the Request deploys workflow asks to deploy glyph and zeta when their system changed since their last deployment, and each request waits for approval; a newer request replaces one still waiting. spore deploys main daily on a schedule. To deploy by hand, run the Deploy workflow and tick the hosts to deploy, or from the CLI:
+CI evaluates and builds every host on every push and PR. After CI passes on main, the Request deploys workflow asks to deploy each host whose system changed since its last deployment. glyph's and zeta's requests wait for approval, and a newer request replaces one still waiting; spore deploys right away, but only for commits I push, and the overnight flake update reaches it with its daily scheduled deploy. Each NixOS host posts its package changes to Slack when it activates. To deploy by hand, run the Deploy workflow and tick the hosts to deploy, or from the CLI:
 ```shell
 gh workflow run Deploy -f glyph=true -f spore=true -f zeta=true
 gh workflow run Deploy -f spore=true
