@@ -9,7 +9,7 @@ What each app may do on GitHub is enforced by rulesets and documented under "Git
 | | App | Role | Key sealed into | Badge color |
 | --- | --- | --- | --- | --- |
 | <img src="teleomycete.svg" width="32" alt=""> | teleomycete | Identity for agent-created work | none: glyph mints its tokens | `#04342C` |
-| <img src="teleotrope.svg" width="32" alt=""> | teleotrope | Flake updater for rc, merges its own PRs | rc's `update` | `#26215C` |
+| <img src="teleotrope.svg" width="32" alt=""> | teleotrope | Flake updater, merges its own PRs | every flake-update repo's `update` | `#26215C` |
 | <img src="teleoid.svg" width="32" alt=""> | teleoid | Approves my PRs so they can auto-merge | every agent repo's `approve` | `#4A1B0C` |
 | <img src="teleopsis.svg" width="32" alt=""> | teleopsis | Read-only observer for stackptr/ops | ops's `plan` | `#042C53` |
 | <img src="teleozyme.svg" width="32" alt=""> | teleozyme | Applies approved plans for stackptr/ops | ops's `production` | `#FAC775` |
@@ -22,9 +22,9 @@ The key is never sealed into an environment. On glyph, `agents-github-token.serv
 
 ## teleotrope
 
-Updates rc's flake inputs daily, or on demand for selected inputs, from `.github/workflows/update.yml`, which calls stackptr/actions's reusable `update-flake.yml`. It runs in rc's main-only `update` environment (`UPDATER_CLIENT_ID`, `UPDATER_PRIVATE_KEY`) and commits as `teleotrope[bot]`.
+Updates flake inputs daily, or on demand for selected inputs, in the repos with stackptr/ops's `flakeUpdates` (rc, actions, flakes and zx.dev), from each one's `.github/workflows/update.yml`, which calls stackptr/actions's reusable `update-flake.yml`. It runs in that repo's main-only `update` environment (`UPDATER_CLIENT_ID`, `UPDATER_PRIVATE_KEY`) and commits as `teleotrope[bot]`.
 
-It opens the PR, waits for the required checks, and merges directly. The app may bypass rc's approval ruleset and nothing else: "Require CI" has no bypass and still applies to the merge.
+It opens the PR, waits for the required checks, and merges directly. The app may bypass those repos' approval ruleset, and "Agent branches" to push its own branch, and nothing else: "Require CI" has no bypass and still applies to the merge.
 
 ## teleoid
 
