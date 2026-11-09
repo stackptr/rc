@@ -54,6 +54,11 @@
     attic = {
       url = "github:zhaofengli/attic";
     };
+    # glyph's agent builder VM (hosts/glyph/services/agent-builder.nix)
+    microvm = {
+      url = "github:microvm-nix/microvm.nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     # Pinned to a release tag: main moves several times a day and the Update
     # workflow would follow it. Bump the tag by hand. nixpkgs is not followed:
     # Hermes picks its Python from its own lock (pm/lock.json) and refuses a
