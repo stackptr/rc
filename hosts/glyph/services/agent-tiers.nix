@@ -245,7 +245,10 @@ in {
       "${cfg.home}/.config"
       "${cfg.home}/.config/nono"
       "${cfg.home}/.config/nono/profiles"
-      # Granted by the nono profile, so they have to exist first
+      # Granted by the nono profile, so they have to exist first: Landlock
+      # can't grant a missing path, and the home itself isn't granted, so
+      # OpenCode can't create them. ~/.cache is user_caches_linux's.
+      "${cfg.home}/.cache"
       "${cfg.home}/.config/opencode"
       "${cfg.home}/.local"
       "${cfg.home}/.local/share"
