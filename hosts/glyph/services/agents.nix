@@ -18,8 +18,9 @@
   # Repositories the agents work on; Paseo's worktrees go in .worktrees
   workspaces = "${home}/workspaces";
   paseoHome = "/var/lib/paseo";
-  # The agents' GitHub App. A separate user mints its installation tokens
-  # into tokenDir, which the agents can read but not the app's key.
+  # The agents' GitHub App. A separate user mints its installation tokens,
+  # one per entry in githubTokens, each into a directory only its group can
+  # read; none of them can read the app's key.
   githubApp = {
     clientId = "Iv23liplzBiAJHoFzanK";
     slug = "teleomycete";
@@ -29,8 +30,36 @@
     owner = "stackptr";
   };
   tokenUser = "agents-github";
-  tokenDir = "/run/agents-github";
-  tokenFile = "${tokenDir}/token";
+  tokenRoot = "/run/agents-github";
+  # The dispatcher of unattended jobs (#740) runs as this user. It posts the
+  # jobs' results, so it needs Issues, which the tiers never get.
+  dispatchUser = "agent-dispatch";
+  # Each token is narrowed below the app's grant by `permissions` and
+  # `repositories` (null: all the installation has). Asking for a
+  # permission the app lacks fails that token, not the others.
+  githubTokens = {
+    # Paseo's agents: everything the app has, on every repo it's installed
+    # on, as before. They push branches and open PRs and issues anywhere
+    # teleomycete is installed.
+    write = {
+      group = user;
+      permissions = null;
+      repositories = null;
+    };
+    # Reads CI logs and the code, and comments and files issues; can't push
+    dispatcher = {
+      group = dispatchUser;
+      permissions = {
+        actions = "read";
+        contents = "read";
+        issues = "write";
+        pull_requests = "write";
+      };
+      repositories = ["rc"];
+    };
+  };
+  tokenDir = name: "${tokenRoot}/${name}";
+  tokenFile = "${tokenDir "write"}/token";
   gitCredential = pkgs.writeShellScript "git-credential-agents-github" ''
     # git also calls helpers with store and erase; only get has an answer
     [ "$1" = get ] || exit 0
@@ -178,7 +207,7 @@
         # The GitHub token. The directory, not the file: each mint replaces
         # the file, and Landlock grants follow the inode the path had when
         # the sandbox started.
-        tokenDir
+        (tokenDir "write")
       ];
       allow = [
         # Repositories and Paseo's worktrees, where agents work
@@ -392,6 +421,11 @@ in {
     group = tokenUser;
   };
   users.groups.${tokenUser} = {};
+  users.users.${dispatchUser} = {
+    isSystemUser = true;
+    group = dispatchUser;
+  };
+  users.groups.${dispatchUser} = {};
 
   # Only spore's nginx may reach OpenCode's server or Paseo over the
   # tailnet, which puts Pocket ID in front of them (code.zx.dev,
@@ -498,55 +532,66 @@ in {
       };
     };
     link = target: {"L+".argument = "${target}";};
-  in {
-    # The home predates these units: an earlier DynamicUser unit left it,
-    # and systemd moved it into place, owned by nobody (65534), so neither
-    # OpenCode nor nono could write to it. Everything in it belongs to the
-    # agent user, so Z resets ownership recursively; modes are left alone.
-    ${home} =
-      dir
-      // {
-        Z = {
-          inherit user;
-          group = user;
-          mode = "-";
+  in
+    {
+      # The home predates these units: an earlier DynamicUser unit left it,
+      # and systemd moved it into place, owned by nobody (65534), so neither
+      # OpenCode nor nono could write to it. Everything in it belongs to the
+      # agent user, so Z resets ownership recursively; modes are left alone.
+      ${home} =
+        dir
+        // {
+          Z = {
+            inherit user;
+            group = user;
+            mode = "-";
+          };
         };
+      ${workspaces} = dir;
+      "${home}/.config" = dir;
+      "${home}/.config/opencode" = dir;
+      "${home}/.config/nono" = dir;
+      "${home}/.config/nono/profiles" = dir;
+      "${home}/.config/nono/profiles/agents.json" = link nonoProfile;
+      # The profile grants OpenCode's data and state directories, so they have
+      # to exist and be the agent user's before the first start
+      "${home}/.local" = dir;
+      "${home}/.local/share" = dir;
+      "${home}/.local/share/opencode" = dir;
+      "${home}/.local/state" = dir;
+      "${home}/.local/state/opencode" = dir;
+      "${home}/.claude" = dir;
+      "${home}/.pi" = dir;
+      "${home}/.pi/agent" = dir;
+      # Traversable, so each token's group can reach its own directory
+      ${tokenRoot}.d = {
+        user = tokenUser;
+        group = tokenUser;
+        mode = "0711";
       };
-    ${workspaces} = dir;
-    "${home}/.config" = dir;
-    "${home}/.config/opencode" = dir;
-    "${home}/.config/nono" = dir;
-    "${home}/.config/nono/profiles" = dir;
-    "${home}/.config/nono/profiles/agents.json" = link nonoProfile;
-    # The profile grants OpenCode's data and state directories, so they have
-    # to exist and be the agent user's before the first start
-    "${home}/.local" = dir;
-    "${home}/.local/share" = dir;
-    "${home}/.local/share/opencode" = dir;
-    "${home}/.local/state" = dir;
-    "${home}/.local/state/opencode" = dir;
-    "${home}/.claude" = dir;
-    "${home}/.pi" = dir;
-    "${home}/.pi/agent" = dir;
-    # setgid, so the token is created in the agents' group, which can read
-    # it but not replace it
-    ${tokenDir}.d = {
-      user = tokenUser;
-      group = user;
-      mode = "2750";
-    };
-    ${paseoHome} = dir;
-    # Granted by the nono profile, so it has to exist before Paseo first runs
-    "${paseoHome}/opencode-home" = dir;
-    "${paseoHome}/runtime" = dir;
-    "${paseoHome}/runtime/opencode" = dir;
-    "${paseoHome}/config.json" = link paseoConfig;
-  };
+      ${paseoHome} = dir;
+      # Granted by the nono profile, so it has to exist before Paseo first runs
+      "${paseoHome}/opencode-home" = dir;
+      "${paseoHome}/runtime" = dir;
+      "${paseoHome}/runtime/opencode" = dir;
+      "${paseoHome}/config.json" = link paseoConfig;
+    }
+    # setgid, so each token is created in its group, which can read it but
+    # not replace it
+    // lib.mapAttrs' (name: token:
+      lib.nameValuePair (tokenDir name) {
+        d = {
+          user = tokenUser;
+          inherit (token) group;
+          mode = "2750";
+        };
+      })
+    githubTokens;
 
   # Installation tokens last an hour. Every 20 minutes, so a single failed run
   # (which fires the "Systemd unit failed" alert) doesn't let the token expire.
   systemd.services.agents-github-token = {
-    description = "Mint a GitHub App installation token for the coding agents";
+    description = "Mint GitHub App installation tokens for the coding agents";
     wants = ["network-online.target"];
     after = ["network-online.target" "systemd-tmpfiles-setup.service" "systemd-tmpfiles-resetup.service"];
     path = with pkgs; [coreutils curl jq openssl];
@@ -557,7 +602,7 @@ in {
       UMask = "0027";
       ProtectSystem = "strict";
       ProtectHome = true;
-      ReadWritePaths = [tokenDir];
+      ReadWritePaths = [tokenRoot];
       PrivateTmp = true;
       PrivateDevices = true;
       NoNewPrivileges = true;
@@ -578,17 +623,35 @@ in {
       jwt="$header.$payload.$signature"
 
       api() {
-        curl -sSf -H "Authorization: Bearer $jwt" \
+        curl -sS -H "Authorization: Bearer $jwt" \
           -H "Accept: application/vnd.github+json" \
           -H "X-GitHub-Api-Version: 2022-11-28" "$@"
       }
       # The app is private, so its only installation is on ${githubApp.owner}
-      installation=$(api https://api.github.com/users/${githubApp.owner}/installation | jq -er .id)
-      token=$(api -X POST "https://api.github.com/app/installations/$installation/access_tokens" \
-        | jq -er .token)
+      installation=$(api --fail https://api.github.com/users/${githubApp.owner}/installation | jq -er .id)
 
-      printf '%s' "$token" >${tokenFile}.new
-      mv ${tokenFile}.new ${tokenFile}
+      # One failed token (say, a permission the app hasn't been granted)
+      # leaves the others to mint, then fails the unit
+      failed=0
+      mint() {
+        local name=$1 body=$2 response
+        if response=$(api --fail-with-body -X POST -d "$body" \
+          "https://api.github.com/app/installations/$installation/access_tokens") &&
+          token=$(jq -er .token <<<"$response"); then
+          printf '%s' "$token" >"${tokenRoot}/$name/token.new"
+          mv "${tokenRoot}/$name/token.new" "${tokenRoot}/$name/token"
+        else
+          echo "Minting the $name token failed: $response" >&2
+          failed=1
+        fi
+      }
+      ${lib.concatStrings (lib.mapAttrsToList (name: token: let
+          body = lib.filterAttrs (_: v: v != null) {inherit (token) permissions repositories;};
+        in ''
+          mint ${name} ${lib.escapeShellArg (builtins.toJSON body)}
+        '')
+        githubTokens)}
+      exit $failed
     '';
   };
   systemd.timers.agents-github-token = {
