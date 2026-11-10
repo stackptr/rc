@@ -1,9 +1,9 @@
 {
   config,
   lib,
-  hostname,
   ...
 }: let
+  inherit (config.networking) hostName;
   cfg = config.rc.backup;
 in {
   options.rc.backup = {
@@ -31,8 +31,8 @@ in {
     # with Object Read & Write on its bucket only), so no host can read or
     # delete another's backups. R2 tokens can't be limited to a prefix, so a
     # second host needs its own bucket, not a path in this one.
-    age.secrets.restic-env.file = ../../hosts/${hostname}/secrets/restic-env.age;
-    age.secrets.restic-password.file = ../../hosts/${hostname}/secrets/restic-password.age;
+    age.secrets.restic-env.file = ../../hosts/${hostName}/secrets/restic-env.age;
+    age.secrets.restic-password.file = ../../hosts/${hostName}/secrets/restic-password.age;
 
     services.restic.backups.daily = {
       initialize = true;

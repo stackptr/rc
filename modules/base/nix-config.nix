@@ -4,7 +4,6 @@
   config,
   pkgs,
   lib,
-  username,
   ...
 }: {
   nix = {
@@ -12,7 +11,6 @@
     nixPath = lib.mapAttrsToList (key: value: "${key}=${value.to.path}") config.nix.registry;
     settings = {
       experimental-features = ["nix-command" "flakes"];
-      trusted-users = [username];
       # attic on glyph, published through spore as cache.zx.dev. glyph
       # overrides this with its local address (hosts/glyph/services/attic.nix).
       extra-substituters = lib.mkDefault ["https://cache.zx.dev/main"];

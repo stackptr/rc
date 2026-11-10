@@ -2,12 +2,12 @@
   config,
   lib,
   pkgs,
-  nixDarwin,
+  inputs,
   ...
 }:
 with lib; let
   cfg = config.programs.fastscripts;
-  text = import "${nixDarwin}/modules/lib/write-text.nix" {
+  text = import "${inputs.nix-darwin}/modules/lib/write-text.nix" {
     inherit lib;
     mkTextDerivation = pkgs.writeText;
   };

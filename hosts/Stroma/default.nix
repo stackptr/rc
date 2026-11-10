@@ -1,10 +1,10 @@
 {
   config,
-  keys,
   pkgs,
-  username,
   ...
-}: {
+}: let
+  keys = import ../../lib/keys.nix;
+in {
   imports = [
     ./dock.nix
     ./hardware.nix
@@ -37,6 +37,6 @@
   # A user secret, read by home-manager through osConfig
   age.secrets.aichat-env = {
     file = ../../home/secrets/aichat-env.age;
-    owner = username;
+    owner = config.system.primaryUser;
   };
 }

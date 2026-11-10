@@ -3,7 +3,6 @@
   lib,
   config,
   pkgs,
-  keys,
   ...
 }: {
   users = {
@@ -15,4 +14,6 @@
       shell = pkgs.zsh;
     };
   };
+
+  nix.settings.trusted-users = ["mu"];
 }

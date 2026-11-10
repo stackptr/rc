@@ -1,14 +1,11 @@
 inputs @ {
-  self,
   nixpkgs,
-  nixpkgs-stable-24-05,
   agenix,
   home-manager,
   nix-darwin,
   nix-homebrew,
   homebrew-core,
   homebrew-cask,
-  llm-profile,
   nix-index-database,
   direnv-instant,
   zx-dev,
@@ -17,23 +14,14 @@ inputs @ {
   golink,
   ...
 }: let
-  keys = import ./keys.nix;
   overlays = import ./../overlays;
 
   mkHomeManager = {
     username,
-    hostname,
     configDir,
-    system,
-    showBatteryStatus,
-    lightweight ? false,
+    lightweight,
   }: let
-    pkgs-stable-24-05 = import nixpkgs-stable-24-05 {inherit system;};
     hostHomePath = ./../hosts/${configDir}/home.nix;
-    hostHomeConfig =
-      if builtins.pathExists hostHomePath
-      then hostHomePath
-      else null;
   in {
     home-manager.useGlobalPkgs = true;
     home-manager.useUserPackages = true;
@@ -45,11 +33,10 @@ inputs @ {
           ./../modules/home
           ./../home
         ]
-        ++ nixpkgs.lib.optionals (hostHomeConfig != null) [hostHomeConfig];
+        ++ nixpkgs.lib.optional (!lightweight) ./../home/full.nix
+        ++ nixpkgs.lib.optional (builtins.pathExists hostHomePath) hostHomePath;
     };
-    home-manager.extraSpecialArgs = {
-      inherit hostname lightweight llm-profile pkgs-stable-24-05 showBatteryStatus;
-    };
+    home-manager.extraSpecialArgs = {inherit inputs;};
   };
 
   mkNixosHost = {
@@ -61,22 +48,19 @@ inputs @ {
   }:
     nixpkgs.lib.nixosSystem {
       inherit system;
-      specialArgs = {
-        inherit inputs keys username hostname;
-        pkgs-stable-24-05 = import nixpkgs-stable-24-05 {inherit system;};
-      };
+      specialArgs = {inherit inputs;};
       modules = [
-        {environment.systemPackages = [agenix.packages.${system}.default];}
+        {
+          rc.host.name = hostname;
+          environment.systemPackages = [agenix.packages.${system}.default];
+        }
         disko.nixosModules.disko
         ./../modules/base
         ./../modules/nixos
         ./../hosts/${configDir}
         agenix.nixosModules.default
         home-manager.nixosModules.home-manager
-        (mkHomeManager {
-          inherit username hostname system lightweight configDir;
-          showBatteryStatus = false;
-        })
+        (mkHomeManager {inherit username configDir lightweight;})
         {
           nixpkgs.overlays = overlays;
         }
@@ -96,22 +80,16 @@ inputs @ {
   in
     nix-darwin.lib.darwinSystem {
       inherit system;
-      specialArgs = {
-        inherit inputs self keys username hostname;
-        pkgs-stable-24-05 = import nixpkgs-stable-24-05 {inherit system;};
-        nixDarwin = nix-darwin;
-      };
+      specialArgs = {inherit inputs;};
       modules = [
+        {rc.host.name = hostname;}
         nix-homebrew.darwinModules.nix-homebrew
         ./../modules/base
         ./../modules/darwin
         ./../hosts/${configDir}
         agenix.darwinModules.default
         home-manager.darwinModules.home-manager
-        (mkHomeManager {
-          inherit username hostname system lightweight configDir;
-          showBatteryStatus = true;
-        })
+        (mkHomeManager {inherit username configDir lightweight;})
         {
           nix-homebrew = {
             enable = true;

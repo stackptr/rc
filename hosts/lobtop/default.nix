@@ -1,4 +1,4 @@
-{username, ...}: {
+{config, ...}: {
   imports = [
     ./dock.nix
     ./hardware.nix
@@ -23,6 +23,6 @@
   # with sshd's host key (hosts/lobtop/key.pub).
   age.secrets.otel-token = {
     file = ./secrets/otel-token.age;
-    owner = username;
+    owner = config.system.primaryUser;
   };
 }
