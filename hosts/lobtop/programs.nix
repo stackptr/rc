@@ -12,6 +12,18 @@
     ];
   };
 
+  # CodexBar (cask in modules/darwin/rc.nix) reads Claude usage with the Claude
+  # Code CLI's OAuth token, which only lobtop has: the other Macs use the desktop
+  # app. The first key is Settings > Providers > Claude > "Allow reading Claude
+  # Code's credentials". The prompt policy lets background refreshes ask for
+  # Keychain access again after Claude Code rotates its token and drops the
+  # grant; the default, onlyOnUserAction, fails quietly until a manual Refresh.
+  # macOS's own Always Allow on the first prompt still has to be clicked once.
+  system.defaults.CustomUserPreferences."com.steipete.codexbar" = {
+    claudeOAuthDirectKeychainReadAllowed = true;
+    claudeOAuthKeychainPromptMode = "always";
+  };
+
   programs.daisydisk = {
     enable = true;
   };

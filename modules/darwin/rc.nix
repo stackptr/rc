@@ -32,8 +32,7 @@ in {
       taps = builtins.attrNames config.nix-homebrew.taps; # See: zhaofengli/nix-homebrew#5
       # Claude plan usage (session and weekly limits) in the menu bar. The cask
       # rather than nixpkgs' codexbar, which trails releases and wraps the GUI
-      # binary as `codexbar`; the cask links the real CLI. In the app, Claude
-      # needs "Allow reading Claude Code's credentials" for the OAuth source.
+      # binary as `codexbar`; the cask links the real CLI.
       casks = ["codexbar"];
       # N.B.: Cleanup uninstalls every App Store app not listed here, however it
       # was installed (Homebrew/brew#22450)
