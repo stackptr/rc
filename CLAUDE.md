@@ -24,7 +24,10 @@ Layout:
 just                              # Switch current host
 just switch hostname              # Switch specific host
 just switch-remote spore          # Build on this host, deploy to spore (it's memory-constrained)
+just switch-remote zeta glyph     # Build on glyph, deploy to zeta
 ```
+
+glyph sends aarch64-linux builds to Stroma's linux-builder VM (`hosts/Stroma/linux-builder.nix`, `hosts/glyph/remote-builder.nix`) and falls back to its own qemu binfmt when Stroma is unreachable, so `switch-remote zeta glyph` is much faster than building on zeta. Changing the VM's NixOS system (anything in `nix.linux-builder.config` beyond `virtualisation.*`) means building an aarch64-linux image, which needs a working Linux builder: land such a change only after the default builder is running.
 
 **Check a change before committing** (evaluates without building; catches option conflicts and type errors):
 ```bash
