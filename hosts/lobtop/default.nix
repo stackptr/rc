@@ -3,6 +3,7 @@
     ./dock.nix
     ./hardware.nix
     ./managed-device.nix
+    ./power.nix
     ./programs.nix
   ];
 
