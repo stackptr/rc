@@ -140,13 +140,13 @@ in {
             description = "AudioMuse-AI's web container on glyph is not answering, so Navidrome's audiomuseai plugin can't reach it";
           })
           (mkEndpoint {
-            name = "paseo";
+            name = "t3-code";
             group = "glyph";
-            # Unauthenticated liveness probe, through spore: glyph only accepts
-            # Paseo's port from spore
-            url = "https://agents.zx.dev/api/health";
+            # T3's unauthenticated environment descriptor, through spore:
+            # glyph only accepts T3's port from spore
+            url = "https://agents.zx.dev/.well-known/t3/environment";
             conditions = ["[STATUS] == 200"];
-            description = "Paseo on glyph is not answering through spore, so agents.zx.dev and its agents are down";
+            description = "T3 Code on glyph is not answering through spore, so agents.zx.dev and its agents are down";
           })
           (mkEndpoint {
             name = "reachable";

@@ -68,7 +68,7 @@ in {
         # on a work machine, proposed rule changes shouldn't go to a public
         # repo anyway — so skip skills entirely when the gateway is disabled.
         # One entry per skill, rather than the directory, so other configs
-        # can add their own (Paseo's agents on glyph, hosts/glyph/services/agents.nix)
+        # can add their own
         skills = lib.optionalAttrs cfg.ai.gateway.enable (
           lib.mapAttrs (name: _: "${profile.skills}/${name}")
           (lib.filterAttrs (_: type: type == "directory") (builtins.readDir profile.skills))
