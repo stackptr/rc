@@ -1,9 +1,10 @@
-# Coding agents on glyph: OpenCode's server (code.zx.dev) and Paseo
+# Coding agents on glyph: OpenCode's server (code.zx.dev) and T3 Code
 # (agents.zx.dev), which runs Claude Code, OpenCode and Pi agents. Everything
 # here runs as one unprivileged user, the write tier (unattended jobs that
 # need less run as the other tiers' users, ./agent-tiers.nix), and every
-# agent process runs inside the same nono profile, which grants the workspaces and the agents' own state but not
-# Paseo's home (its local credential and config) or anything else of glyph's.
+# agent process runs inside the same nono profile, which grants the workspaces
+# and the agents' own state but not T3's home (its sessions, pairing secrets
+# and database) or anything else of glyph's.
 # On GitHub they act as the teleomycete app: they can push branches and
 # open PRs, but not change workflows, and rulesets keep them from merging.
 {
@@ -15,9 +16,12 @@
 }: let
   user = "opencode";
   home = "/var/lib/opencode";
-  # Repositories the agents work on; Paseo's worktrees go in .worktrees
+  # Repositories the agents work on
   workspaces = "${home}/workspaces";
-  paseoHome = "/var/lib/paseo";
+  # T3's base directory: its database, settings, login sessions and pairing
+  # secrets. Only its worktrees are granted to the agents.
+  t3Home = "/var/lib/t3code";
+  t3Worktrees = "${t3Home}/worktrees";
   # The agents' GitHub App. A separate user mints its installation tokens
   # into tokenDir, which the agents can read but not the app's key.
   githubApp = {
@@ -43,7 +47,8 @@
     exec ${lib.getExe pkgs.gh} "$@"
   '';
   opencodePort = 8890;
-  paseoPort = 6767;
+  # Paseo's old port, so agents.zx.dev's proxy on spore didn't change
+  t3Port = 6767;
   # The agents reach MCPJungle only through this proxy, which serves only
   # their tool group: on MCPJungle's own port they'd get every server
   # (the Obsidian vault included) and its unauthenticated admin API
@@ -96,7 +101,7 @@
 
     You run on glyph as `${user}`, sandboxed: you can't see other users' processes or the system journal, and you can't SSH to any host. Don't ask the user to run `journalctl`, `systemctl status` or `ps` for you: the `glyph` MCP server's grafana tools answer most of that.
 
-    - Loki has journald from glyph, spore and zeta for 30 days: `{host="glyph", unit="paseo.service"}`, with `priority=~"[0-3]"` for errors. A unit's own stream has only its output; its start, stop and result lines come from systemd under the unit's description, not its name: `{host="glyph", app="systemd"} |= "Home Manager environment for opencode"`. Every deploy logs `{app="nixos-deploy"}`, with the revision and a package diff.
+    - Loki has journald from glyph, spore and zeta for 30 days: `{host="glyph", unit="t3code.service"}`, with `priority=~"[0-3]"` for errors. A unit's own stream has only its output; its start, stop and result lines come from systemd under the unit's description, not its name: `{host="glyph", app="systemd"} |= "Home Manager environment for opencode"`. Every deploy logs `{app="nixos-deploy"}`, with the revision and a package diff.
     - Prometheus has unit states (`node_systemd_unit_state`), restarts (`node_systemd_service_restart_total`) and per-unit CPU and memory (`container_cpu_usage_seconds_total`, `container_memory_working_set_bytes`, by `unit`).
 
     Ask the user only for what neither shows, and say what you checked first.
@@ -149,8 +154,8 @@
 
   # nono adds its `default` profile: system paths read-only, ~/.ssh and other
   # credentials denied, workdir none. Paths not listed here, like the rest of
-  # Paseo's home (its local credential and config) and of /var/lib, don't
-  # exist inside the sandbox.
+  # T3's home (its sessions, pairing secrets and database) and of /var/lib,
+  # don't exist inside the sandbox.
   nonoProfile = json.generate "agents.json" {
     meta = {
       name = "agents";
@@ -164,27 +169,22 @@
       # rm, mv, cp, npm, kill and so on, which agents need
       exclude = ["dangerous_commands"];
     };
-    # Explicit grants only, never the working directory: Paseo starts some
-    # processes in the home (probing Pi from Settings, for one), and granting
-    # that would cover ~/.ssh and the rest, which Landlock can't then deny, so
-    # nono refuses to start. A process whose directory isn't granted starts in /.
+    # Explicit grants only, never the working directory: a process started in
+    # the home would need a grant covering ~/.ssh and the rest, which Landlock
+    # can't then deny, so nono refuses to start. A process whose directory
+    # isn't granted starts in /.
     filesystem = {
       read = [
         "/etc"
-        # Paseo writes its OpenCode bridge plugins here, and the OpenCode
-        # server it starts has to load them; read-only, so agents can't
-        # change what Paseo's server runs
-        "${paseoHome}/runtime/opencode"
         # The GitHub token. The directory, not the file: each mint replaces
         # the file, and Landlock grants follow the inode the path had when
         # the sandbox started.
         tokenDir
       ];
       allow = [
-        # Repositories and Paseo's worktrees, where agents work
+        # Repositories, and T3's worktrees of them, where agents work
         workspaces
-        # The working directory of the OpenCode server Paseo starts
-        "${paseoHome}/opencode-home"
+        t3Worktrees
         "${home}/.config/opencode"
         "${home}/.local/share/opencode"
         "${home}/.local/state/opencode"
@@ -192,143 +192,93 @@
         "${home}/.pi/agent"
       ];
     };
-    # The daemon's password would let an agent drive Paseo itself
-    environment.deny_vars = ["PASEO_PASSWORD"];
   };
   # No audit trail: nono would keep it in ~/.local/state/nono, where nothing
   # reads it, and failing to create it there stops the agent from starting.
   # The journal has each unit's output.
   nonoRun = "${lib.getExe pkgs.nono} -s run --profile agents --no-audit --";
-  # Paseo launches each provider through these, so every agent it starts is
-  # sandboxed. Workers don't get Claude's token.
+  # T3 launches each provider through these, so every agent it starts is
+  # sandboxed. Each is named like the CLI it wraps and goes first on T3's
+  # PATH, so the default binary path (`claude`, `opencode`, `pi`) finds the
+  # wrapper before the policy below pins it. Workers don't get Claude's token.
   sandboxed = name: command:
-    pkgs.writeShellScript "${name}-sandboxed" ''
+    pkgs.writeShellScriptBin name ''
       exec ${nonoRun} ${command} "$@"
     '';
   claudeSandboxed = sandboxed "claude" (lib.getExe pkgs.claude-code);
   opencodeSandboxed = sandboxed "opencode" "env -u CLAUDE_CODE_OAUTH_TOKEN ${lib.getExe pkgs.opencode}";
   piSandboxed = sandboxed "pi" "env -u CLAUDE_CODE_OAUTH_TOKEN ${lib.getExe pkgs.pi-coding-agent}";
+  providers = [claudeSandboxed opencodeSandboxed piSandboxed];
 
-  paseoConfig = json.generate "paseo-config.json" {
-    "$schema" = "https://paseo.sh/schemas/paseo.config.v1.json";
-    version = 1;
-    daemon = {
-      listen = "0.0.0.0:${toString paseoPort}";
-      hostnames = ["agents.zx.dev" "glyph" "glyph.note-iwato.ts.net"];
-      # Whose X-Forwarded-* headers to believe: spore's nginx, on either
-      # address family. Paseo derives the web UI's ws:// or wss:// from
-      # X-Forwarded-Proto, so a spore connection over IPv6 that isn't listed
-      # here gets ws://, which the browser blocks on https://agents.zx.dev.
-      trustedProxies = ["loopback" tailnet.spore.v4 tailnet.spore.v6];
-      relay.enabled = false;
-      # Paseo's tools (launching and messaging agents) for the supervisor
-      mcp = {
-        enabled = true;
-        injectIntoAgents = true;
+  # The package's wrapper puts its own gh, git and codex first on PATH; its gh
+  # would shadow ghWithToken, so agents would push without the app's token
+  t3code = pkgs.t3code.override {
+    enableCodex = false;
+    enableGitHub = false;
+    enableGit = false;
+  };
+  # Read from /etc/t3code/policy.json at every start, from T3 0.1.7; 0.1.6
+  # ignores it. T3 refuses to start on a policy it can't fully enforce, so
+  # the build checks it once the package can.
+  t3Policy = json.generate "t3code-policy.json" {
+    schemaVersion = 1;
+    organization = "rc";
+    supportUrl = "https://github.com/stackptr/rc/blob/main/hosts/glyph/services/agents.nix";
+    settings = {
+      # Granted by the nono profile; anywhere else and agents can't work there
+      worktreesDirectory = {
+        value = t3Worktrees;
+        locked = true;
       };
-      # Presets of provider, model, mode and effort in the new-agent picker
-      agentProfiles = [
-        {
-          id = "supervisor";
-          name = "Supervisor";
-          provider = "claude";
-          model = "claude-opus-5-5";
-          thinkingOptionId = "high";
-          modeId = "auto";
-          notes = "Plans, delegates to workers and reviews their work";
-        }
-        {
-          id = "worker";
-          name = "Worker";
-          provider = "opencode";
-          # The model is opencode.json's default, Qwen on Stroma
-          modeId = "build";
-          notes = "Local model on Stroma, for well-scoped tasks";
-        }
-        {
-          id = "implementer";
-          name = "Implementer";
-          provider = "claude-worker";
-          model = "claude-sonnet-5-5";
-          thinkingOptionId = "high";
-          modeId = "acceptEdits";
-          notes = "Multi-file changes the local worker can't handle reliably";
-        }
-      ];
+      # Its Chrome needs user namespaces, which RestrictNamespaces denies
+      enableAgentBrowserAccess = {
+        value = false;
+        locked = true;
+      };
     };
-    worktrees.root = "${workspaces}/.worktrees";
-    features.webUi.enabled = true;
-    log.console = {
-      level = "info";
-      format = "json";
-    };
-    # The picker lists providers by `order`, lowest first. Paseo 0.12.0
-    # parses it but doesn't apply it yet, and lists the built-in providers in
-    # its own order (Claude, then OpenCode, then Pi).
-    agents.providers = {
-      # Workers, on oMLX: they get no Paseo tools, so they can't launch agents
-      opencode = {
-        command = ["${opencodeSandboxed}"];
-        paseoTools.enabled = false;
-        order = 1;
+    limits = {
+      # Setting a ceiling hands every provider's launch settings (binary path,
+      # arguments, environment) to this policy, so nobody can point one past
+      # nono from the UI. nono, not T3's modes, is the boundary, so the
+      # ceiling itself is the broadest mode: unattended workers need to edit
+      # and run commands, which OpenCode only does without asking in
+      # full-access.
+      maxRuntimeMode = "full-access";
+      clients = ["local-browser" "remote"];
+      # A cloudflared tunnel to T3's relay, around the firewall below
+      connect = false;
+      telemetry = false;
+      browserCookieImport = false;
+      # Nix updates T3 and the providers
+      updates.mode = "off";
+      providers = {
+        allowedDrivers = ["claudeAgent" "opencode" "pi"];
+        instances = {
+          claudeAgent = {
+            locked = true;
+            binaryPath = lib.getExe claudeSandboxed;
+          };
+          # Locked, so it also can't connect to a server URL instead
+          opencode = {
+            locked = true;
+            binaryPath = lib.getExe opencodeSandboxed;
+          };
+          pi = {
+            locked = true;
+            binaryPath = lib.getExe piSandboxed;
+          };
+        };
       };
-      pi = {
-        command = ["${piSandboxed}"];
-        paseoTools.enabled = false;
-        order = 2;
-      };
-      # The supervisor: plans, delegates and reviews
-      claude = {
-        command = ["${claudeSandboxed}"];
-        order = 3;
-        # Replaces the model list Paseo discovers. Paseo fills in each model's
-        # thinking options from its own manifest, matched by id.
-        models = [
-          {
-            id = "claude-opus-5-5";
-            label = "Opus 5.5";
-            isDefault = true;
-          }
-          {
-            id = "claude-sonnet-5-5";
-            label = "Sonnet 5.5";
-          }
-          # Paseo writes agent titles, commit messages and other metadata with
-          # the first model whose id contains "haiku"; without one it uses the
-          # agent's own model
-          {
-            id = "claude-haiku-5-5";
-            label = "Haiku 5.5";
-          }
-        ];
-      };
-      # Claude as a worker, for the Implementer profile: Paseo's tools are set
-      # per provider, so without its own the Implementer could launch agents
-      claude-worker = {
-        extends = "claude";
-        label = "Claude Worker";
-        command = ["${claudeSandboxed}"];
-        paseoTools.enabled = false;
-        order = 4;
-        # A derived provider doesn't inherit Claude's model list
-        models = [
-          {
-            id = "claude-sonnet-5-5";
-            label = "Sonnet 5.5";
-            isDefault = true;
-          }
-        ];
-      };
-      codex.enabled = false;
-      copilot.enabled = false;
-      omp.enabled = false;
-      # Registered by plugins built into Paseo, which load at every start
-      # whatever the plugin settings say, so removing them in the UI doesn't
-      # last; an override here hides their providers
-      antigravity.enabled = false;
-      muse.enabled = false;
     };
   };
+  t3PolicyChecked =
+    if lib.versionAtLeast t3code.version "0.1.7"
+    then
+      pkgs.runCommand "t3code-policy.json" {} ''
+        HOME=$TMPDIR ${lib.getExe' t3code "t3"} policy check ${t3Policy}
+        cp ${t3Policy} $out
+      ''
+    else t3Policy;
 
   hardening =
     common.serviceConfig
@@ -343,8 +293,8 @@
   # systemd sets SHELL from the user's passwd entry, nologin for a system
   # user, and the agents run their shell tools with it
   shell = lib.getExe pkgs.bash;
-  # procps for ps: Paseo lists an OpenCode server's children with
-  # `ps --ppid` when it stops one, and an ENOENT there crashes its worker
+  # procps for ps: T3 reads the process table to stop agents and find the
+  # ports their servers listen on
   path = [ghWithToken] ++ (with pkgs; [bash coreutils findutils gnugrep gnused git procps]);
   # Give up after 5 failed starts in 5 minutes instead of looping, so the
   # "Systemd unit failed" alert fires rather than only the restart one
@@ -356,13 +306,6 @@ in {
   # STROMA_API_KEY
   age.secrets.opencode-env = {
     file = ../secrets/opencode-env.age;
-    owner = user;
-  };
-  # PASEO_PASSWORD, for the web UI and every other client. Unlike OpenCode's
-  # server, Paseo needs one even behind the firewall rule below: without it,
-  # anything reaching its port controls it, and agents reach it on loopback.
-  age.secrets.paseo-env = {
-    file = ../secrets/paseo-env.age;
     owner = user;
   };
   # CLAUDE_CODE_OAUTH_TOKEN from `claude setup-token`, so Claude Code agents
@@ -393,15 +336,14 @@ in {
   };
   users.groups.${tokenUser} = {};
 
-  # Only spore's nginx may reach OpenCode's server or Paseo over the
-  # tailnet, which puts Pocket ID in front of them (code.zx.dev,
-  # agents.zx.dev). The exception is Paseo from the iPhone, iPad, Stroma and
-  # Rhizome: its app can't log in to Pocket ID, so it connects directly with
-  # only Paseo's password, and any device listed here can drive the agents. This can't
-  # go in nixos-fw: tailscaled's ts-input chain,
-  # first in filter INPUT, accepts everything from tailscale0 before nixos-fw
-  # sees it. mangle INPUT runs earlier and tailscaled leaves it alone; it
-  # can't REJECT, so others time out.
+  # Only spore's nginx may reach OpenCode's server or T3 over the tailnet,
+  # which puts Pocket ID in front of them (code.zx.dev, agents.zx.dev). The
+  # exception is T3 from the iPhone, iPad, Stroma and Rhizome: its apps can't
+  # log in to Pocket ID, so they connect directly and T3's pairing is their
+  # only gate. This can't go in nixos-fw: tailscaled's ts-input chain, first
+  # in filter INPUT, accepts everything from tailscale0 before nixos-fw sees
+  # it. mangle INPUT runs earlier and tailscaled leaves it alone; it can't
+  # REJECT, so others time out.
   #
   # Postgres trusts every local connection (hosts/glyph/services/db.nix), so
   # anything running as this user could connect as the superuser. The socket
@@ -413,7 +355,7 @@ in {
   # ntfyAgentsPort.
   networking.firewall.extraCommands = ''
     ip46tables -t mangle -N opencode-in 2>/dev/null || ip46tables -t mangle -F opencode-in
-    ${onlyFrom ["spore"] opencodePort}${onlyFrom ["spore" "blip" "slate" "stroma" "rhizome"] paseoPort}
+    ${onlyFrom ["spore"] opencodePort}${onlyFrom ["spore" "blip" "slate" "stroma" "rhizome"] t3Port}
     ip46tables -t mangle -D INPUT -j opencode-in 2>/dev/null || true
     ip46tables -t mangle -I INPUT -j opencode-in
 
@@ -535,12 +477,10 @@ in {
       group = user;
       mode = "2750";
     };
-    ${paseoHome} = dir;
-    # Granted by the nono profile, so it has to exist before Paseo first runs
-    "${paseoHome}/opencode-home" = dir;
-    "${paseoHome}/runtime" = dir;
-    "${paseoHome}/runtime/opencode" = dir;
-    "${paseoHome}/config.json" = link paseoConfig;
+    ${t3Home} = dir;
+    # Granted by the nono profile, so it has to exist before any agent starts,
+    # OpenCode's server included, even if T3 hasn't run yet
+    ${t3Worktrees} = dir;
   };
 
   # Installation tokens last an hour. Every 20 minutes, so a single failed run
@@ -623,11 +563,11 @@ in {
       };
   };
 
-  # Paseo runs Claude Code with this user's config (CLAUDE_CONFIG_DIR is
+  # T3 runs Claude Code with this user's config (CLAUDE_CONFIG_DIR is
   # ~/.claude), so it uses the same module as my own Claude Code
   # (modules/home/development.nix): the llm-profile prompt, the glyph MCP
   # gateway, llm-profile's skills, the read-only permission allowlist and
-  # telemetry. They follow llm-profile and Paseo updates with the flake.
+  # telemetry. They follow llm-profile updates with the flake.
   home-manager.users.${user} = {
     imports = [../../../modules/home/development.nix];
     home.stateVersion = "23.11";
@@ -636,17 +576,10 @@ in {
     # so the permission allowlist's mcp__glyph__ rules still match.
     programs.mcp.servers.glyph.url = lib.mkForce mcpURL;
     programs.claude-code = {
-      # Paseo runs pkgs.claude-code itself, through the nono wrapper
+      # T3 runs pkgs.claude-code itself, through the nono wrapper
       package = null;
       # Appended to the llm-profile prompt development.nix sets (lines merge)
       context = lib.mkAfter (githubNote + hostsNote);
-      # Paseo's orchestration skills, from the source of the Paseo it runs.
-      # The nixpkgs package leaves out the skills/ directory its own
-      # installer copies from, so Settings > Agents > Orchestration skills
-      # can't install them.
-      skills =
-        lib.genAttrs ["paseo" "paseo-handoff" "paseo-committee" "paseo-advisor"]
-        (name: "${pkgs.paseo.src}/skills/${name}");
     };
     # Commits as the app's bot, and pushes with its installation token. No
     # SSH key, so SSH remotes are rewritten to HTTPS.
@@ -678,41 +611,55 @@ in {
     };
   };
 
-  # agents.zx.dev on spore proxies here. Its web UI loads without the
-  # password; the API and WebSocket need it.
-  systemd.services.paseo = {
-    description = "Paseo agent daemon";
+  # The admin CLI, for pairing devices (see CLAUDE.md, Coding agents)
+  environment.systemPackages = [t3code];
+  environment.etc."t3code/policy.json".source = t3PolicyChecked;
+
+  # agents.zx.dev on spore proxies here. Every client, browser or app, pairs
+  # with a one-time token before it can do anything, loopback included, so
+  # agents can't drive T3 without one.
+  systemd.services.t3code = {
+    description = "T3 Code server";
     wantedBy = ["multi-user.target"];
     # Claude's config above, written by home-manager's activation unit
     wants = ["network-online.target" "home-manager-${user}.service" "agents-github-token.service"];
     after = ["network-online.target" "systemd-tmpfiles-setup.service" "systemd-tmpfiles-resetup.service" "home-manager-${user}.service" "agents-github-token.service"];
+    # It reads the policy only at start
+    restartTriggers = [t3PolicyChecked];
     inherit (startLimit) startLimitIntervalSec startLimitBurst;
-    path = path ++ [pkgs.paseo];
+    # The sandboxed providers first, so `claude`, `opencode` and `pi` are them
+    path = providers ++ path ++ [t3code];
     environment = {
       HOME = home;
       SHELL = shell;
-      PASEO_HOME = paseoHome;
-      # Read by the OpenCode server Paseo starts
+      # Read by the OpenCode servers T3 starts
       OPENCODE_CONFIG = opencodeSettings;
       # Keeps .claude.json inside ~/.claude, which the sandbox grants
       CLAUDE_CONFIG_DIR = "${home}/.claude";
       DISABLE_AUTOUPDATER = "1";
+      # The policy turns it off from 0.1.7; this covers 0.1.6
+      T3CODE_TELEMETRY_ENABLED = "false";
     };
     serviceConfig =
       hardening
       // {
-        ExecStart = "${pkgs.paseo}/bin/paseo-server";
+        ExecStart = "${lib.getExe' t3code "t3"} serve --base-dir ${t3Home} --host 0.0.0.0 --port ${toString t3Port}";
         EnvironmentFile = [
           config.age.secrets.opencode-env.path
-          config.age.secrets.paseo-env.path
           config.age.secrets.claude-code-env.path
         ];
-        StateDirectory = ["opencode" "paseo"];
+        StateDirectory = ["opencode" "t3code"];
         StateDirectoryMode = "0700";
-        ReadWritePaths = [home paseoHome];
+        ReadWritePaths = [home t3Home];
         WorkingDirectory = workspaces;
-        # Agents get SIGTERM with the daemon; its own shutdown takes up to 10s
-        TimeoutStopSec = 15;
+        # `t3 serve` prints a one-time admin pairing token at every start: as
+        # a line of its own, in the pairing URL and app link, and as a QR code.
+        # In the journal it would reach Loki, which agents (and Hermes) can
+        # query through grafana-mcp, so drop those lines. Pair devices with
+        # `t3 auth pairing create` instead.
+        LogFilterPatterns = ["~^Token: " "~#token=" "~t3code://" "~[█▀▄]"];
+        # Agents get SIGTERM with the server, and up to 10s to exit
+        TimeoutStopSec = 20;
       };
   };
 }

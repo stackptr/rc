@@ -19,7 +19,6 @@ in
     "pgadmin-client-secret"
     "pgadmin-password"
     "opencode-env"
-    "paseo-env"
     "claude-code-env"
     "restic-env"
     "restic-password"

@@ -6,7 +6,7 @@
     v4 = "100.89.150.33";
     v6 = "fd7a:115c:a1e0::a033:9621";
   };
-  # The iPhone, iPad and the Macs that run the Paseo app
+  # The iPhone, iPad and the Macs that run the T3 Code app
   blip = {
     v4 = "100.71.241.100";
     v6 = "fd7a:115c:a1e0::1c33:f165";

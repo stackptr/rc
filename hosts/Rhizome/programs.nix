@@ -17,7 +17,7 @@
     casks = [
       "dash"
       "legcord"
-      "paseo"
+      "t3-code"
       "textual"
     ];
   };

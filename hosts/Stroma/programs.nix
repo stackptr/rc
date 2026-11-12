@@ -14,7 +14,7 @@
     enable = true;
     casks = [
       "legcord"
-      "paseo"
+      "t3-code"
     ];
   };
 

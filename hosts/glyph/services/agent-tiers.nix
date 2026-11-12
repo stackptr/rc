@@ -1,4 +1,4 @@
-# Capability tiers for unattended agent jobs. Paseo (./agents.nix) runs
+# Capability tiers for unattended agent jobs. T3 Code (./agents.nix) runs
 # every agent as one user, `opencode`, with the write tier's access: GitHub
 # pushes, the agents' MCP group, the network. Jobs that need less run as a
 # tier's own user instead, each with its own home, nono profile, MCP group
@@ -8,10 +8,9 @@
 #   rc-source.
 # - review: PR review. rc-source; the dispatcher passes the diff in.
 #
-# They don't run under Paseo: Paseo starts every agent as its own user and
-# can't switch, so a tier would need a daemon of its own (user, port,
-# password, firewall exception), only to show unattended runs nobody
-# watches. Jobs run as transient systemd units through `agent-run <tier>
+# They don't run under T3: T3 starts every agent as its own user and can't
+# switch, so a tier would need a server of its own (user, port, pairing,
+# firewall exception), only to show unattended runs nobody watches. Jobs run as transient systemd units through `agent-run <tier>
 # <command>` instead, e.g. `agent-run observe opencode run --standalone
 # "<prompt>"`, and the dispatcher (#740) keeps the record of each run.
 {

@@ -139,10 +139,16 @@
       "agents.zx.dev" = {
         forceSSL = true;
         useACMEHost = "zx.dev";
-        # Paseo on glyph, which also requires its own password
+        # T3 Code on glyph, which also requires each client to pair
         requireAuth = true;
-        # For Gatus: glyph only accepts Paseo's port from spore. requireAuth
-        # only guards locations."/", so this exact match skips Pocket ID.
+        # For Gatus: glyph only accepts T3's port from spore. requireAuth
+        # only guards locations."/", so these exact matches skip Pocket ID.
+        # T3's environment descriptor (id, label, version); T3 itself serves
+        # it without auth to clients deciding whether to pair.
+        locations."= /.well-known/t3/environment".proxyPass = "http://glyph.note-iwato.ts.net:6767";
+        # Paseo's health check, only until zeta's Gatus check moves to the
+        # path above, so the merge's deploys can land in any order. Remove it
+        # in a follow-up.
         locations."= /api/health".proxyPass = "http://glyph.note-iwato.ts.net:6767";
         locations."/" = {
           proxyPass = "http://glyph.note-iwato.ts.net:6767";

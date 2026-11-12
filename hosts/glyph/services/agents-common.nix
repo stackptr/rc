@@ -19,7 +19,7 @@
     # Nix; home-manager-opencode.service, which does, is a unit of its own.
     InaccessiblePaths = ["/mnt" "/run/agenix" "/run/agenix.d" "/run/postgresql" "/nix/var/nix/daemon-socket"];
     # Other users' processes and their command lines; the agents still see
-    # their own, which Paseo lists with ps
+    # their own, which T3 lists with ps
     ProtectProc = "invisible";
     PrivateTmp = true;
     PrivateDevices = true;
