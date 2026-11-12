@@ -24,7 +24,8 @@ Layout:
 just                              # Switch current host (asks before activating)
 just switch hostname              # Switch specific host (asks before activating)
 just apply [hostname]             # Same as switch, without asking
-just switch-remote spore          # Build on this host, deploy to spore (it's memory-constrained)
+just switch-remote spore          # Build on this host, deploy to spore (it's memory-constrained; asks before activating)
+just apply-remote spore           # Same as switch-remote, without asking
 ```
 
 **Check a change before committing** (evaluates without building; catches option conflicts and type errors):

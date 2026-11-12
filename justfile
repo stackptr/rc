@@ -21,5 +21,11 @@ _switch host *flags:
 update:
   nix flake update --commit-lock-file
 
-switch-remote target-host build-host="localhost":
-  nh os switch --target-host root@{{target-host}} --build-host {{build-host}} --hostname {{target-host}} .
+# Build on build-host, show the diff, and ask before activating on target-host
+switch-remote target-host build-host="localhost": (_switch-remote target-host build-host "--ask")
+
+# Build on build-host and activate on target-host without asking
+apply-remote target-host build-host="localhost": (_switch-remote target-host build-host)
+
+_switch-remote target-host build-host *flags:
+  nh os switch --target-host root@{{target-host}} --build-host {{build-host}} --hostname {{target-host}} . {{flags}}
