@@ -33,6 +33,18 @@ in {
   # `security find-certificate -c "Gateway CA - Cloudflare Managed G2" -p /Library/Keychains/System.keychain`.
   security.pki.certificateFiles = [./cloudflare-gateway-ca.pem];
 
+  # WARP won't connect while Tailscale handles DNS: Tailscale makes
+  # 100.100.100.100 the system's default resolver, and WARP's connectivity
+  # check then fails to resolve connectivity-check.warp-svc. So Tailscale's
+  # DNS is off on this host (`tailscale set --accept-dns=false`, kept in the
+  # Mac app's state, not here) and WARP's proxy stays the default resolver.
+  # This sends only tailnet names to MagicDNS, which still answers at
+  # 100.100.100.100. Short names like `glyph` don't resolve; use
+  # glyph.note-iwato.ts.net.
+  environment.etc."resolver/note-iwato.ts.net".text = ''
+    nameserver 100.100.100.100
+  '';
+
   # GUI apps get their environment from launchd, not the shell, so Node-based
   # apps (e.g. T3 driving Claude Code) otherwise reject the Gateway's certs.
   # An agent rather than launchd.user.envVariables: that option only runs
