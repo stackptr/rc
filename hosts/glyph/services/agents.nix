@@ -338,12 +338,12 @@ in {
 
   # Only spore's nginx may reach OpenCode's server or T3 over the tailnet,
   # which puts Pocket ID in front of them (code.zx.dev, agents.zx.dev). The
-  # exception is T3 from the iPhone, iPad, Stroma and Rhizome: its apps can't
-  # log in to Pocket ID, so they connect directly and T3's pairing is their
-  # only gate. This can't go in nixos-fw: tailscaled's ts-input chain, first
-  # in filter INPUT, accepts everything from tailscale0 before nixos-fw sees
-  # it. mangle INPUT runs earlier and tailscaled leaves it alone; it can't
-  # REJECT, so others time out.
+  # exception is T3 from the iPhone, iPad, Stroma, Rhizome and lobtop: its
+  # apps can't log in to Pocket ID, so they connect directly and T3's pairing
+  # is their only gate. This can't go in nixos-fw: tailscaled's ts-input
+  # chain, first in filter INPUT, accepts everything from tailscale0 before
+  # nixos-fw sees it. mangle INPUT runs earlier and tailscaled leaves it
+  # alone; it can't REJECT, so others time out.
   #
   # Postgres trusts every local connection (hosts/glyph/services/db.nix), so
   # anything running as this user could connect as the superuser. The socket
@@ -355,7 +355,7 @@ in {
   # ntfyAgentsPort.
   networking.firewall.extraCommands = ''
     ip46tables -t mangle -N opencode-in 2>/dev/null || ip46tables -t mangle -F opencode-in
-    ${onlyFrom ["spore"] opencodePort}${onlyFrom ["spore" "blip" "slate" "stroma" "rhizome"] t3Port}
+    ${onlyFrom ["spore"] opencodePort}${onlyFrom ["spore" "blip" "slate" "stroma" "rhizome" "lobtop"] t3Port}
     ip46tables -t mangle -D INPUT -j opencode-in 2>/dev/null || true
     ip46tables -t mangle -I INPUT -j opencode-in
 
