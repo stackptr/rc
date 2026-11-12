@@ -9,6 +9,7 @@ import ./mk-host.nix "spore" [
   "notifier-smtp-password"
   "oauth2-proxy-env"
   "pocket-id-encryption-key"
+  "t3-proxy-auth"
   "tailscale-auth-key"
   "user-password"
 ]
