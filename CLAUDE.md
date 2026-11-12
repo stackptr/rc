@@ -21,8 +21,9 @@ Layout:
 
 **Build and switch to configuration** (only when asked; see Guardrails):
 ```bash
-just                              # Switch current host
-just switch hostname              # Switch specific host
+just                              # Switch current host (asks before activating)
+just switch hostname              # Switch specific host (asks before activating)
+just apply [hostname]             # Same as switch, without asking
 just switch-remote spore          # Build on this host, deploy to spore (it's memory-constrained)
 ```
 

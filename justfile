@@ -4,13 +4,19 @@ default: switch
 # Substitute work laptop hostname if necessary
 hostname := `h=$(hostname | cut -d "." -f 1); case "$h" in LOB-*) echo "lobtop";; *) echo "$h";; esac`
 
+# Build, show the diff, and ask before activating
+switch host=hostname: (_switch host "--ask")
+
+# Build and activate without asking
+apply host=hostname: (_switch host)
+
 [macos]
-switch host=hostname:
-  nh darwin switch --hostname {{host}} . --ask
+_switch host *flags:
+  nh darwin switch --hostname {{host}} . {{flags}}
 
 [linux]
-switch host=hostname:
-  nh os switch --hostname {{host}} . --ask
+_switch host *flags:
+  nh os switch --hostname {{host}} . {{flags}}
 
 update:
   nix flake update --commit-lock-file
