@@ -19,9 +19,11 @@
   # Repositories the agents work on
   workspaces = "${home}/workspaces";
   # T3's base directory: its database, settings, login sessions and pairing
-  # secrets. Only its worktrees are granted to the agents.
+  # secrets. Only its worktrees and scratch folders are granted to the agents.
   t3Home = "/var/lib/t3code";
   t3Worktrees = "${t3Home}/worktrees";
+  # Threads started without a project work in a folder of their own here
+  t3Scratch = "${t3Home}/scratch";
   # The agents' GitHub App. A separate user mints its installation tokens
   # into tokenDir, which the agents can read but not the app's key.
   githubApp = {
@@ -182,9 +184,11 @@
         tokenDir
       ];
       allow = [
-        # Repositories, and T3's worktrees of them, where agents work
+        # Repositories, T3's worktrees of them, and the folders of threads
+        # without a project, where agents work
         workspaces
         t3Worktrees
+        t3Scratch
         "${home}/.config/opencode"
         "${home}/.local/share/opencode"
         "${home}/.local/state/opencode"
@@ -481,6 +485,7 @@ in {
     # Granted by the nono profile, so it has to exist before any agent starts,
     # OpenCode's server included, even if T3 hasn't run yet
     ${t3Worktrees} = dir;
+    ${t3Scratch} = dir;
   };
 
   # Installation tokens last an hour. Every 20 minutes, so a single failed run
