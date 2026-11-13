@@ -9,6 +9,7 @@
     enable = true;
     casks = [
       "meetingbar"
+      "t3-code"
     ];
   };
 
