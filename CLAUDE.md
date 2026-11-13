@@ -19,7 +19,7 @@ Layout:
 
 ## Common Commands
 
-**Build and switch to configuration** (only when asked; see Guardrails):
+**Build and switch to configuration** (for me to run in a terminal; never run these yourself, see Guardrails):
 ```bash
 just                              # Switch current host (asks before activating)
 just switch hostname              # Switch specific host (asks before activating)
@@ -324,7 +324,9 @@ Hermes Agent (`hosts/glyph/services/hermes.nix`, flake input `hermes-agent` pinn
 
 ## Guardrails
 
-- Merging doesn't deploy right away. After CI passes on main, `request-deploys.yml` dispatches Deploy for each host whose system changed since its last successful deployment (compared by `scripts/normalized-system.nix`, which sets aside the flake revision and glyph's rc-source copy of the repo). glyph's and zeta's deploys wait for my approval, and Deploy's `supersede` job cancels an older run still waiting for the same hosts. spore has no reviewer, so it's requested only when I pushed the commit (the workflow_run's actor is the repo owner), and deploys right away; the Update workflow's overnight merge, pushed by teleotrope, isn't requested, and the Deploy workflow deploys main to spore daily at 17:00 UTC once CI's spore build has passed on main (skipped if spore already runs main). So a merge of mine reaches spore within minutes and an update within a day, and a branch deployed to spore by hand is replaced by main at the next request or scheduled run. Every activation on a NixOS host posts its nvd package diff and a compare link to #updates through ntfy (`modules/nixos/deploy-marker.nix`). Deploys otherwise run by hand, via `just switch` or the Deploy workflow. Don't switch a host, merge a PR, approve a deployment, or run the Deploy workflow unless asked.
+- Merging doesn't deploy right away. After CI passes on main, `request-deploys.yml` dispatches Deploy for each host whose system changed since its last successful deployment (compared by `scripts/normalized-system.nix`, which sets aside the flake revision and glyph's rc-source copy of the repo). glyph's and zeta's deploys wait for my approval, and Deploy's `supersede` job cancels an older run still waiting for the same hosts. spore has no reviewer, so it's requested only when I pushed the commit (the workflow_run's actor is the repo owner), and deploys right away; the Update workflow's overnight merge, pushed by teleotrope, isn't requested, and the Deploy workflow deploys main to spore daily at 17:00 UTC once CI's spore build has passed on main (skipped if spore already runs main). So a merge of mine reaches spore within minutes and an update within a day, and a branch deployed to spore by hand is replaced by main at the next request or scheduled run. Every activation on a NixOS host posts its nvd package diff and a compare link to #updates through ntfy (`modules/nixos/deploy-marker.nix`). Deploys otherwise run by hand, via `just switch` or the Deploy workflow.
+- Never switch a host (`just`, `just switch`, `just apply`, `switch-remote`, `apply-remote`, or `nh`, `darwin-rebuild`, `nixos-rebuild` or deploy-rs directly), run the Deploy workflow, or approve a deployment, even when asked: switches happen only in my terminal or through the Deploy workflow. When a change needs activating, say which command to run and stop.
+- Don't merge a PR unless asked.
 
 ## Committing
 
