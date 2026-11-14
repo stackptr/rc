@@ -5,6 +5,7 @@
     ./daisydisk.nix
     ./fastscripts.nix
     ./iina.nix
+    ./karabiner.nix
     ./little-snitch.nix
     ./netnewswire.nix
     ./popclip.nix

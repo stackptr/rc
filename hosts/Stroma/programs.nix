@@ -33,6 +33,12 @@
     enableDefaults = true;
   };
 
+  programs.karabiner = {
+    enable = true;
+    enableDefaults = true;
+    startOnActivation = true;
+  };
+
   programs.daisydisk = {
     enable = true;
   };
