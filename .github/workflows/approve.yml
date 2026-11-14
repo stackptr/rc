@@ -16,7 +16,7 @@ permissions: {}
 
 jobs:
   approve:
-    uses: stackptr/actions/.github/workflows/approve.yml@61b09980127796ed52936b6372b6701a0409099d # v1.1.0
+    uses: stackptr/actions/.github/workflows/approve.yml@64f9d824393b74c4dabaec6834211b3032622008 # v1.2.0
     # A reusable workflow's `secrets` holds only what the caller passes, even
     # for a job that declares an environment: without this, the `approve`
     # environment's APPROVER_PRIVATE_KEY arrives empty. It also passes any
