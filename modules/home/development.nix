@@ -208,17 +208,21 @@ in {
               "mcp__figma__get_screenshot"
               # MCP: the gateway on glyph, by upstream server. Globs follow tool
               # renames upstream; obsidian-vault is left out so its writes prompt.
-              "mcp__glyph__aws-knowledge__*"
-              "mcp__glyph__basic-memory__*"
-              "mcp__glyph__cloudflare-docs__*"
-              "mcp__glyph__context7__*"
-              "mcp__glyph__deepwiki__*"
+              # home-manager ships programs.mcp servers in a generated plugin
+              # named "hm", so Claude Code names the tools
+              # mcp__plugin_hm_<server>__<tool>; plain mcp__glyph__ rules no
+              # longer match.
+              "mcp__plugin_hm_glyph__aws-knowledge__*"
+              "mcp__plugin_hm_glyph__basic-memory__*"
+              "mcp__plugin_hm_glyph__cloudflare-docs__*"
+              "mcp__plugin_hm_glyph__context7__*"
+              "mcp__plugin_hm_glyph__deepwiki__*"
               # grafana is read-only; see modules/nixos/llm/grafana-mcp.nix
-              "mcp__glyph__grafana__*"
-              "mcp__glyph__kagi__*"
-              "mcp__glyph__mcp-nixos__*"
+              "mcp__plugin_hm_glyph__grafana__*"
+              "mcp__plugin_hm_glyph__kagi__*"
+              "mcp__plugin_hm_glyph__mcp-nixos__*"
               # rc-source serves a read-only store path
-              "mcp__glyph__rc-source__*"
+              "mcp__plugin_hm_glyph__rc-source__*"
             ];
             deny = [];
           };

@@ -142,6 +142,8 @@ If `nix` is installed, run `scripts/fmt-sandboxed` instead of `nix fmt .`. Cloud
 
 **Did a commit change a host's system?** Compare `scripts/normalized-system.nix` at both commits (`nix eval --raw --file scripts/normalized-system.nix --apply 'f: f { flake = "git+file://<repo>?rev=<sha>"; host = "glyph"; }'`), not the raw toplevel: `system.configurationRevision` and glyph's rc-source copy of the repo (`"${inputs.self}"`) change every host's or glyph's derivation on every commit. `nix eval --file` doesn't call a function with `--argstr`, hence `--apply`; and a Nix path literal there (`/var/empty`) is copied into the store, so it fails where the path doesn't exist: use a string. `git+file` with `rev` works from a detached checkout with no local branch.
 
+**Claude Code's MCP tool names:** home-manager's claude-code module ships `programs.mcp` servers (and `programs.claude-code.mcpServers`) inside a generated plugin named `hm`, so Claude Code names their tools `mcp__plugin_hm_<server>__<tool>`, e.g. `mcp__plugin_hm_glyph__grafana__query_loki_logs`. Permission rules in `modules/home/development.nix` have to use that prefix; plain `mcp__glyph__` rules silently stop matching, and every call prompts.
+
 **`lib.mkForce` vs `lib.mkDefault`:** a host that must diverge from a value a shared module sets uses `lib.mkForce`; without it Nix errors on the conflicting definitions. A shared module that wants hosts to override freely sets `lib.mkDefault` instead. Example: `modules/base/gc.nix` sets `nix.gc.dates = "weekly"`, and `hosts/spore/default.nix` overrides it with `lib.mkForce "daily"`.
 
 ## Monitoring Stack

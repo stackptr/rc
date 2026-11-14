@@ -578,7 +578,7 @@ in {
     home.stateVersion = "23.11";
     rc.development.ai.enable = true;
     # Their tool group, not the whole gateway (see mcpPort). Same server name,
-    # so the permission allowlist's mcp__glyph__ rules still match.
+    # so the permission allowlist's mcp__plugin_hm_glyph__ rules still match.
     programs.mcp.servers.glyph.url = lib.mkForce mcpURL;
     programs.claude-code = {
       # T3 runs pkgs.claude-code itself, through the nono wrapper
