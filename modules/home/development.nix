@@ -63,16 +63,11 @@ in {
           if cfg.ai.gateway.enable
           then profile.agent
           else profile."agent-standalone";
-        # propose-rule is currently the only skill. Its fallback (leaving a
-        # note in Basic Memory for a later session) needs the gateway, and
-        # on a work machine, proposed rule changes shouldn't go to a public
-        # repo anyway — so skip skills entirely when the gateway is disabled.
         # One entry per skill, rather than the directory, so other configs
         # can add their own
-        skills = lib.optionalAttrs cfg.ai.gateway.enable (
+        skills =
           lib.mapAttrs (name: _: "${profile.skills}/${name}")
-          (lib.filterAttrs (_: type: type == "directory") (builtins.readDir profile.skills))
-        );
+          (lib.filterAttrs (_: type: type == "directory") (builtins.readDir profile.skills));
         settings = {
           model = "sonnet";
           # Disabled in favor of Basic Memory MCP for cross-device access
