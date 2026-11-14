@@ -1,7 +1,6 @@
 {
   config,
   pkgs,
-  username,
   ...
 }: {
   imports = [
@@ -21,6 +20,6 @@
   # with sshd's host key (hosts/Rhizome/key.pub).
   age.secrets.aichat-env = {
     file = ../../home/secrets/aichat-env.age;
-    owner = username;
+    owner = config.system.primaryUser;
   };
 }

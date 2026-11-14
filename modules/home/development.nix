@@ -1,15 +1,15 @@
 {
   config,
-  hostname,
+  inputs,
   lib,
-  llm-profile,
+  osConfig,
   pkgs,
   ...
 }: let
   inherit (lib) mkIf mkOption;
 
   cfg = config.rc.development;
-  profile = import ../../lib/llm-profile.nix llm-profile;
+  profile = import ../../lib/llm-profile.nix inputs.llm-profile;
 in {
   options = {
     rc.development = {
@@ -91,7 +91,7 @@ in {
               OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE = "cumulative";
               # Becomes a host label on metrics and an indexed label in Loki,
               # matching the other hosts' {host="..."}.
-              OTEL_RESOURCE_ATTRIBUTES = "host=${lib.toLower hostname}";
+              OTEL_RESOURCE_ATTRIBUTES = "host=${lib.toLower osConfig.rc.host.name}";
             };
           statusLine = {
             type = "command";

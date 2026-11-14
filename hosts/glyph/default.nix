@@ -1,8 +1,4 @@
-{
-  config,
-  username,
-  ...
-}: {
+{config, ...}: {
   imports = [
     ./hardware.nix
     ./services
@@ -80,12 +76,12 @@
   age.secrets = {
     aichat-env = {
       file = ../../home/secrets/aichat-env.age;
-      owner = username;
+      owner = "mu";
     };
     # glyph's SSH client key (keys.clients.glyph) for root on spore and zeta
     ssh-client-key = {
       file = ./secrets/ssh-client-key.age;
-      owner = username;
+      owner = "mu";
     };
   };
 

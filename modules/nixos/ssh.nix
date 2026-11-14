@@ -3,10 +3,9 @@
   lib,
   config,
   pkgs,
-  keys,
-  hostname,
   ...
 }: let
+  keys = import ../../lib/keys.nix;
   # sshd rejects a signature from these keys unless the YubiKey checked the
   # FIDO2 PIN, not just a touch.
   yubikeys = map (k: "verify-required ${k}") keys.yubikeys;
@@ -20,7 +19,7 @@ in {
   users.users.root.openssh.authorizedKeys.keys =
     [keys.deploy]
     ++ people
-    ++ lib.optional (hostname != "glyph") keys.clients.glyph;
+    ++ lib.optional (config.networking.hostName != "glyph") keys.clients.glyph;
 
   users.users.mu.openssh.authorizedKeys.keys = people;
 
