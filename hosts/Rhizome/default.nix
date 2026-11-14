@@ -17,6 +17,16 @@
     system = true;
   };
 
+  # A laptop on networks I don't control, with nothing that needs to accept
+  # connections. Apple-signed and Developer ID-signed apps are still allowed
+  # (macOS defaults), so AirDrop and the like keep working. Stroma stays
+  # unmanaged: its Nix-built exporters are only ad-hoc signed, and glyph
+  # scrapes them.
+  networking.applicationFirewall = {
+    enable = true;
+    enableStealthMode = true;
+  };
+
   # A user secret, read by home-manager through osConfig. Decrypted at boot
   # with sshd's host key (hosts/Rhizome/key.pub).
   age.secrets.aichat-env = {
