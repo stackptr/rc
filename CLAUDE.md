@@ -77,7 +77,7 @@ Three private GitHub Apps act on rc, with a role the rulesets below enforce. rc 
 
 | Ruleset | Target | Rules | Bypass |
 |---|---|---|---|
-| Require CI | default branch | the six host builds must pass; no force push | Repository admin |
+| Require CI | default branch | the NixOS host builds, `eval (darwin)` and `build (darwin)` must pass (`build (darwin)` is skipped, which passes, on PRs that change neither `flake.lock` nor `ci.yml`); no force push | Repository admin |
 | Require approval | default branch | PR with 1 approval, stale approvals dismissed, approval of the most recent push; no deletion or force push | Repository admin, `teleotrope` |
 | Agent branches | all but the default branch and `agents/**/*` | restrict creations, updates and deletions; no force push | Repository admin, `teleotrope` (`flakeUpdates`), Dependabot (`dependabot`) |
 | Agent-only branches | `agents/**/*` | restrict creations and updates | Repository admin, `teleomycete` (`agentsInstalled`) |
