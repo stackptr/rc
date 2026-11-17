@@ -104,6 +104,7 @@
     You run on glyph as `${user}`, sandboxed: you can't see other users' processes or the system journal, and you can't SSH to any host. Don't ask the user to run `journalctl`, `systemctl status` or `ps` for you: the `glyph` MCP server's grafana tools answer most of that.
 
     - Loki has journald from glyph, spore and zeta for 30 days: `{host="glyph", unit="t3code.service"}`, with `priority=~"[0-3]"` for errors. A unit's own stream has only its output; its start, stop and result lines come from systemd under the unit's description, not its name: `{host="glyph", app="systemd"} |= "Home Manager environment for opencode"`. Every deploy logs `{app="nixos-deploy"}`, with the revision and a package diff.
+    - Loki has GitHub Actions history for the user's repos, hourly: `{unit="github-actions-log.service"} | json`, one line per run (`kind="run"`) and per job (`kind="job"`, with `conclusion`, `queue_seconds`, `annotations`, and `unacquired` for jobs GitHub found no runner for), and the last 200 lines of each failed job's log (`kind="log"`, by `job_id`).
     - Prometheus has unit states (`node_systemd_unit_state`), restarts (`node_systemd_service_restart_total`) and per-unit CPU and memory (`container_cpu_usage_seconds_total`, `container_memory_working_set_bytes`, by `unit`).
 
     Ask the user only for what neither shows, and say what you checked first.

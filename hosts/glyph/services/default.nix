@@ -16,6 +16,7 @@
     ./dns.nix
     ./filebrowser.nix
     ./freshrss.nix
+    ./github-actions-log.nix
     ./grafana.nix
     ./hermes.nix
     ./jellyfin.nix
