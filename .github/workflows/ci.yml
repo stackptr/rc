@@ -29,6 +29,8 @@ jobs:
           exit 1
         fi
 
+  # The NixOS hosts, one job each. The macOS hosts are in eval-darwin and
+  # build-darwin below.
   build:
     strategy:
       fail-fast: false
@@ -37,15 +39,6 @@ jobs:
           - host: glyph
             system: x86_64-linux
             runner: ubuntu-latest
-          - host: Rhizome
-            system: aarch64-darwin
-            runner: macos-latest
-          - host: Stroma
-            system: aarch64-darwin
-            runner: macos-latest
-          - host: lobtop
-            system: aarch64-darwin
-            runner: macos-latest
           - host: spore
             system: x86_64-linux
             runner: ubuntu-latest
@@ -69,15 +62,9 @@ jobs:
       id: eval
       env:
         HOST: ${{ matrix.host }}
-        SYSTEM: ${{ matrix.system }}
       run: |
-        if [ "$SYSTEM" = "aarch64-darwin" ]; then
-          attr=".#darwinConfigurations.$HOST.system"
-        else
-          attr=".#nixosConfigurations.$HOST.config.system.build.toplevel"
-        fi
         rc=0
-        drv=$(nix eval --raw "$attr.drvPath" 2>eval.log) || rc=$?
+        drv=$(nix eval --raw ".#nixosConfigurations.$HOST.config.system.build.toplevel.drvPath" 2>eval.log) || rc=$?
         cat eval.log
         if grep -q "evaluation warning:" eval.log; then
           encoded=$(python3 -c "import sys; print(sys.stdin.read().replace('%','%25').replace('\n','%0A').replace('\r','%0D'))" < eval.log)
@@ -111,11 +98,98 @@ jobs:
         attic push rc:main "$(which attic)"
         attic push rc:main ./result-devshell
 
+  # macOS runners can take many minutes to pick up a job, so PRs check the
+  # darwin hosts by evaluating them on Linux, which catches most of what a
+  # config change breaks. They're built on macOS only on main and for PRs
+  # that change flake.lock (teleotrope merges those once CI passes, and
+  # input bumps are what break builds that evaluate) or this workflow. Both
+  # jobs are required checks; a skipped build-darwin counts as passing.
+  eval-darwin:
+    name: eval (darwin)
+    runs-on: ubuntu-latest
+    outputs:
+      build: ${{ steps.changes.outputs.build }}
+    steps:
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      with:
+        # A PR checks out its merge commit; its first parent is the base
+        fetch-depth: 2
+    - uses: cachix/install-nix-action@448cde739abec1eaf0646249e3d25bb8d9bc7702 # v31.11.2
+      with:
+        github_access_token: ${{ secrets.GITHUB_TOKEN }}
+    # No import-from-derivation, which would need an aarch64-darwin builder
+    # here: an evaluation that needs one fails instead of trying to build.
+    - name: Evaluate system configurations
+      run: |
+        rc=0
+        for host in Rhizome Stroma lobtop; do
+          nix eval --raw --option allow-import-from-derivation false \
+            ".#darwinConfigurations.$host.system.drvPath" 2>eval.log || rc=1
+          echo
+          cat eval.log
+          if grep -q "evaluation warning:" eval.log; then
+            encoded=$(python3 -c "import sys; print(sys.stdin.read().replace('%','%25').replace('\n','%0A').replace('\r','%0D'))" < eval.log)
+            echo "::warning title=Evaluation warnings ($host)::${encoded}"
+          fi
+        done
+        exit $rc
+    # Here rather than in a job of its own: if this failed, build-darwin
+    # would be skipped, which passes, but this job's failure still blocks.
+    - name: Decide whether to build
+      id: changes
+      run: |
+        if [ "$GITHUB_EVENT_NAME" != pull_request ]; then
+          build=true
+        elif git diff --quiet HEAD^1 HEAD -- flake.lock .github/workflows/ci.yml; then
+          build=false
+          echo "::notice::Not building the darwin hosts: neither flake.lock nor ci.yml changed"
+        else
+          build=true
+        fi
+        echo "build=$build" >> "$GITHUB_OUTPUT"
+
+  # One job for all three, so a run waits for one macOS runner, and the
+  # second and third builds reuse most of the first's closure.
+  build-darwin:
+    name: build (darwin)
+    needs: eval-darwin
+    if: needs.eval-darwin.outputs.build == 'true'
+    runs-on: macos-latest
+    # As in build: only main's builds get the `attic` environment
+    environment: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && 'attic' || '' }}
+    steps:
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+    - uses: cachix/install-nix-action@448cde739abec1eaf0646249e3d25bb8d9bc7702 # v31.11.2
+      with:
+        github_access_token: ${{ secrets.GITHUB_TOKEN }}
+        extra_nix_config: |
+          extra-substituters = https://cache.zx.dev/main
+          extra-trusted-public-keys = main:mu0jkxdJTGWC3djDSEQb3rvZgqlhA8WVMulcTo5IW6c=
+    # Links result, result-1 and result-2
+    - name: Build system configurations
+      run: |
+        nix build \
+          .#darwinConfigurations.Rhizome.system \
+          .#darwinConfigurations.Stroma.system \
+          .#darwinConfigurations.lobtop.system
+    # As in build's step of the same name
+    - name: Push to Attic
+      if: github.ref == 'refs/heads/main'
+      env:
+        ATTIC_TOKEN: ${{ secrets.ATTIC_TOKEN }}
+      run: |
+        nix build .#devShells.aarch64-darwin.default -o ./result-devshell
+        nix profile install github:zhaofengli/attic/7a19204df10d606c5070e6bb72615c3461900c05#attic-client --fallback
+        attic login rc https://cache.zx.dev "$ATTIC_TOKEN"
+        attic push rc:main ./result ./result-1 ./result-2
+        attic push rc:main "$(which attic)"
+        attic push rc:main ./result-devshell
+
   # One Slack message per failed run on main, naming every failed job. The
   # token is in the main-only `notify` environment, so PR runs can't post;
   # their failures show on the PR.
   notify:
-    needs: [lint, build]
+    needs: [lint, build, eval-darwin, build-darwin]
     if: failure() && github.event_name == 'push'
     runs-on: ubuntu-latest
     environment: notify
