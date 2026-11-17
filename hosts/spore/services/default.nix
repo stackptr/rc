@@ -25,10 +25,6 @@
     scrapeUri = "http://127.0.0.1:9080/nginx_status";
   };
 
-  services.glances = {
-    inherit (config.services.homepage-dashboard) enable;
-  };
-
   services.golink = {
     enable = true;
     tailscaleAuthKeyFile = config.age.secrets.tailscale-auth-key.path;
