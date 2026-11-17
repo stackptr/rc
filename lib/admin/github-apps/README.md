@@ -2,7 +2,7 @@
 
 The GitHub Apps that act on my repositories, with their private keys and logos.
 
-Each `<app>.age` file holds the app's only copy of its private key, because GitHub shows a key just once. They're encrypted to the admin YubiKeys (`keys.admins`), with rules in `lib/secrets/admin.nix`. teleomycete's is the exception: glyph decrypts it to mint the agents' tokens, so it's also encrypted to glyph and its rule is in `lib/secrets/glyph.nix`. stackptr/ops seals each of the other keys into the GitHub environment that uses it.
+Each `<app>.age` file holds the app's only copy of its private key, because GitHub shows a key just once. They're encrypted to the admin YubiKeys (`keys.admins`), with rules in `lib/secrets/admin.nix`. teleomycete's and teleometer's are the exceptions: glyph decrypts them (to mint the agents' tokens, and to log GitHub Actions history), so they're also encrypted to glyph and their rules are in `lib/secrets/glyph.nix`. stackptr/ops seals each of the other keys into the GitHub environment that uses it.
 
 What each app may do on GitHub is enforced by rulesets and documented under "GitHub apps and rulesets" in rc's `CLAUDE.md`. App permissions and installations are set by hand and recorded in stackptr/ops's `apps.nix`. This file covers the keys and logos; keep all three in step.
 
@@ -13,6 +13,7 @@ What each app may do on GitHub is enforced by rulesets and documented under "Git
 | <img src="teleoid.svg" width="32" alt=""> | teleoid | Approves my PRs so they can auto-merge | every agent repo's `approve` | `#4A1B0C` |
 | <img src="teleopsis.svg" width="32" alt=""> | teleopsis | Read-only observer for stackptr/ops | ops's `plan` | `#042C53` |
 | <img src="teleozyme.svg" width="32" alt=""> | teleozyme | Applies approved plans for stackptr/ops | ops's `production` | `#FAC775` |
+| <img src="teleometer.svg" width="32" alt=""> | teleometer | Read-only observer of GitHub Actions | none: glyph mints its tokens | `#173404` |
 
 ## teleomycete
 
@@ -40,6 +41,12 @@ Applies approved OpenTofu plans for stackptr/ops: rulesets, workflow permissions
 
 **Any action by teleozyme outside an approved ops deployment is unexpected and should be investigated.**
 
+## teleometer
+
+Read-only observer of GitHub Actions, installed on every repository: Actions and Checks read, and no webhook (stackptr/rc#866 would add one). It writes nothing and is never a bypass actor.
+
+The key is never sealed into an environment. On glyph, `github-actions-log.service` signs a JWT with it every hour, mints an installation token, and logs each run and job completed since the last poll, with the tail of each failed job's log, as JSON lines that Alloy ships to Loki (`hosts/glyph/services/github-actions-log.nix`). Only that unit's user can read the key.
+
 ## Logos
 
 `<app>.svg` is the source for each app's logo. OpenTofu can't manage an app's logo or badge color, so set them by hand under the app's settings, in **Display information**. GitHub accepts PNG, JPG, or GIF only:
@@ -58,5 +65,5 @@ Set the badge color to the logo's own background color, from the table above. te
    ```sh
    (cd ~/Development/rc && direnv exec . agenix -d lib/admin/github-apps/teleoid.age -i lib/admin/yubikey-a.txt) | just seal <repo> approve APPROVER_PRIVATE_KEY
    ```
-   For teleomycete, deploy glyph instead.
+   For teleomycete and teleometer, deploy glyph instead.
 4. Delete the old key from the app's settings.
