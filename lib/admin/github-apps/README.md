@@ -13,7 +13,7 @@ What each app may do on GitHub is enforced by rulesets and documented under "Git
 | <img src="teleoid.svg" width="32" alt=""> | teleoid | Approves my PRs so they can auto-merge | every agent repo's `approve` | `#4A1B0C` |
 | <img src="teleopsis.svg" width="32" alt=""> | teleopsis | Read-only observer for stackptr/ops | ops's `plan` | `#042C53` |
 | <img src="teleozyme.svg" width="32" alt=""> | teleozyme | Applies approved plans for stackptr/ops | ops's `production` | `#FAC775` |
-|  | teleometer | Reads Actions history into Loki | none: glyph uses it directly |  |
+| <img src="teleometer.svg" width="32" alt=""> | teleometer | Read-only observer of GitHub Actions | none: glyph mints its tokens | `#173404` |
 
 ## teleomycete
 
@@ -43,7 +43,9 @@ Applies approved OpenTofu plans for stackptr/ops: rulesets, workflow permissions
 
 ## teleometer
 
-Reads GitHub Actions history, read-only: Actions and Checks, installed on every repository, with no webhook. On glyph, `github-actions-log.service` mints an installation token with it every hour and logs each run and job completed since the last poll, with the tail of each failed job's log, as JSON lines in its journal, which Alloy ships to Loki (`hosts/glyph/services/github-actions-log.nix`). The key is readable only by that unit's user.
+Read-only observer of GitHub Actions, installed on every repository: Actions and Checks read, and no webhook (stackptr/rc#866 would add one). It writes nothing and is never a bypass actor.
+
+The key is never sealed into an environment. On glyph, `github-actions-log.service` signs a JWT with it every hour, mints an installation token, and logs each run and job completed since the last poll, with the tail of each failed job's log, as JSON lines that Alloy ships to Loki (`hosts/glyph/services/github-actions-log.nix`). Only that unit's user can read the key.
 
 ## Logos
 

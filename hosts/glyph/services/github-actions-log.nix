@@ -38,8 +38,7 @@ in {
     wants = ["network-online.target"];
     after = ["network-online.target"];
     environment = {
-      # TODO: teleometer's client ID, once the app exists
-      APP_CLIENT_ID = "";
+      APP_CLIENT_ID = "Iv23liroeutHTNeLtwl5";
       APP_OWNER = "stackptr";
       APP_KEY = config.age.secrets.github-actions-log-key.path;
     };
