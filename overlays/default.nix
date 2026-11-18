@@ -3,6 +3,9 @@
   # Custom packages defined in this repository
   (import ./custom-packages.nix)
 
+  # Packages broken in nixpkgs, taken from the revision they last built on
+  (import ./pinned.nix)
+
   # Fix Daisydisk ahead of upstream
   (import ./daisydisk.nix)
 
