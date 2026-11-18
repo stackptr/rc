@@ -111,9 +111,10 @@
     group = "grafana-mcp";
   };
 
-  # SLACK_MCP_XOXB_TOKEN: a read-only bot (history and read scopes, no
-  # chat:write) invited to #alerts and #updates only, so agents can read
-  # alerts and updates but still post only through ntfy.
+  # SLACK_MCP_XOXB_TOKEN: Ocellus, a read-only bot (history and read scopes,
+  # no chat:write; lib/admin/slack-apps/ocellus.manifest.json) invited to
+  # #alerts and #updates only, so agents can read alerts and updates but
+  # still post only through ntfy.
   age.secrets.slack-mcp-env.file = ./../secrets/slack-mcp-env.age;
 
   services.basic-memory.enable = true;
