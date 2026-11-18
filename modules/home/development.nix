@@ -253,6 +253,24 @@ in {
       };
     })
 
+    # Answering bot reviews is most of what agents write through `gh api`,
+    # and each reply would otherwise ask. Ask rules can't make exceptions,
+    # so these two scripts do just that, outside `gh api`'s rules: reply to
+    # a bot's review thread, and resolve one. Both refuse threads a person
+    # started. They call the `gh` on PATH, so on glyph they act as the
+    # agents' GitHub app, not as me.
+    (mkIf cfg.ai.enable (let
+      script = name:
+        pkgs.writeShellApplication {
+          inherit name;
+          text = builtins.readFile ./gh-review/${name}.sh;
+        };
+      scripts = ["gh-review-reply" "gh-resolve-thread"];
+    in {
+      home.packages = map script scripts;
+      programs.claude-code.settings.permissions.allow = map (name: "Bash(${name} *)") scripts;
+    }))
+
     (mkIf (cfg.ai.enable && cfg.ai.gateway.enable) {
       programs.mcp = {
         enable = true;
