@@ -6,5 +6,6 @@
     ./mcpjungle.nix
     ./obsidian-vault-mcp.nix
     ./rc-source-mcp.nix
+    ./slack-mcp.nix
   ];
 }

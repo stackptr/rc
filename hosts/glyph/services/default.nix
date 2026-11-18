@@ -111,6 +111,11 @@
     group = "grafana-mcp";
   };
 
+  # SLACK_MCP_XOXB_TOKEN: a read-only bot (history and read scopes, no
+  # chat:write) invited to #alerts and #updates only, so agents can read
+  # alerts and updates but still post only through ntfy.
+  age.secrets.slack-mcp-env.file = ./../secrets/slack-mcp-env.age;
+
   services.basic-memory.enable = true;
   rc.backup = {
     enable = true;
@@ -138,13 +143,17 @@
     enable = true;
     sourcePath = "${inputs.self}";
   };
+  services.slack-mcp = {
+    enable = true;
+    environmentFile = config.age.secrets.slack-mcp-env.path;
+  };
   # Re-register MCP servers when a local server's unit changes (new binary,
   # flags or environment), so MCPJungle's copy of its tool list stays
   # current. rc-source is left out: its unit changes on every commit, but its
   # tool list doesn't.
   systemd.timers.mcpjungle-register.restartTriggers =
     map (name: config.systemd.units."${name}.service".unit)
-    ["basic-memory" "mcp-nixos" "grafana-mcp" "obsidian-vault-mcp"];
+    ["basic-memory" "mcp-nixos" "grafana-mcp" "obsidian-vault-mcp" "slack-mcp"];
   services.mcpjungle = {
     enable = true;
     servers.basic-memory = {
@@ -169,6 +178,10 @@
     servers.obsidian-vault = {
       url = "http://127.0.0.1:8097/mcp";
       description = "Read and write files in the Obsidian vault";
+    };
+    servers.slack = {
+      url = "http://127.0.0.1:${toString config.services.slack-mcp.port}/mcp";
+      description = "Read-only Slack history from #alerts (Grafana and Gatus alerts) and #updates (CI, downloads and other informational posts). Can't post: send messages through ntfy.";
     };
     servers.rc-source = {
       url = "http://127.0.0.1:8098/mcp";

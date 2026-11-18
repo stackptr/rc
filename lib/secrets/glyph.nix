@@ -12,6 +12,7 @@ in
     "open-webui-api-key"
     "open-webui-env"
     "grafana-mcp-token"
+    "slack-mcp-env"
     "attic-credentials"
     "user-password"
     "obsidian-auth-token"

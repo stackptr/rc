@@ -19,6 +19,9 @@ self: super: {
   # MCP Gateway
   mcpjungle = super.callPackage ./../packages/mcpjungle/package.nix {};
 
+  # Slack MCP server (glyph: agents read #alerts and #updates)
+  slack-mcp-server = super.callPackage ./../packages/slack-mcp-server/package.nix {};
+
   # Obsidian headless sync client
   obsidian-headless = super.callPackage ./../packages/obsidian-headless/package.nix {};
 
