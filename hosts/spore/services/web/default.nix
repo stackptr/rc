@@ -9,6 +9,7 @@
     ./auth.nix
     ./feishin.nix
     ./irc-proxy.nix
+    ./nginx2root.nix
     ./srv.nix
   ];
 
