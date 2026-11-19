@@ -52,6 +52,10 @@
     enable = true;
   };
 
+  programs.obsidian = {
+    enable = true;
+  };
+
   programs.popclip = {
     enable = true;
     startOnActivation = true;

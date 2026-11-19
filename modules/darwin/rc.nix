@@ -123,8 +123,8 @@ in {
             "/Applications/NaviBeat.app" # TestFlight beta, installed by hand
             "/System/Applications/Calendar.app"
             "/System/Applications/Reminders.app"
-            "/Applications/Obsidian.app"
           ]
+          ++ optional config.programs.obsidian.enable "/Applications/Obsidian.app"
           ++ optional config.programs.things.enable "/Applications/Things3.app"
           ++ [
             "/System/Applications/Messages.app"

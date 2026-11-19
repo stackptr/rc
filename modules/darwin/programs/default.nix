@@ -8,6 +8,7 @@
     ./little-snitch.nix
     ./meetingbar.nix
     ./netnewswire.nix
+    ./obsidian.nix
     ./popclip.nix
     ./postico.nix
     ./roon.nix
