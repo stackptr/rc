@@ -268,7 +268,14 @@ in {
     })
 
     (mkIf cfg.enable {
-      homebrew.casks = ["zed"];
+      # auto_update is off and the cask is marked auto_updates, so without
+      # greedy nothing would ever upgrade Zed.
+      homebrew.casks = [
+        {
+          name = "zed";
+          greedy = true;
+        }
+      ];
 
       home-manager.users.${username} = {
         xdg.configFile =
