@@ -51,6 +51,11 @@
     enable = true;
   };
 
+  programs.meetingbar = {
+    enable = true;
+    startOnActivation = true;
+  };
+
   programs.netnewswire = {
     enable = true;
   };

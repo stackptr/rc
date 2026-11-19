@@ -8,7 +8,6 @@
   homebrew = {
     enable = true;
     casks = [
-      "meetingbar"
       "t3-code"
     ];
   };
@@ -29,6 +28,11 @@
 
   programs.little-snitch = {
     enable = true;
+  };
+
+  programs.meetingbar = {
+    enable = true;
+    startOnActivation = true;
   };
 
   programs.netnewswire = {
