@@ -79,4 +79,9 @@
     enable = true;
     startOnActivation = true;
   };
+
+  programs.zed = {
+    enable = true;
+    enableDefaults = true;
+  };
 }

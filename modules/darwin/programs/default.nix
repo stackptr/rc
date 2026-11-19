@@ -13,5 +13,6 @@
     ./scroll-reverser.nix
     ./soundsource.nix
     ./ykding.nix
+    ./zed.nix
   ];
 }
