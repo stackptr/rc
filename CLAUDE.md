@@ -170,8 +170,6 @@ Grafana, Loki and Prometheus on glyph. Use them before `journalctl` or SSH when 
 - An external service: poll its API from a timer on glyph and print JSON lines to the journal, as `github-actions-log` does. That needs no public endpoint. Sending its webhooks to ntfy would mean exposing ntfy's publish endpoint through spore, so do that only for something real-time that can't be polled.
 - An external service whose Slack integration is for me (threads, buttons, acknowledging) can keep posting to Slack directly when agents don't need its data.
 
-Reading Slack itself was tried and dropped in #869: a read-only bot (Ocellus) behind korotovsky/slack-mcp-server, whose package, module and app manifest are on that PR. It's worth reviving only if several sources agents need end up existing only in Slack.
-
 **grafana-mcp:** registered in mcpjungle on glyph (`http://127.0.0.1:8095/mcp`) with LogQL, PromQL and dashboard tools. It's read-only (`--disable-write` in `modules/nixos/llm/grafana-mcp.nix`): change alert rules and dashboards in the flake.
 
 **MCPJungle** serves the tool list it fetched when each server registered. `mcpjungle-register` re-registers every server at boot and when a local server's unit changes (`restartTriggers` in `hosts/glyph/services/default.nix`); by hand: `systemctl restart mcpjungle-register`. Re-registering deregisters first, so a server that fails loses its tools and the unit exits non-zero (the "Systemd unit failed" alert fires); `{unit="mcpjungle-register.service"} |= "ERROR"` names it. Servers needing auth take `headers` plus an `environmentFile`.
