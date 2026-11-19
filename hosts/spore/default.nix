@@ -43,6 +43,7 @@
     hosts = {
       "100.79.196.96" = ["glyph.note-iwato.ts.net"];
       "100.100.142.9" = ["zeta.note-iwato.ts.net"];
+      "100.122.26.71" = ["stroma.note-iwato.ts.net"];
     };
   };
 
