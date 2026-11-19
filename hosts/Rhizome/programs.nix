@@ -76,6 +76,10 @@
     startOnActivation = true;
   };
 
+  programs.slack = {
+    enable = true;
+  };
+
   programs.soundsource = {
     enable = true;
     startOnActivation = true;

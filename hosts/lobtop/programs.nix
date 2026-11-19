@@ -60,6 +60,11 @@
     startOnActivation = true;
   };
 
+  programs.slack = {
+    enable = true;
+    installCask = false; # Kandji installs it
+  };
+
   programs.soundsource = {
     enable = true;
     startOnActivation = true;

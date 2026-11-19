@@ -126,10 +126,8 @@ in {
           ]
           ++ optional config.programs.obsidian.enable "/Applications/Obsidian.app"
           ++ optional config.programs.things.enable "/Applications/Things3.app"
-          ++ [
-            "/System/Applications/Messages.app"
-            "/Applications/Slack.app"
-          ];
+          ++ ["/System/Applications/Messages.app"]
+          ++ optional config.programs.slack.enable "/Applications/Slack.app";
 
         # Disable hot corners
         wvous-tl-corner = 1;
