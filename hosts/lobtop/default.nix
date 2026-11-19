@@ -1,7 +1,6 @@
 {username, ...}: {
   imports = [
     ./claude-warm.nix
-    ./dock.nix
     ./hardware.nix
     ./managed-device.nix
     ./power.nix
