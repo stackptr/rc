@@ -8,11 +8,15 @@
     ./little-snitch.nix
     ./meetingbar.nix
     ./netnewswire.nix
+    ./obsidian.nix
     ./popclip.nix
     ./postico.nix
     ./roon.nix
     ./scroll-reverser.nix
+    ./slack.nix
     ./soundsource.nix
+    ./t3-code.nix
+    ./things.nix
     ./ykding.nix
     ./zed.nix
   ];

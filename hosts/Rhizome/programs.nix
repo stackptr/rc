@@ -16,7 +16,6 @@
     casks = [
       "dash"
       "legcord"
-      "t3-code"
       "textual"
     ];
   };
@@ -53,6 +52,10 @@
     enable = true;
   };
 
+  programs.obsidian = {
+    enable = true;
+  };
+
   programs.popclip = {
     enable = true;
     startOnActivation = true;
@@ -73,6 +76,10 @@
     startOnActivation = true;
   };
 
+  programs.slack = {
+    enable = true;
+  };
+
   programs.soundsource = {
     enable = true;
     startOnActivation = true;
@@ -81,6 +88,14 @@
   programs.cmux = {
     enable = true;
     enableDefaults = true;
+  };
+
+  programs.t3-code = {
+    enable = true;
+  };
+
+  programs.things = {
+    enable = true;
   };
 
   programs.zed = {
