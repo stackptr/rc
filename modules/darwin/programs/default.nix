@@ -14,6 +14,7 @@
     ./scroll-reverser.nix
     ./soundsource.nix
     ./t3-code.nix
+    ./things.nix
     ./ykding.nix
     ./zed.nix
   ];

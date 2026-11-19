@@ -88,6 +88,10 @@
     enable = true;
   };
 
+  programs.things = {
+    enable = true;
+  };
+
   programs.zed = {
     enable = true;
     enableDefaults = true;

@@ -52,7 +52,6 @@ in {
         "Pixea" = 1507782672;
         "Play" = 1596506190;
         "TestFlight" = 899247664;
-        "Things" = 904280696;
         "Timery" = 1425368544;
         "Tot" = 1491071483;
         "wBlock" = 6746388723;
@@ -125,7 +124,9 @@ in {
             "/System/Applications/Calendar.app"
             "/System/Applications/Reminders.app"
             "/Applications/Obsidian.app"
-            "/Applications/Things3.app"
+          ]
+          ++ optional config.programs.things.enable "/Applications/Things3.app"
+          ++ [
             "/System/Applications/Messages.app"
             "/Applications/Slack.app"
           ];
