@@ -259,20 +259,23 @@ in {
 
     # Answering bot reviews is most of what agents write through `gh api`,
     # and each reply would otherwise ask. Ask rules can't make exceptions,
-    # so these two scripts do just that, outside `gh api`'s rules: reply to
-    # a bot's review thread, and resolve one. Both refuse threads a person
-    # started. They call the `gh` on PATH, so on glyph they act as the
-    # agents' GitHub app, not as me.
+    # so these scripts do just that, outside `gh api`'s rules: list a PR's
+    # open review threads, reply to a bot's thread, and resolve one. The
+    # last two refuse threads a person started. gh-review-reply-human
+    # replies to those and isn't allowed here: llm-profile's
+    # address-pr-review skill allows it while that skill runs. They call the
+    # `gh` on PATH, so on glyph they act as the agents' GitHub app, not as me.
     (mkIf cfg.ai.enable (let
       script = name:
         pkgs.writeShellApplication {
           inherit name;
+          runtimeInputs = [pkgs.jq];
           text = builtins.readFile ./gh-review/${name}.sh;
         };
-      scripts = ["gh-review-reply" "gh-resolve-thread"];
+      allowed = ["gh-review-threads" "gh-review-reply" "gh-resolve-thread"];
     in {
-      home.packages = map script scripts;
-      programs.claude-code.settings.permissions.allow = map (name: "Bash(${name} *)") scripts;
+      home.packages = map script (allowed ++ ["gh-review-reply-human"]);
+      programs.claude-code.settings.permissions.allow = map (name: "Bash(${name} *)") allowed;
     }))
 
     (mkIf (cfg.ai.enable && cfg.ai.gateway.enable) {
