@@ -6,6 +6,7 @@
   environment.systemPackages = with pkgs; [
     m-cli
     mas
+    meetingbar
     secretive
     the-unarchiver
   ];
