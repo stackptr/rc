@@ -7,9 +7,6 @@
 
   homebrew = {
     enable = true;
-    casks = [
-      "t3-code"
-    ];
   };
 
   programs.daisydisk = {
@@ -67,6 +64,10 @@
   programs.cmux = {
     enable = true;
     enableDefaults = true;
+  };
+
+  programs.t3-code = {
+    enable = true;
   };
 
   programs.zed = {

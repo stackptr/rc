@@ -16,7 +16,6 @@
     casks = [
       "dash"
       "legcord"
-      "t3-code"
       "textual"
     ];
   };
@@ -81,6 +80,10 @@
   programs.cmux = {
     enable = true;
     enableDefaults = true;
+  };
+
+  programs.t3-code = {
+    enable = true;
   };
 
   programs.zed = {

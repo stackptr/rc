@@ -14,7 +14,6 @@
     enable = true;
     casks = [
       "legcord"
-      "t3-code"
     ];
   };
 
@@ -83,6 +82,10 @@
   programs.soundsource = {
     enable = true;
     startOnActivation = true;
+  };
+
+  programs.t3-code = {
+    enable = true;
   };
 
   programs.zed = {
