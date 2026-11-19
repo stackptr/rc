@@ -2,13 +2,13 @@
   environment.systemPackages = with pkgs; [
     m-cli
     mas
+    meetingbar
     the-unarchiver
   ];
 
   homebrew = {
     enable = true;
     casks = [
-      "meetingbar"
       "t3-code"
     ];
   };
