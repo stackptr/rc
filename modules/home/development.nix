@@ -78,6 +78,10 @@ in {
               GIT_CONFIG_COUNT = "1";
               GIT_CONFIG_KEY_0 = "commit.gpgsign";
               GIT_CONFIG_VALUE_0 = "false";
+              # The documented default. Some builds (2.1.318 on Rhizome) chose
+              # system alone, and on macOS 27 Claude Code reads almost nothing
+              # from the system store, so every request failed TLS.
+              CLAUDE_CODE_CERT_STORE = "bundled,system";
             }
             // lib.optionalAttrs cfg.ai.telemetry.enable {
               CLAUDE_CODE_ENABLE_TELEMETRY = "1";
