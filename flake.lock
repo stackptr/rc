@@ -410,11 +410,11 @@
     "llm-profile": {
       "flake": false,
       "locked": {
-        "lastModified": 1795131593,
-        "narHash": "sha256-E/uzHLGxa5EvLCFEhMisHlvGfoFXZwHU3FPEw7emJMY=",
+        "lastModified": 1795131893,
+        "narHash": "sha256-xcXD38c2jDPsSPkBXJbMzgnqU0elfWg9ioQLV3PQkIk=",
         "owner": "stackptr",
         "repo": "llm-profile",
-        "rev": "9955b99e1be8862eac243259d4389fd6065eb4d4",
+        "rev": "5aa73960d9b12d5927747f13de21c4e2292ae0dd",
         "type": "github"
       },
       "original": {
