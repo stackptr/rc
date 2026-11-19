@@ -43,6 +43,7 @@ in {
 
       programs.zed.settings = {
         auto_update = mkDefault false;
+        disable_ai = mkDefault true;
         theme = mkDefault {
           mode = "system";
           light = "Nova Light";
@@ -104,7 +105,6 @@ in {
           breadcrumbs = true;
           quick_actions = false;
           selections_menu = false;
-          agent_review = false;
           code_actions = false;
         };
 
@@ -148,13 +148,6 @@ in {
           include_warnings = false;
           inline = {enabled = true;};
         };
-
-        edit_predictions = mkDefault {
-          provider = "copilot";
-          mode = "eager";
-          enabled_in_text_threads = true;
-        };
-        show_edit_predictions = mkDefault true;
 
         load_direnv = mkDefault "shell_hook";
         double_click_in_multibuffer = mkDefault "open";
@@ -221,7 +214,6 @@ in {
 
         prettier = mkDefault {allowed = true;};
         languages = mkDefault {
-          "Plain Text" = {show_edit_predictions = false;};
           "JavaScript" = {
             tab_size = 2;
             formatter = {
@@ -272,26 +264,6 @@ in {
             ];
           }
         ];
-
-        agent_servers = mkDefault {
-          "claude-acp" = {type = "registry";};
-        };
-
-        agent = mkDefault {
-          dock = "left";
-          enable_feedback = false;
-          default_model = {
-            provider = "anthropic";
-            model = "claude-sonnet-4-6-1m-context-thinking-latest";
-            enable_thinking = true;
-          };
-          favorite_models = [];
-          model_parameters = [];
-          commit_message_model = {
-            provider = "anthropic";
-            model = "claude-sonnet-4-6-latest";
-          };
-        };
       };
     })
 
