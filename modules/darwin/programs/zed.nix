@@ -64,7 +64,7 @@ in {
         diff_view_style = mkDefault "unified";
 
         title_bar = mkDefault {
-          show_branch_icon = true;
+          show_branch_status_icon = true;
           show_branch_name = true;
           show_project_items = true;
           show_onboarding_banner = false;
@@ -260,6 +260,18 @@ in {
             };
           };
         };
+
+        ssh_connections = mkDefault [
+          {
+            host = "glyph";
+            username = "mu";
+            args = [];
+            projects = [
+              {paths = ["/home/mu/Development/freckle"];}
+              {paths = ["/home/mu/Development/rc"];}
+            ];
+          }
+        ];
 
         agent_servers = mkDefault {
           "claude-acp" = {type = "registry";};
