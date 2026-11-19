@@ -111,21 +111,24 @@ in {
         magnification = true;
         tilesize = 42;
         largesize = 86;
-        persistent-apps = [
-          "/System/Volumes/Preboot/Cryptexes/App/System/Applications/Safari.app"
-          "/System/Applications/Mail.app"
-          "/Applications/Zed.app"
-          "/Applications/cmux.app"
-          "/Applications/T3 Code (Beta).app"
-          "/Applications/NetNewsWire.app"
-          "/Applications/NaviBeat.app" # TestFlight beta, installed by hand
-          "/System/Applications/Calendar.app"
-          "/System/Applications/Reminders.app"
-          "/Applications/Obsidian.app"
-          "/Applications/Things3.app"
-          "/System/Applications/Messages.app"
-          "/Applications/Slack.app"
-        ];
+        persistent-apps =
+          [
+            "/System/Volumes/Preboot/Cryptexes/App/System/Applications/Safari.app"
+            "/System/Applications/Mail.app"
+          ]
+          ++ optional config.programs.zed.enable "/Applications/Zed.app"
+          ++ optional config.programs.cmux.enable "/Applications/cmux.app"
+          ++ optional config.programs.t3-code.enable "/Applications/T3 Code (Beta).app"
+          ++ optional config.programs.netnewswire.enable "/Applications/NetNewsWire.app"
+          ++ [
+            "/Applications/NaviBeat.app" # TestFlight beta, installed by hand
+            "/System/Applications/Calendar.app"
+            "/System/Applications/Reminders.app"
+            "/Applications/Obsidian.app"
+            "/Applications/Things3.app"
+            "/System/Applications/Messages.app"
+            "/Applications/Slack.app"
+          ];
 
         # Disable hot corners
         wvous-tl-corner = 1;
