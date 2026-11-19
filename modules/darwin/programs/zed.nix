@@ -162,7 +162,7 @@ in {
         project_panel = mkDefault {
           button = true;
           default_width = 240;
-          dock = "right";
+          dock = "left";
           entry_spacing = "standard";
           file_icons = true;
           folder_icons = true;
@@ -206,7 +206,7 @@ in {
           button = true;
         };
         outline_panel = mkDefault {
-          dock = "right";
+          dock = "left";
           button = false;
         };
         notification_panel = mkDefault {button = false;};
