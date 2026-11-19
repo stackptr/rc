@@ -4,7 +4,6 @@
   ...
 }: {
   environment.systemPackages = with pkgs; [
-    github-desktop
     m-cli
     mas
     secretive
