@@ -43,6 +43,10 @@ in {
 
       programs.zed.settings = {
         auto_update = mkDefault false;
+        telemetry = mkDefault {
+          metrics = false;
+          diagnostics = false;
+        };
         disable_ai = mkDefault true;
         theme = mkDefault {
           mode = "system";
