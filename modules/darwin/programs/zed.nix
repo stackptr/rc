@@ -165,7 +165,7 @@ in {
           dock = "left";
           entry_spacing = "standard";
           file_icons = true;
-          folder_icons = true;
+          folder_indicator = "icon";
           git_status = true;
           indent_size = 16;
           auto_reveal_entries = true;
