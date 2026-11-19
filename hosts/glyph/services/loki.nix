@@ -33,6 +33,15 @@ _: {
 
       limits_config = {
         retention_period = "30d";
+        # Logins, privilege use, deploys, nginx's error log and the kernel,
+        # for looking back at an incident past 30 days. About 40 MB a month.
+        retention_stream = [
+          {
+            selector = ''{app=~"sshd|sshd-session|sudo|su|systemd-logind|nixos-deploy|deploy-rs|nginx|kernel"}'';
+            priority = 1;
+            period = "180d";
+          }
+        ];
         ingestion_burst_size_mb = 16;
         ingestion_rate_mb = 8;
         # OTLP pushes (Claude Code events): index the host resource attribute
