@@ -41,6 +41,9 @@
     device = "zdata/documents";
     fsType = "zfs";
   };
+  # The /mnt mounts require this unit, so restarting it on a switch unmounts
+  # them, and services that start before they're remounted fail.
+  systemd.services.zfs-import-zdata.restartIfChanged = false;
 
   users.users.colleen = {
     isSystemUser = true;

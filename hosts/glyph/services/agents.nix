@@ -524,7 +524,8 @@ in {
       jwt="$header.$payload.$signature"
 
       api() {
-        curl -sSf -H "Authorization: Bearer $jwt" \
+        curl -sSf --retry 5 --retry-all-errors --retry-delay 2 \
+          -H "Authorization: Bearer $jwt" \
           -H "Accept: application/vnd.github+json" \
           -H "X-GitHub-Api-Version: 2022-11-28" "$@"
       }
