@@ -9,6 +9,7 @@
     ./auth.nix
     ./feishin.nix
     ./irc-proxy.nix
+    ./nginx2root.nix
     ./srv.nix
   ];
 
@@ -18,16 +19,6 @@
     owner = "nginx";
     mode = "400";
   };
-  # A long-lived T3 session token from glyph, as the nginx directive that
-  # sends it: `proxy_set_header Authorization "Bearer <token>";`
-  age.secrets.t3-proxy-auth = {
-    file = ../../secrets/t3-proxy-auth.age;
-    owner = "nginx";
-    mode = "400";
-  };
-  # nginx reads the token only when it loads its config
-  systemd.services.nginx.reloadTriggers = [config.age.secrets.t3-proxy-auth.file];
-
   services.nginx = {
     enable = true;
     recommendedProxySettings = true;
@@ -143,37 +134,6 @@
         locations."/" = {
           proxyPass = "http://glyph.note-iwato.ts.net:8890";
           proxyWebsockets = true;
-        };
-      };
-      "agents.zx.dev" = {
-        forceSSL = true;
-        useACMEHost = "zx.dev";
-        # T3 Code on glyph. Pocket ID is the only login: once it lets a
-        # request through, spore signs it in to T3 with one shared session
-        # token, so browsers don't pair. The apps connect to glyph directly
-        # and still pair.
-        requireAuth = true;
-        # For Gatus: glyph only accepts T3's port from spore. requireAuth
-        # only guards locations."/", so this exact match skips Pocket ID.
-        # T3's environment descriptor (id, label, version); T3 itself serves
-        # it without auth to clients deciding whether to pair. No token here.
-        locations."= /.well-known/t3/environment".proxyPass = "http://glyph.note-iwato.ts.net:6767";
-        locations."/" = {
-          proxyPass = "http://glyph.note-iwato.ts.net:6767";
-          proxyWebsockets = true;
-          extraConfig = ''
-            # Agent output streams over a WebSocket for the whole session
-            proxy_buffering off;
-            proxy_read_timeout 3600s;
-            proxy_send_timeout 3600s;
-            client_max_body_size 100m;
-            include ${config.age.secrets.t3-proxy-auth.path};
-            # T3 checks its own session cookie before the header, so a
-            # browser's expired pairing cookie would win and be refused.
-            # Pocket ID's cookie is only needed by auth_request, which reads
-            # the client's request, not this one.
-            proxy_set_header Cookie "";
-          '';
         };
       };
       "cache.zx.dev" = {

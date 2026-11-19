@@ -125,11 +125,11 @@
         "treefmt-nix": "treefmt-nix"
       },
       "locked": {
-        "lastModified": 1794327458,
-        "narHash": "sha256-JAmGAzhVfrgi3DoO28Z9OvH5zHc2LwpSNHeYHdhttnY=",
+        "lastModified": 1795071863,
+        "narHash": "sha256-VsFJnHhqZG2ffsmgXEK/66Hxog3x8WJCmQhpUL73pmU=",
         "owner": "Mic92",
         "repo": "direnv-instant",
-        "rev": "2ce8a114080ce55d9dc8a0e5f96eea5fe871e776",
+        "rev": "785a1a3064f8bb11a77fedcdfac8d33ba65fc126",
         "type": "github"
       },
       "original": {
@@ -362,11 +362,11 @@
     "homebrew-cask": {
       "flake": false,
       "locked": {
-        "lastModified": 1795008824,
-        "narHash": "sha256-K4SVIOAsxq+6ydC4GEsRtYe0V0Io3f2pB1wwUQEL/bc=",
+        "lastModified": 1795097460,
+        "narHash": "sha256-BxHxvKoz0YDvQK5q0Lg4GeqTiIzrttAyZXkt+5Jf7lo=",
         "owner": "homebrew",
         "repo": "homebrew-cask",
-        "rev": "4181f7a7fc911534eedc921e788bc4fe118126f7",
+        "rev": "4310d3aac313f422a65947b52a9acd8d3ce1b257",
         "type": "github"
       },
       "original": {
@@ -378,11 +378,11 @@
     "homebrew-core": {
       "flake": false,
       "locked": {
-        "lastModified": 1795009302,
-        "narHash": "sha256-z4XxqwYiD7oCDGHwv4nHP91h1BMiPJN8dTEL3RTWwO4=",
+        "lastModified": 1795091322,
+        "narHash": "sha256-cnwBEziRPy9zar+lVC/7U87KRWTQNXxkQlhZv5YDCsQ=",
         "owner": "homebrew",
         "repo": "homebrew-core",
-        "rev": "df69c4ae50a5c295943b98a727fcc48fd0c8d585",
+        "rev": "aa2355fbd7243b45c1e156f76b1148370e5e47b5",
         "type": "github"
       },
       "original": {
@@ -394,11 +394,11 @@
     "homebrew-omlx": {
       "flake": false,
       "locked": {
-        "lastModified": 1794984024,
-        "narHash": "sha256-f0gtliM5nHbMDEs2q5eRf9yAN2D0yRFNLazpYMqsHPs=",
+        "lastModified": 1795083567,
+        "narHash": "sha256-SDk8O4Hs22KGTzJMYOR8rP99p3zsGyPjc+bmZ/SrY10=",
         "owner": "jundot",
         "repo": "omlx",
-        "rev": "b1bb94a6d53fdb2a48b6fb5afc0e8d5e33f76913",
+        "rev": "807cbc14fd60f737a8114f33f4dad4041fa5625b",
         "type": "github"
       },
       "original": {
@@ -507,11 +507,11 @@
         "nixpkgs": "nixpkgs_3"
       },
       "locked": {
-        "lastModified": 1794906521,
-        "narHash": "sha256-B3ox9O5jQ7/RU2IECjP6MtA0BRqL9+yunGJRow0c1gA=",
+        "lastModified": 1795018746,
+        "narHash": "sha256-glQAHvZGgBVjzGIWgIZYSf3X10gvtO2LPR4rtyP/Soc=",
         "owner": "NixOS",
         "repo": "nixos-hardware",
-        "rev": "d9da8426d86bd7e937226f5ecef1df1504ead2e8",
+        "rev": "33475966110df258f52d05ec4d4cd6394637cbb9",
         "type": "github"
       },
       "original": {
@@ -707,6 +707,7 @@
         "nixpkgs": "nixpkgs_4",
         "nixpkgs-stable-24-05": "nixpkgs-stable-24-05",
         "systems": "systems_2",
+        "zed-nova-theme": "zed-nova-theme",
         "zx-dev": "zx-dev"
       }
     },
@@ -801,6 +802,22 @@
         "type": "github"
       }
     },
+    "zed-nova-theme": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1778631800,
+        "narHash": "sha256-tO7TiyjOyqFLYGaJdoE/eSndyqLEsyLKK0qYSl7vtWg=",
+        "owner": "stackptr",
+        "repo": "zed-nova-theme",
+        "rev": "484ab792b9544a49eb93cdd5e5e5a0c853f8216d",
+        "type": "github"
+      },
+      "original": {
+        "owner": "stackptr",
+        "repo": "zed-nova-theme",
+        "type": "github"
+      }
+    },
     "zx-dev": {
       "inputs": {
         "anemone": "anemone",
@@ -812,11 +829,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1794747621,
-        "narHash": "sha256-cFscVXZu48rG4qnsUajZgLyqvKDSKy/MoFA5XrUgl0U=",
+        "lastModified": 1795012707,
+        "narHash": "sha256-6goWtB/YzABUi4LmVzpHl5eTnmV9ki6lTQqH3owKD6Y=",
         "owner": "stackptr",
         "repo": "zx.dev",
-        "rev": "f03d7d2030d7e2825caa391e5950c1535c2c5596",
+        "rev": "1d0f67ef4f3f49d658c994739db57cafb497d341",
         "type": "github"
       },
       "original": {

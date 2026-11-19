@@ -1,6 +1,6 @@
-# Coding agents on glyph: OpenCode's server (code.zx.dev) and T3 Code
-# (agents.zx.dev), which runs Claude Code, OpenCode and Pi agents. Everything
-# here runs as one unprivileged user, the write tier (unattended jobs that
+# Coding agents on glyph: OpenCode's server (code.zx.dev) and T3 Code, which
+# runs Claude Code, OpenCode and Pi agents. Everything here runs as one
+# unprivileged user, the write tier (unattended jobs that
 # need less run as the other tiers' users, ./agent-tiers.nix), and every
 # agent process runs inside the same nono profile, which grants the workspaces
 # and the agents' own state but not T3's home (its sessions, pairing secrets
@@ -49,7 +49,6 @@
     exec ${lib.getExe pkgs.gh} "$@"
   '';
   opencodePort = 8890;
-  # Paseo's old port, so agents.zx.dev's proxy on spore didn't change
   t3Port = 6767;
   # The agents reach MCPJungle only through this proxy, which serves only
   # their tool group: on MCPJungle's own port they'd get every server
@@ -341,14 +340,14 @@ in {
   };
   users.groups.${tokenUser} = {};
 
-  # Only spore's nginx may reach OpenCode's server or T3 over the tailnet,
-  # which puts Pocket ID in front of them (code.zx.dev, agents.zx.dev). The
-  # exception is T3 from the iPhone, iPad, Stroma, Rhizome and lobtop: its
-  # apps can't log in to Pocket ID, so they connect directly and T3's pairing
-  # is their only gate. This can't go in nixos-fw: tailscaled's ts-input
-  # chain, first in filter INPUT, accepts everything from tailscale0 before
-  # nixos-fw sees it. mangle INPUT runs earlier and tailscaled leaves it
-  # alone; it can't REJECT, so others time out.
+  # Only spore's nginx may reach OpenCode's server over the tailnet, which
+  # puts Pocket ID in front of it (code.zx.dev). T3 has no proxy: only the
+  # iPhone, iPad, Stroma, Rhizome and lobtop connect to it, and T3's pairing
+  # is their gate; zeta's Gatus reads its unauthenticated descriptor. This
+  # can't go in nixos-fw: tailscaled's ts-input chain, first in filter INPUT,
+  # accepts everything from tailscale0 before nixos-fw sees it. mangle INPUT
+  # runs earlier and tailscaled leaves it alone; it can't REJECT, so others
+  # time out.
   #
   # Postgres trusts every local connection (hosts/glyph/services/db.nix), so
   # anything running as this user could connect as the superuser. The socket
@@ -360,7 +359,7 @@ in {
   # ntfyAgentsPort.
   networking.firewall.extraCommands = ''
     ip46tables -t mangle -N opencode-in 2>/dev/null || ip46tables -t mangle -F opencode-in
-    ${onlyFrom ["spore"] opencodePort}${onlyFrom ["spore" "blip" "slate" "stroma" "rhizome" "lobtop"] t3Port}
+    ${onlyFrom ["spore"] opencodePort}${onlyFrom ["blip" "slate" "stroma" "rhizome" "lobtop" "zeta"] t3Port}
     ip46tables -t mangle -D INPUT -j opencode-in 2>/dev/null || true
     ip46tables -t mangle -I INPUT -j opencode-in
 
@@ -524,7 +523,8 @@ in {
       jwt="$header.$payload.$signature"
 
       api() {
-        curl -sSf -H "Authorization: Bearer $jwt" \
+        curl -sSf --retry 5 --retry-all-errors --retry-delay 2 \
+          -H "Authorization: Bearer $jwt" \
           -H "Accept: application/vnd.github+json" \
           -H "X-GitHub-Api-Version: 2022-11-28" "$@"
       }
@@ -621,9 +621,8 @@ in {
   environment.systemPackages = [t3code];
   environment.etc."t3code/policy.json".source = t3PolicyChecked;
 
-  # agents.zx.dev on spore proxies here. Every client, browser or app, pairs
-  # with a one-time token before it can do anything, loopback included, so
-  # agents can't drive T3 without one.
+  # Every client, browser or app, pairs with a one-time token before it can
+  # do anything, loopback included, so agents can't drive T3 without one.
   systemd.services.t3code = {
     description = "T3 Code server";
     wantedBy = ["multi-user.target"];

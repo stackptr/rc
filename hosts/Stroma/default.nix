@@ -6,7 +6,6 @@
   ...
 }: {
   imports = [
-    ./dock.nix
     ./hardware.nix
     ./monitoring.nix
     ./omlx.nix

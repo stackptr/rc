@@ -52,7 +52,6 @@ in {
         "Pixea" = 1507782672;
         "Play" = 1596506190;
         "TestFlight" = 899247664;
-        "Things" = 904280696;
         "Timery" = 1425368544;
         "Tot" = 1491071483;
         "wBlock" = 6746388723;
@@ -109,6 +108,26 @@ in {
         show-recents = false;
         static-only = false;
         magnification = true;
+        tilesize = 42;
+        largesize = 86;
+        persistent-apps =
+          [
+            "/System/Volumes/Preboot/Cryptexes/App/System/Applications/Safari.app"
+            "/System/Applications/Mail.app"
+          ]
+          ++ optional config.programs.zed.enable "/Applications/Zed.app"
+          ++ optional config.programs.cmux.enable "/Applications/cmux.app"
+          ++ optional config.programs.t3-code.enable "/Applications/T3 Code (Beta).app"
+          ++ optional config.programs.netnewswire.enable "/Applications/NetNewsWire.app"
+          ++ [
+            "/Applications/NaviBeat.app" # TestFlight beta, installed by hand
+            "/System/Applications/Calendar.app"
+            "/System/Applications/Reminders.app"
+          ]
+          ++ optional config.programs.obsidian.enable "/Applications/Obsidian.app"
+          ++ optional config.programs.things.enable "/Applications/Things3.app"
+          ++ ["/System/Applications/Messages.app"]
+          ++ optional config.programs.slack.enable "/Applications/Slack.app";
 
         # Disable hot corners
         wvous-tl-corner = 1;

@@ -8,10 +8,13 @@
     inputs.nixos-hardware.nixosModules.raspberry-pi-4
   ];
   boot = {
-    # nixos-hardware defaults to the Raspberry Pi vendor kernel, which Hydra
-    # doesn't build, so every nixpkgs bump recompiled it in CI (~1h45m).
-    # Mainline supports the Pi 4 and is in cache.nixos.org.
-    kernelPackages = pkgs.linuxPackages;
+    # Keep nixos-hardware's default, the Raspberry Pi vendor kernel, even
+    # though Hydra doesn't build it and CI compiles it on every nixpkgs bump
+    # (~1h45m). Mainline doesn't fit the U-Boot on the firmware partition:
+    # booti moves the Image to 0x200000, and from 6.18.57 mainline's
+    # image_size (70 MiB) runs past fdt_addr_r (0x4700000), so U-Boot skips
+    # the entry and boots an older generation instead. The vendor Image is
+    # about 37 MB.
     initrd.availableKernelModules = ["xhci_pci" "usbhid" "usb_storage"];
     loader = {
       grub.enable = false;
