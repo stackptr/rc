@@ -156,6 +156,14 @@ in {
         requires = lib.optionals cfg.issuer.localDatabase ["postgresql.target"];
       };
 
+      # oauth2-proxy exits unless OIDC discovery against the issuer succeeds,
+      # which needs nginx and Pocket ID (and its database) up. At boot that
+      # can take longer than the default start limit allows.
+      systemd.services.oauth2-proxy = {
+        unitConfig.StartLimitIntervalSec = 0;
+        serviceConfig.RestartSec = 5;
+      };
+
       services.oauth2-proxy = {
         enable = true;
         provider = "oidc";
