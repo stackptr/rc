@@ -22,6 +22,8 @@
       "timeo=600"
     ];
   };
+  # NixOS's NFS support turns rpcbind on, but NFSv4 doesn't use it
+  services.rpcbind.enable = lib.mkForce false;
 
   services.nginx.virtualHosts."srv.zx.dev" = {
     root = "/mnt/srv/www";
