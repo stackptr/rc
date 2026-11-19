@@ -142,11 +142,11 @@ in {
           (mkEndpoint {
             name = "t3-code";
             group = "glyph";
-            # T3's unauthenticated environment descriptor, through spore:
-            # glyph only accepts T3's port from spore
-            url = "https://agents.zx.dev/.well-known/t3/environment";
+            # T3's unauthenticated environment descriptor; glyph's firewall
+            # lets zeta reach T3's port for this
+            url = "http://${glyph}:6767/.well-known/t3/environment";
             conditions = ["[STATUS] == 200"];
-            description = "T3 Code on glyph is not answering through spore, so agents.zx.dev and its agents are down";
+            description = "T3 Code on glyph is not answering, so its agents are down";
           })
           (mkEndpoint {
             name = "reachable";

@@ -191,13 +191,6 @@ in {
             };
           }
           {
-            "T3 Code" = {
-              description = "Claude, OpenCode and Pi agents on glyph";
-              href = "https://agents.zx.dev";
-              icon = "mdi-robot-outline";
-            };
-          }
-          {
             "File Browser" = {
               description = "Files on glyph";
               href = "https://files.zx.dev";
