@@ -71,7 +71,7 @@ in {
           show_onboarding_banner = false;
           show_user_picture = false;
           show_user_menu = true;
-          show_sign_in = true;
+          show_sign_in = false;
           show_menus = false;
         };
 
@@ -203,7 +203,7 @@ in {
         };
         collaboration_panel = mkDefault {
           dock = "right";
-          button = true;
+          button = false;
         };
         outline_panel = mkDefault {
           dock = "left";
