@@ -6,7 +6,6 @@
   environment.systemPackages = with pkgs; [
     m-cli
     mas
-    meetingbar
     secretive
     the-unarchiver
   ];
@@ -50,6 +49,11 @@
 
   programs.little-snitch = {
     enable = true;
+  };
+
+  programs.meetingbar = {
+    enable = true;
+    startOnActivation = true;
   };
 
   programs.netnewswire = {

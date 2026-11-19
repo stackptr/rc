@@ -6,6 +6,7 @@
     ./fastscripts.nix
     ./iina.nix
     ./little-snitch.nix
+    ./meetingbar.nix
     ./netnewswire.nix
     ./popclip.nix
     ./postico.nix
