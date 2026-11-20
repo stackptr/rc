@@ -10,6 +10,8 @@ in {
     enable = mkEnableOption "CodexBar";
 
     startOnActivation = mkEnableOption "starting CodexBar on activation";
+
+    notifications = mkEnableOption "CodexBar's limit reset, quota and pace warning notifications";
   };
 
   config = mkIf cfg.enable {
@@ -18,9 +20,9 @@ in {
       "com.steipete.codexbar" = {
         usageBarsShowUsed = true;
         tokenCostUsageEnabled = false;
-        limitResetNotificationsEnabled = true;
-        quotaWarningNotificationsEnabled = true;
-        predictivePaceWarningNotificationsEnabled = true;
+        limitResetNotificationsEnabled = cfg.notifications;
+        quotaWarningNotificationsEnabled = cfg.notifications;
+        predictivePaceWarningNotificationsEnabled = cfg.notifications;
       };
     };
     system.disableUpdates = ["com.steipete.codexbar"];

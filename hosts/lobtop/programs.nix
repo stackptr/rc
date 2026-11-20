@@ -78,6 +78,7 @@
   programs.codexbar = {
     enable = true;
     startOnActivation = true;
+    notifications = true;
   };
 
   programs.t3-code = {
