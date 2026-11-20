@@ -49,23 +49,11 @@ in {
         rejects is left uninstalled, since T3 Code won't start with one.
       '';
     };
-
-    notificationMode = mkOption {
-      type = types.nullOr (types.enum ["off" "notifications" "sound" "notifications-and-sound"]);
-      default = null;
-      description = ''
-        Thread notifications in the desktop app. This is a client setting,
-        which the policy can't manage, so activation writes it into
-        {file}`~/.t3/userdata/client-settings.json` whenever it differs. Null
-        leaves it to the UI. Other clients (iOS, browsers) keep their own.
-      '';
-    };
   };
 
   config = mkMerge [
     (mkIf cfg.enableDefaults {
       programs.t3-code = {
-        notificationMode = mkDefault "notifications";
         settings = {
           idleCompaction = mkDefault "beforeCacheExpires";
           promptSuggestionsEnabled = mkDefault true;
@@ -135,33 +123,9 @@ in {
         }
       '';
 
-      home-manager.users.${username} = {lib, ...}: {
-        # The app writes this shim on first launch; T3 suggests `t3` commands
-        # only when the one on PATH is this shim.
-        home.sessionPath = ["$HOME/.t3/bin"];
-
-        home.activation.t3CodeNotifications = mkIf (cfg.notificationMode != null) (
-          lib.hm.dag.entryAfter ["writeBoundary"] ''
-            f="$HOME/.t3/userdata/client-settings.json"
-            current="$(${getExe pkgs.jq} -r '.notificationMode // empty' "$f" 2> /dev/null || true)"
-            if [ "$current" != ${escapeShellArg cfg.notificationMode} ]; then
-              tmp="$(mktemp)"
-              if [ -f "$f" ]; then
-                jqArgs=('.notificationMode = $mode' "$f")
-              else
-                jqArgs=(-n '{notificationMode: $mode}')
-              fi
-              if ${getExe pkgs.jq} --arg mode ${escapeShellArg cfg.notificationMode} "''${jqArgs[@]}" > "$tmp"; then
-                run mkdir -p "$(dirname "$f")"
-                run mv "$tmp" "$f"
-              else
-                warnEcho "Couldn't update T3 Code's notification mode in $f"
-                rm -f "$tmp"
-              fi
-            fi
-          ''
-        );
-      };
+      # The app writes this shim on first launch; T3 suggests `t3` commands
+      # only when the one on PATH is this shim.
+      home-manager.users.${username}.home.sessionPath = ["$HOME/.t3/bin"];
     })
   ];
 }
