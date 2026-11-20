@@ -27,6 +27,7 @@ in {
         predictivePaceWarningNotificationsEnabled = true;
       };
     };
+    system.disableUpdates = ["com.steipete.codexbar"];
     system.startOnActivation = mkIf cfg.startOnActivation {
       CodexBar = "/Applications/CodexBar.app/";
     };
