@@ -9,6 +9,7 @@
     ./auth.nix
     ./feishin.nix
     ./irc-proxy.nix
+    ./nginx2root.nix
     ./srv.nix
   ];
 
@@ -18,7 +19,6 @@
     owner = "nginx";
     mode = "400";
   };
-
   services.nginx = {
     enable = true;
     recommendedProxySettings = true;
@@ -134,26 +134,6 @@
         locations."/" = {
           proxyPass = "http://glyph.note-iwato.ts.net:8890";
           proxyWebsockets = true;
-        };
-      };
-      "agents.zx.dev" = {
-        forceSSL = true;
-        useACMEHost = "zx.dev";
-        # Paseo on glyph, which also requires its own password
-        requireAuth = true;
-        # For Gatus: glyph only accepts Paseo's port from spore. requireAuth
-        # only guards locations."/", so this exact match skips Pocket ID.
-        locations."= /api/health".proxyPass = "http://glyph.note-iwato.ts.net:6767";
-        locations."/" = {
-          proxyPass = "http://glyph.note-iwato.ts.net:6767";
-          proxyWebsockets = true;
-          extraConfig = ''
-            # Agent output streams over a WebSocket for the whole session
-            proxy_buffering off;
-            proxy_read_timeout 3600s;
-            proxy_send_timeout 3600s;
-            client_max_body_size 100m;
-          '';
         };
       };
       "cache.zx.dev" = {

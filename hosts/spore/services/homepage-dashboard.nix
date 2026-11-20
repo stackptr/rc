@@ -140,16 +140,6 @@ in {
               };
             };
           }
-          {
-            "Network Usage" = {
-              widget = {
-                type = "glances";
-                url = "http://localhost:${builtins.toString config.services.glances.port}";
-                version = 4;
-                metric = "network:eth0";
-              };
-            };
-          }
         ];
       }
       {
@@ -198,13 +188,6 @@ in {
               description = "Coding agent on glyph";
               href = "https://code.zx.dev";
               icon = "opencode";
-            };
-          }
-          {
-            "Paseo" = {
-              description = "Claude, OpenCode and Pi agents on glyph";
-              href = "https://agents.zx.dev";
-              icon = "mdi-robot-outline";
             };
           }
           {

@@ -7,9 +7,6 @@
 
   homebrew = {
     enable = true;
-    casks = [
-      "meetingbar"
-    ];
   };
 
   # CodexBar (cask in modules/darwin/rc.nix) reads Claude usage with the Claude
@@ -42,7 +39,16 @@
     enable = true;
   };
 
+  programs.meetingbar = {
+    enable = true;
+    startOnActivation = true;
+  };
+
   programs.netnewswire = {
+    enable = true;
+  };
+
+  programs.obsidian = {
     enable = true;
   };
 
@@ -66,12 +72,30 @@
     startOnActivation = true;
   };
 
+  programs.slack = {
+    enable = true;
+    installCask = false; # Kandji installs it
+  };
+
   programs.soundsource = {
     enable = true;
     startOnActivation = true;
   };
 
   programs.cmux = {
+    enable = true;
+    enableDefaults = true;
+  };
+
+  programs.t3-code = {
+    enable = true;
+  };
+
+  programs.things = {
+    enable = true;
+  };
+
+  programs.zed = {
     enable = true;
     enableDefaults = true;
   };

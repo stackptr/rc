@@ -31,5 +31,11 @@ in {
     KbdInteractiveAuthentication = false;
   };
 
+  # Only the keys declared above: sshd otherwise also reads
+  # ~/.ssh/authorized_keys, which Nix doesn't manage. spore's root had one
+  # left over from install, still trusting glyph's host key after rc
+  # dropped it.
+  services.openssh.authorizedKeysInHomedir = false;
+
   security.pam.sshAgentAuth.authorizedKeysFiles = lib.mkForce ["/etc/ssh/authorized_keys.d/%u"];
 }

@@ -18,6 +18,11 @@
     OTEL_LOGS_EXPORTER = "otlp";
     OTEL_METRICS_EXPORTER = "otlp";
     OTEL_METRIC_EXPORT_INTERVAL = "60000";
+    # Cloudflare Gateway's CA, for every claude however it was launched (T3
+    # can start before the launchd agent's setenv). On macOS 27, Claude Code
+    # reads only one certificate from the system store, so MDM's Keychain
+    # copy of the CA no longer covers for a missing env var.
+    NODE_EXTRA_CA_CERTS = "/etc/ssl/certs/ca-certificates.crt";
   };
 
   # cmux's claude wrapper adds its computer-use MCP server with --mcp-config,

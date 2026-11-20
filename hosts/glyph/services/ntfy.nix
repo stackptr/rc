@@ -33,7 +33,8 @@ in {
   # ntfy's own fields: title (the notification preview), message (Slack
   # mrkdwn), tags (the first is the emoji), click (a link) and priority
   # (4 and up go to #alerts, the rest to #updates). Messages on the agents'
-  # topic go to #agents as plain text. See ./ntfy-to-slack.jq.
+  # topic go to #agents as plain text. See ./ntfy-to-slack.jq. Each message
+  # is also printed as one JSON line, so Loki keeps the record agents read.
   systemd.services.ntfy-slack-relay = {
     description = "Forward ntfy notifications to Slack";
     after = ["ntfy-sh.service" "network.target"];
@@ -54,6 +55,9 @@ in {
       curl -sN --retry 10 --retry-connrefused --retry-delay 1 \
         "${ntfyUrl}/${ntfyTopic},${agentsTopic}/json" |
       while IFS= read -r event; do
+        jq -c 'select((.event // "message") == "message" and (.message // "") != "")
+          | {id, time, topic, priority: (.priority // 3), tags: ((.tags // []) | join(",")), title, message, click}' \
+          <<< "$event" || true
         payload=$(jq -c --arg alerts "#alerts" --arg updates "#updates" --arg agents ${agentsChannel} \
           --arg agentsTopic ${agentsTopic} -f ${./ntfy-to-slack.jq} <<< "$event") || continue
         [ -n "$payload" ] || continue

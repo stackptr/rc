@@ -159,6 +159,14 @@ _: let
       summary = "{{ $labels.name }} on {{ $labels.instance }} has not triggered in over 26h";
     })
     (mkRule {
+      uid = "reboot-required";
+      title = "Reboot required";
+      # modules/nixos/reboot-required.nix; the series is absent when the
+      # booted kernel is current
+      expr = "(time() - nixos_reboot_required_since_seconds) / 86400 > 7";
+      summary = "{{ $labels.instance }} has run an older kernel than its active system for {{ printf \"%.0f\" $values.A.Value }} days; reboot it";
+    })
+    (mkRule {
       uid = "systemd-unit-restarting";
       title = "Systemd unit restart loop";
       # Restart= keeps a crash-looping unit out of the failed state, so the

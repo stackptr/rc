@@ -6,7 +6,12 @@
     v4 = "100.89.150.33";
     v6 = "fd7a:115c:a1e0::a033:9621";
   };
-  # The iPhone, iPad and the Macs that run the Paseo app
+  # Gatus on zeta checks that T3 answers
+  zeta = {
+    v4 = "100.100.142.9";
+    v6 = "fd7a:115c:a1e0::d33:8e09";
+  };
+  # The iPhone, iPad and the Macs that run the T3 Code app
   blip = {
     v4 = "100.71.241.100";
     v6 = "fd7a:115c:a1e0::1c33:f165";
@@ -22,5 +27,9 @@
   rhizome = {
     v4 = "100.89.6.21";
     v6 = "fd7a:115c:a1e0::7a33:615";
+  };
+  lobtop = {
+    v4 = "100.118.53.121";
+    v6 = "fd7a:115c:a1e0::fd33:3579";
   };
 }

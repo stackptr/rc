@@ -14,7 +14,6 @@
     enable = true;
     casks = [
       "legcord"
-      "paseo"
     ];
   };
 
@@ -51,7 +50,16 @@
     enable = true;
   };
 
+  programs.meetingbar = {
+    enable = true;
+    startOnActivation = true;
+  };
+
   programs.netnewswire = {
+    enable = true;
+  };
+
+  programs.obsidian = {
     enable = true;
   };
 
@@ -75,8 +83,25 @@
     startOnActivation = true;
   };
 
+  programs.slack = {
+    enable = true;
+  };
+
   programs.soundsource = {
     enable = true;
     startOnActivation = true;
+  };
+
+  programs.t3-code = {
+    enable = true;
+  };
+
+  programs.things = {
+    enable = true;
+  };
+
+  programs.zed = {
+    enable = true;
+    enableDefaults = true;
   };
 }

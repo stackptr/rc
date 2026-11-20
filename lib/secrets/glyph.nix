@@ -19,7 +19,6 @@ in
     "pgadmin-client-secret"
     "pgadmin-password"
     "opencode-env"
-    "paseo-env"
     "claude-code-env"
     "restic-env"
     "restic-password"
@@ -32,4 +31,7 @@ in
     # teleomycete's key: kept with the other GitHub App keys, but glyph mints
     # the agents' tokens with it, so unlike them it's also encrypted to glyph
     "lib/admin/github-apps/teleomycete.age".publicKeys = [keys.glyph] ++ keys.admins;
+    # teleometer's key: glyph logs GitHub Actions history with it
+    # (hosts/glyph/services/github-actions-log.nix)
+    "lib/admin/github-apps/teleometer.age".publicKeys = [keys.glyph] ++ keys.admins;
   }

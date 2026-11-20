@@ -63,16 +63,11 @@ in {
           if cfg.ai.gateway.enable
           then profile.agent
           else profile."agent-standalone";
-        # propose-rule is currently the only skill. Its fallback (leaving a
-        # note in Basic Memory for a later session) needs the gateway, and
-        # on a work machine, proposed rule changes shouldn't go to a public
-        # repo anyway — so skip skills entirely when the gateway is disabled.
         # One entry per skill, rather than the directory, so other configs
-        # can add their own (Paseo's agents on glyph, hosts/glyph/services/agents.nix)
-        skills = lib.optionalAttrs cfg.ai.gateway.enable (
+        # can add their own
+        skills =
           lib.mapAttrs (name: _: "${profile.skills}/${name}")
-          (lib.filterAttrs (_: type: type == "directory") (builtins.readDir profile.skills))
-        );
+          (lib.filterAttrs (_: type: type == "directory") (builtins.readDir profile.skills));
         settings = {
           model = "sonnet";
           # Disabled in favor of Basic Memory MCP for cross-device access
@@ -83,6 +78,10 @@ in {
               GIT_CONFIG_COUNT = "1";
               GIT_CONFIG_KEY_0 = "commit.gpgsign";
               GIT_CONFIG_VALUE_0 = "false";
+              # The documented default. Some builds (2.1.318 on Rhizome) chose
+              # system alone, and on macOS 27 Claude Code reads almost nothing
+              # from the system store, so every request failed TLS.
+              CLAUDE_CODE_CERT_STORE = "bundled,system";
             }
             // lib.optionalAttrs cfg.ai.telemetry.enable {
               CLAUDE_CODE_ENABLE_TELEMETRY = "1";
@@ -257,6 +256,27 @@ in {
         ];
       };
     })
+
+    # Answering bot reviews is most of what agents write through `gh api`,
+    # and each reply would otherwise ask. Ask rules can't make exceptions,
+    # so these scripts do just that, outside `gh api`'s rules: list a PR's
+    # open review threads, reply to a bot's thread, and resolve one. The
+    # last two refuse threads a person started. gh-review-reply-human
+    # replies to those and isn't allowed here: llm-profile's
+    # address-pr-review skill allows it while that skill runs. They call the
+    # `gh` on PATH, so on glyph they act as the agents' GitHub app, not as me.
+    (mkIf cfg.ai.enable (let
+      script = name:
+        pkgs.writeShellApplication {
+          inherit name;
+          runtimeInputs = [pkgs.jq];
+          text = builtins.readFile ./gh-review/${name}.sh;
+        };
+      allowed = ["gh-review-threads" "gh-review-reply" "gh-resolve-thread"];
+    in {
+      home.packages = map script (allowed ++ ["gh-review-reply-human"]);
+      programs.claude-code.settings.permissions.allow = map (name: "Bash(${name} *)") allowed;
+    }))
 
     (mkIf (cfg.ai.enable && cfg.ai.gateway.enable) {
       programs.mcp = {
