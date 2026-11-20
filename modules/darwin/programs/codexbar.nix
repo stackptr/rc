@@ -18,6 +18,15 @@ in {
   # the app rewrites whole, so they stay unmanaged.
   config = mkIf cfg.enable {
     homebrew.casks = ["codexbar"];
+    system.defaults.CustomUserPreferences = {
+      "com.steipete.codexbar" = {
+        usageBarsShowUsed = true;
+        tokenCostUsageEnabled = false;
+        limitResetNotificationsEnabled = true;
+        quotaWarningNotificationsEnabled = true;
+        predictivePaceWarningNotificationsEnabled = true;
+      };
+    };
     system.startOnActivation = mkIf cfg.startOnActivation {
       CodexBar = "/Applications/CodexBar.app/";
     };
