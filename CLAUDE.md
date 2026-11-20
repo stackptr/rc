@@ -14,7 +14,7 @@ Layout:
 - `modules/`: shared modules: `base/` (all hosts: nix settings, GC, unfree packages), `nixos/`, `darwin/`, `home/` (home-manager modules)
 - `home/`: the home-manager configuration every host imports
 - `lib/hosts.nix`: host builders (`mkNixosHost`, `mkDarwinHost`); `lib/keys.nix`, `lib/secrets/`: SSH keys and agenix recipients
-- `overlays/`: package overrides, listed in `overlays/default.nix` with a comment saying why each exists
+- `overlays/`: package overrides, listed in `overlays/default.nix` with a comment saying why each exists; `pinned.json`: packages pinned to an older nixpkgs while broken (see "A package broken in nixpkgs")
 - `packages/<name>/package.nix`: packages not in nixpkgs, exposed by `overlays/custom-packages.nix`
 
 ## Common Commands
@@ -145,6 +145,8 @@ If `nix` is installed, run `scripts/fmt-sandboxed` instead of `nix fmt .`. Cloud
 **Did a commit change a host's system?** Compare `scripts/normalized-system.nix` at both commits (`nix eval --raw --file scripts/normalized-system.nix --apply 'f: f { flake = "git+file://<repo>?rev=<sha>"; host = "glyph"; }'`), not the raw toplevel: `system.configurationRevision` and glyph's rc-source copy of the repo (`"${inputs.self}"`) change every host's or glyph's derivation on every commit. `nix eval --file` doesn't call a function with `--argstr`, hence `--apply`; and a Nix path literal there (`/var/empty`) is copied into the store, so it fails where the path doesn't exist: use a string. `git+file` with `rev` works from a detached checkout with no local branch.
 
 **`lib.mkForce` vs `lib.mkDefault`:** a host that must diverge from a value a shared module sets uses `lib.mkForce`; without it Nix errors on the conflicting definitions. A shared module that wants hosts to override freely sets `lib.mkDefault` instead. Example: `modules/base/gc.nix` sets `nix.gc.dates = "weekly"`, and `hosts/spore/default.nix` overrides it with `lib.mkForce "daily"`.
+
+**A package broken in nixpkgs** (it fails to build, so a flake update's CI fails): work around it in its own PR from main, never on the update branch, which the next Update run force-pushes. Every workaround gets an issue from the Workaround template (label `workaround`): what breaks, the PR that works around it, the upstream fix, and when to remove it; the code doesn't reference the issue, so start from the issue to find a workaround to remove. For a test-only failure, prefer an override that skips the tests (`overlays/paho-mqtt.nix`), which keeps the package current. Otherwise pin it: `git fetch && scripts/pin-package add <attr>` adds it to `overlays/pinned.json` with the nixpkgs revision in origin/main's `flake.lock` (the last one every host built on), and `overlays/pinned.nix` takes it from that revision with `builtins.fetchTree`; `scripts/pin-package remove <attr>` drops it. The script needs only git and jq, so agents can run it. Each pin keeps its own revision, so pinning a second package never moves the first. Only top-level attributes can be pinned: a library from another nixpkgs mixed into today's package set mixes two closures, so pin the application that uses it. The pin's CI on main proves little, since main's revision still builds the package; the next Update run is the test. A pinned package gets no security fixes until the pin goes, so remove it as soon as upstream builds again.
 
 ## Monitoring Stack
 
