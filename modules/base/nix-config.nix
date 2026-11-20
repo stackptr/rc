@@ -8,7 +8,9 @@
   ...
 }: {
   nix = {
-    registry = lib.mapAttrs (_: value: {flake = value;}) inputs;
+    # Not self, nor systems (a path inside self): their store paths change on
+    # every commit, and so would every host's system
+    registry = lib.mapAttrs (_: value: {flake = value;}) (removeAttrs inputs ["self" "systems"]);
     nixPath = lib.mapAttrsToList (key: value: "${key}=${value.to.path}") config.nix.registry;
     settings = {
       experimental-features = ["nix-command" "flakes"];
