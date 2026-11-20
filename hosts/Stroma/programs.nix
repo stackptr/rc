@@ -42,6 +42,18 @@
   };
   rc.darwin.defaults.fastscripts = true;
 
+  # The GoodLinks API, on the tailnet at stroma:9429 for the goodlinks MCP
+  # server on glyph. The address is Stroma's Tailscale IPv4.
+  programs.goodlinks = {
+    enable = true;
+    api.enable = true;
+    keepRunning = true;
+    api.forward = {
+      enable = true;
+      address = "100.122.26.71";
+    };
+  };
+
   programs.iina = {
     enable = true;
   };
