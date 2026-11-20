@@ -2,6 +2,7 @@
   imports = [
     ./chromium.nix
     ./cmux.nix
+    ./codexbar.nix
     ./daisydisk.nix
     ./fastscripts.nix
     ./iina.nix

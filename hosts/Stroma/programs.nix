@@ -32,6 +32,11 @@
     enableDefaults = true;
   };
 
+  programs.codexbar = {
+    enable = true;
+    startOnActivation = true;
+  };
+
   programs.daisydisk = {
     enable = true;
   };

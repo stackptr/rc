@@ -75,6 +75,12 @@
     enableDefaults = true;
   };
 
+  programs.codexbar = {
+    enable = true;
+    startOnActivation = true;
+    enableNotifications = true;
+  };
+
   programs.t3-code = {
     enable = true;
   };
