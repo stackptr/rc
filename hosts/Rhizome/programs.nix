@@ -97,6 +97,7 @@
 
   programs.t3-code = {
     enable = true;
+    enableDefaults = true;
   };
 
   programs.things = {
