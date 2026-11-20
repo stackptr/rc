@@ -12,10 +12,6 @@ in {
     startOnActivation = mkEnableOption "starting CodexBar on activation";
   };
 
-  # The cask rather than nixpkgs' codexbar, which trails releases and wraps the
-  # GUI binary as `codexbar`; the cask links the real CLI. Provider settings
-  # (the Claude source included) live in ~/.config/codexbar/config.json, which
-  # the app rewrites whole, so they stay unmanaged.
   config = mkIf cfg.enable {
     homebrew.casks = ["codexbar"];
     system.defaults.CustomUserPreferences = {
