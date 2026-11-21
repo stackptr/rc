@@ -2,7 +2,6 @@
   config,
   lib,
   pkgs,
-  username,
   ...
 }:
 with lib; let
@@ -42,7 +41,7 @@ in {
 
   config = mkIf cfg.enable {
     environment.systemPackages = [cfg.package];
-    home-manager.users.${username}.home.file = lib.listToAttrs (map (extId: {
+    home-manager.users.${config.system.primaryUser}.home.file = lib.listToAttrs (map (extId: {
         name = "${cfg.configDir}/External Extensions/${extId}.json";
         value.text = builtins.toJSON {};
       })

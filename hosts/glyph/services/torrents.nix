@@ -1,9 +1,11 @@
 {
   config,
   pkgs,
-  pkgs-stable-24-05,
+  inputs,
   ...
-}: {
+}: let
+  pkgs-stable-24-05 = inputs.nixpkgs-stable-24-05.legacyPackages.${pkgs.stdenv.hostPlatform.system};
+in {
   services.transmission = {
     enable = true;
     package = pkgs-stable-24-05.transmission_4;

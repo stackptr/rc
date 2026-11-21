@@ -1,7 +1,6 @@
 {
   pkgs,
   lib,
-  showBatteryStatus,
   ...
 }: let
   tmux-nerd-font-window-name = pkgs.tmuxPlugins.mkTmuxPlugin {
@@ -77,7 +76,7 @@ in {
         }
         tmuxPlugins.yank
       ]
-      ++ lib.optionals showBatteryStatus [
+      ++ lib.optionals pkgs.stdenv.hostPlatform.isDarwin [
         {
           plugin = tmuxPlugins.battery;
           extraConfig = ''

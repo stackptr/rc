@@ -2,7 +2,6 @@
   config,
   lib,
   pkgs,
-  username,
   ...
 }:
 with lib; let
@@ -134,7 +133,7 @@ in {
     (mkIf cfg.enable {
       homebrew.casks = ["cmux"];
 
-      home-manager.users.${username} = {
+      home-manager.users.${config.system.primaryUser} = {
         xdg.configFile."cmux/cmux.json" = {
           source = jsonFormat.generate "cmux-config" ({
               "$schema" = "https://raw.githubusercontent.com/manaflow-ai/cmux/main/web/data/cmux.schema.json";
