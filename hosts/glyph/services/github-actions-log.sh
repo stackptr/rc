@@ -116,7 +116,9 @@ for repo in $repos; do
         run_seconds: ((.updated_at | fromdate) - (.run_started_at | fromdate)),
         unacquired_jobs: $unacquired_jobs, url: .html_url
       }' <<<"$run" >>"$out"
-  done <"$runs"
+  # Oldest first, so the latest run of a job is also its latest line, which
+  # last_over_time in the Builds dashboard relies on. The API lists newest first.
+  done < <(jq -sc 'sort_by(.updated_at)[]' "$runs")
 
   cat "$out"
   printf '%s\n' "$until" >"$state"
