@@ -74,6 +74,8 @@ in {
         controlMaster = "auto";
         controlPersist = "10m";
       });
+      matchBlocks."glyph spore zeta glyph.note-iwato.ts.net spore.note-iwato.ts.net zeta.note-iwato.ts.net".user = "mu";
+      matchBlocks."stroma stroma.note-iwato.ts.net".user = "corey";
       extraConfig = ''
         IgnoreUnknown UseKeychain
         UseKeychain yes
