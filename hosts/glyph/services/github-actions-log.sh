@@ -1,7 +1,7 @@
 # Logs the GitHub Actions runs that completed since the last poll, in every
 # repo the app is installed on, as JSON lines on stdout, which journald hands
 # to Loki: one per job ("kind":"job"), one per run ("kind":"run"), and the
-# tail of each failed job's log ("kind":"log"). Run hourly by
+# tail of each failed job's log ("kind":"log"). Run every 15 minutes by
 # github-actions-log.service (./github-actions-log.nix), which sets
 # APP_CLIENT_ID, APP_OWNER and APP_KEY.
 
