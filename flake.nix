@@ -75,6 +75,14 @@
     };
     nix-homebrew = {
       url = "github:zhaofengli/nix-homebrew";
+      inputs.brew-src.follows = "brew-src";
+    };
+    # Ahead of nix-homebrew's pin (7.0.11): homebrew-core's bottle blocks use
+    # manifest_sha256 since brew 7.0.14, and older brew can't read them. Drop
+    # this once nix-homebrew pins 7.0.14 or later (#901).
+    brew-src = {
+      url = "github:Homebrew/brew/7.0.15";
+      flake = false;
     };
     homebrew-core = {
       url = "github:homebrew/homebrew-core";

@@ -6,6 +6,7 @@ inputs @ {
   home-manager,
   nix-darwin,
   nix-homebrew,
+  brew-src,
   homebrew-core,
   homebrew-cask,
   llm-profile,
@@ -117,6 +118,15 @@ inputs @ {
             enable = true;
             enableRosetta = false;
             user = username;
+            # nix-homebrew labels brew with its own pin's version, not the override's
+            package = let
+              version = (builtins.fromJSON (builtins.readFile ./../flake.lock)).nodes.brew-src.original.ref;
+            in
+              brew-src
+              // {
+                name = "brew-${version}";
+                inherit version;
+              };
             taps = {
               "homebrew/homebrew-core" = homebrew-core;
               "homebrew/homebrew-cask" = homebrew-cask;
