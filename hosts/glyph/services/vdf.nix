@@ -25,6 +25,8 @@ in {
     ];
   };
 
+  systemd.services.podman-vdf.unitConfig.RequiresMountsFor = "/mnt/archive";
+
   systemd.tmpfiles.rules = [
     "d ${dataDir} 0750 root root - -"
     "d ${dataDir}/config 0750 root root - -"
