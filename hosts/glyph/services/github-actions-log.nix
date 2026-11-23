@@ -1,4 +1,4 @@
-# GitHub Actions history in Loki, for Grafana and the agents: every hour,
+# GitHub Actions history in Loki, for Grafana and the agents: every 15 minutes,
 # ./github-actions-log.sh logs each run and job completed in the repos the
 # teleometer app is installed on, with the tail of each failed job's log,
 # as JSON lines in this unit's journal:
@@ -61,7 +61,7 @@ in {
   systemd.timers.github-actions-log = {
     wantedBy = ["timers.target"];
     timerConfig = {
-      OnCalendar = "hourly";
+      OnCalendar = "*:0/15";
       Persistent = true;
     };
   };

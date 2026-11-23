@@ -1,7 +1,7 @@
 # Logs the GitHub Actions runs that completed since the last poll, in every
 # repo the app is installed on, as JSON lines on stdout, which journald hands
 # to Loki: one per job ("kind":"job"), one per run ("kind":"run"), and the
-# tail of each failed job's log ("kind":"log"). Run hourly by
+# tail of each failed job's log ("kind":"log"). Run every 15 minutes by
 # github-actions-log.service (./github-actions-log.nix), which sets
 # APP_CLIENT_ID, APP_OWNER and APP_KEY.
 
@@ -116,7 +116,9 @@ for repo in $repos; do
         run_seconds: ((.updated_at | fromdate) - (.run_started_at | fromdate)),
         unacquired_jobs: $unacquired_jobs, url: .html_url
       }' <<<"$run" >>"$out"
-  done <"$runs"
+  # Oldest first, so the latest run of a job is also its latest line, which
+  # last_over_time in the Builds dashboard relies on. The API lists newest first.
+  done < <(jq -sc 'sort_by(.updated_at)[]' "$runs")
 
   cat "$out"
   printf '%s\n' "$until" >"$state"
