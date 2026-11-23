@@ -2,6 +2,7 @@
 {
   imports = [
     ./gc.nix
+    ./host.nix
     ./nix-config.nix
     ./unfree-packages.nix
   ];

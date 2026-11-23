@@ -1,8 +1,8 @@
 {
   config,
   lib,
+  osConfig,
   pkgs,
-  hostname,
   ...
 }: let
   inherit (lib) mkIf mkOption;
@@ -10,7 +10,7 @@
   cfg = config.rc.ssh;
 
   # This Mac's Secretive key, if it has one (lib/keys.nix)
-  secureEnclaveKey = (import ../../lib/keys.nix).secureEnclave.${hostname} or null;
+  secureEnclaveKey = (import ../../lib/keys.nix).secureEnclave.${osConfig.rc.host.name} or null;
   hasSecureEnclaveKey = secureEnclaveKey != null;
 in {
   options = {

@@ -14,6 +14,7 @@ Layout:
 - `modules/`: shared modules: `base/` (all hosts: nix settings, GC, unfree packages), `nixos/`, `darwin/`, `home/` (home-manager modules)
 - `home/`: the home-manager configuration every host imports
 - `lib/hosts.nix`: host builders (`mkNixosHost`, `mkDarwinHost`); `lib/keys.nix`, `lib/secrets/`: SSH keys and agenix recipients
+- The only special argument is `inputs` (system and home-manager modules). Everything else about the host comes from config: `config.networking.hostName` on NixOS, `config.system.primaryUser` on macOS (the NixOS user is always `mu`), `rc.host.name` on both (home-manager reads `osConfig.rc.host.name`, since nix-darwin's `networking.hostName` is null on Rhizome and Stroma), and `import ../../lib/keys.nix` for keys. A lightweight host (zeta, spore) skips `home/full.nix`
 - `overlays/`: package overrides, listed in `overlays/default.nix` with a comment saying why each exists
 - `packages/<name>/package.nix`: packages not in nixpkgs, exposed by `overlays/custom-packages.nix`
 
