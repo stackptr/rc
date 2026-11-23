@@ -2,6 +2,10 @@
 # images in /mnt/archive. dupes.zx.dev on spore, behind Pocket ID.
 _: let
   dataDir = "/var/lib/vdf";
+  # The scanner's own log (ffmpeg and file errors), which VDF writes only to
+  # log.txt next to its binary; Alloy ships it as {app="vdf"}. Outside
+  # dataDir so Alloy's dynamic user can read it.
+  logFile = "/var/log/vdf/log.txt";
 in {
   virtualisation.oci-containers.containers.vdf = {
     # Upstream's :latest is a daily build; bump the release by hand
@@ -19,6 +23,7 @@ in {
       "/mnt/archive:/mnt/archive:ro"
       "${dataDir}/config:/root/.config/VDF"
       "${dataDir}/state:/root/.local/state/VDF"
+      "${logFile}:/app/log.txt"
     ];
     # tailscale0 is trusted, so no firewall rule
     ports = ["8087:8080"];
@@ -34,5 +39,19 @@ in {
     "d ${dataDir} 0750 root root - -"
     "d ${dataDir}/config 0750 root root - -"
     "d ${dataDir}/state 0750 root root - -"
+    "d /var/log/vdf 0755 root root - -"
+    # The bind mount needs the file to exist before the container starts
+    "f ${logFile} 0644 root root - -"
   ];
+
+  # copytruncate keeps the inode the container's bind mount points at
+  services.logrotate.settings.vdf = {
+    files = logFile;
+    frequency = "weekly";
+    rotate = 4;
+    copytruncate = true;
+    compress = true;
+    missingok = true;
+    notifempty = true;
+  };
 }
