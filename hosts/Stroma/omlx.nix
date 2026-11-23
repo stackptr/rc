@@ -93,6 +93,8 @@ in {
   # switch that changes them reloads the daemon.
   launchd.daemons.omlx.script = ''
     set -eu
+    # oMLX creates it on first start, but the merge below runs before that
+    mkdir -p ${basePath}
     umask 077
     ${mergeInto "${basePath}/settings.json" (json.generate "omlx-settings.json" settings)}
     ${mergeInto "${basePath}/model_settings.json" (json.generate "omlx-model-settings.json" modelSettings)}
