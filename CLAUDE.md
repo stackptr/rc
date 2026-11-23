@@ -151,7 +151,7 @@ If `nix` is installed, run `scripts/fmt-sandboxed` instead of `nix fmt .`. Cloud
 Grafana, Loki and Prometheus on glyph. Use them before `journalctl` or SSH when investigating failures, slowness or disk issues.
 
 - **Grafana** (glyph:3000, `monitoring.zx.dev` via spore): config in `hosts/glyph/services/grafana.nix`; the image renderer (localhost:8081) backs `get_panel_image`.
-- **Loki** (glyph:3100): journald from glyph, spore and zeta via Alloy, oMLX's log from Stroma, plus Claude Code events over OTLP; 30 days.
+- **Loki** (glyph:3100): journald from glyph, spore and zeta via Alloy, oMLX's log from Stroma, VDF's scan log on glyph (`{app="vdf"}`), plus Claude Code events over OTLP; 30 days.
 - **Prometheus** (glyph:9099): scrapes glyph, spore, zeta and Stroma (node_exporter, mactop, json_exporter for oMLX, Alloy; `hosts/Stroma/monitoring.nix`), plus OTLP pushes; 90 days.
 - **CI failures**: the `notify` job in `.github/workflows/ci.yml` posts to #alerts as Hypha through `stackptr/actions/slack-notify` (pinned by SHA; needs `SLACK_BOT_TOKEN` from the main-only `notify` environment and `permissions: actions: read`; only runs of main post, and PR failures show on the PR). Test a change to it with `dry-run: true`.
 - **Port scan**: `.github/workflows/port-scan.yml` scans every TCP port on spore's public address daily from a GitHub runner and posts to #alerts if one is open that spore's firewall on main doesn't allow, or if nothing is open at all. The expected list comes from evaluating spore's config, so there's nothing to update by hand. Home has no public services to scan beyond glyph's Transmission forward.
@@ -191,7 +191,7 @@ Journald streams carry these labels:
 | `priority` | `PRIORITY` | `0`–`7` (0=emerg, 3=err, 4=warn, 6=info, 7=debug) |
 | `app` | `SYSLOG_IDENTIFIER` | `navidrome`, `nginx`, `kernel` |
 
-**Podman containers log everything at `priority="3"`:** oci-containers units (`podman-<name>.service` on glyph: audiomuse-flask, audiomuse-worker, open-terminal) write the containers' stderr to the journal at err, INFO lines included, so `priority=~"[0-3]"` matches everything. Filter on the text instead, e.g. `|~ "\\[(ERROR|CRITICAL|WARNING)\\]|Traceback"`.
+**Podman containers log everything at `priority="3"`:** oci-containers units (`podman-<name>.service` on glyph: audiomuse-flask, audiomuse-worker, open-terminal) write the containers' stderr to the journal at err, INFO lines included, so `priority=~"[0-3]"` matches everything. Filter on the text instead, e.g. `|~ "\\[(ERROR|CRITICAL|WARNING)\\]|Traceback"`. conmon (2.2+) takes the priority from a `<N>` prefix at the start of a line instead, so a container that writes one gets real priorities: VDF does, through .NET's systemd console formatter (`Logging__Console__FormatterName`), and its stdout would otherwise all land at info.
 
 **Alloy journal relabel names:** the source label is `__journal_` plus the lowercased field name, so `_SYSTEMD_UNIT` becomes `__journal__systemd_unit` (double underscore) and `PRIORITY` becomes `__journal_priority`.
 

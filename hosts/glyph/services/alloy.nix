@@ -24,6 +24,52 @@ _: {
       forward_to    = [loki.write.local.receiver]
     }
 
+    // Video Duplicate Finder's scanner log (vdf.nix). Lines are
+    // "HH:mm:ss => [ERROR] text", tagged only for warnings and errors, plus a
+    // blank line and a dashed banner at the start of each scan.
+    local.file_match "vdf" {
+      path_targets = [{"__path__" = "/var/log/vdf/log.txt", "app" = "vdf"}]
+    }
+
+    loki.source.file "vdf" {
+      targets    = local.file_match.vdf.targets
+      forward_to = [loki.process.vdf.receiver]
+    }
+
+    loki.process "vdf" {
+      stage.drop {
+        expression = "^\\s*$"
+      }
+
+      // A message with newlines (an exception) continues on lines without
+      // the timestamp
+      stage.multiline {
+        firstline     = "^(\\d{2}:\\d{2}:\\d{2} => |-{60} )"
+        max_wait_time = "3s"
+      }
+
+      stage.regex {
+        expression = "^\\S+ => \\[(?P<level>ERROR|WARNING)\\] "
+      }
+
+      // The journald priority numbers, so {priority=~"[0-3]"} finds VDF's
+      // scan errors too
+      stage.template {
+        source   = "priority"
+        template = "{{ if eq .level \"ERROR\" }}3{{ else if eq .level \"WARNING\" }}4{{ else }}6{{ end }}"
+      }
+
+      stage.labels {
+        values = {priority = ""}
+      }
+
+      stage.label_drop {
+        values = ["filename"]
+      }
+
+      forward_to = [loki.write.local.receiver]
+    }
+
     // CPU, memory and disk I/O per systemd unit and slice, from cgroups.
     // Prometheus scrapes it from Alloy's own server (the cadvisor job in
     // prometheus.nix). docker_only limits it to the root cgroup and the
