@@ -12,11 +12,11 @@
 # directory name). oMLX rewrites both files from the admin dashboard
 # (http://127.0.0.1:8000/admin), so they can't be store symlinks. Instead
 # `settings` and `modelSettings` below are deep-merged into them before each
-# start: declared keys win, and everything else (API keys and sub-keys,
-# server_aliases, models' pinned/default flags) stays editable in the
-# dashboard. A dashboard change to a declared key lasts until the next
-# restart. Declare only values that differ from oMLX's defaults, so new
-# defaults arrive with upgrades.
+# start, along with the master API key from agenix: declared keys win, and
+# everything else (sub-keys, server_aliases, models' pinned/default flags)
+# stays editable in the dashboard. A dashboard change to a declared key
+# lasts until the next restart. Declare only values that differ from oMLX's
+# defaults, so new defaults arrive with upgrades.
 {
   config,
   inputs,
@@ -38,7 +38,8 @@
       # All interfaces, so Open WebUI on glyph reaches it over the tailnet
       # (http://stroma.note-iwato.ts.net:8000/v1). On anything but a
       # loopback-only bind oMLX requires an API key for every request
-      # except /health, local ones included.
+      # except /health, local ones included, and won't start without
+      # auth.api_key (omlx-api-key below).
       host = "0.0.0.0";
       port = 8000;
     };
@@ -62,11 +63,16 @@
   };
 
   # A missing file starts from {}; jq's `*` merges objects recursively and
-  # replaces arrays. Written to a temp file and renamed, as oMLX does, with
-  # its 0600 mode (settings.json holds the API keys).
-  mergeInto = file: declared: ''
+  # replaces arrays. `filter` runs after the merge, with `args` passed to jq.
+  # Written to a temp file and renamed, as oMLX does, with its 0600 mode
+  # (settings.json holds the API keys).
+  mergeInto = file: declared: {
+    args ? "",
+    filter ? "",
+  }: ''
     { cat ${file} 2>/dev/null || echo '{}'; } \
-      | ${lib.getExe pkgs.jq} --slurpfile declared ${declared} '. * $declared[0]' \
+      | ${lib.getExe pkgs.jq} --slurpfile declared ${declared} ${args} \
+        '. * $declared[0]${filter}' \
       > ${file}.nix.tmp
     mv ${file}.nix.tmp ${file}
   '';
@@ -96,14 +102,25 @@ in {
     # oMLX creates it on first start, but the merge below runs before that
     mkdir -p ${basePath}
     umask 077
-    ${mergeInto "${basePath}/settings.json" (json.generate "omlx-settings.json" settings)}
-    ${mergeInto "${basePath}/model_settings.json" (json.generate "omlx-model-settings.json" modelSettings)}
+    ${mergeInto "${basePath}/settings.json" (json.generate "omlx-settings.json" settings) {
+      args = "--rawfile apiKey ${config.age.secrets.omlx-api-key.path}";
+      filter = ''| .auth.api_key = ($apiKey | rtrimstr("\n"))'';
+    }}
+    ${mergeInto "${basePath}/model_settings.json" (json.generate "omlx-model-settings.json" modelSettings) {}}
     # The keg's opt/ link, as the formula's own service uses: bin/omlx can
     # be taken by something else (the menubar app installs its CLI there),
     # and then `brew link` fails and bin/omlx isn't Homebrew's. --base-path
     # is explicit so it doesn't depend on the menubar app's base-path file.
     exec ${optLink}/bin/omlx serve --base-path ${basePath}
   '';
+
+  # Decrypted at boot, before login. If the daemon starts first, the merge
+  # fails and launchd retries.
+  age.secrets.omlx-api-key = {
+    file = ./secrets/omlx-api-key.age;
+    owner = user;
+  };
+
   launchd.daemons.omlx.serviceConfig = {
     UserName = user;
     EnvironmentVariables = {
