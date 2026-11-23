@@ -9,6 +9,9 @@ in {
     environment = {
       # Pocket ID on spore is the gate, as for AudioMuse
       VDF_WEB_AUTH = "false";
+      # One line per entry with a <N> prefix, which conmon turns into the
+      # journal priority; otherwise every line lands at 6 (stdout)
+      Logging__Console__FormatterName = "systemd";
     };
     volumes = [
       # Same path inside, so results match filebrowser and Samba. Read-only:
