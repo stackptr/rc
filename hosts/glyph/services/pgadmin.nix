@@ -62,6 +62,9 @@ in {
       ];
       # Nothing to encrypt: the server entry has no saved password
       MASTER_PASSWORD_REQUIRED = false;
+      # Since 9.19, server mode refuses a libpq service not listed here. The
+      # service holds no password, and only one user can log in.
+      SERVER_MODE_ALLOWED_SERVICES = ["glyph"];
     };
   };
 
