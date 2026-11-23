@@ -140,6 +140,15 @@ in {
             description = "AudioMuse-AI's web container on glyph is not answering, so Navidrome's audiomuseai plugin can't reach it";
           })
           (mkEndpoint {
+            name = "vdf";
+            group = "glyph";
+            # The UI itself: VDF has no health endpoint, and its own auth is
+            # off, so / answers 200 (dupes.zx.dev's Pocket ID is on spore)
+            url = "http://${glyph}:8087/";
+            conditions = ["[STATUS] == 200"];
+            description = "Video Duplicate Finder on glyph is not answering, so dupes.zx.dev is down; check podman-vdf.service";
+          })
+          (mkEndpoint {
             name = "t3-code";
             group = "glyph";
             # T3's unauthenticated environment descriptor; glyph's firewall

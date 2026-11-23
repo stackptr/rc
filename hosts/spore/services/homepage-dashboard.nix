@@ -198,6 +198,13 @@ in {
             };
           }
           {
+            "Video Duplicate Finder" = {
+              description = "Duplicates in /mnt/archive";
+              href = "https://dupes.zx.dev";
+              icon = "mdi-content-duplicate";
+            };
+          }
+          {
             "pgAdmin" = {
               description = "Databases on glyph";
               href = "https://db.zx.dev";

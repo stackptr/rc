@@ -31,6 +31,7 @@
     ./samba.nix
     ./webdav.nix
     ./torrents.nix
+    ./vdf.nix
   ];
   users.groups.media = {};
   users.users.mu.extraGroups = ["media"];
