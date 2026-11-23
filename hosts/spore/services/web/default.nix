@@ -197,6 +197,17 @@
           '';
         };
       };
+      "dupes.zx.dev" = {
+        forceSSL = true;
+        useACMEHost = "zx.dev";
+        # The only gate: Video Duplicate Finder's own auth is off
+        requireAuth = true;
+        locations."/" = {
+          proxyPass = "http://glyph.note-iwato.ts.net:8087";
+          # Blazor Server keeps the UI on a SignalR websocket
+          proxyWebsockets = true;
+        };
+      };
       "db.zx.dev" = {
         forceSSL = true;
         useACMEHost = "zx.dev";
