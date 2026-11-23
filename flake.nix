@@ -79,7 +79,7 @@
     };
     # Ahead of nix-homebrew's pin (7.0.11): homebrew-core's bottle blocks use
     # manifest_sha256 since brew 7.0.14, and older brew can't read them. Drop
-    # this once nix-homebrew pins 7.0.14 or later.
+    # this once nix-homebrew pins 7.0.14 or later (#901).
     brew-src = {
       url = "github:Homebrew/brew/7.0.15";
       flake = false;
