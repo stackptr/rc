@@ -56,6 +56,11 @@ in {
         "Tot" = 1491071483;
         "wBlock" = 6746388723;
       };
+      casks = [
+        "claude"
+        "tailscale-app"
+        "whatsapp"
+      ];
     };
 
     programs.fastscripts = mkIf cfg.fastscripts {
