@@ -17,6 +17,7 @@
       "dash"
       "legcord"
       "textual"
+      "zoom"
     ];
   };
 
