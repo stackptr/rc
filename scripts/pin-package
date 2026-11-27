@@ -1,0 +1,60 @@
+#!/usr/bin/env bash
+# Pin a package that fails to build on the nixpkgs in flake.lock to the
+# revision main last built on, or drop its pin (overlays/pinned.nix).
+#
+#   scripts/pin-package add <attr>      # e.g. pgadmin4
+#   scripts/pin-package remove <attr>
+#
+# `add` takes the revision from origin/main's flake.lock, so fetch first. It
+# needs only git and jq, not nix: agents run it too.
+set -euo pipefail
+
+usage() {
+  echo "usage: $0 add|remove <attr>" >&2
+  exit 2
+}
+
+[[ $# -eq 2 ]] || usage
+action=$1
+attr=$2
+
+cd "$(git rev-parse --show-toplevel)"
+pins=overlays/pinned.json
+jq -e 'type == "object"' "$pins" >/dev/null || {
+  echo "$pins isn't a JSON object" >&2
+  exit 1
+}
+
+# Pins replace a top-level attribute only: a library from another nixpkgs in
+# today's package set (python3Packages.foo) mixes two closures. Pin the
+# application that uses it instead.
+if [[ ! $attr =~ ^[A-Za-z_][A-Za-z0-9_\'-]*$ ]]; then
+  echo "$attr: only top-level attributes can be pinned" >&2
+  exit 1
+fi
+
+case $action in
+add)
+  if jq -e --arg attr "$attr" 'has($attr)' "$pins" >/dev/null; then
+    echo "$attr is already pinned" >&2
+    exit 1
+  fi
+  lock=$(git show origin/main:flake.lock)
+  pin=$(jq -c '.nodes[.nodes.root.inputs.nixpkgs].locked | {rev, narHash}' <<<"$lock")
+  jq -S --arg attr "$attr" --argjson pin "$pin" '.[$attr] = $pin' "$pins" >"$pins.tmp"
+  echo "Pinned $attr to nixpkgs $(jq -r .rev <<<"$pin")"
+  ;;
+remove)
+  if ! jq -e --arg attr "$attr" 'has($attr)' "$pins" >/dev/null; then
+    echo "$attr isn't pinned" >&2
+    exit 1
+  fi
+  jq -S --arg attr "$attr" 'del(.[$attr])' "$pins" >"$pins.tmp"
+  echo "Unpinned $attr"
+  ;;
+*)
+  usage
+  ;;
+esac
+
+mv "$pins.tmp" "$pins"
